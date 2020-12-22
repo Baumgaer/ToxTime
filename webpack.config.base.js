@@ -65,9 +65,20 @@ module.exports = (_env, options, returnConfigObject) => {
                 use: [cacheLoaderSettings("serverJS"), threadLoaderSettings(), {
                     loader: 'babel-loader',
                     options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                useBuiltIns: "entry",
+                                targets: {
+                                    node: "current"
+                                },
+                                modules: false
+                            }]
+                        ],
                         plugins: [
                             "@babel/plugin-proposal-nullish-coalescing-operator",
-                            "@babel/plugin-proposal-optional-chaining"
+                            "@babel/plugin-proposal-optional-chaining",
+                            "@babel/plugin-transform-runtime",
+                            "@babel/plugin-proposal-object-rest-spread"
                         ],
                         sourceMap: 'inline'
                     }

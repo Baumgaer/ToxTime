@@ -1,7 +1,7 @@
 {
     "verbose": false,
     "watch": [
-        "./src/server/"
+        "./server.js"
     ],
     "env": {
         "NODE_ENV": "development",
@@ -13,7 +13,7 @@
         "DB_DATABASE_NAME": "ToxTime",
         "DB_USER": "",
         "DB_USER_PASSWORD": "",
-        "SESSION_SECRET": "",
+        "SESSION_SECRET": "no_secret",
         "SESSION_MAX_AGE": "1h",
         "PATH_STATIC_FILES": "./dist"
     }

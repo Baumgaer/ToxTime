@@ -9,6 +9,7 @@ import { createServer } from 'http';
 import path from "path";
 import { path as rootPath } from "app-root-path";
 import ms from "ms";
+import { createHash } from 'crypto';
 
 /**
  * This is base server of a web server with standard setup, security and basic routes
@@ -20,6 +21,7 @@ class WebServer {
     constructor() {
         this.app = express();
         this.server = createServer(this.app);
+        this.sessionSecret = createHash("sha512").update(process.env.SESSION_SECRET).digest("base64");
 
         this.setupGeneralSettings();
         this.setupSecurity();
@@ -40,16 +42,18 @@ class WebServer {
         this.app.use((request, response, next) => {
             const contentSecurityNonce = uuidV4();
             response.locals.cspNonce = contentSecurityNonce;
+
+            const styleSrc = ["'self'"];
+            const scriptSrc = styleSrc;
+            if (process.env.NODE_ENV === 'development') {
+                styleSrc.push("'unsafe-eval'", "'unsafe-inline'");
+            } else styleSrc.push(`'nonce-${contentSecurityNonce}'`);
+
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {
-                    directives: {
-                        defaultSrc: ["'self'"],
-                        scriptSrc: ["'self'", `'nonce-${contentSecurityNonce}'`].concat(process.env.NODE_ENV === 'development' ? ["'unsafe-eval'"] : []),
-                        styleSrc: ["'self'", `'nonce-${contentSecurityNonce}'`, "'sha256-rJJyMDPmHMZS0mPmL877gjjApxGMVa4522UDb4ctw7I='"]
-                    }
+                    directives: { defaultSrc: ["'self'"], scriptSrc, styleSrc }
                 }
             });
-            if (process.env.NODE_ENV === 'development' && request.path === "/api") return next();
             helmetMiddleWare(request, response, next);
         });
         this.app.use(hpp());
@@ -72,7 +76,7 @@ class WebServer {
         });
 
         this.app.use(expressSession({
-            secret: process.env.SESSION_SECRET,
+            secret: this.sessionSecret,
             cookie: { maxAge: ms(process.env.SESSION_MAX_AGE) },
             store,
             resave: true,
