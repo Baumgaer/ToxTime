@@ -2,7 +2,8 @@
 node_modules
 /dist
 /var
-
+/server.js
+/server.js.map
 
 # local env files
 .env
