@@ -10,6 +10,11 @@ import path from "path";
 import { path as rootPath } from "app-root-path";
 import ms from "ms";
 
+/**
+ * This is base server of a web server with standard setup, security and basic routes
+ *
+ * @class WebServer
+ */
 class WebServer {
 
     constructor() {
