@@ -2,7 +2,6 @@
     "name": "tox-time",
     "version": "0.1.0",
     "private": true,
-    "type": "module",
     "scripts": {
         "start": "nodemon --config ./config.json ./server.js",
         "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
