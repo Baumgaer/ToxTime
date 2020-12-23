@@ -9,7 +9,7 @@ Vue.use(VueI18n);
  * @returns {Record<string, Record<string, string>>} the locales messages
  */
 function loadLocaleMessages() {
-    const locales = require.context('./locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
+    const locales = require.context('~client/locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
     /** @type {Record<string, Record<string, string>>} */
     const messages = {};
     locales.keys().forEach(key => {

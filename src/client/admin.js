@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import router from "~client/router";
-import i18n from "~client/i18n";
+import i18n from "~client/controllers/i18n";
 import App from '~client/App.vue';
 
 Vue.config.productionTip = false;

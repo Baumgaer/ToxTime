@@ -86,6 +86,8 @@ class WebServer {
 
     setupRoutes() {
         this.app.use(expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
+        this.app.use("/admin", expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
+        this.app.use("/public", expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
     }
 
     start() {

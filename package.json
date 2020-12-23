@@ -5,10 +5,10 @@
     "scripts": {
         "start": "nodemon --config ./config.json ./server.js",
         "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-        "dev:frontend": "vue-cli-service build ./src/client/main.js --mode development --watch",
+        "dev:frontend": "vue-cli-service build --mode development --watch",
         "dev:backend": "webpack --progress --mode development --watch --config webpack.config.server.js",
         "dev:serve": "nodemon --config ./config.json -L --inspect=0.0.0.0:9001 ./server.js",
-        "build": "webpack --progress --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline ./src/client/main.js",
+        "build": "webpack --progress --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
         "lint": "vue-cli-service lint"
     },
     "dependencies": {

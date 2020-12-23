@@ -1,3 +1,5 @@
 {
-    "helloWorld": "Hallo Welt"
+    "helloWorld": "Hallo Welt",
+    "helloAdmin": "Hallo Administrator",
+    "helloLogin": "Hallo Login"
 }
