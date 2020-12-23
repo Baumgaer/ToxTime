@@ -45,6 +45,8 @@ module.exports = (env, options, returnConfigObject) => {
         }
     });
 
+    settings.output.libraryTarget = "commonjs";
+
     ///////////////////////////////////
     // EXTEND BUILD PLUGINS
     // @ts-ignore

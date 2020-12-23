@@ -69,18 +69,20 @@ module.exports = (_env, options, returnConfigObject) => {
                             ['@babel/preset-env', {
                                 useBuiltIns: "entry",
                                 targets: {
-                                    node: "current"
+                                    node: true
                                 },
-                                modules: false
+                                modules: "commonjs"
                             }]
                         ],
                         plugins: [
                             "@babel/plugin-proposal-nullish-coalescing-operator",
                             "@babel/plugin-proposal-optional-chaining",
-                            "@babel/plugin-transform-runtime",
-                            "@babel/plugin-proposal-object-rest-spread"
-                        ],
-                        sourceMap: 'inline'
+                            // "@babel/plugin-transform-runtime",
+                            // "@babel/plugin-proposal-object-rest-spread",
+                            // "@babel/plugin-transform-modules-commonjs",
+                            // "@babel/plugin-syntax-export-default-from",
+                            // "@babel/plugin-proposal-export-default-from"
+                        ]
                     }
                 }]
             }]

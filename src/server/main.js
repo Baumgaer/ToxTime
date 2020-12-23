@@ -1,3 +1,6 @@
+import { install } from "source-map-support";
+if (process.env.NODE_ENV === "development") install();
+
 import express, { json, urlencoded, static as expressStatic } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';
@@ -10,6 +13,7 @@ import path from "path";
 import { path as rootPath } from "app-root-path";
 import ms from "ms";
 import { createHash } from 'crypto';
+import { toURIPathPart } from "~common/utils";
 
 /**
  * This is base server of a web server with standard setup, security and basic routes
@@ -86,8 +90,14 @@ class WebServer {
 
     setupRoutes() {
         this.app.use(expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
-        this.app.use("/admin", expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
-        this.app.use("/public", expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
+        const apps = require.context('~server/app', true, /[A-Za-z0-9-_,\s]+\.js$/i);
+        apps.keys().forEach((key) => {
+            /** @type {import("./lib/DefaultApp")["default"]} */
+            const app = apps(key).default;
+            const clApp = new app(this.app, this.server);
+            clApp.routerNameSpace = toURIPathPart(clApp.routerNameSpace);
+            this.app.use(clApp.routerNamespace, clApp);
+        });
     }
 
     start() {
