@@ -13,6 +13,11 @@ import path from "path";
 import { path as rootPath } from "app-root-path";
 import ms from "ms";
 import { createHash } from 'crypto';
+// import passport from "passport";
+// import { Strategy as PassportStrategy } from "passport-local";
+// import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
+
 import { toURIPathPart } from "~common/utils";
 
 /**
@@ -27,6 +32,7 @@ class WebServer {
 
         /** @type {Promise[]} */
         this.awaitingActions = [];
+        this.databaseURI = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE_NAME}`;
 
         this.app = express();
         this.server = createServer(this.app);
@@ -51,6 +57,16 @@ class WebServer {
         this.app.use(json());
         this.app.use(urlencoded({ extended: true }));
         this.app.use(compression());
+
+        console.debug("2.1 Connecting to database");
+        mongoose.connect(this.databaseURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+            // auth: {
+            //     user: process.env.DB_USER || null,
+            //     password: process.env.DB_USER_PASSWORD || null
+            // }
+        });
     }
 
     setupSecurity() {
@@ -76,12 +92,11 @@ class WebServer {
     }
 
     setupSession() {
-        const uri = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE_NAME}`;
-        console.info(`4. Connecting to session store ${uri}`);
+        console.info(`4. Connecting to session store ${this.databaseURI}`);
 
         const MongoDBStore = mongoDBSession(expressSession);
         const store = new MongoDBStore({
-            uri,
+            uri: this.databaseURI,
             collection: "sessions",
             expires: ms(process.env.SESSION_MAX_AGE)
         });
