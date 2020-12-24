@@ -6,7 +6,6 @@
  * @returns {string} The corrected path of an "URL"
  */
 export function toURIPathPart(value) {
-    console.log("JA NE:", value);
     value = value.replace(/\/+/g, "/");
     if (!value.startsWith("/")) value = `/${value}`;
     if (value.endsWith("/") && value.length > 1) {

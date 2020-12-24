@@ -45,7 +45,7 @@ module.exports = (_env, options, returnConfigObject) => {
         output: {
             filename: "[name].js"
         },
-        context: path.resolve(arp.path, "out"),
+        context: path.resolve(arp.path),
         devtool: isDevelopment ? 'inline-source-map' : 'source-map', // use cheap-eval-source-map when sourcemaps are broken
         plugins: [
             new webpack.ExtendedAPIPlugin(),
