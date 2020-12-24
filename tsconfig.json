@@ -1,0 +1,59 @@
+{
+    "compilerOptions": {
+        "target": "es2019",
+        "module": "CommonJS",
+        "outDir": ".",
+        "rootDir": "src",
+        "incremental": true,
+        "sourceMap": true,
+        "tsBuildInfoFile": "var/buildcache/backend",
+        "baseUrl": ".",
+        "paths": {
+            "~server/*": [
+                "src/server/*"
+            ],
+            "~client/*": [
+                "src/client/*"
+            ],
+            "~common/*": [
+                "src/common/*"
+            ]
+        },
+        "lib": [
+            "es2018",
+            "webworker",
+            "dom",
+            "esnext.asynciterable"
+        ],
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "removeComments": true,
+        "importHelpers": true,
+        "isolatedModules": false,
+        "newLine": "LF",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "allowUnreachableCode": false,
+        "resolveJsonModule": true,
+        "moduleResolution": "node",
+        "typeRoots": [],
+        "types": [
+            "node",
+            "express",
+            "webpack",
+            "webpack-env"
+        ],
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "exclude": [
+        "node_modules",
+        "var",
+        "dist",
+    ]
+}

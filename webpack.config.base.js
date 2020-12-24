@@ -5,7 +5,8 @@ const arp = require('app-root-path');
 
 const webpack = require("webpack");
 const TerserPlugin = require('terser-webpack-plugin');
-const jsConfigPathsPlugin = require('jsconfig-paths-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin').TsconfigPathsPlugin;
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = (_env, options, returnConfigObject) => {
 
@@ -48,41 +49,52 @@ module.exports = (_env, options, returnConfigObject) => {
         devtool: isDevelopment ? 'inline-source-map' : 'source-map', // use cheap-eval-source-map when sourcemaps are broken
         plugins: [
             new webpack.ExtendedAPIPlugin(),
-            // new webpack.DefinePlugin({
-            //     ENVIRONMENTAL_ROUTES_PATH: JSON.stringify(path.resolve(arp.path, options.scriptDir, "routes")),
-            //     ENVIRONMENTAL_MODELS_PATH: JSON.stringify(path.resolve(arp.path, options.scriptDir, "models")),
-            //     ENVIRONMENTAL_INTERFACES_PATH: JSON.stringify(path.resolve(arp.path, options.scriptDir, "interfaces"))
-            // })
+            new ForkTsCheckerWebpackPlugin({
+                async: true,
+                typescript: {
+                    enabled: true,
+                    configFile: path.resolve(arp.path, options.tsConfigPath),
+                    diagnosticOptions: {
+                        syntactic: true
+                    },
+                    profile: true
+                }
+            })
         ],
         resolve: {
+            extensions: [".js", ".njk", ".less"],
+            alias: {
+                //less path resolve. "~" is replaced by less-loader
+                "~server": path.resolve(arp.path, "src", "server"),
+                "~common": path.resolve(arp.path, "src", "common")
+            },
+            // Add `.ts` and `.tsx` as a resolvable extension.
             plugins: [
-                new jsConfigPathsPlugin()
+                new TsconfigPathsPlugin({
+                    configFile: path.resolve(arp.path, options.tsConfigPath),
+                    extensions: [".js"]
+                })
             ]
         },
         module: {
             rules: [{
-                test: /\.js?$/,
-                use: [cacheLoaderSettings("serverJS"), threadLoaderSettings(), {
+                test: /\.tsx?$/,
+                use: [cacheLoaderSettings("typescript"), threadLoaderSettings(), {
                     loader: 'babel-loader',
                     options: {
-                        presets: [
-                            ['@babel/preset-env', {
-                                useBuiltIns: "entry",
-                                targets: {
-                                    node: true
-                                },
-                                modules: "commonjs"
-                            }]
-                        ],
                         plugins: [
                             "@babel/plugin-proposal-nullish-coalescing-operator",
-                            "@babel/plugin-proposal-optional-chaining",
-                            // "@babel/plugin-transform-runtime",
-                            // "@babel/plugin-proposal-object-rest-spread",
-                            // "@babel/plugin-transform-modules-commonjs",
-                            // "@babel/plugin-syntax-export-default-from",
-                            // "@babel/plugin-proposal-export-default-from"
-                        ]
+                            "@babel/plugin-proposal-optional-chaining"
+                        ],
+                        sourceMap: 'inline'
+                    }
+                }, {
+                    loader: 'ts-loader',
+                    options: {
+                        happyPackMode: true, // IMPORTANT! use happyPackMode mode to speed-up compilation and reduce errors reported to webpack
+                        transpileOnly: true,
+                        experimentalWatchApi: options.watch === true,
+                        allowTsInNodeModules: false
                     }
                 }]
             }]

@@ -95,7 +95,7 @@ class WebServer {
             /** @type {import("./lib/DefaultApp")["default"]} */
             const app = apps(key).default;
             const clApp = new app(this.app, this.server);
-            clApp.routerNameSpace = toURIPathPart(clApp.routerNameSpace);
+            clApp.routerNamespace = toURIPathPart(clApp.routerNamespace);
             this.app.use(clApp.routerNamespace, clApp);
         });
     }

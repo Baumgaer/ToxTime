@@ -15,7 +15,8 @@ module.exports = (env, options, returnConfigObject) => {
     const inherited = Object.assign({}, options);
     Object.assign(options, {
         cacheDir: "./var/buildcache/backend",
-        scriptDir: "./src/server"
+        scriptDir: "./src/server",
+        tsConfigPath: "./tsconfig.json"
     }, inherited);
 
     ///////////////////////////////////
