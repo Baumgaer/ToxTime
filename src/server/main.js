@@ -13,12 +13,13 @@ import path from "path";
 import { path as rootPath } from "app-root-path";
 import ms from "ms";
 import { createHash } from 'crypto';
-// import passport from "passport";
-// import { Strategy as PassportStrategy } from "passport-local";
+import passport from "passport";
+import { Strategy as PassportStrategy } from "passport-local";
 // import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
 import { toURIPathPart } from "~common/utils";
+import User from "~server/models/User";
 
 /**
  * This is base server of a web server with standard setup, security and basic routes
@@ -40,6 +41,8 @@ class WebServer {
             useUnifiedTopology: true
         };
 
+        // NOTE: Only add authentication data when everything is given.
+        // Otherwise there will be an illogical error when trying to connect to database.
         if (process.env.DB_USER && process.env.DB_USER_PASSWORD) {
             Object.assign(this.dbSettings, {
                 user: process.env.DB_USER,
@@ -75,6 +78,7 @@ class WebServer {
 
         try {
             await mongoose.connect(this.databaseURI, this.dbSettings);
+            mongoose.set('useCreateIndex', true);
             console.debug("2.1.1 Database connection established");
         } catch (error) {
             console.error(`2.1.1 Could not connect to database. Reason: ${error}`);
@@ -134,6 +138,13 @@ class WebServer {
             resave: true,
             saveUninitialized: true
         }));
+
+        this.app.use(passport.initialize());
+        this.app.use(passport.session());
+
+        passport.use(new PassportStrategy(User.authenticate()));
+        passport.serializeUser(User.serializeUser());
+        passport.deserializeUser(User.deserializeUser());
     }
 
     setupRoutes() {

@@ -1,4 +1,5 @@
 import { Schema, connection } from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
 import User from "~common/models/User";
 
 const schema = new Schema({
@@ -21,6 +22,7 @@ const schema = new Schema({
         required: true,
         default: false
     },
+    isActive: Boolean,
     matriculationNumber: {
         type: Number,
         required: true
@@ -28,4 +30,12 @@ const schema = new Schema({
 });
 
 schema.loadClass(User);
+schema.plugin(passportLocalMongoose, {
+    usernameUnique: false,
+    findByUsername: (model, queryParameters) => {
+        // Add additional query parameter - AND condition - active: true
+        queryParameters.active = true;
+        return model.findOne(queryParameters);
+    }
+});
 export default connection.model("User", schema);
