@@ -63,7 +63,7 @@
             }
         ],
         "no-var": "error",
-        "valid-jsdoc": "error",
+        "valid-jsdoc": "off",
         "require-jsdoc": [
             "error",
             {

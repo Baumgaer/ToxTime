@@ -84,7 +84,9 @@ module.exports = (_env, options, returnConfigObject) => {
                     options: {
                         plugins: [
                             "@babel/plugin-proposal-nullish-coalescing-operator",
-                            "@babel/plugin-proposal-optional-chaining"
+                            "@babel/plugin-proposal-optional-chaining",
+                            "@babel/plugin-proposal-decorators",
+                            "@babel/plugin-syntax-decorators"
                         ],
                         sourceMap: 'inline'
                     }
