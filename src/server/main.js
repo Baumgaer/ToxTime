@@ -34,6 +34,19 @@ class WebServer {
         this.awaitingActions = [];
         this.databaseURI = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE_NAME}`;
 
+        /** @type {mongoose.ConnectOptions} */
+        this.dbSettings = {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        };
+
+        if (process.env.DB_USER && process.env.DB_USER_PASSWORD) {
+            Object.assign(this.dbSettings, {
+                user: process.env.DB_USER,
+                password: process.env.DB_USER_PASSWORD
+            });
+        }
+
         this.app = express();
         this.server = createServer(this.app);
         this.sessionSecret = createHash("sha512").update(process.env.SESSION_SECRET).digest("base64");
@@ -49,7 +62,7 @@ class WebServer {
         }
     }
 
-    setupGeneralSettings() {
+    async setupGeneralSettings() {
         console.debug("2. Preparing server");
         // parse the body to get post data and so on
         // NOTE: This is important for some middlewares to have directly.
@@ -59,14 +72,14 @@ class WebServer {
         this.app.use(compression());
 
         console.debug("2.1 Connecting to database");
-        mongoose.connect(this.databaseURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-            // auth: {
-            //     user: process.env.DB_USER || null,
-            //     password: process.env.DB_USER_PASSWORD || null
-            // }
-        });
+
+        try {
+            await mongoose.connect(this.databaseURI, this.dbSettings);
+            console.debug("2.1.1 Database connection established");
+        } catch (error) {
+            console.error(`2.1.1 Could not connect to database. Reason: ${error}`);
+        }
+
     }
 
     setupSecurity() {
@@ -98,7 +111,8 @@ class WebServer {
         const store = new MongoDBStore({
             uri: this.databaseURI,
             collection: "sessions",
-            expires: ms(process.env.SESSION_MAX_AGE)
+            expires: ms(process.env.SESSION_MAX_AGE),
+            connectionOptions: this.dbSettings
         });
 
         this.awaitingActions.push(new Promise((resolve, reject) => {
