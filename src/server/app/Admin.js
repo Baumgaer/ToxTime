@@ -1,5 +1,4 @@
 import DefaultApp from "~server/lib/DefaultApp";
-import express from "express";
 
 /**
  * @typedef {import("express")} express
@@ -19,12 +18,13 @@ export default class AdminApp extends DefaultApp {
     /**
      * test
      *
-     * @param {Request} _request the request
-     * @param {Response} response the response
+     * @param {import("express").Request} _request the request
+     * @param {import("express").Response} response the response
      * @returns {void}
      * @memberof AdminApp
      */
     test(_request, response) {
-        response.send("lol");
+        response.locals.lol = "ja ne";
+        response.locals.test = true;
     }
 }

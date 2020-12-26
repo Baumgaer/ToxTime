@@ -1,7 +1,7 @@
 import { Router, static as expressStatic } from "express";
 import path from "path";
 import { path as rootPath } from "app-root-path";
-import passport from "passport";
+import httpErrors from "http-errors";
 
 export default class DefaultApp {
 
@@ -23,7 +23,10 @@ export default class DefaultApp {
 
         /** @type {ReturnType<import("express")["Router"]>} */
         this.router = Router();
-        this.router.use(expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".")));
+        this.router.use((request, response, next) => {
+            if (this.authenticatedOnly && !request.user || this.adminRightsNeeded) return next(httpErrors.Unauthorized());
+            expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES || "."))(request, response, next);
+        });
 
     }
 
@@ -38,7 +41,7 @@ export default class DefaultApp {
      */
     addRoute(method, url, handler) {
         const methodName = method.toLowerCase();
-        this.router[methodName](url, (request, response, next) => this[`handle${methodName.charAt(0).toUpperCase() + methodName.slice(1)}`](handler, request, response, next));
+        this.router[methodName](url, (request, response, next) => this.handle(handler, request, response, next));
     }
 
     /**
@@ -51,10 +54,10 @@ export default class DefaultApp {
      * @returns {void}
      * @memberof DefaultApp
      */
-    handleGet(handler, request, response, next) {
-        if (this.authenticatedOnly && !request.user || this.adminRightsNeeded) return response.send("Not Authenticated");
+    handle(handler, request, response, next) {
+        if (this.authenticatedOnly && !request.user || this.adminRightsNeeded) return next(httpErrors.Unauthorized());
         handler(request, response, next);
-        if (!response.headersSent) response.send(response.locales);
+        if (!response.headersSent) response.json(response.locales);
     }
 
 }
