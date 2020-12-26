@@ -1,7 +1,7 @@
 import { install } from "source-map-support";
 if (process.env.NODE_ENV === "development") install();
 
-import express, { json, urlencoded, static as expressStatic } from 'express';
+import express, { json, urlencoded } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -9,14 +9,12 @@ import expressSession from 'express-session';
 import mongoDBSession from "connect-mongodb-session";
 import { v4 as uuidV4 } from "uuid";
 import { createServer } from 'http';
-import path from "path";
-import { path as rootPath } from "app-root-path";
 import ms from "ms";
 import { createHash } from 'crypto';
 import passport from "passport";
 import { Strategy as PassportStrategy } from "passport-local";
-// import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import httpErrors from "http-errors";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
@@ -149,14 +147,21 @@ class WebServer {
 
     setupRoutes() {
         console.debug("5. Collecting routes");
-        this.app.use(expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES)));
         const apps = require.context('~server/app', true, /[A-Za-z0-9-_,\s]+\.js$/i);
+
+        // Collect apps which will collect their routes
         apps.keys().forEach((key) => {
             /** @type {import("./lib/DefaultApp")["default"]} */
             const app = apps(key).default;
             const clApp = new app(this.app, this.server);
             clApp.routerNamespace = toURIPathPart(clApp.routerNamespace);
+            clApp.collectRoutes();
             this.app.use(clApp.routerNamespace, clApp.router);
+        });
+
+        // Route not found
+        this.app.use((_request, _response, next) => {
+            next(httpErrors.NotFound());
         });
     }
 

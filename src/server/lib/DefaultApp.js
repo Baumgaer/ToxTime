@@ -2,6 +2,7 @@ import { Router, static as expressStatic } from "express";
 import path from "path";
 import { path as rootPath } from "app-root-path";
 import httpErrors from "http-errors";
+import { toURIPathPart } from "~common/utils";
 
 export default class DefaultApp {
 
@@ -41,7 +42,22 @@ export default class DefaultApp {
      */
     addRoute(method, url, handler) {
         const methodName = method.toLowerCase();
-        this.router[methodName](url, (request, response, next) => this.handle(handler, request, response, next));
+        this.router[methodName](toURIPathPart(url), (request, response, next) => this.handle(handler, request, response, next));
+    }
+
+    collectRoutes() {
+        const routes = require.context("~server/routes", true, /\.js$/i, "sync");
+        routes.keys().forEach((key) => {
+            /** @type {import("./DefaultRoute")["default"]} */
+            const route = routes(key).default;
+            const clRoute = new route(this.app, this);
+            if (!clRoute.routeOf || (clRoute.routeOf.length && !clRoute.routeOf.includes(this.routerNamespace))) return;
+            clRoute.routerNameSpace = toURIPathPart(clRoute.routerNameSpace);
+            const collectedRoutes = clRoute.collectRoutes();
+            for (const collectedRoute of collectedRoutes) {
+                this.addRoute(collectedRoute.method, collectedRoute.path, collectedRoute.handler);
+            }
+        });
     }
 
     /**

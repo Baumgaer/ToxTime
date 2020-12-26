@@ -13,3 +13,35 @@ export function toURIPathPart(value) {
     }
     return value;
 }
+
+/**
+ * Converts a camelCase string into a kebab-case string
+ *
+ * @export
+ * @param {string} string the string to convert
+ * @returns {string} the converted string
+ */
+export function camelCaseToKebabCase(string) {
+    return string.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+/**
+ *
+ *
+ * @export
+ * @param {Object} toCheck
+ * @returns
+ */
+export function getAllFuncs(toCheck) {
+    let props = [];
+    let obj = toCheck;
+
+    do {
+        props = props.concat(Object.getOwnPropertyNames(obj));
+        obj = Object.getPrototypeOf(obj);
+    } while (obj);
+
+    return props.sort().filter((e, i, arr) => {
+        if (e != arr[i + 1] && typeof toCheck[e] == 'function') return true;
+    });
+}
