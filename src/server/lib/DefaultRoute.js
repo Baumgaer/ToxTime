@@ -1,4 +1,5 @@
 import { camelCaseToKebabCase, getAllFuncs, toURIPathPart } from "~common/utils";
+import { flattenDeep } from "lodash";
 
 /**
  * @typedef {Object} RouteObject
@@ -28,8 +29,18 @@ export default class DefaultRoute {
         getAllFuncs(this).forEach(name => {
             const route = {};
             const method = this[name];
-            if (typeof method !== "function" && method.name) return;
-            const convertedName = camelCaseToKebabCase(method.name).split("-");
+            if (typeof method !== "function" || !name.startsWith("route")) return;
+
+            let convertedName = camelCaseToKebabCase(method.name).split("-");
+            convertedName.shift();
+            for (let [index, part] of convertedName.entries()) {
+                convertedName[index] = `/${part.split("8").join("/:")}`;
+            }
+            convertedName = convertedName.map((part) => {
+                return part.split("/").filter((item) => !!item);
+            });
+
+            convertedName = flattenDeep(convertedName);
 
             if (!["get", "post", "put", "patch", "delete"].includes(convertedName[0])) return;
 
@@ -39,7 +50,7 @@ export default class DefaultRoute {
                     route.method = part;
                     continue;
                 }
-                path += `/${part.replace("8", "/:")}`;
+                path += `/${part.replace(/8/g, "/:")}`;
             }
 
             route.path = toURIPathPart(path);
@@ -56,9 +67,9 @@ export default class DefaultRoute {
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
      * @returns {void}
-     * @memberof AdminApp
+     * @memberof DefaultRoute
      */
-    getTestLol8user(request, response) {
+    routeGetTestLol8user(request, response) {
         response.send(request.params.user);
     }
 

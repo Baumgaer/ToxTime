@@ -73,7 +73,6 @@ export default class DefaultApp {
     handle(handler, request, response, next) {
         if (this.authenticatedOnly && !request.user || this.adminRightsNeeded) return next(httpErrors.Unauthorized());
         handler(request, response, next);
-        if (!response.headersSent) response.json(response.locales);
     }
 
 }
