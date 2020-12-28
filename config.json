@@ -15,6 +15,11 @@
         "DB_USER_PASSWORD": "",
         "SESSION_SECRET": "no_secret",
         "SESSION_MAX_AGE": "1h",
+        "MAIL_ADDRESS": "noreply@uni-bonn.de",
+        "MAIL_HOST": "",
+        "MAIL_PORT": 465,
+        "MAIL_USER": "",
+        "MAIL_PASSWORD": "",
         "PATH_STATIC_FILES": "./dist"
     }
 }

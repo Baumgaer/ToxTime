@@ -18,6 +18,11 @@ const schema = new Schema({
         required: true,
         unique: true
     },
+    locale: {
+        type: String,
+        required: true,
+        default: "en-US"
+    },
     registrationDate: {
         type: Date,
         required: true,

@@ -23,7 +23,8 @@ export default class Register extends DefaultRoute {
         const user = new User({
             email: request.params.email,
             password: request.params.password,
-            matriculationNumber: request.params.matr
+            matriculationNumber: request.params.matr,
+            locale: request.headers["accept-language"]
         });
 
         await User.register(user, request.params.password, (error) => {
