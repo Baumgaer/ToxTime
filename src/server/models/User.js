@@ -13,29 +13,40 @@ const schema = new Schema({
     nickname: {
         type: String
     },
-    password: {
-        type: String,
-        required: true
+    matriculationNumber: {
+        type: Number,
+        required: true,
+        unique: true
+    },
+    registrationDate: {
+        type: Date,
+        required: true,
+        default: new Date()
     },
     isConfirmed: {
         type: Boolean,
         required: true,
         default: false
     },
-    isActive: Boolean,
-    matriculationNumber: {
-        type: Number,
-        required: true
+    isActive: {
+        type: Boolean,
+        required: true,
+        default: true
     }
+}, {
+    collection: "users"
 });
 
 schema.loadClass(User);
 schema.plugin(passportLocalMongoose, {
     usernameUnique: false,
+    usernameField: "email",
     findByUsername: (model, queryParameters) => {
         // Add additional query parameter - AND condition - active: true
-        queryParameters.active = true;
+        queryParameters.isConfirmed = true;
+        queryParameters.isActive = true;
         return model.findOne(queryParameters);
     }
 });
+
 export default connection.model("User", schema);

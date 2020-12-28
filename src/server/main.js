@@ -140,7 +140,7 @@ class WebServer {
         this.app.use(passport.initialize());
         this.app.use(passport.session());
 
-        passport.use(new PassportStrategy(User.authenticate()));
+        passport.use("local", new PassportStrategy({ usernameField: "email" }, User.authenticate()));
         passport.serializeUser(User.serializeUser());
         passport.deserializeUser(User.deserializeUser());
     }

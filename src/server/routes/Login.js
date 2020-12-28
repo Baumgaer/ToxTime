@@ -1,5 +1,6 @@
+import passport from "passport";
 import DefaultRoute from "~server/lib/DefaultRoute";
-import User from "~server/models/User";
+
 export default class Login extends DefaultRoute {
 
     constructor(mainApp, subApp) {
@@ -15,24 +16,17 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
-    async routeGet8username8email8password8matr(request, response) {
-        const user = new User({
-            username: request.params.username,
-            email: request.params.email,
-            password: request.params.password,
-            matriculationNumber: request.params.matr
-        });
-
-        await User.register(user, request.params.password, (err) => {
-            if (err) {
-                response.send({
-                    success: false, message: "Your account could not be saved. Error: ", err
-                });
-            } else {
-                response.json({
-                    success: true, message: "Your account has been saved"
-                });
-            }
-        });
+    async routeGet8email8password(request, response) {
+        if (!request.params.email) return response.send({});
+        if (!request.params.password) return response.send({});
+        request.body = request.params;
+        passport.authenticate("local", (error, user) => {
+            if (error) return response.send({ success: false, error });
+            if (!user) return response.send({ success: false, error: { name: "emailOrPasswordIncorrect" } });
+            request.logIn(user, (error) => {
+                if (error) return response.send({ success: false, error });
+                response.send({ success: true });
+            });
+        })(request, response);
     }
 }
