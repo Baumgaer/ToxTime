@@ -42,7 +42,9 @@ export default class DefaultApp {
      */
     addRoute(method, url, handler) {
         const methodName = method.toLowerCase();
-        this.router[methodName](toURIPathPart(url), (request, response, next) => this.handle(handler, request, response, next));
+        const normalizedURL = toURIPathPart(url);
+        this.router[methodName](normalizedURL, (request, response, next) => this.handle(handler, request, response, next));
+        console.debug(methodName, this.routerNamespace, normalizedURL, handler);
     }
 
     collectRoutes() {

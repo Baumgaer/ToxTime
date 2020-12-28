@@ -6,6 +6,7 @@ export default class Login extends DefaultRoute {
     constructor(mainApp, subApp) {
         super(mainApp, subApp);
         this.routerNameSpace = "/login";
+        this.routeOf = ["/"];
     }
 
     /**
@@ -18,6 +19,21 @@ export default class Login extends DefaultRoute {
      */
     routeGet(_request, response) {
         response.redirect("/");
+    }
+
+    /**
+     * test
+     *
+     * @param {import("express").Request} request the request
+     * @param {import("express").Response} response the response
+     * @returns {void}
+     * @memberof Login
+     */
+    routeGetTest(request, response) {
+        response.send({
+            lng: request.language,
+            trans: request.t("hello")
+        });
     }
 
     /**

@@ -7,6 +7,7 @@ export default class Register extends DefaultRoute {
     constructor(mainApp, subApp) {
         super(mainApp, subApp);
         this.routerNameSpace = "/register";
+        this.routeOf = ["/", "/admin"];
     }
 
     /**

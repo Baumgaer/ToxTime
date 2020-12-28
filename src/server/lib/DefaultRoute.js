@@ -58,19 +58,11 @@ export default class DefaultRoute {
             routes.push(route);
         });
 
-        return routes;
-    }
+        routes.sort((a, b) => {
+            return b.path.split("/").length - a.path.split("/").length;
+        });
 
-    /**
-     * test
-     *
-     * @param {import("express").Request} request the request
-     * @param {import("express").Response} response the response
-     * @returns {void}
-     * @memberof DefaultRoute
-     */
-    routeGetTestLol8user(request, response) {
-        response.send(request.params.user);
+        return routes;
     }
 
 }

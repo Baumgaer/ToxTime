@@ -15,6 +15,8 @@ import passport from "passport";
 import { Strategy as PassportStrategy } from "passport-local";
 import mongoose from "mongoose";
 import httpErrors from "http-errors";
+import i18next from "i18next";
+import i18nextMiddleware from "i18next-http-middleware";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
@@ -72,8 +74,36 @@ class WebServer {
         this.app.use(urlencoded({ extended: true }));
         this.app.use(compression());
 
-        console.debug("2.1 Connecting to database");
+        /**
+         * requires all locales and adds them to an object
+         *
+         * @returns {Record<string, Record<string, string>>} the locale messages
+         */
+        function loadLocaleMessages() {
+            const locales = require.context('~server/locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
+            /** @type {Record<string, Record<string, string>>} */
+            const messages = {};
+            locales.keys().forEach(key => {
+                const matched = key.match(/\.\/([A-Za-z0-9-_]+)/i);
+                if (matched && matched.length > 1) {
+                    const locale = matched[1];
+                    messages[locale] = locales(key);
+                }
+            });
+            return messages;
+        }
 
+        // Setup i18n for multi language
+        i18next.use(i18nextMiddleware.LanguageDetector).init({
+            defaultNS: "",
+            lng: "cimode",
+            lowerCaseLng: true,
+            fallbackLng: "en-us",
+            resources: loadLocaleMessages()
+        });
+        this.app.use(i18nextMiddleware.handle(i18next));
+
+        console.debug("2.1 Connecting to database");
         try {
             await mongoose.connect(this.databaseURI, this.dbSettings);
             mongoose.set('useCreateIndex', true);
