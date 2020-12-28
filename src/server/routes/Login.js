@@ -16,6 +16,18 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    routeGet(_request, response) {
+        response.redirect("/");
+    }
+
+    /**
+     * test
+     *
+     * @param {import("express").Request} request the request
+     * @param {import("express").Response} response the response
+     * @returns {void}
+     * @memberof Login
+     */
     async routeGet8email8password(request, response) {
         if (!request.params.email) return response.send({});
         if (!request.params.password) return response.send({});
