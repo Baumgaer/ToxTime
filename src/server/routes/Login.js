@@ -44,16 +44,20 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
-    async routeGet8email8password(request, response) {
-        if (!request.params.email) return response.send({});
-        if (!request.params.password) return response.send({});
-        request.body = request.params;
+    async routePost(request, response) {
+        if (!request.body.email) return response.send({ success: false, error: { name: "invalidEmail" } });
+        if (!request.body.password) return response.send({ success: false, error: { name: "invalidPassword" } });
+
         passport.authenticate("local", (error, user) => {
             if (error) return response.send({ success: false, error });
             if (!user) return response.send({ success: false, error: { name: "emailOrPasswordIncorrect" } });
             request.logIn(user, (error) => {
                 if (error) return response.send({ success: false, error });
-                response.send({ success: true });
+                const theUser = Object.assign({}, user)._doc;
+                delete theUser.salt;
+                delete theUser.hash;
+
+                response.send({ success: true, data: { models: [theUser] } });
             });
         })(request, response);
     }

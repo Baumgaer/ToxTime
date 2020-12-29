@@ -12,7 +12,7 @@ router.beforeEach((to, _from, next) => {
         if (item.name === to.name) return true;
         return false;
     });
-    if (component && component.components && component.components.default && component.components.default && component.components.default.props.subTitle) {
+    if (component?.components?.default?.props?.subTitle) {
         title = `${component.components.default.props.subTitle} - ${title}`;
     }
     document.title = title;

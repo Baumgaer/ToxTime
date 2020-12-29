@@ -1,5 +1,9 @@
 {
     "helloWorld": "Hallo Welt",
     "helloAdmin": "Hallo Administrator",
-    "helloLogin": "Hallo Login"
+    "helloLogin": "Hallo Login",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "login": "Anmelden",
+    "forgotPassword": "Passwort vergessen"
 }

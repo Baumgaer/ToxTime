@@ -4,6 +4,7 @@
         "./server.js"
     ],
     "env": {
+        "APP_NAME": "ToxTime",
         "NODE_ENV": "development",
         "DEBUG": true,
         "APP_HOST": "localhost",

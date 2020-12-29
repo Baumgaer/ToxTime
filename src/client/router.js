@@ -4,6 +4,7 @@ import i18n from "~client/controllers/i18n";
 
 // import components
 import HelloWorld from "~client/components/HelloWorld.vue";
+import Login from "~client/components/Login.vue";
 
 const routes = [
     {
@@ -28,6 +29,14 @@ const routes = [
             title: i18n.tc("helloLogin")
         },
         path: "/",
+        component: Login
+    },
+    {
+        name: "loginreset",
+        meta: {
+            title: i18n.tc("helloLogin")
+        },
+        path: "/login/reset",
         component: HelloWorld
     }
 ];

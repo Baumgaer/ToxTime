@@ -1,0 +1,49 @@
+.login {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 40%;
+    padding: 20px;
+
+    background-color: var(--secondary-background-color, #d3d2d2);
+    border-radius: 3px;
+
+    .email,
+    .password {
+        display: block;
+        width: calc(100% - 10px);
+        height: 25px;
+        padding: 5px;
+        margin: 10px 0;
+        border-radius: 3px;
+        border: 1px solid gray;
+    }
+
+    .buttons {
+        text-align: right;
+
+        .loginButton {
+            width: auto;
+            padding: 5px;
+            float: left;
+
+            border: 1px solid gray;
+            border-radius: 3px;
+
+            cursor: pointer;
+        }
+
+        .forgotPassword {
+            display: block;
+            padding: 5px;
+            float: right;
+            color: var(--primary-text-color, black);
+
+            &:hover {
+                color: var(--primary-text-hover-color, #383737);
+            }
+        }
+    }
+}
