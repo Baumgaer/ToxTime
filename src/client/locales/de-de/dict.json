@@ -5,5 +5,8 @@
     "email": "E-Mail",
     "password": "Passwort",
     "login": "Anmelden",
-    "forgotPassword": "Passwort vergessen"
+    "forgotPassword": "Passwort vergessen",
+    "emailOrPasswordIncorrect": "E-Mail oder passwort inkorrekt",
+    "emailIncorrect": "E-Mail inkorrekt",
+    "passwordNotFilled": "Passwort nicht ausgefüllt"
 }

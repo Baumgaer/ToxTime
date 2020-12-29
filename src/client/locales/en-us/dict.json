@@ -2,8 +2,11 @@
     "helloWorld": "Hello World",
     "helloAdmin": "Hello Administrator",
     "helloLogin": "Hello Login",
-    "email": "e-mail",
-    "password": "password",
-    "login": "log in",
-    "forgotPassword": "forgot password"
+    "email": "E-mail",
+    "password": "Password",
+    "login": "Log in",
+    "forgotPassword": "Forgot password",
+    "emailOrPasswordIncorrect": "E-mail or password incorrect",
+    "emailIncorrect": "E-mail incorrect",
+    "passwordNotFilled": "Password not filled"
 }

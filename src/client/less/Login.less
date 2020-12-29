@@ -11,7 +11,8 @@
     border-radius: 3px;
 
     .email,
-    .password {
+    .password,
+    .hintBox {
         display: block;
         width: calc(100% - 10px);
         height: 25px;
@@ -19,6 +20,13 @@
         margin: 10px 0;
         border-radius: 3px;
         border: 1px solid gray;
+    }
+
+    .hintBox {
+        display: none;
+        font-weight: bold;
+        color: var(--primary-fail-text-color, darkred);
+        background-color: var(--secondary-fail-color, lightcoral);
     }
 
     .buttons {
