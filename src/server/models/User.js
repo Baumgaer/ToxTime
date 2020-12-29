@@ -23,6 +23,17 @@ const schema = new Schema({
         required: true,
         default: "en-US"
     },
+    isAdmin: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    currentGameSession: String,
+    solvedGameSessions: {
+        type: Array,
+        required: true,
+        default: []
+    },
     registrationDate: {
         type: Date,
         required: true,
