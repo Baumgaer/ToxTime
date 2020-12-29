@@ -20,9 +20,12 @@
                 <button type="submit" class="loginButton">
                     {{ $t("login") }}
                 </button>
-                <router-link to="loginreset" class="forgetPassword">{{
-                    $t("forgotPassword")
-                }}</router-link>
+                <router-link
+                    :to="{ name: 'loginreset' }"
+                    class="forgetPassword"
+                >
+                    {{ $t("forgotPassword") }}
+                </router-link>
             </div>
         </form>
     </section>

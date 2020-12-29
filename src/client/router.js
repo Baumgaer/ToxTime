@@ -26,7 +26,7 @@ const routes = [
     {
         name: "login",
         meta: {
-            title: i18n.tc("helloLogin")
+            title: i18n.tc("login")
         },
         path: "/",
         component: Login
@@ -34,7 +34,7 @@ const routes = [
     {
         name: "loginreset",
         meta: {
-            title: i18n.tc("helloLogin")
+            title: i18n.tc("forgotPassword")
         },
         path: "/login/reset",
         component: HelloWorld
