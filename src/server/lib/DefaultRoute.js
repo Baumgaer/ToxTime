@@ -1,5 +1,7 @@
 import { camelCaseToKebabCase, getAllFuncs, toURIPathPart } from "~common/utils";
 import { flattenDeep } from "lodash";
+import path from "path";
+import { path as rootPath } from "app-root-path";
 
 /**
  * @typedef {Object} RouteObject
@@ -63,6 +65,21 @@ export default class DefaultRoute {
         });
 
         return routes;
+    }
+
+    /**
+     * test
+     *
+     * @param {import("express").Response} response the response
+     * @param {string} fileName the name of the file to send
+     * @returns {void}
+     * @memberof Login
+     */
+    sendStaticFile(response, fileName = "index.html") {
+        response.sendFile(fileName, { root: path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".") }, (err) => {
+            response.end();
+            if (err) throw (err);
+        });
     }
 
 }

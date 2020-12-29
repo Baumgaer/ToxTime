@@ -24,16 +24,13 @@ export default class Login extends DefaultRoute {
     /**
      * test
      *
-     * @param {import("express").Request} request the request
+     * @param {import("express").Request} _request the request
      * @param {import("express").Response} response the response
      * @returns {void}
      * @memberof Login
      */
-    routeGetTest(request, response) {
-        response.send({
-            lng: request.language,
-            trans: request.t("hello")
-        });
+    routeGetReset(_request, response) {
+        this.sendStaticFile(response);
     }
 
     /**

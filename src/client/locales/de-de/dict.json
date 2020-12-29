@@ -8,5 +8,7 @@
     "forgotPassword": "Passwort vergessen",
     "emailOrPasswordIncorrect": "E-Mail oder passwort inkorrekt",
     "emailIncorrect": "E-Mail inkorrekt",
-    "passwordNotFilled": "Passwort nicht ausgefüllt"
+    "passwordNotFilled": "Passwort nicht ausgefüllt",
+    "resetPassword": "Passwort zurücksetzen",
+    "backToLogin": "Zurück zur Anmeldung"
 }

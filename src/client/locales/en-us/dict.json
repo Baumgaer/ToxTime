@@ -8,5 +8,7 @@
     "forgotPassword": "Forgot password",
     "emailOrPasswordIncorrect": "E-mail or password incorrect",
     "emailIncorrect": "E-mail incorrect",
-    "passwordNotFilled": "Password not filled"
+    "passwordNotFilled": "Password not filled",
+    "resetPassword": "Reset password",
+    "backToLogin": "Back to log in"
 }

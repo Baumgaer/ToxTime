@@ -78,7 +78,7 @@ export default {
             }
             const userData = result.data.models[0];
             ApiClient.store.activeUser = Object.assign(new User(), userData);
-            this.$router.push({ name: "public" });
+            this.$router.push({ name: userData.isAdmin ? "admin" : "public" });
         }
     }
 };

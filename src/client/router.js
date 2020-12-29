@@ -5,6 +5,7 @@ import i18n from "~client/controllers/i18n";
 // import components
 import HelloWorld from "~client/components/HelloWorld.vue";
 import Login from "~client/components/Login.vue";
+import PasswordReset from "~client/components/PasswordReset.vue";
 
 const routes = [
     {
@@ -37,7 +38,7 @@ const routes = [
             title: i18n.tc("forgotPassword")
         },
         path: "/login/reset",
-        component: HelloWorld
+        component: PasswordReset
     }
 ];
 
