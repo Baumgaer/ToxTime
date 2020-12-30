@@ -6,9 +6,9 @@
         "start": "nodemon --config ./config.json ./server.js",
         "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
         "dev:frontend": "vue-cli-service build --mode development --watch",
-        "dev:backend": "webpack --progress --mode development --watch --config webpack.config.server.js",
+        "dev:backend": "webpack --mode development --watch --config webpack.config.server.js",
         "dev:serve": "nodemon --config ./config.json -L --inspect=0.0.0.0:9001 ./server.js",
-        "build": "webpack --progress --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
+        "build": "webpack --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
@@ -20,6 +20,7 @@
         "core-js": "^3.8.1",
         "express": "^4.17.1",
         "express-session": "^1.17.1",
+        "graceful-fs": "^4.2.4",
         "helmet": "^4.3.1",
         "hpp": "^0.2.3",
         "http-errors": "^1.8.0",

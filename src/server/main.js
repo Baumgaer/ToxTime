@@ -20,6 +20,7 @@ import i18nextMiddleware from "i18next-http-middleware";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
+import EmailTransporter from "~server/lib/EmailTransporter";
 
 /**
  * This is base server of a web server with standard setup, security and basic routes
@@ -74,32 +75,26 @@ class WebServer {
         this.app.use(urlencoded({ extended: true }));
         this.app.use(compression());
 
-        /**
-         * requires all locales and adds them to an object
-         *
-         * @returns {Record<string, Record<string, string>>} the locale messages
-         */
-        function loadLocaleMessages() {
-            const locales = require.context('~server/locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
-            /** @type {Record<string, Record<string, string>>} */
-            const messages = {};
-            locales.keys().forEach(key => {
-                const matched = key.match(/\.\/([A-Za-z0-9-_]+)/i);
-                if (matched && matched.length > 1) {
-                    const locale = matched[1];
-                    messages[locale] = locales(key);
-                }
-            });
-            return messages;
-        }
+        const locales = require.context('~server/locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
+        const resources = {};
+        locales.keys().forEach(key => {
+            const matched = key.match(/\.\/([A-Za-z0-9-_]+)/i);
+            if (matched && matched.length > 1) {
+                const locale = matched[1];
+                resources[locale] = {
+                    dict: locales(key)
+                };
+            }
+        });
 
         // Setup i18n for multi language
         i18next.use(i18nextMiddleware.LanguageDetector).init({
-            defaultNS: "",
+            ns: "dict",
+            defaultNS: "dict",
             lng: "cimode",
             lowerCaseLng: true,
             fallbackLng: "en-us",
-            resources: loadLocaleMessages()
+            resources
         });
         this.app.use(i18nextMiddleware.handle(i18next));
 
@@ -110,6 +105,15 @@ class WebServer {
             console.debug("2.1.1 Database connection established");
         } catch (error) {
             console.error(`2.1.1 Could not connect to database. Reason: ${error}`);
+        }
+
+        console.debug("2.2 connecting to mail server");
+        try {
+            const emailTransporter = EmailTransporter.getInstance();
+            const authInfo = (await emailTransporter.transporter).options.auth;
+            console.debug(`2.2.1 E-mail server connection established. Using user: ${authInfo.user}, pass: ${authInfo.pass}`);
+        } catch (error) {
+            console.error(`2.2.1 could not connect to mail server. Reason: ${error}`);
         }
 
     }

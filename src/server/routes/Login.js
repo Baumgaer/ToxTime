@@ -1,5 +1,8 @@
 import passport from "passport";
+import httpErrors from "http-errors";
+import { isEmail } from "validator";
 import DefaultRoute from "~server/lib/DefaultRoute";
+import EmailTransporter from "~server/lib/EmailTransporter";
 
 export default class Login extends DefaultRoute {
 
@@ -31,6 +34,27 @@ export default class Login extends DefaultRoute {
      */
     routeGetReset(_request, response) {
         this.sendStaticFile(response);
+    }
+
+    /**
+     * test
+     *
+     * @param {import("express").Request} request the request
+     * @param {import("express").Response} response the response
+     * @param {import("express").NextFunction} response the next middleware
+     * @returns {void}
+     * @memberof Login
+     */
+    async routePostReset(request, response, next) {
+        const email = request.body.email;
+        if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
+        const emailTransporter = EmailTransporter.getInstance();
+        try {
+            await emailTransporter.send(request, { to: "baumgaertner1@gmx.net", subject: "resetPassword" });
+            response.send({ success: true, data: {} });
+        } catch (error) {
+            next(httpErrors.InternalServerError(error));
+        }
     }
 
     /**

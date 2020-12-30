@@ -1,6 +1,7 @@
 <template>
     <section class="login">
-        <form v-on:submit="doReset($event)">
+        <form action="/login/reset" v-on:submit="doReset($event)">
+            <div ref="hintBox" class="fail hintBox"></div>
             <input
                 type="text"
                 name="email"
@@ -19,11 +20,28 @@
 </template>
 
 <script>
+import ApiClient from "~client/controllers/ApiClient";
+import { isEmail } from "validator";
+import i18n from "~client/controllers/i18n";
+
 export default {
     methods: {
+        resetField() {
+            this.$refs.email.classList.remove("fail");
+            this.$refs.hintBox.innerText = "";
+            this.$refs.hintBox.style.display = "none";
+        },
+
         doReset(event) {
             event.preventDefault();
-            console.log("lallaa");
+            const email = this.$refs.email.value;
+            if (!email || !isEmail(email)) {
+                this.$refs.email.classList.add("fail");
+                this.$refs.hintBox.innerText = i18n.t("emailIncorrect");
+                this.$refs.hintBox.style.display = "block";
+                return;
+            }
+            ApiClient.post("/login/reset", { email });
         }
     }
 };
