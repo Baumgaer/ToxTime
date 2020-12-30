@@ -8,12 +8,15 @@ import { path as rootPath } from "app-root-path";
  * @property {string} from the sender email address
  * @property {string} to the receiver email address
  * @property {string} subject the translation string of the subject. Will be used to decide which email template will be used.
+ * @property {Record<string, any>} locales The locales which are used to render the template
  */
 
 export default class EmailTransporter {
 
     constructor() {
         if (!EmailTransporter.usedGetInstance) throw new Error("Use Emailtransporter.getInstance() instead of new EmailTransporter()");
+        /** @type {Record<string, Record<string, import("nunjucks").Template>>} */
+        this.templates = this.collectEmailTemplates();
         this.transporter = this.createTransporter();
     }
 
@@ -24,6 +27,20 @@ export default class EmailTransporter {
             EmailTransporter.usedGetInstance = false;
         }
         return EmailTransporter.instance;
+    }
+
+    collectEmailTemplates() {
+        const templates = {};
+        const templateContext = require.context("~server/templates/email", true, /\.njk$/i, "sync");
+        templateContext.keys().forEach((key) => {
+            const matched = key.match(/\.\/([A-Za-z0-9-_]+)/i);
+            const locale = matched[1];
+            const templateName = path.basename(key).split(".").slice(0, -1).join();
+
+            if (!templates[locale]) templates[locale] = {};
+            templates[locale][templateName] = templateContext(key);
+        });
+        return templates;
     }
 
     async createTransporter() {
@@ -67,12 +84,13 @@ export default class EmailTransporter {
     async send(request, params = {}) {
         params = Object.assign({ from: process.env.MAIL_ADDRESS, to: "", subject: "" }, params);
         console.info(`Sending e-mail to ${params.to}`);
+        const content = this.templates[params.locales.user.locale || "en-us"][params.subject].render(params.locales);
         return await (await this.transporter).sendMail({
             from: params.from,
             to: params.to,
             subject: request.t(params.subject),
-            text: "test",
-            html: "<strong>test</strong>"
+            text: content,
+            html: content
         });
     }
 

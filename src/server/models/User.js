@@ -21,7 +21,7 @@ const schema = new Schema({
     locale: {
         type: String,
         required: true,
-        default: "en-US"
+        default: "en-us"
     },
     isAdmin: {
         type: Boolean,
@@ -48,6 +48,10 @@ const schema = new Schema({
         type: Boolean,
         required: true,
         default: true
+    },
+    passwordResetToken: {
+        type: String,
+        unique: true
     }
 }, {
     collection: "users"

@@ -97,6 +97,16 @@ module.exports = (_env, options, returnConfigObject) => {
                         allowTsInNodeModules: false
                     }
                 }]
+            }, {
+                test: /\.(njk|nunjucks)$/,
+                use: [cacheLoaderSettings("templates"), threadLoaderSettings(), {
+                    loader: 'renewed-nunjucks-loader',
+                    options: {
+                        sourceMap: 'inline',
+                        config: path.resolve(arp.path, "nunjucks.config.js"),
+                        quiet: true
+                    }
+                }]
             }]
         },
         optimization: {

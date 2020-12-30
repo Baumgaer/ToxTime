@@ -1,6 +1,7 @@
 import passport from "passport";
 import httpErrors from "http-errors";
 import { isEmail } from "validator";
+import { v4 as uuIDv4 } from "uuid";
 import DefaultRoute from "~server/lib/DefaultRoute";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import User from "~server/models/User";
@@ -52,7 +53,19 @@ export default class Login extends DefaultRoute {
         const emailTransporter = EmailTransporter.getInstance();
         try {
             const user = await User.findOne({ email });
-            if (user) await emailTransporter.send(request, { to: email, subject: "resetPassword" });
+            if (user) {
+                const token = uuIDv4();
+                user.passwordResetToken = token;
+                await user.save();
+                await emailTransporter.send(request, {
+                    to: email,
+                    subject: "resetPassword",
+                    locales: {
+                        url: `http://${process.env.domain || "localhost"}/login/reset/${token}`,
+                        user: user
+                    }
+                });
+            }
             response.send({ success: true, data: {} });
         } catch (error) {
             next(httpErrors.InternalServerError(error));
