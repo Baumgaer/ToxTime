@@ -8,6 +8,7 @@
                 ref="email"
                 class="email"
                 :placeholder="$t('email')"
+                v-on:keydown="resetField()"
             />
             <button type="submit" class="resetButton">
                 {{ $t("resetPassword") }}
@@ -32,7 +33,7 @@ export default {
             this.$refs.hintBox.style.display = "none";
         },
 
-        doReset(event) {
+        async doReset(event) {
             event.preventDefault();
             const email = this.$refs.email.value;
             if (!email || !isEmail(email)) {
@@ -41,7 +42,19 @@ export default {
                 this.$refs.hintBox.style.display = "block";
                 return;
             }
-            ApiClient.post("/login/reset", { email });
+            const result = await ApiClient.post("/login/reset", { email });
+            console.log(result);
+            if (!result.success) {
+                this.$refs.hintBox.classList.add("fail");
+                this.$refs.hintBox.innerText = i18n.t("errorWhileSendingEmail");
+            } else {
+                this.$refs.hintBox.classList.remove("fail");
+                this.$refs.hintBox.classList.add("success");
+                this.$refs.hintBox.innerText = i18n.t("passwordResetSuccess", {
+                    email
+                });
+            }
+            this.$refs.hintBox.style.display = "block";
         }
     }
 };

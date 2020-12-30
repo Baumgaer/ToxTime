@@ -1,3 +1,5 @@
+@import "variables.less";
+
 .login {
     position: absolute;
     left: 50%;
@@ -25,8 +27,16 @@
     .hintBox {
         display: none;
         font-weight: bold;
-        color: var(--primary-fail-text-color, darkred);
-        background-color: var(--secondary-fail-color, lightcoral);
+        color: var(--hint-text-color, @white);
+        height: auto;
+
+        &.fail {
+            background-color: var(--fail-color, @failColor);
+        }
+
+        &.success {
+            background-color: var(--success-color, @successColor);
+        }
     }
 
     .buttons {

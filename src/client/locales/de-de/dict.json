@@ -10,5 +10,7 @@
     "emailIncorrect": "E-Mail inkorrekt",
     "passwordNotFilled": "Passwort nicht ausgefüllt",
     "resetPassword": "Passwort zurücksetzen",
-    "backToLogin": "Zurück zur Anmeldung"
+    "backToLogin": "Zurück zur Anmeldung",
+    "passwordResetSuccess": "Es wurde eine E-Mail zum Zurücksetzen des Passwortes an {email} gesendet",
+    "errorWhileSendingEmail": "Fehler beim Senden der E-Mail"
 }

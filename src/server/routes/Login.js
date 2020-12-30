@@ -3,6 +3,7 @@ import httpErrors from "http-errors";
 import { isEmail } from "validator";
 import DefaultRoute from "~server/lib/DefaultRoute";
 import EmailTransporter from "~server/lib/EmailTransporter";
+import User from "~server/models/User";
 
 export default class Login extends DefaultRoute {
 
@@ -50,7 +51,8 @@ export default class Login extends DefaultRoute {
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
         try {
-            await emailTransporter.send(request, { to: "baumgaertner1@gmx.net", subject: "resetPassword" });
+            const user = await User.findOne({ email });
+            if (user) await emailTransporter.send(request, { to: email, subject: "resetPassword" });
             response.send({ success: true, data: {} });
         } catch (error) {
             next(httpErrors.InternalServerError(error));

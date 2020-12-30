@@ -10,5 +10,7 @@
     "emailIncorrect": "E-mail incorrect",
     "passwordNotFilled": "Password not filled",
     "resetPassword": "Reset password",
-    "backToLogin": "Back to log in"
+    "backToLogin": "Back to log in",
+    "passwordResetSuccess": "An e-mail to reset the password was sent to {email}",
+    "errorWhileSendingEmail": "Error while sending e-mail"
 }
