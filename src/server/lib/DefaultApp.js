@@ -2,6 +2,8 @@ import { Router, static as expressStatic } from "express";
 import path from "path";
 import { path as rootPath } from "app-root-path";
 import httpErrors from "http-errors";
+import { configure, renderString } from "nunjucks";
+import { readFileSync } from "graceful-fs";
 import { toURIPathPart } from "~common/utils";
 
 export default class DefaultApp {
@@ -22,11 +24,23 @@ export default class DefaultApp {
         /** @type {boolean} */
         this.authenticatedOnly = false;
 
+        configure({ autoescape: false });
+        const staticPath = path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".");
+        const loadedIndex = readFileSync(path.resolve(staticPath, "index.html")).toString();
         /** @type {ReturnType<import("express")["Router"]>} */
         this.router = Router();
-        this.router.use((request, response, next) => {
-            if (this.authenticatedOnly && !request.user || this.adminRightsNeeded) return next(httpErrors.Unauthorized());
-            expressStatic(path.resolve(rootPath, process.env.PATH_STATIC_FILES || "."))(request, response, next);
+        this.router.use(async (request, response, next) => {
+            if (this.authenticatedOnly && !request.user || this.adminRightsNeeded && !request.user.isAdmin) return next(httpErrors.Unauthorized());
+            if (["/", "index.html"].includes(request.path)) {
+                if (request.user && request.user.passwordResetToken) {
+                    request.user.passwordResetToken = "";
+                    await request.user.save();
+                }
+                response.send(renderString(loadedIndex, {
+                    userInformation: JSON.stringify((request.user || {})),
+                    nonce: response.locals.cspNonce
+                }));
+            } else expressStatic(staticPath)(request, response, next);
         });
 
     }
