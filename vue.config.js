@@ -16,8 +16,8 @@ module.exports = {
         config.resolve.alias["~common"] = path.resolve(arp.path, "src", "common");
     },
     pages: {
-        index: "src/client/index.js",
-        admin: "src/client/admin.js",
-        public: "src/client/public.js"
+        index: "src/client/Index.js",
+        admin: "src/client/Admin.js",
+        public: "src/client/Public.js"
     }
 };

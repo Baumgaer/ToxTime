@@ -23,7 +23,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
-    routeGet(_request, response) {
+    async routeGet(request, response) {
         response.redirect("/");
     }
 

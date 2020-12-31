@@ -7,4 +7,5 @@ export default class IndexApp extends DefaultApp {
         this.adminRightsNeeded = false;
         this.authenticatedOnly = false;
     }
+
 }
