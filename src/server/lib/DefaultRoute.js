@@ -11,9 +11,9 @@ import { path as rootPath } from "app-root-path";
  */
 export default class DefaultRoute {
 
-    constructor(mainApp, subApp) {
+    constructor(mainApp, parentApp) {
         this.mainApp = mainApp;
-        this.subApp = subApp;
+        this.parentApp = parentApp;
         this.routerNameSpace = "/";
         this.routeOf = [];
     }

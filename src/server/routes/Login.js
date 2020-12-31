@@ -9,8 +9,8 @@ import { isUUID } from "validator";
 
 export default class Login extends DefaultRoute {
 
-    constructor(mainApp, subApp) {
-        super(mainApp, subApp);
+    constructor(mainApp, parentApp) {
+        super(mainApp, parentApp);
         this.routerNameSpace = "/login";
         this.routeOf = ["/"];
     }

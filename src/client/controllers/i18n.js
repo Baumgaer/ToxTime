@@ -23,7 +23,7 @@ function loadLocaleMessages() {
 }
 
 export default new VueI18n({
-    locale: navigator.language.toLowerCase(),
+    locale: window.userInformation.locale || navigator.language.toLowerCase(),
     fallbackLocale: "en-us",
     messages: loadLocaleMessages()
 });

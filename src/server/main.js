@@ -17,10 +17,13 @@ import mongoose from "mongoose";
 import httpErrors from "http-errors";
 import i18next from "i18next";
 import i18nextMiddleware from "i18next-http-middleware";
+import nunjucks from "nunjucks";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
+
+import nunjucksConfig from "./../../nunjucks.config";
 
 /**
  * This is base server of a web server with standard setup, security and basic routes
@@ -74,6 +77,10 @@ class WebServer {
         this.app.use(json());
         this.app.use(urlencoded({ extended: true }));
         this.app.use(compression());
+
+        this.templateEnvironment = new nunjucks.Environment(null, { express: this.app });
+        nunjucksConfig(this.templateEnvironment);
+
 
         const locales = require.context('~server/locales', true, /[A-Za-z0-9-_,\s]+\.json$/i);
         const resources = {};
@@ -187,7 +194,7 @@ class WebServer {
         apps.keys().forEach((key) => {
             /** @type {import("./lib/DefaultApp")["default"]} */
             const app = apps(key).default;
-            const clApp = new app(this.app, this.server);
+            const clApp = new app(this.app, this.server, this.templateEnvironment);
             clApp.routerNamespace = toURIPathPart(clApp.routerNamespace);
             clApp.collectRoutes();
             this.app.use(clApp.routerNamespace, clApp.router);

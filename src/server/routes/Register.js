@@ -4,8 +4,8 @@ import User from "~server/models/User";
 
 export default class Register extends DefaultRoute {
 
-    constructor(mainApp, subApp) {
-        super(mainApp, subApp);
+    constructor(mainApp, parentApp) {
+        super(mainApp, parentApp);
         this.routerNameSpace = "/register";
         this.routeOf = ["/", "/admin"];
     }

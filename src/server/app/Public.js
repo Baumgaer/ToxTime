@@ -2,9 +2,9 @@ import DefaultApp from "~server/lib/DefaultApp";
 
 export default class PublicApp extends DefaultApp {
 
-    constructor(app, server) {
-        super(app, server);
+    constructor(app, server, renderEngine) {
+        super(app, server, renderEngine);
         this.routerNamespace = "/public";
-        this.authenticatedOnly = true;
+        this.adminRightsNeeded = false;
     }
 }
