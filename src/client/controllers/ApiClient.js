@@ -37,6 +37,7 @@ export default class ApiClient {
             body: JSON.stringify(data)
         });
 
+        if (response.status < 200 || response.status >= 300) return Promise.resolve({ success: false, error: { name: "unknownError" } });
         return response.json();
     }
 }

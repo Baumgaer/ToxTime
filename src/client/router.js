@@ -39,6 +39,14 @@ const routes = [
         },
         path: "/login/reset",
         component: PasswordReset
+    },
+    {
+        name: "loginresetWithToken",
+        meta: {
+            title: i18n.tc("resetPassword")
+        },
+        path: "/login/reset/:token",
+        component: PasswordReset
     }
 ];
 
