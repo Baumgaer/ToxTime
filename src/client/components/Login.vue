@@ -34,7 +34,6 @@
 <script>
 import { isEmail } from "validator";
 import ApiClient from "~client/controllers/ApiClient";
-import User from "~common/models/User";
 import i18n from "~client/controllers/i18n";
 
 export default {
@@ -77,9 +76,7 @@ export default {
                 return;
             }
             const userData = result.data.models[0];
-            ApiClient.store.activeUser = Object.assign(new User(), userData);
-            this.$router.push({ name: userData.isAdmin ? "admin" : "public" });
-            window.location.reload();
+            window.location.href = userData.isAdmin ? "/admin" : "/public";
         }
     }
 };

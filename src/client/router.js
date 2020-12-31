@@ -3,27 +3,10 @@ import VueRouter from 'vue-router';
 import i18n from "~client/controllers/i18n";
 
 // import components
-import HelloWorld from "~client/components/HelloWorld.vue";
 import Login from "~client/components/Login.vue";
 import PasswordReset from "~client/components/PasswordReset.vue";
 
-const routes = [
-    {
-        name: "admin",
-        meta: {
-            title: i18n.tc("helloAdmin")
-        },
-        path: "/admin",
-        component: HelloWorld
-    },
-    {
-        name: "public",
-        meta: {
-            title: i18n.tc("helloWorld")
-        },
-        path: "/public",
-        component: HelloWorld
-    },
+let routes = [
     {
         name: "login",
         meta: {
@@ -51,4 +34,28 @@ const routes = [
 ];
 
 Vue.use(VueRouter);
-export default new VueRouter({ mode: "history", routes });
+
+export default class Router {
+
+    static extendRoutes(theRoutes) {
+        this.routes = this.routes.concat(theRoutes);
+    }
+
+    static init() {
+        const router = new VueRouter({ mode: "history", routes: this.routes });
+        router.beforeEach((to, _from, next) => {
+            let title = to.meta.title;
+            const component = to.matched.find((item) => {
+                if (item.name === to.name) return true;
+                return false;
+            });
+            if (component?.components?.default?.props?.subTitle) {
+                title = `${component.components.default.props.subTitle} - ${title}`;
+            }
+            document.title = title;
+            next();
+        });
+        return router;
+    }
+}
+Router.routes = routes;

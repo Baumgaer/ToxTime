@@ -26,8 +26,8 @@ export default class DefaultApp {
         /** @type {boolean} */
         this.authenticatedOnly = true;
 
+        let loadedIndex = null;
         const staticPath = path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".");
-        const loadedIndex = readFileSync(path.resolve(staticPath, "index.html")).toString();
         /** @type {ReturnType<import("express")["Router"]>} */
         this.router = Router();
         this.router.use(async (request, response, next) => {
@@ -36,6 +36,9 @@ export default class DefaultApp {
                 if (request.user && request.user.passwordResetToken) {
                     request.user.passwordResetToken = "";
                     await request.user.save();
+                }
+                if (!loadedIndex) {
+                    loadedIndex = readFileSync(path.resolve(staticPath, `${this.routerNamespace.substring(1) || "index"}.html`)).toString();
                 }
                 response.send(this.renderEngine.renderString(loadedIndex, {
                     userInformation: JSON.parse(JSON.stringify((request.user || {}))),

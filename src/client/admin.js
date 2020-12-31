@@ -1,23 +1,23 @@
 import Vue from 'vue';
 
-import router from "~client/router";
+import Router from "~client/router";
 import i18n from "~client/controllers/i18n";
 import App from '~client/App.vue';
 
+import HelloWorld from "~client/components/HelloWorld.vue";
+
 Vue.config.productionTip = false;
 
-router.beforeEach((to, _from, next) => {
-    let title = to.meta.title;
-    const component = to.matched.find((item) => {
-        if (item.name === to.name) return true;
-        return false;
-    });
-    if (component?.components?.default?.props?.subTitle) {
-        title = `${component.components.default.props.subTitle} - ${title}`;
-    }
-    document.title = title;
-    next();
-});
+Router.extendRoutes([{
+    name: "admin",
+    meta: {
+        title: i18n.tc("helloAdmin")
+    },
+    path: "/admin",
+    component: HelloWorld
+}]);
+
+const router = Router.init();
 
 new Vue({
     i18n,

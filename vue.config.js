@@ -15,16 +15,9 @@ module.exports = {
         config.resolve.alias["~client"] = path.resolve(arp.path, "src", "client");
         config.resolve.alias["~common"] = path.resolve(arp.path, "src", "common");
     },
-    chainWebpack: config => {
-        // If you wish to remove the standard entry point
-        config.entryPoints.delete('app');
-
-        // then add your own
-        config.entry('admin')
-            .add('./src/client/admin.js')
-            .end()
-            .entry('public')
-            .add('./src/client/public.js')
-            .end();
+    pages: {
+        index: "src/client/index.js",
+        admin: "src/client/admin.js",
+        public: "src/client/public.js"
     }
 };
