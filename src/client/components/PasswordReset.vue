@@ -18,7 +18,7 @@
                 <button type="submit" class="resetButton">
                     {{ $t("resetPassword") }}
                 </button>
-                <router-link :to="{ name: 'loginreset' }" class="backToLogin">
+                <router-link :to="{ name: 'login' }" class="backToLogin">
                     {{ $t("backToLogin") }}
                 </router-link>
             </div>
@@ -146,6 +146,7 @@ export default {
                 return;
             }
             this.hint("success", null, i18n.t("passwordSuccessfullySet"));
+            setTimeout(() => this.$router.push("/"), 2000);
         }
     }
 };

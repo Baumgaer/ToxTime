@@ -22,7 +22,7 @@
                 </button>
                 <router-link
                     :to="{ name: 'loginreset' }"
-                    class="forgetPassword"
+                    class="forgotPassword"
                 >
                     {{ $t("forgotPassword") }}
                 </router-link>

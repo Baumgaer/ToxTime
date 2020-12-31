@@ -9,7 +9,7 @@
     width: 40%;
     padding: 20px;
 
-    background-color: var(--secondary-background-color, #d3d2d2);
+    background-color: var(--secondary-background-color, @dusk);
     border-radius: 3px;
 
     .email,
@@ -43,26 +43,40 @@
         text-align: right;
 
         .loginButton,
+        .resetButton,
         .setPasswordButton {
             width: auto;
             padding: 5px;
-            float: left;
+            float: right;
+            font-size: 16px;
 
-            border: 1px solid gray;
+            border: 1px solid var(--gray-color, @gray);
             border-radius: 3px;
 
+            background-color: var(--success-color, @successColor);
+            color: var(--white-color, @white);
+
             cursor: pointer;
+
+            &:hover {
+                background-color: var(--green-color, @green);
+            }
         }
 
         .forgotPassword,
         .backToLogin {
             display: block;
             padding: 5px;
-            float: right;
-            color: var(--primary-text-color, black);
+            float: left;
+            color: var(--primary-text-color, @white);
+            background-color: var(--info-color, @infoColor);
+            text-decoration: none;
+
+            border: 1px solid var(--gray-color, @gray);
+            border-radius: 3px;
 
             &:hover {
-                color: var(--primary-text-hover-color, #383737);
+                background-color: var(--primary-color, @primaryColor);
             }
         }
     }
