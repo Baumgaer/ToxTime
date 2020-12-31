@@ -122,9 +122,8 @@ export default class Login extends DefaultRoute {
         const user = await this.checkPasswordResetToken(request, response, next);
         user.passwordResetToken = "";
         try {
-            console.log(user);
-            await user.save();
             await user.setPassword(password);
+            await user.save();
             response.send({ success: true, data: {} });
         } catch (error) {
             next(httpErrors.InternalServerError(error));
