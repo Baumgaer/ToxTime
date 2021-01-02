@@ -30,13 +30,14 @@ export default class Login extends DefaultRoute {
     /**
      * test
      *
-     * @param {import("express").Request} _request the request
+     * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
+     * @param {import("express").NextFunction} next the next middleware
      * @returns {void}
      * @memberof Login
      */
-    routeGetReset(_request, response) {
-        this.sendStaticFile(response);
+    routeGetReset(request, response, next) {
+        this.parentApp.sendStaticFile(request, response, next, true);
     }
 
     /**

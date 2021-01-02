@@ -26,27 +26,30 @@ export default class DefaultApp {
         /** @type {boolean} */
         this.authenticatedOnly = true;
 
-        let loadedIndex = null;
-        const staticPath = path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".");
+        /** @type {string | null} */
+        this.loadedIndex = null;
+
         /** @type {ReturnType<import("express")["Router"]>} */
         this.router = Router();
-        this.router.use(async (request, response, next) => {
-            if (this.authenticatedOnly && !request.user || this.adminRightsNeeded && !request.user.isAdmin) return next(httpErrors.Unauthorized());
-            if (["/", "index.html"].includes(request.path)) {
-                if (request.user && request.user.passwordResetToken) {
-                    request.user.passwordResetToken = "";
-                    await request.user.save();
-                }
-                if (!loadedIndex) {
-                    loadedIndex = readFileSync(path.resolve(staticPath, `${this.routerNamespace.substring(1) || "index"}.html`)).toString();
-                }
-                response.send(this.renderEngine.renderString(loadedIndex, {
-                    userInformation: JSON.parse(JSON.stringify((request.user || {}))),
-                    nonce: response.locals.cspNonce
-                }));
-            } else expressStatic(staticPath)(request, response, next);
-        });
+        this.router.use((request, response, next) => this.sendStaticFile(request, response, next));
 
+    }
+
+    async sendStaticFile(request, response, next, useAppRouterNameSpace) {
+        const staticPath = path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".");
+        const ownHtmlName = `${this.routerNamespace.substring(1) || "index"}.html`;
+        if (this.authenticatedOnly && !request.user || this.adminRightsNeeded && !request.user.isAdmin) return next(httpErrors.Unauthorized());
+        if (["/", ownHtmlName].includes(request.path) || useAppRouterNameSpace) {
+            if (request.user && request.user.passwordResetToken) {
+                request.user.passwordResetToken = "";
+                await request.user.save();
+            }
+            if (!this.loadedIndex) this.loadedIndex = readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
+            response.send(this.renderEngine.renderString(this.loadedIndex, {
+                userInformation: JSON.parse(JSON.stringify((request.user || {}))),
+                nonce: response.locals.cspNonce
+            }));
+        } else expressStatic(staticPath)(request, response, next);
     }
 
     /**

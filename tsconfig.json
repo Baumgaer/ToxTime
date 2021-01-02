@@ -54,5 +54,8 @@
         "node_modules",
         "var",
         "dist",
+        "server.js",
+        "webpack",
+        "webpack.config.*.js"
     ]
 }
