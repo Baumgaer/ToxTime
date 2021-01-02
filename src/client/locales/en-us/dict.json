@@ -17,5 +17,14 @@
     "passwordSuccessfullySet": "Password reset successfully",
     "login": "Log in",
     "backToLogin": "Back to log in",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "adminArea": "Administration area",
+    "navigation": "Navigation",
+    "items": "Items",
+    "users": "Users",
+    "lessons": "Lessons",
+    "scenes": "Scenes",
+    "objects": "Objects",
+    "recipes": "Recipes",
+    "settings": "Settings"
 }

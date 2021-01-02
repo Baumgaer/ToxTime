@@ -67,7 +67,7 @@ export default class Login extends DefaultRoute {
                         user: user
                     }
                 });
-            }
+            } else console.info(`ignored email ${email} because no user was found`);
             response.send({ success: true, data: {} });
         } catch (error) {
             next(httpErrors.InternalServerError(error));

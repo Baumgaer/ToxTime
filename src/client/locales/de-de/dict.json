@@ -17,5 +17,14 @@
     "passwordSuccessfullySet": "Passwort erfolgreich zurückgesetzt",
     "login": "Anmelden",
     "backToLogin": "Zurück zur Anmeldung",
-    "unknownError": "Unbekannter Fehler"
+    "unknownError": "Unbekannter Fehler",
+    "adminArea": "Administrationsbereich",
+    "navigation": "Navigation",
+    "items": "Artikel",
+    "users": "Benutzer",
+    "lessons": "Lektionen",
+    "scenes": "Szenen",
+    "objects": "Objekte",
+    "recipes": "Rezepte",
+    "settings": "Einstellungen"
 }

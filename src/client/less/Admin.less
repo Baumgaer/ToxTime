@@ -1,0 +1,105 @@
+@import (less) "variables.less";
+
+.admin {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 200px 350px 1fr;
+    grid-template-areas: "nav items editor";
+    height: 100%;
+
+    header {
+        h2 {
+            margin-left: 10px;
+            color: var(--white-color, @white);
+            display: inline-block;
+        }
+    }
+
+    .navigation {
+        background-color: var(--dark-color, @dark);
+        grid-area: "nav";
+
+        .button {
+            @height: 50px;
+            color: var(--white-color, @white);
+
+            &:hover {
+                background-color: var(--dusk-color, @dusk);
+                cursor: pointer;
+            }
+
+            &.active {
+                background-color: var(--primary-color, @primaryColor);
+
+                &:hover {
+                    background-color: var(--info-color, @infoColor);
+                }
+            }
+
+            > * {
+                display: inline-block;
+                vertical-align: middle;
+                height: @height;
+            }
+
+            .icon {
+                width: @height;
+                line-height: @height;
+                text-align: center;
+                font-size: 20px;
+            }
+
+            .label {
+                width: calc(100% - @height);
+                line-height: @height;
+            }
+        }
+    }
+
+    .items {
+        background-color: var(--dusk-color, @dusk);
+        grid-area: "items";
+        color: var(--white-color, @white);
+        overflow: hidden;
+
+        header {
+            display: block;
+            white-space: nowrap;
+
+            h2 {
+                display: inline-block;
+                box-sizing: border-box;
+                width: calc(100% - 60px);
+            }
+            .button {
+                display: inline-block;
+                grid-area: "collapseButton";
+                @height: 30px;
+                height: @height;
+                line-height: @height;
+                width: @height;
+                cursor: pointer;
+                text-align: center;
+                margin: 0 10px;
+
+                &.collapsed {
+                    margin: 5px;
+                }
+
+                &:hover {
+                    background-color: var(--light-color, @light);
+                    border-radius: 5px;
+                    color: var(--dark-color, @dark);
+                }
+            }
+        }
+
+        .list {
+            margin: 0 10px;
+        }
+    }
+
+    .editor {
+        grid-area: "editor";
+    }
+}

@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import "vue-material-design-icons/styles.css";
+
 export default {
     name: "App"
 };

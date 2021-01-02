@@ -4,17 +4,17 @@ import Router from "~client/controllers/Router";
 import i18n from "~client/controllers/i18n";
 import App from '~client/App.vue';
 
-import HelloWorld from "~client/components/HelloWorld.vue";
+import Admin from "~client/components/Admin.vue";
 
 Vue.config.productionTip = false;
 
 Router.extendRoutes([{
     name: "admin",
     meta: {
-        title: i18n.tc("helloAdmin")
+        title: i18n.tc("adminArea")
     },
     path: "/admin",
-    component: HelloWorld
+    component: Admin
 }]);
 
 const router = Router.init();
