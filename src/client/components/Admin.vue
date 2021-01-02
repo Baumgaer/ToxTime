@@ -4,38 +4,32 @@
             <header>
                 <h2>{{ $t('navigation') }}</h2>
             </header>
-            <div class="button" ref="users" v-on:click="onNavButtonClick('users')">
-                <div class="icon"><account-icon /></div>
-                <div class="label">{{ $t('users') }}</div>
-            </div>
-            <div class="button" ref="lessons" v-on:click="onNavButtonClick('lessons')">
-                <div class="icon"><school-icon /></div>
-                <div class="label">{{ $t('lessons') }}</div>
-            </div>
-            <div class="button" ref="scenes" v-on:click="onNavButtonClick('scenes')">
-                <div class="icon"><theater-icon /></div>
-                <div class="label">{{ $t('scenes') }}</div>
-            </div>
-            <div class="button" ref="objects" v-on:click="onNavButtonClick('objects')">
-                <div class="icon"><ufo-icon /></div>
-                <div class="label">{{ $t('objects') }}</div>
-            </div>
-            <div class="button" ref="recipes" v-on:click="onNavButtonClick('recipes')">
-                <div class="icon"><graph-icon /></div>
-                <div class="label">{{ $t('recipes') }}</div>
-            </div>
-            <div class="button" ref="settings" v-on:click="onNavButtonClick('settings')">
-                <div class="icon"><cog-icon /></div>
-                <div class="label">{{ $t('settings') }}</div>
-            </div>
+            <Button ref="users" name="users" :active="this.category === 'users'" v-on:click="onNavButtonClick('users')" >
+                <account-icon />
+            </Button>
+            <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" v-on:click="onNavButtonClick('lessons')" >
+                <school-icon />
+            </Button>
+            <Button ref="scenes" name="scenes" :active="this.category === 'scenes'" v-on:click="onNavButtonClick('scenes')" >
+                <theater-icon />
+            </Button>
+            <Button ref="objects" name="objects" :active="this.category === 'objects'" v-on:click="onNavButtonClick('objects')" >
+                <ufo-icon />
+            </Button>
+            <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" v-on:click="onNavButtonClick('recipes')" >
+                <graph-icon />
+            </Button>
+            <Button ref="settings" name="settings" :active="this.category === 'settings'" v-on:click="onNavButtonClick('settings')" >
+                <cog-icon />
+            </Button>
         </nav>
         <section class="items" ref="items">
             <header>
                 <h2 v-show="!itemsCollapsed">{{ $t(this.category) }}</h2>
-                <div :class="!itemsCollapsed ? 'button' : 'button collapsed'" v-on:click="onCollapseButtonClick()">
+                <Button ref="settings" :class="!itemsCollapsed ? '' : 'collapsed'" name="collapse" :showLabel="false" v-on:click="onCollapseButtonClick()" >
                     <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
                     <arrow-collapse-left-icon v-else />
-                </div>
+                </Button>
             </header>
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
                 TEST!
@@ -48,6 +42,8 @@
 </template>
 
 <script>
+import Button from "~client/components/Button.vue";
+
 import AccountIcon from "vue-material-design-icons/Account";
 import SchoolIcon from "vue-material-design-icons/School";
 import TheaterIcon from "vue-material-design-icons/Theater";
@@ -66,7 +62,8 @@ export default {
         GraphIcon,
         CogIcon,
         ArrowCollapseLeftIcon,
-        ArrowCollapseRightIcon
+        ArrowCollapseRightIcon,
+        Button
     },
     data() {
         return {
@@ -79,11 +76,6 @@ export default {
     },
     methods: {
         onNavButtonClick(name) {
-            const buttons = Array.from(this.$refs.navigation.getElementsByClassName("button"));
-            for (const button of buttons) {
-                button.classList.remove("active");
-            }
-            this.$refs[name].classList.add("active");
             this.category = name;
         },
         onCollapseButtonClick() {

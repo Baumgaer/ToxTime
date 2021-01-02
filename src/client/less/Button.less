@@ -1,0 +1,36 @@
+@import (less) "variables";
+
+.button {
+    @height: 50px;
+
+    &:hover {
+        background-color: var(--hover-color, @dusk);
+        cursor: pointer;
+    }
+
+    &.active {
+        background-color: var(--active-color, @primaryColor);
+
+        &:hover {
+            background-color: var(--active-hover-color, @infoColor);
+        }
+    }
+
+    > * {
+        display: inline-block;
+        vertical-align: middle;
+        height: var(--button-height, @height);
+    }
+
+    .icon {
+        width: var(--button-height, @height);
+        line-height: var(--button-height, @height);
+        text-align: center;
+        font-size: var(--button-font-size, 20px);
+    }
+
+    .label {
+        width: calc(100% - var(--button-width, --button-height, @height));
+        line-height: var(--button-height, @height);
+    }
+}

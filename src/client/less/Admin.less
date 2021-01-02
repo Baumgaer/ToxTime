@@ -20,39 +20,7 @@
         grid-area: "nav";
 
         .button {
-            @height: 50px;
             color: var(--white-color, @white);
-
-            &:hover {
-                background-color: var(--dusk-color, @dusk);
-                cursor: pointer;
-            }
-
-            &.active {
-                background-color: var(--primary-color, @primaryColor);
-
-                &:hover {
-                    background-color: var(--info-color, @infoColor);
-                }
-            }
-
-            > * {
-                display: inline-block;
-                vertical-align: middle;
-                height: @height;
-            }
-
-            .icon {
-                width: @height;
-                line-height: @height;
-                text-align: center;
-                font-size: 20px;
-            }
-
-            .label {
-                width: calc(100% - @height);
-                line-height: @height;
-            }
         }
     }
 
@@ -74,13 +42,7 @@
             .button {
                 display: inline-block;
                 grid-area: "collapseButton";
-                @height: 30px;
-                height: @height;
-                line-height: @height;
-                width: @height;
-                cursor: pointer;
-                text-align: center;
-                margin: 0 10px;
+                --button-height: 30px;
 
                 &.collapsed {
                     margin: 5px;
