@@ -18,6 +18,15 @@ export default class ApiClient {
             if (!ApiClient._store[command.collection]) ApiClient._store[command.collection] = {};
             ApiClient._store[command.collection][command.key] = command.value;
         }
+        if (command.name === "remove") {
+            if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
+            delete ApiClient._store[command.collection][command.key];
+        }
+
+        if (command.name === "update") {
+            if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
+            Object.assign(ApiClient._store[command.collection][command.key], command.value);
+        }
     }
 
     static post(target, data = {}, additionalHeaders = {}) {
