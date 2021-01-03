@@ -14,7 +14,7 @@ export default class ApiClient {
     }
 
     static set store(command) {
-        console.log(command);
+        if (command.name === "add") ApiClient._store[command.key] = command.value;
     }
 
     static post(target, data = {}, additionalHeaders = {}) {
@@ -67,6 +67,11 @@ export default class ApiClient {
                 const newModel = new ApiClient.modelMap[model.className]();
                 Object.assign(newModel, model);
                 mapped.data.models.push(newModel);
+                this.store = {
+                    name: "add",
+                    key: model._id,
+                    value: newModel
+                };
             }
         }
 

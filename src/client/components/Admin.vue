@@ -80,6 +80,7 @@ export default {
             if (!result.success) {
                 return this.items = [];
             }
+            console.log(ApiClient.store);
             this.items = result.data.models;
         },
 
