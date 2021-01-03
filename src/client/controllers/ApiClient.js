@@ -14,7 +14,10 @@ export default class ApiClient {
     }
 
     static set store(command) {
-        if (command.name === "add") ApiClient._store[command.key] = command.value;
+        if (command.name === "add") {
+            if (!ApiClient._store[command.collection]) ApiClient._store[command.collection] = {};
+            ApiClient._store[command.collection][command.key] = command.value;
+        }
     }
 
     static post(target, data = {}, additionalHeaders = {}) {
@@ -69,6 +72,7 @@ export default class ApiClient {
                 mapped.data.models.push(newModel);
                 this.store = {
                     name: "add",
+                    collection: model.collection,
                     key: model._id,
                     value: newModel
                 };
