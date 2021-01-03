@@ -1,5 +1,5 @@
 <template>
-    <main class="admin" v-bind:style="itemsCollapsed ? 'gridTemplateColumns: 200px 40px 1fr' : ''">
+    <main class="admin" v-bind:style="itemsCollapsed ? 'gridTemplateColumns: 200px 30px 1fr' : ''">
         <nav class="navigation" ref="navigation">
             <header>
                 <h2>{{ $t('navigation') }}</h2>
@@ -24,15 +24,26 @@
             </Button>
         </nav>
         <section class="items" ref="items">
-            <header>
+            <header :style="itemsCollapsed ? 'display: block' : ''">
                 <h2 v-show="!itemsCollapsed">{{ $t(this.category) }}</h2>
-                <Button ref="settings" :class="!itemsCollapsed ? '' : 'collapsed'" name="collapse" :showLabel="false" v-on:click="onCollapseButtonClick()" >
-                    <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
-                    <arrow-collapse-left-icon v-else />
-                </Button>
+                <div class="buttons">
+                    <Button ref="settings" :class="!itemsCollapsed ? 'collapseButton' : 'collapseButton collapsed'" name="collapse" :showLabel="false" v-on:click="onCollapseButtonClick()" >
+                        <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
+                        <arrow-collapse-left-icon v-else />
+                    </Button>
+                    <Button class="addButton" v-show="!itemsCollapsed" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
+                        <plus-icon />
+                    </Button>
+                </div>
             </header>
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
-                TEST!
+                <div v-if="this.items.length">
+                    <Item v-for="item of this.items" :key="item.id" :model="item" />
+                </div>
+                <div v-else class="empty">{{ $t('noContent') }}</div>
+                <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
+                    <plus-icon />
+                </Button>
             </section>
         </section>
         <section class="editor">
@@ -43,43 +54,41 @@
 
 <script>
 import Button from "~client/components/Button.vue";
-
-import AccountIcon from "vue-material-design-icons/Account";
-import SchoolIcon from "vue-material-design-icons/School";
-import TheaterIcon from "vue-material-design-icons/Theater";
-import UfoIcon from "vue-material-design-icons/Ufo";
-import GraphIcon from "vue-material-design-icons/Graph";
-import CogIcon from "vue-material-design-icons/Cog";
-import ArrowCollapseLeftIcon from "vue-material-design-icons/ArrowCollapseLeft";
-import ArrowCollapseRightIcon from "vue-material-design-icons/ArrowCollapseRight";
+import Item from "~client/components/Item.vue";
+import ApiClient from "~client/controllers/ApiClient";
 
 export default {
     components: {
-        AccountIcon,
-        SchoolIcon,
-        TheaterIcon,
-        UfoIcon,
-        GraphIcon,
-        CogIcon,
-        ArrowCollapseLeftIcon,
-        ArrowCollapseRightIcon,
-        Button
+        Button,
+        Item
     },
     data() {
         return {
             category: "users",
-            itemsCollapsed: false
+            itemsCollapsed: false,
+            items: []
         };
     },
     mounted() {
         this.onNavButtonClick("users");
     },
     methods: {
-        onNavButtonClick(name) {
+
+        async onNavButtonClick(name) {
             this.category = name;
+            const result = await ApiClient.get(`/admin/${name}`);
+            if (!result.success) {
+                return this.items = [];
+            }
+            this.items = result.data.models;
         },
+
         onCollapseButtonClick() {
             this.itemsCollapsed = Boolean(this.$refs.items.clientWidth > 100);
+        },
+
+        onAddItemButtonClick() {
+            console.log("lol");
         }
     }
 };

@@ -26,5 +26,7 @@
     "scenes": "Scenes",
     "objects": "Objects",
     "recipes": "Recipes",
-    "settings": "Settings"
+    "settings": "Settings",
+    "noContent": "Currently no content",
+    "addItem": "Add item"
 }

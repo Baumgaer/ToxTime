@@ -45,3 +45,15 @@ export function getAllFuncs(toCheck) {
         if (e != arr[i + 1] && typeof toCheck[e] == 'function') return true;
     });
 }
+
+/**
+ * Handles transformation of data of the database
+ *
+ * @export
+ * @param doc The database document
+ * @param ret The pre passed value which will be returned
+ * @param modelClass The model class (NOT INSTANCE!) which is dependant
+ */
+export function dataTransformer(doc, ret, modelClass) {
+    ret.className = modelClass.className;
+}

@@ -148,10 +148,9 @@ export default class Login extends DefaultRoute {
             if (!user) return response.send({ success: false, error: { name: "emailOrPasswordIncorrect" } });
             request.logIn(user, (error) => {
                 if (error) return response.send({ success: false, error });
-                const theUser = Object.assign({}, user)._doc;
-                delete theUser.salt;
+                const theUser = Object.assign({}, user.toObject());
                 delete theUser.hash;
-
+                delete theUser.salt;
                 response.send({ success: true, data: { models: [theUser] } });
             });
         })(request, response);

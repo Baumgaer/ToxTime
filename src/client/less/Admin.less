@@ -17,7 +17,7 @@
 
     .navigation {
         background-color: var(--dark-color, @dark);
-        grid-area: "nav";
+        grid-area: nav;
 
         .button {
             color: var(--white-color, @white);
@@ -26,42 +26,61 @@
 
     .items {
         background-color: var(--dusk-color, @dusk);
-        grid-area: "items";
+        grid-area: items;
         color: var(--white-color, @white);
         overflow: hidden;
 
         header {
-            display: block;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-areas:
+                "headline ."
+                "headline buttons"
+                "headline .";
             white-space: nowrap;
+            height: 68px;
 
             h2 {
-                display: inline-block;
+                grid-area: headline;
                 box-sizing: border-box;
                 width: calc(100% - 60px);
             }
-            .button {
-                display: inline-block;
-                grid-area: "collapseButton";
-                --button-height: 30px;
+            .buttons {
+                grid-area: buttons;
+                line-height: 68px;
+                text-align: right;
 
-                &.collapsed {
-                    margin: 5px;
+                .collapseButton,
+                .addButton {
+                    float: right;
+                    --button-height: 30px;
+                    --button-width: 30px;
+                    --hover-color: var(--gray-color, @gray);
                 }
-
-                &:hover {
-                    background-color: var(--light-color, @light);
-                    border-radius: 5px;
-                    color: var(--dark-color, @dark);
+                &.collapsed {
+                    width: 40px;
                 }
             }
         }
 
         .list {
-            margin: 0 10px;
+            height: 100%;
+
+            .empty {
+                margin: 0 10px;
+                text-align: center;
+                height: 50px;
+                line-height: 50px;
+            }
+
+            .addButton {
+                --hover-color: var(--gray-color, @gray);
+            }
         }
     }
 
     .editor {
-        grid-area: "editor";
+        grid-area: editor;
     }
 }

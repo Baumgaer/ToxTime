@@ -94,6 +94,7 @@ export default class DefaultApp {
      * @memberof DefaultApp
      */
     handle(handler, request, response, next) {
+        request.session.touch();
         if ((this.authenticatedOnly && !request.user) ||
             (this.adminRightsNeeded && (!request.user || request.user && !request.user.isAdmin))) return next(httpErrors.Unauthorized());
         handler(request, response, next);

@@ -1,7 +1,5 @@
 {
     "helloWorld": "Hallo Welt",
-    "helloAdmin": "Hallo Administrator",
-    "helloLogin": "Hallo Login",
     "email": "E-Mail",
     "emailIncorrect": "E-Mail inkorrekt",
     "errorWhileSendingEmail": "Fehler beim Senden der E-Mail",
@@ -26,5 +24,7 @@
     "scenes": "Szenen",
     "objects": "Objekte",
     "recipes": "Rezepte",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "noContent": "Zur Zeit keine Inhalte",
+    "addItem": "Artikel hinzufügen"
 }

@@ -1,0 +1,31 @@
+@import (less) "variables.less";
+
+.item {
+    @height: 50px;
+    @halfHeight: 25px;
+
+    display: grid;
+    grid-template-columns: @height 1fr;
+    grid-template-rows: @height;
+    grid-template-areas: "avatar info" "avatar info";
+
+    &:hover {
+        background-color: var(--gray-color, @gray);
+    }
+
+    .avatar {
+        grid-area: avatar;
+        text-align: center;
+        line-height: @height;
+        font-size: 24px;
+    }
+
+    .info {
+        grid-area: info;
+
+        > * {
+            height: @halfHeight;
+            line-height: @halfHeight;
+        }
+    }
+}

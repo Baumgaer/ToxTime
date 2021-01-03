@@ -1,6 +1,18 @@
-export default class User {
+import BaseModel from "~common/lib/BaseModel";
 
-    test() {
-        return "Test successful";
+export default class User extends BaseModel {
+
+    getName(preferredField) {
+        return `${this[preferredField] || this.email}`;
+    }
+
+    getAvatar() {
+        return {
+            type: "component",
+            name: "account-icon"
+        };
     }
 }
+
+User.className = "User";
+User.collection = "users";

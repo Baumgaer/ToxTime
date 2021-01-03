@@ -1,6 +1,7 @@
 import { Schema, connection } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
-import User from "~common/models/User";
+import Model from "~common/models/User";
+import { dataTransformer } from "~common/utils";
 
 const schema = new Schema({
     email: {
@@ -28,9 +29,9 @@ const schema = new Schema({
         required: true,
         default: false
     },
-    currentGameSession: String,
+    currentGameSession: Schema.Types.ObjectId,
     solvedGameSessions: {
-        type: Array,
+        type: [{ type: Schema.Types.ObjectId }],
         required: true,
         default: []
     },
@@ -54,10 +55,12 @@ const schema = new Schema({
         unique: true
     }
 }, {
-    collection: "users"
+    collection: Model.collection,
+    toObject: { transform: (doc, ret) => dataTransformer(doc, ret, Model) },
+    toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, Model) }
 });
 
-schema.loadClass(User);
+schema.loadClass(Model);
 schema.plugin(passportLocalMongoose, {
     usernameUnique: false,
     usernameField: "email",
@@ -68,5 +71,6 @@ schema.plugin(passportLocalMongoose, {
         return model.findOne(queryParameters);
     }
 });
-
-export default connection.model("User", schema);
+const TheModel = connection.model(Model.className, schema);
+TheModel.className = Model.className;
+export default TheModel;

@@ -1,2 +1,2 @@
-import User from "~common/models/User";
-export default User;
+import CommonUser from "~common/models/User";
+export default class User extends CommonUser { }
