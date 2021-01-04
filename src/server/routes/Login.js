@@ -63,7 +63,7 @@ export default class Login extends DefaultRoute {
                     to: email,
                     subject: "resetPassword",
                     locales: {
-                        url: `http://${process.env.domain || "localhost"}/login/reset/${token}`,
+                        url: `http://${process.environment.domain || "localhost"}/login/reset/${token}`,
                         user: user
                     }
                 });

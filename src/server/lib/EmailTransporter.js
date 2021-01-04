@@ -60,7 +60,7 @@ export default class EmailTransporter {
      */
     async createTransporter() {
         let testAccount = {};
-        if (process.env.NODE_ENV === "development") {
+        if (process.environment.NODE_ENV === "development") {
             const testAccountCache = path.resolve(rootPath, "var", "buildcache", "backend", "ethereal.mail.json");
             if (existsSync(testAccountCache)) {
                 testAccount = JSON.parse(readFileSync(testAccountCache).toString());
@@ -78,12 +78,12 @@ export default class EmailTransporter {
         }
 
         return createTransport({
-            host: host || process.env.MAIL_HOST,
-            port: port || process.env.MAIL_PORT,
-            secure: secure || process.env.MAIL_PORT === 465, // true for 465, false for other ports
+            host: host || process.environment.MAIL_HOST,
+            port: port || process.environment.MAIL_PORT,
+            secure: secure || process.environment.MAIL_PORT === 465, // true for 465, false for other ports
             auth: {
-                user: testAccount.user || process.env.MAIL_USER,
-                pass: testAccount.pass || process.env.MAIL_PASSWORD
+                user: testAccount.user || process.environment.MAIL_USER,
+                pass: testAccount.pass || process.environment.MAIL_PASSWORD
             }
         });
     }
@@ -98,7 +98,7 @@ export default class EmailTransporter {
      * @memberof EmailTransporter
      */
     async send(request, params = {}) {
-        params = Object.assign({ from: `${process.env.MAIL_NAME} <${process.env.MAIL_ADDRESS}>`, to: "", subject: "" }, params);
+        params = Object.assign({ from: `${process.environment.MAIL_NAME} <${process.environment.MAIL_ADDRESS}>`, to: "", subject: "" }, params);
         console.info(`Sending e-mail to ${params.to}`);
         const content = this.templates[params.locales.user.locale || "en-us"][params.subject].render(params.locales);
         return await (await this.transporter).sendMail({

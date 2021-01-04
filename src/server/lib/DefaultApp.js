@@ -36,7 +36,7 @@ export default class DefaultApp {
     }
 
     async sendStaticFile(request, response, next, useAppRouterNameSpace) {
-        const staticPath = path.resolve(rootPath, process.env.PATH_STATIC_FILES || ".");
+        const staticPath = path.resolve(rootPath, process.environment.PATH_STATIC_FILES || ".");
         const ownHtmlName = `${this.routerNamespace.substring(1) || "index"}.html`;
         if (this.authenticatedOnly && !request.user || this.adminRightsNeeded && !request.user.isAdmin) return next(httpErrors.Unauthorized());
         if (["/", ownHtmlName].includes(request.path) || useAppRouterNameSpace) {
@@ -65,7 +65,7 @@ export default class DefaultApp {
         const methodName = method.toLowerCase();
         const normalizedURL = toURIPathPart(url);
         this.router[methodName](normalizedURL, (request, response, next) => this.handle(handler, request, response, next));
-        console.debug(methodName, this.routerNamespace, normalizedURL, handler);
+        if (process.environment.DEBUG) console.debug(`5.1 adding route ${methodName} ${toURIPathPart(`${this.routerNamespace}${normalizedURL}`)}`);
     }
 
     collectRoutes() {

@@ -8,10 +8,13 @@ const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toSt
 const parsedConfig = yaml.parse(configString);
 const config = Object.assign({
     "APP_NAME": "PACMaker",
+    "APP_DOMAIN": "localhost",
+    "APP_HTTPS_ONLY": true,
 
     "APP_HOST": "localhost",
     "APP_HTTP_PORT": 80,
     "APP_HTTPS_PORT": 443,
+    "APP_TRUST_PROXY": false,
 
     "DB_HOST": "localhost",
     "DB_PORT": 27017,
@@ -53,7 +56,7 @@ module.exports = {
 
         "log_date_format": "YYYY-MM-DD HH:mm Z",
         "out_file": path.resolve(arp.path, "var", "log", "stdout.log"),
-        "error_log": path.resolve(arp.path, "var", "log", "error.log"),
+        "error_file": path.resolve(arp.path, "var", "log", "error.log"),
         "pid_file": path.resolve(arp.path, "var", "pid"),
 
         watch: shouldWatch ? ["/src/server", "/src/common"] : false,
