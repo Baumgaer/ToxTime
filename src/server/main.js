@@ -174,7 +174,7 @@ class WebServer {
             cookie: {
                 httpOnly: true,
                 domain: process.environment.APP_DOMAIN,
-                secure: process.environment.APP_HTTPS_ONLY,
+                secure: process.environment.APP_SECURE,
                 maxAge: ms(process.environment.SESSION_MAX_AGE)
             },
             store,

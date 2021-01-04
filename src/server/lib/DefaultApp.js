@@ -94,7 +94,7 @@ export default class DefaultApp {
      * @memberof DefaultApp
      */
     handle(handler, request, response, next) {
-        console.info(`${request.connection.remoteAddress} ${request.method} ${request.path}`);
+        console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
         if ((this.authenticatedOnly && !request.user) ||
             (this.adminRightsNeeded && (!request.user || request.user && !request.user.isAdmin))) return next(httpErrors.Unauthorized());
         handler(request, response, next);

@@ -10,7 +10,8 @@
         "dev:backend": "webpack --mode development --watch --config webpack.config.server.js",
         "dev:serve": "pm2 start ecosystem.config.js --env development --deep-monitoring --source-map-support",
         "build": "webpack --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
-        "lint": "vue-cli-service lint"
+        "lint": "vue-cli-service lint",
+        "postinstall": "pm2 install pm2-logrotate"
     },
     "dependencies": {
         "app-root-path": "^3.0.0",
