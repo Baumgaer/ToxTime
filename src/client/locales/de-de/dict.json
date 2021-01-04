@@ -26,5 +26,8 @@
     "recipes": "Rezepte",
     "settings": "Einstellungen",
     "noContent": "Zur Zeit keine Inhalte",
-    "addItem": "Artikel hinzufügen"
+    "addItem": "Artikel hinzufügen",
+    "addUser": "Benutzer hinzufügen",
+    "matriculationNumber": "Matrikelnummer",
+    "isAdmin": "Administrator"
 }

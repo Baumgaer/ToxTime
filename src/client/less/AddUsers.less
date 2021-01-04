@@ -1,0 +1,41 @@
+@import (less) "variables.less";
+
+.addUsers {
+    height: 100%;
+
+    @gridTemplate: 1fr 1fr 100px;
+
+    .form {
+        display: grid;
+        grid-template-columns: @gridTemplate;
+        grid-template-areas: "email matriculationNumber isAdmin";
+
+        .email {
+            grid-area: email;
+        }
+
+        .matriculationNumber {
+            grid-area: matriculationNumber;
+        }
+
+        .isAdmin {
+            grid-area: isAdmin;
+            --height: 27px;
+            --width: 100px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: @gridTemplate;
+            grid-template-areas: "email matriculationNumber isAdmin";
+            grid-column: auto / span 3;
+
+            .input {
+                border: 1px solid @gray;
+                user-select: none;
+                outline: none;
+                padding: 5px;
+            }
+        }
+    }
+}

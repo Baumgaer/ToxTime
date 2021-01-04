@@ -47,7 +47,7 @@
             </section>
         </section>
         <section class="editor">
-
+            <AddUsers v-if="activeEditor === 'addUsers'" />
         </section>
     </main>
 </template>
@@ -56,17 +56,21 @@
 import Button from "~client/components/Button.vue";
 import Item from "~client/components/Item.vue";
 import ApiClient from "~client/controllers/ApiClient";
+import AddUsers from "~client/components/AddUsers.vue";
+import { capitalize } from "~common/utils";
 
 export default {
     components: {
         Button,
-        Item
+        Item,
+        AddUsers
     },
     data() {
         return {
             category: "users",
             itemsCollapsed: false,
-            items: []
+            items: [],
+            activeEditor: null
         };
     },
     mounted() {
@@ -89,7 +93,7 @@ export default {
         },
 
         onAddItemButtonClick() {
-            console.log("lol");
+            this.activeEditor = `add${capitalize(this.category)}`;
         }
     }
 };

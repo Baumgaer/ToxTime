@@ -26,11 +26,11 @@ export function camelCaseToKebabCase(string) {
 }
 
 /**
- *
+ * Collects all method names of a given object
  *
  * @export
  * @param {Object} toCheck
- * @returns
+ * @returns {string[]}
  */
 export function getAllFuncs(toCheck) {
     let props = [];
@@ -50,11 +50,22 @@ export function getAllFuncs(toCheck) {
  * Handles transformation of data of the database
  *
  * @export
- * @param doc The database document
- * @param ret The pre passed value which will be returned
- * @param modelClass The model class (NOT INSTANCE!) which is dependant
+ * @param {any} doc The database document
+ * @param {any} ret The pre passed value which will be returned
+ * @param {any} modelClass The model class (NOT INSTANCE!) which is dependant
  */
 export function dataTransformer(doc, ret, modelClass) {
     ret.className = modelClass.className;
     ret.collection = modelClass.collection;
+}
+
+/**
+ * Capitalizes the first character of the given string
+ *
+ * @export
+ * @param {string} string
+ * @returns {string}
+ */
+export function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }

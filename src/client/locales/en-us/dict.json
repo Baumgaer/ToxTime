@@ -28,5 +28,8 @@
     "recipes": "Recipes",
     "settings": "Settings",
     "noContent": "Currently no content",
-    "addItem": "Add item"
+    "addItem": "Add item",
+    "addUser": "Add user",
+    "matriculationNumber": "Matriculation number",
+    "isAdmin": "Administrator"
 }
