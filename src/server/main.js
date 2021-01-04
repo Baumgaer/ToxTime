@@ -223,6 +223,7 @@ class WebServer {
         }
     }
 }
+
 process.environment = {};
 // First convert all environment variables to their right type
 for (const key in process.env) {
@@ -235,5 +236,6 @@ for (const key in process.env) {
         }
     }
 }
+
 const server = new WebServer();
 server.start();

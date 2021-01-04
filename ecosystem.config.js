@@ -57,9 +57,11 @@ module.exports = {
         "log_date_format": "YYYY-MM-DD HH:mm Z",
         "out_file": path.resolve(arp.path, "var", "log", "stdout.log"),
         "error_file": path.resolve(arp.path, "var", "log", "error.log"),
-        "pid_file": path.resolve(arp.path, "var", "pid"),
+        "pid_file": path.resolve(arp.path, "var", "pid", "process.pid"),
 
-        watch: shouldWatch ? ["/src/server", "/src/common"] : false,
+        watch: shouldWatch ? ["./src/server", "./src/common"] : false,
+        "restart_delay": 1500,
+        "max_restarts": 6,
 
         env: Object.assign({
             "NODE_ENV": config.NODE_ENV || "production",
