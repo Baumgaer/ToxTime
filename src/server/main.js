@@ -1,6 +1,3 @@
-import { install } from "source-map-support";
-if (process.env.NODE_ENV === "development") install();
-
 import express, { json, urlencoded } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';

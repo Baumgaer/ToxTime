@@ -43,6 +43,8 @@ for (const [index, argv] of process.argv.entries()) {
     }
 }
 
+console.log(shouldWatch ? "Watching for changes" : "");
+
 module.exports = {
     apps: [{
         name: config.APP_NAME || "PACMaker",
@@ -54,17 +56,7 @@ module.exports = {
         "error_log": path.resolve(arp.path, "var", "log", "error.log"),
         "pid_file": path.resolve(arp.path, "var", "pid"),
 
-        watch: shouldWatch,
-        "ignore_watch": [
-            "node_modules",
-            "dist",
-            "src",
-            "var",
-            "public",
-            "webpack",
-            /webpack\..*?.js/,
-            "server.js.map"
-        ],
+        watch: shouldWatch ? ["/src/server", "/src/common"] : false,
 
         env: Object.assign({
             "NODE_ENV": config.NODE_ENV || "production",

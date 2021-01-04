@@ -29,6 +29,13 @@ export default class EmailTransporter {
         return EmailTransporter.instance;
     }
 
+    /**
+     * Precompiles email templates and stores them in an object with locale and
+     * template name.
+     *
+     * @returns {Record<string, Record<string, import("nunjucks").Template>>}
+     * @memberof EmailTransporter
+     */
     collectEmailTemplates() {
         const templates = {};
         const templateContext = require.context("~server/templates/email", true, /\.njk$/i, "sync");
@@ -43,6 +50,14 @@ export default class EmailTransporter {
         return templates;
     }
 
+    /**
+     * Creates an email transporter with the globally defined MAIL_ configuration.
+     * If NODE_ENV is development, ethereal.mail will be used to avoid
+     * blacklisting own email addresses and committing passwords.
+     *
+     * @returns
+     * @memberof EmailTransporter
+     */
     async createTransporter() {
         let testAccount = {};
         if (process.env.NODE_ENV === "development") {
@@ -74,7 +89,8 @@ export default class EmailTransporter {
     }
 
     /**
-     * test
+     * Sends an email to given receiver (to) in params.
+     * If from is not given, the global configured sender will be used.
      *
      * @param {import("express").Request} request the request
      * @param {SendParams} params parameters to send the email
