@@ -172,15 +172,16 @@ class WebServer {
         this.app.use(expressSession({
             secret: this.sessionSecret,
             cookie: {
-                maxAge: ms(process.environment.SESSION_MAX_AGE),
                 httpOnly: true,
                 domain: process.environment.APP_DOMAIN,
-                secure: process.environment.APP_HTTPS_ONLY
+                secure: process.environment.APP_HTTPS_ONLY,
+                maxAge: ms(process.environment.SESSION_MAX_AGE)
             },
             store,
             resave: true,
             saveUninitialized: true,
-            name: process.environment.APP_NAME
+            name: process.environment.APP_NAME,
+            rolling: true
         }));
 
         this.app.use(passport.initialize());
