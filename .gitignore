@@ -4,6 +4,7 @@ node_modules
 /var
 /server.js
 /server.js.map
+/config.yaml
 
 # local env files
 .env

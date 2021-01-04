@@ -82,7 +82,7 @@ export default class EmailTransporter {
      * @memberof EmailTransporter
      */
     async send(request, params = {}) {
-        params = Object.assign({ from: process.env.MAIL_ADDRESS, to: "", subject: "" }, params);
+        params = Object.assign({ from: `${process.env.MAIL_NAME} <${process.env.MAIL_ADDRESS}>`, to: "", subject: "" }, params);
         console.info(`Sending e-mail to ${params.to}`);
         const content = this.templates[params.locales.user.locale || "en-us"][params.subject].render(params.locales);
         return await (await this.transporter).sendMail({

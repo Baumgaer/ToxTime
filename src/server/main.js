@@ -210,8 +210,8 @@ class WebServer {
         try {
             await Promise.race(this.awaitingActions);
             console.info("6. Starting server");
-            this.server.listen(process.env.APP_PORT, process.env.APP_HOST, null, () => {
-                console.info(`6.1 server is running and reachable on http://${process.env.APP_HOST}:${process.env.APP_PORT}`);
+            this.server.listen(process.env.APP_HTTP_PORT, process.env.APP_HOST, null, () => {
+                console.info(`6.1 server is running and reachable on http://${process.env.APP_HOST}:${process.env.APP_HTTP_PORT}`);
             });
         } catch (_error) {
             console.error(`Server not started! Not all awaiting actions are resolved`);
