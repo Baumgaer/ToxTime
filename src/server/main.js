@@ -15,10 +15,12 @@ import httpErrors from "http-errors";
 import i18next from "i18next";
 import i18nextMiddleware from "i18next-http-middleware";
 import nunjucks from "nunjucks";
+import pmx from "@pm2/io";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
+import Register from "~server/routes/Register";
 
 import nunjucksConfig from "./../../nunjucks.config";
 
@@ -218,12 +220,27 @@ class WebServer {
             console.info("6. Starting server");
             this.server.listen(process.environment.APP_HTTP_PORT, process.environment.APP_HOST, null, () => {
                 console.info(`6.1 server is running and reachable on http://${process.environment.APP_HOST}:${process.environment.APP_HTTP_PORT}`);
+                process.send('ready');
             });
         } catch (_error) {
             console.error(`Server not started! Not all awaiting actions are resolved`);
+            process.exit(1);
         }
     }
 }
+
+pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
+    const data = JSON.parse(parameter.replace(/'/g, "\""));
+    const password = data.password;
+    console.info(`registering user ${data.email} via command`);
+    try {
+        const result = await Register.registerUser(data, password);
+        reply(result);
+    } catch (error) {
+        console.error(error);
+        reply({ success: false, error });
+    }
+});
 
 process.environment = {};
 // First convert all environment variables to their right type

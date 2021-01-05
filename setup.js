@@ -3,6 +3,8 @@ const path = require("path");
 const arp = require("app-root-path");
 const prompts = require("prompts");
 const yaml = require("yaml");
+const pm2 = require("pm2");
+const childProcess = require("child_process");
 
 const configFilePath = path.resolve(arp.path, "config.yaml");
 
@@ -12,6 +14,7 @@ const defaults = defaultsRegEx.exec(ecosystemString)[1];
 const questionsRegEx = /\/\*(?<question>.*?)\*\/\n(?<id>.*?):\s(?<default>.*?),/gis;
 const selectRegex = /@property \{(?<value>.*?)\} (?<title>.*?) (?<description>.*?)\n/gis;
 
+// Match questions
 const questions = [];
 let matches = questionsRegEx.exec(defaults);
 while (matches) {
@@ -76,10 +79,66 @@ while (matches) {
         }
     }
 
-    console.info(`Writing config to ${configFilePath}`);
+    console.info(`\n\nWriting config to ${configFilePath}`);
 
     const config = yaml.stringify(results);
     fs.writeFileSync(configFilePath, config, { encoding: "utf-8" });
 
-    console.info("FINISHED!");
+    console.log("Now the administration user will be created. Please enter an email address and a password");
+
+    const adminUserQuestions = [{
+        name: "email",
+        message: "E-Mail",
+        type: "text"
+    }, {
+        name: "password",
+        message: "Password",
+        type: "text",
+        style: "password"
+    }];
+
+    const adminResults = await prompts(adminUserQuestions);
+
+    pm2.connect((error) => {
+        if (error) {
+            console.error(error);
+            pm2.disconnect();
+            process.exit(1);
+        }
+
+        const ecoSystem = require("./ecosystem.config");
+        // eslint-disable-next-line
+        ecoSystem.apps[0].wait_ready = true;
+
+        console.info("starting server");
+
+        pm2.start(ecoSystem.apps[0], (error) => {
+            if (error) {
+                console.error(error);
+                pm2.disconnect();
+                process.exit(1);
+            }
+
+            console.info(`registering admin user`);
+
+            const data = Object.assign(adminResults, {
+                isAdmin: true,
+                isConfirmed: true,
+                isActive: true,
+                matriculationNumber: 0,
+                locale: "en-us"
+            });
+
+            try {
+                childProcess.execSync(`npx pm2 trigger ${results.APP_NAME || questions.filter((question) => question.name === "APP_NAME")[0].initial} register:user ${JSON.stringify(data).replace(/"/g, "'")}`, { stdio: "inherit" });
+                console.info("FINISHED!");
+            } catch (error) {
+                console.error(error);
+                process.exit(1);
+            }
+
+            pm2.disconnect();
+        });
+
+    });
 })();

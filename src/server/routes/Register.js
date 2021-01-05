@@ -10,6 +10,20 @@ export default class Register extends DefaultRoute {
         this.routeOf = ["/", "/admin"];
     }
 
+    static registerUser(data, password) {
+        return new Promise((resolve, reject) => {
+            const user = new User(data);
+
+            User.register(user, password, (error) => {
+                if (error) {
+                    reject({ success: false, error });
+                } else {
+                    resolve({ success: true });
+                }
+            });
+        });
+    }
+
     /**
      * test
      *
@@ -19,21 +33,13 @@ export default class Register extends DefaultRoute {
      * @memberof Register
      */
     async routeGet8email8password8matr(request, response) {
-
         if (!request.params.email || !isEmail(request.params.email)) return response.send({ success: false, error: { name: "notAnEmail" } });
-        const user = new User({
+        const result = await Register.registerUser({
             email: request.params.email,
             password: request.params.password,
             matriculationNumber: request.params.matr,
             locale: request.headers["accept-language"]
-        });
-
-        await User.register(user, request.params.password, (error) => {
-            if (error) {
-                response.send({ success: false, error });
-            } else {
-                response.json({ success: true });
-            }
-        });
+        }, request.params.password);
+        response.send(result);
     }
 }
