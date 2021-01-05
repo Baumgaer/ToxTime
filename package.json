@@ -11,8 +11,7 @@
         "dev:serve": "pm2 start ecosystem.config.js --env development --deep-monitoring --source-map-support",
         "build": "webpack --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
         "lint": "vue-cli-service lint",
-        "postinstall": "pm2 install pm2-logrotate",
-        "setup": "npm install && node ./setup.js"
+        "setup": "npm install && pm2 install pm2-logrotate && node ./setup.js"
     },
     "dependencies": {
         "app-root-path": "^3.0.0",
@@ -39,6 +38,7 @@
         "passport-local": "^1.0.0",
         "passport-local-mongoose": "^6.0.1",
         "pm2": "^4.5.1",
+        "prompts": "^2.4.0",
         "source-map-support": "^0.5.19",
         "uuid": "^8.3.2",
         "validator": "^13.5.2",
@@ -46,7 +46,6 @@
         "vue-i18n": "^8.22.2",
         "vue-material-design-icons": "^4.11.0",
         "vue-router": "^3.4.9",
-        "wizard": "^2.0.0",
         "yaml": "^1.10.0"
     },
     "devDependencies": {

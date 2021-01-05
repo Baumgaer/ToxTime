@@ -43,14 +43,14 @@ const defaults = {
      * If there is a reverse proxy in front of this application, for example nginx,
      * this will enable the application to react on requests of this proxy.
      *
-     * possible values:
-     *      boolean: will use the most right entry of header X-Forwarded-* as IP or disable the behavior
-     *      IP addresses: will define a subnet. use comma to separate for several values e.g. loopback, 123.123.123.123
-     *          loopback - 127.0.0.1/8, ::1/128,
-     *          linklocal - 169.254.0.0/16, fe80::/10,
-     *          uniquelocal - 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7
-     *          any other IP address
-     *      number: The nth hop from the proxy server should be trusted as a client.
+     * @type {select}
+     * @property {false} Disable will disable reverse proxy
+     * @property {true} Enable will use the most right entry of header X-Forwarded-* as IP or disable the behavior
+     * @property {"loopback"} Loopback 127.0.0.1/8, ::1/128
+     * @property {"linklocal"} LinkLocal 169.254.0.0/16, fe80::/10
+     * @property {"uniquelocal"} UniqueLocal 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7
+     * @property {1} Number The nth hop from the proxy server should be trusted as a client. Must be set manually in config.yaml
+     * @property {""} Manual any other IP address or list of IP addresses. Must be set manually in config.yaml
      */
     "APP_TRUST_PROXY": false,
 
