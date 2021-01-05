@@ -4,9 +4,7 @@ const arp = require("app-root-path");
 const path = require("path");
 const crypto = require("crypto");
 
-const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();
-const parsedConfig = yaml.parse(configString);
-const config = Object.assign({
+const defaults = {
     /**
      * The name of the application. Will be used to identify the application in
      * the process manager and will be displayed in the web application.
@@ -134,7 +132,11 @@ const config = Object.assign({
 
     // Static config
     "PATH_STATIC_FILES": path.resolve(arp.path, "dist")
-}, parsedConfig);
+};
+
+const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();
+const parsedConfig = yaml.parse(configString);
+const config = Object.assign(defaults, parsedConfig);
 
 let shouldWatch = false;
 
