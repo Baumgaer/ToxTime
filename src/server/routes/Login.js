@@ -104,7 +104,7 @@ export default class Login extends DefaultRoute {
      */
     async routeGetReset8token(request, response, next) {
         await this.checkPasswordResetToken(request, response, next);
-        this.sendStaticFile(response);
+        this.parentApp.sendStaticFile(response);
     }
 
     /**
