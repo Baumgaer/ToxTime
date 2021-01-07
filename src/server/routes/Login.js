@@ -87,9 +87,15 @@ export default class Login extends DefaultRoute {
      */
     async checkPasswordResetToken(request, _response, next) {
         const token = request.params.token;
-        if (!token || !isUUID(token, "4")) return next(httpErrors.NotAcceptable());
+        if (!token || !isUUID(token, "4")) {
+            next(httpErrors.NotAcceptable());
+            return null;
+        }
         const user = await User.findOne({ passwordResetToken: token }).exec();
-        if (!user) return next(httpErrors.NotFound());
+        if (!user) {
+            next(httpErrors.NotFound());
+            return null;
+        }
         return user;
     }
 
@@ -103,7 +109,8 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     async routeGetReset8token(request, response, next) {
-        await this.checkPasswordResetToken(request, response, next);
+        const result = await this.checkPasswordResetToken(request, response, next);
+        if (!result) return;
         this.parentApp.sendStaticFile(request, response, next, true);
     }
 
