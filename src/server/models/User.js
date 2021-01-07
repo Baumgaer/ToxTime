@@ -52,7 +52,8 @@ const schema = new Schema({
     },
     passwordResetToken: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true
     }
 }, {
     collection: Model.collection,
