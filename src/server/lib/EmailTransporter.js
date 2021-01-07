@@ -2,6 +2,7 @@ import { createTransport, createTestAccount } from "nodemailer";
 import { writeFileSync, readFileSync, existsSync } from "graceful-fs";
 import path from "path";
 import { path as rootPath } from "app-root-path";
+import stripHTML from "string-strip-html";
 
 /**
  * @typedef {Object} SendParams
@@ -105,7 +106,7 @@ export default class EmailTransporter {
             from: params.from,
             to: params.to,
             subject: request.t(params.subject),
-            text: content,
+            text: stripHTML(content).result,
             html: content
         });
     }

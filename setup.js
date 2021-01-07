@@ -130,7 +130,7 @@ while (matches) {
             });
 
             try {
-                childProcess.execSync(`npx pm2 trigger ${results.APP_NAME || questions.filter((question) => question.name === "APP_NAME")[0].initial} register:user ${JSON.stringify(data).replace(/"/g, "'")}`, { stdio: "inherit" });
+                childProcess.execSync(`npx pm2 trigger ${results.APP_NAME || questions.filter((question) => question.name === "APP_NAME")[0].initial} register:user "${JSON.stringify(data).replace(/"/g, "'")}"`, { stdio: "inherit" });
                 console.info("FINISHED!");
             } catch (error) {
                 console.error(error);

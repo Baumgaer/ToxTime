@@ -53,6 +53,7 @@ export default class Login extends DefaultRoute {
         const email = request.body.email;
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
+        const protocol = process.environment.APP_SECURE ? "https://" : "http://";
         try {
             const user = await User.findOne({ email }).exec();
             if (user) {
@@ -63,7 +64,8 @@ export default class Login extends DefaultRoute {
                     to: email,
                     subject: "resetPassword",
                     locales: {
-                        url: `http://${process.environment.domain || "localhost"}/login/reset/${token}`,
+                        domain: `${protocol}${process.environment.APP_DOMAIN}`,
+                        url: `${protocol}${process.environment.APP_DOMAIN}/login/reset/${token}`,
                         user: user
                     }
                 });
