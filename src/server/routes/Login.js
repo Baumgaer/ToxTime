@@ -131,9 +131,9 @@ export default class Login extends DefaultRoute {
         if (!repeatPassword) return response.send({ success: false, error: { name: "passwordNotFilled", field: "repeatPassword" } });
         if (password !== repeatPassword) return response.send({ success: false, error: { name: "passwordsNotEqual", field: "repeatPassword" } });
         const user = await this.checkPasswordResetToken(request, response, next);
-        user.passwordResetToken = "";
         try {
             await user.setPassword(password);
+            user.passwordResetToken = undefined;
             await user.save();
             response.send({ success: true, data: {} });
         } catch (error) {
