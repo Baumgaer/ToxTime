@@ -9,7 +9,9 @@
         "dev:frontend": "vue-cli-service build --mode development --watch",
         "dev:backend": "webpack --mode development --watch --config webpack.config.server.js",
         "dev:serve": "pm2 start ecosystem.config.js --env development --deep-monitoring --source-map-support",
-        "build": "webpack --mode production --config webpack.config.server.js && vue-cli-service build --no-unsafe-inline",
+        "build": "npm run build:backend && npm run build:frontend",
+        "build:frontend": "vue-cli-service build --no-unsafe-inline",
+        "build:backend": "webpack --mode production --config webpack.config.server.js",
         "lint": "vue-cli-service lint",
         "setup": "npm install && pm2 install pm2-logrotate && node ./setup.js"
     },

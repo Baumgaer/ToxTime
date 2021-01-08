@@ -38,6 +38,7 @@ export default class EmailTransporter {
      * @memberof EmailTransporter
      */
     collectEmailTemplates() {
+        if (process.environment.DEBUG) console.debug("2.2a collecting email templates");
         const templates = {};
         const templateContext = require.context("~server/templates/email", true, /\.njk$/i, "sync");
         templateContext.keys().forEach((key) => {
@@ -68,11 +69,15 @@ export default class EmailTransporter {
             } else testAccount = await createTestAccount();
             writeFileSync(testAccountCache, JSON.stringify(testAccount));
         }
-        const host = testAccount ? process.environment.MAIL_HOST || testAccount.smtp.host : process.environment.MAIL_HOST;
-        const port = testAccount ? process.environment.MAIL_PORT || testAccount.smtp.port : process.environment.MAIL_PORT;
-        const secure = testAccount ? ![null, undefined].includes(process.environment.MAIL_TLS) ? process.environment.MAIL_TLS : testAccount.smtp.secure : process.environment.MAIL_TLS;
-        const user = testAccount ? process.environment.MAIL_TLS || testAccount.user : process.environment.MAIL_TLS;
-        const pass = testAccount ? process.environment.MAIL_PASSWORD || testAccount.pass : process.environment.MAIL_PASSWORD;
+        const env = process.environment;
+        const configTLS = env.MAIL_TLS;
+        const testSMTP = testAccount && testAccount.smtp;
+        const host = testAccount ? env.MAIL_HOST || testSMTP.host : env.MAIL_HOST;
+        const port = testAccount ? env.MAIL_PORT || testSMTP.port : env.MAIL_PORT;
+        const secure = testAccount ? (![null, undefined].includes(configTLS) ? configTLS : testSMTP.secure) : configTLS;
+        const user = testAccount ? env.MAIL_USER || testAccount.user : env.MAIL_USER;
+        const pass = testAccount ? env.MAIL_PASSWORD || testAccount.pass : env.MAIL_PASSWORD;
+        if (process.environment.DEBUG) console.debug(`2.2b creating transporter with ${JSON.stringify({ host, port, secure, auth: { user, pass } })}`);
         return createTransport({ host, port, secure, auth: { user, pass } });
     }
 
