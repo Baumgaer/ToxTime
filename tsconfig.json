@@ -45,7 +45,8 @@
             "node",
             "express",
             "webpack",
-            "webpack-env"
+            "webpack-env",
+            "reflect-metadata"
         ],
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,

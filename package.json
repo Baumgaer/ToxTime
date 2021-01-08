@@ -44,6 +44,7 @@
         "pm2": "^4.5.1",
         "pmx": "^1.6.7",
         "prompts": "^2.4.0",
+        "reflect-metadata": "^0.1.13",
         "source-map-support": "^0.5.19",
         "string-strip-html": "^7.0.3",
         "uuid": "^8.3.2",

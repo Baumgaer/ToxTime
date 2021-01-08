@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express, { json, urlencoded } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';

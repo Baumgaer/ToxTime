@@ -4,9 +4,9 @@ import httpErrors from "http-errors";
  * @typedef {Object} RouteOptions
  * @property {boolean} public
  * @property {boolean} allowUser
- * @property {}
  *
  * @typedef {[import("express").Request, import("express").Response, import("express").NextFunction]} RequestHandlerArgs
+ * @typedef { "GET" | "POST" | "PUT" | "PATCH" | "DELETE" } HttpMethods
  */
 
 export default class Route {
@@ -57,7 +57,47 @@ export default class Route {
         return true;
     }
 
-    static _registerRoute(target, handler, method, uri, middlewares) { }
+    /**
+     *
+     *
+     * @static
+     * @param { typeof import("~server/lib/DefaultRoute").default } target
+     * @param { import("express").Handler } handler
+     * @param { HttpMethods } method
+     * @param { string } uri
+     * @param { import("express").RequestHandler[] } middlewares
+     * @memberof Route
+     */
+    static _registerRoute(target, handler, method, uri) {
+        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
+        const routes = Reflect.getMetadata("routes", target);
+        routes.push({
+            method,
+            path: uri,
+            handler
+        });
+    }
+
+    /**
+     * Registers a ALL route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static all(uri, options = {}, ...middlewares) {
+        return (target, method, descriptor) => {
+            this._registerRoute(target, target[method], "GET", uri, middlewares);
+            this._registerRoute(target, target[method], "POST", uri, middlewares);
+            this._registerRoute(target, target[method], "PUT", uri, middlewares);
+            this._registerRoute(target, target[method], "PATCH", uri, middlewares);
+            this._registerRoute(target, target[method], "DELETE", uri, middlewares);
+            return this._overwriteDescriptor(descriptor, options);
+        };
+    }
 
     /**
      * Registers a GET route with its uri, options and assigns middlewares
