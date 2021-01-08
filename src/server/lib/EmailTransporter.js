@@ -70,7 +70,7 @@ export default class EmailTransporter {
             writeFileSync(testAccountCache, JSON.stringify(testAccount));
         }
         const env = process.environment;
-        const configTLS = env.MAIL_TLS;
+        const configTLS = env.MAIL_SSL;
         const testSMTP = testAccount && testAccount.smtp;
         const host = testAccount ? env.MAIL_HOST || testSMTP.host : env.MAIL_HOST;
         const port = testAccount ? env.MAIL_PORT || testSMTP.port : env.MAIL_PORT;

@@ -120,11 +120,13 @@ const defaults = {
     "MAIL_PORT": 465,
 
     /**
-     * Will enable od disable TLS for sending emails. In development mode,
-     * this can sett to null to let the testaccount decide wether it is true
-     * or false. Otherwise the configured value is used.
+     * Will enable or disable SSL for sending emails. In development mode,
+     * this can set to null to let the testaccount decide wether it is true
+     * or false. Otherwise the configured value is used. If it is false,
+     * the mailer will try STARTTLS and if it does not work, it will use no
+     * encryption.
      */
-    "MAIL_TLS": true,
+    "MAIL_SSL": true,
 
     /**
      * The login user name of the mail server. If empty, the test account user
