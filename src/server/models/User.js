@@ -17,7 +17,8 @@ const schema = new Schema({
     matriculationNumber: {
         type: Number,
         required: true,
-        unique: true
+        unique: true,
+        sparse: true
     },
     locale: {
         type: String,
@@ -56,6 +57,7 @@ const schema = new Schema({
         sparse: true
     }
 }, {
+    excludeIndexes: true,
     collection: Model.collection,
     toObject: { transform: (doc, ret) => dataTransformer(doc, ret, Model) },
     toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, Model) }
@@ -72,6 +74,7 @@ schema.plugin(passportLocalMongoose, {
         return model.findOne(queryParameters);
     }
 });
+
 const TheModel = connection.model(Model.className, schema);
 TheModel.className = Model.className;
 export default TheModel;

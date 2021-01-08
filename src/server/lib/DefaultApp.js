@@ -41,7 +41,7 @@ export default class DefaultApp {
         if (this.authenticatedOnly && !request.user || this.adminRightsNeeded && !request.user.isAdmin) return next(httpErrors.Unauthorized());
         if (["/", ownHtmlName].includes(request.path) || useAppRouterNameSpace) {
             if (request.user && request.user.passwordResetToken) {
-                request.user.passwordResetToken = "";
+                request.user.passwordResetToken = undefined;
                 await request.user.save();
             }
             if (!this.loadedIndex) this.loadedIndex = readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
