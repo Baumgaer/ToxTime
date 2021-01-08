@@ -16,6 +16,7 @@ import i18next from "i18next";
 import i18nextMiddleware from "i18next-http-middleware";
 import nunjucks from "nunjucks";
 import pmx from "@pm2/io";
+import normalizeURL from "normalize-url";
 
 import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
@@ -171,19 +172,21 @@ class WebServer {
             });
         }));
 
+        const isSecure = process.environment.APP_SECURE;
         this.app.use(expressSession({
             secret: this.sessionSecret,
             cookie: {
                 httpOnly: true,
-                domain: process.environment.APP_DOMAIN,
-                secure: process.environment.APP_SECURE,
+                domain: new URL(normalizeURL(process.environment.APP_DOMAIN, { forceHttps: isSecure, forceHttp: !isSecure })).hostname, // protocol dues not mapper
+                secure: isSecure,
                 maxAge: ms(process.environment.SESSION_MAX_AGE)
             },
             store,
-            resave: true,
-            saveUninitialized: true,
+            resave: false,
+            saveUninitialized: false,
             name: process.environment.APP_NAME,
-            rolling: true
+            rolling: true,
+            unset: "destroy"
         }));
 
         this.app.use(passport.initialize());

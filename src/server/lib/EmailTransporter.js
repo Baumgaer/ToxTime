@@ -68,14 +68,11 @@ export default class EmailTransporter {
             } else testAccount = await createTestAccount();
             writeFileSync(testAccountCache, JSON.stringify(testAccount));
         }
-
         const host = testAccount ? process.environment.MAIL_HOST || testAccount.smtp.host : process.environment.MAIL_HOST;
         const port = testAccount ? process.environment.MAIL_PORT || testAccount.smtp.port : process.environment.MAIL_PORT;
         const secure = testAccount ? ![null, undefined].includes(process.environment.MAIL_TLS) ? process.environment.MAIL_TLS : testAccount.smtp.secure : process.environment.MAIL_TLS;
         const user = testAccount ? process.environment.MAIL_TLS || testAccount.user : process.environment.MAIL_TLS;
         const pass = testAccount ? process.environment.MAIL_PASSWORD || testAccount.pass : process.environment.MAIL_PASSWORD;
-
-        console.log({ host, port, secure, auth: { user, pass } });
         return createTransport({ host, port, secure, auth: { user, pass } });
     }
 
