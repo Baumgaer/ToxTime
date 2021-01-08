@@ -57,7 +57,6 @@ const schema = new Schema({
         sparse: true
     }
 }, {
-    excludeIndexes: true,
     collection: Model.collection,
     toObject: { transform: (doc, ret) => dataTransformer(doc, ret, Model) },
     toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, Model) }

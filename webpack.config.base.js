@@ -151,7 +151,7 @@ module.exports = (_env, options, returnConfigObject) => {
 
     ///////////////////////////////////
     // EXTEND WATCH OPTIONS
-    if (options.watch) settings.watchOptions = { ignored: ["node_modules", "var/**/*"] };
+    if (options.watch) settings.watchOptions = { ignored: ["node_modules", "var/**/*", "sciebo"] };
 
     const webpackConfigObject = { settings, cacheLoaderSettings, threadLoaderSettings };
     return returnConfigObject ? webpackConfigObject : settings;
