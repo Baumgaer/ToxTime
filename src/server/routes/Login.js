@@ -6,6 +6,7 @@ import DefaultRoute from "~server/lib/DefaultRoute";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import User from "~server/models/User";
 import { isUUID } from "validator";
+import normalizeURL from "normalize-url";
 
 export default class Login extends DefaultRoute {
 
@@ -53,19 +54,19 @@ export default class Login extends DefaultRoute {
         const email = request.body.email;
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
-        const protocol = process.environment.APP_SECURE ? "https://" : "http://";
         try {
             const user = await User.findOne({ email }).exec();
             if (user) {
                 const token = uuIDv4();
+                const isSecure = process.environment.APP_SECURE;
                 user.passwordResetToken = token;
                 await user.save();
                 await emailTransporter.send(request, {
                     to: email,
                     subject: "resetPassword",
                     locales: {
-                        domain: `${protocol}${process.environment.APP_DOMAIN}`,
-                        url: `${protocol}${process.environment.APP_DOMAIN}/login/reset/${token}`,
+                        domain: normalizeURL(process.environment.APP_DOMAIN, { forceHttps: isSecure, forceHttp: !isSecure }),
+                        url: normalizeURL(`${process.environment.APP_DOMAIN}/login/reset/${token}`, { forceHttps: isSecure, forceHttp: !isSecure }),
                         user: user
                     }
                 });
