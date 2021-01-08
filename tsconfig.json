@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "allowJs": true,
         "target": "es2019",
         "module": "CommonJS",
         "outDir": ".",
@@ -56,6 +57,10 @@
         "dist",
         "server.js",
         "webpack",
-        "webpack.config.*.js"
+        "webpack.config.*.js",
+        "nunjucks.config.js",
+        "babel.config.js",
+        "ecosystem.config.js",
+        "setup.js"
     ]
 }

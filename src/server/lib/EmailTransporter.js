@@ -74,7 +74,7 @@ export default class EmailTransporter {
         const testSMTP = testAccount && testAccount.smtp;
         const host = testAccount ? env.MAIL_HOST || testSMTP.host : env.MAIL_HOST;
         const port = testAccount ? env.MAIL_PORT || testSMTP.port : env.MAIL_PORT;
-        const secure = testAccount ? (![null, undefined].includes(configTLS) ? configTLS : testSMTP.secure) : configTLS;
+        const secure = testAccount ? (configTLS ?? testSMTP.secure) : configTLS;
         const user = testAccount ? env.MAIL_USER || testAccount.user : env.MAIL_USER;
         const pass = testAccount ? env.MAIL_PASSWORD || testAccount.pass : env.MAIL_PASSWORD;
         if (process.environment.DEBUG) console.debug(`2.2b creating transporter with ${JSON.stringify({ host, port, secure, auth: { user, pass } })}`);

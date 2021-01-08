@@ -23,6 +23,7 @@ import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import Register from "~server/routes/Register";
 
+// @ts-ignore
 import nunjucksConfig from "./../../nunjucks.config";
 
 /**

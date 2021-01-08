@@ -78,7 +78,7 @@ module.exports = (_env, options, returnConfigObject) => {
         },
         module: {
             rules: [{
-                test: /\.tsx?$/,
+                test: /\.js$/,
                 use: [cacheLoaderSettings("typescript"), threadLoaderSettings(), {
                     loader: 'babel-loader',
                     options: {
