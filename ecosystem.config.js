@@ -106,37 +106,48 @@ const defaults = {
     "MAIL_ADDRESS": "noreply@pacmaker.com",
 
     /**
-     * The IP address of the mail server
+     * The IP address of the mail server. If the host is not given in development
+     * mode, the host of the temporary ether.mail account will be used and the
+     * configured host else.
      */
     "MAIL_HOST": "",
 
     /**
-     * The port of the mail server
+     * The port of the mail server. When the port is 0 in development mode,
+     * the port of the temporary ether.mail account will be used and the
+     * configured port else.
      */
     "MAIL_PORT": 465,
 
     /**
-     * Will enable od disable TLS for sending emails
+     * Will enable od disable TLS for sending emails. In development mode,
+     * this can sett to null to let the testaccount decide wether it is true
+     * or false. Otherwise the configured value is used.
      */
     "MAIL_TLS": true,
 
     /**
-     * The login user name of the mail server
+     * The login user name of the mail server. If empty, the test account user
+     * name will be used in development mode. Otherwise the configured value
+     * will be used.
      */
     "MAIL_USER": "",
 
     /**
-     * The login password of the mail server
+     * The login password of the mail server.If empty, the test account user
+     * password will be used in development mode. Otherwise the configured value
+     * will be used.
      */
-    "MAIL_PASSWORD": "",
+    "MAIL_PASSWORD": ""
+};
 
-    // Static config
+const staticConfig = {
     "PATH_STATIC_FILES": path.resolve(arp.path, "dist")
 };
 
 const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();
 const parsedConfig = yaml.parse(configString);
-const config = Object.assign(defaults, parsedConfig);
+const config = Object.assign(defaults, parsedConfig, staticConfig);
 
 let shouldWatch = false;
 

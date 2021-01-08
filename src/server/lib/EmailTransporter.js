@@ -60,7 +60,7 @@ export default class EmailTransporter {
      * @memberof EmailTransporter
      */
     async createTransporter() {
-        let testAccount = {};
+        let testAccount = null;
         if (process.environment.NODE_ENV === "development") {
             const testAccountCache = path.resolve(rootPath, "var", "buildcache", "backend", "ethereal.mail.json");
             if (existsSync(testAccountCache)) {
@@ -69,24 +69,14 @@ export default class EmailTransporter {
             writeFileSync(testAccountCache, JSON.stringify(testAccount));
         }
 
-        let host = null;
-        let port = null;
-        let secure = null;
-        if (testAccount.smtp) {
-            host = testAccount.smtp.host;
-            port = testAccount.smtp.port;
-            secure = testAccount.smtp.secure;
-        }
+        const host = testAccount ? process.environment.MAIL_HOST || testAccount.smtp.host : process.environment.MAIL_HOST;
+        const port = testAccount ? process.environment.MAIL_PORT || testAccount.smtp.port : process.environment.MAIL_PORT;
+        const secure = testAccount ? ![null, undefined].includes(process.environment.MAIL_TLS) ? process.environment.MAIL_TLS : testAccount.smtp.secure : process.environment.MAIL_TLS;
+        const user = testAccount ? process.environment.MAIL_TLS || testAccount.user : process.environment.MAIL_TLS;
+        const pass = testAccount ? process.environment.MAIL_PASSWORD || testAccount.pass : process.environment.MAIL_PASSWORD;
 
-        return createTransport({
-            host: host || process.environment.MAIL_HOST,
-            port: port || process.environment.MAIL_PORT,
-            secure: secure || process.environment.MAIL_PORT === 465, // true for 465, false for other ports
-            auth: {
-                user: testAccount.user || process.environment.MAIL_USER,
-                pass: testAccount.pass || process.environment.MAIL_PASSWORD
-            }
-        });
+        console.log({ host, port, secure, auth: { user, pass } });
+        return createTransport({ host, port, secure, auth: { user, pass } });
     }
 
     /**

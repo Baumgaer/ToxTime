@@ -70,7 +70,7 @@ export default class ApiClient {
 
         if (response.status < 200 || response.status >= 300) return defaultResponse;
         const theJson = await response.json();
-        const mapped = {};
+        let mapped = {};
         if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
             mapped.success = true;
             mapped.data = { models: [] };
@@ -86,7 +86,7 @@ export default class ApiClient {
                     value: newModel
                 };
             }
-        }
+        } else mapped = theJson;
 
         return Object.keys(mapped).length ? mapped : defaultResponse;
     }
