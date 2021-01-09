@@ -1,3 +1,8 @@
+import fs from "graceful-fs";
+import arp from "app-root-path";
+import path from "path";
+
+
 /**
  * @typedef {Object} RouteOptions
  * @property {boolean} public
@@ -14,29 +19,18 @@
  */
 export default class DefaultRoute {
 
-    constructor(mainApp, parentApp) {
-        this.mainApp = mainApp;
-        this.parentApp = parentApp;
-        this.routerNameSpace = "/";
-        this.routeOf = [];
-    }
+    /** @type {string} */
+    namespace = "";
 
-    /**
-     * Registers a new route in the metadata storage which can then be collected
-     * by an app.
-     *
-     * @static
-     * @param { typeof import("~server/lib/DefaultRoute").default } target
-     * @param { string } handlerName
-     * @param { HttpMethods } method
-     * @param { string } path
-     * @param { import("express").RequestHandler[] } middlewares
-     * @memberof Route
-     */
-    static _registerRoute(target, handlerName, options, method, path) {
-        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
-        const routes = Reflect.getMetadata("routes", target);
-        routes.push({ method, path, handlerName, options });
+    constructor(webServer, renderEngine) {
+        /** @type {import("~server/main").default} */
+        this.webServer = webServer;
+
+        /** @type {import("nunjucks").Environment} */
+        this.renderEngine = renderEngine;
+
+        /** @type {Record<string, string>} */
+        this._renderedPages = {};
     }
 
     /**
@@ -137,6 +131,42 @@ export default class DefaultRoute {
         return (target, method) => {
             this._registerRoute(target, method, options, "DELETE", uri, middlewares);
         };
+    }
+
+    async renderPage(request, response, name) {
+        const staticPath = path.resolve(arp.path, process.environment.PATH_STATIC_FILES);
+        const proto = Reflect.getPrototypeOf(this);
+        const namespace = this.namespace || "/" + proto.constructor.name.toLowerCase();
+        const ownHtmlName = `${name || namespace.substring(1) || "index"}.html`;
+        if (!this._renderedPages[ownHtmlName]) this._renderedPages[ownHtmlName] = fs.readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
+        const environment = {};
+        for (const configName of process.environment.FRONTEND_EXPOSED_CONFIG.split(",")) {
+            environment[configName] = process.environment[configName];
+        }
+        response.send(this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
+            userInformation: JSON.parse(JSON.stringify((request.user || {}))),
+            nonce: response.locals.cspNonce,
+            environment: environment
+        }));
+    }
+
+    /**
+     * Registers a new route in the metadata storage which can then be collected
+     * by an app.
+     *
+     * @static
+     * @param { typeof import("~server/lib/DefaultRoute").default } target
+     * @param { string } handlerName
+     * @param { HttpMethods } method
+     * @param { string } path
+     * @param { import("express").RequestHandler[] } middlewares
+     * @memberof Route
+     */
+    static _registerRoute(target, handlerName, options, method, path) {
+        const handler = target[handlerName];
+        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
+        const routes = Reflect.getMetadata("routes", target);
+        routes.push({ method: method.toLowerCase(), path, handler, options });
     }
 
 }

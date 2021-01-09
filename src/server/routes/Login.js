@@ -9,13 +9,6 @@ import { isUUID } from "validator";
 import normalizeURL from "normalize-url";
 
 export default class Login extends DefaultRoute {
-
-    constructor(mainApp, parentApp) {
-        super(mainApp, parentApp);
-        this.routerNameSpace = "/login";
-        this.routeOf = ["/"];
-    }
-
     /**
      * test
      *
@@ -25,7 +18,7 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     @Login.get("/", { public: true })
-    async routeGet(request, response) {
+    routeGet(request, response) {
         response.redirect("/");
     }
 
@@ -34,14 +27,12 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @param {import("express").NextFunction} next the next middleware
      * @returns {void}
      * @memberof Login
      */
     @Login.get("/reset", { public: true })
-    routeGetReset(request, response, next) {
-        console.log(JSON.stringify(this));
-        this.parentApp.sendStaticFile(request, response, next, true);
+    sendLoginFile(request, response) {
+        this.renderPage(request, response, "index");
     }
 
     /**
@@ -54,7 +45,7 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     @Login.post("/reset", { public: true })
-    async routePostReset(request, response, next) {
+    async requestPasswordReset(request, response, next) {
         const email = request.body.email;
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
@@ -114,10 +105,10 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     @Login.get("/reset/:token", { public: true })
-    async routeGetReset8token(request, response, next) {
+    async renderPasswordResetPage(request, response, next) {
         const result = await this.checkPasswordResetToken(request, response, next);
         if (!result) return;
-        this.parentApp.sendStaticFile(request, response, next, true);
+        this.renderPage(request, response, "index");
     }
 
     /**
@@ -130,7 +121,7 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     @Login.post("/reset/:token", { public: true })
-    async routePostReset8token(request, response, next) {
+    async resetPassword(request, response, next) {
         const password = request.body.password;
         const repeatPassword = request.body.repeatPassword;
         if (!passport) return response.send({ success: false, error: { name: "passwordNotFilled", field: "password" } });
@@ -156,7 +147,7 @@ export default class Login extends DefaultRoute {
      * @memberof Login
      */
     @Login.post("/", { public: true })
-    async routePost(request, response) {
+    async authenticate(request, response) {
         if (!request.body.email) return response.send({ success: false, error: { name: "invalidEmail" } });
         if (!request.body.password) return response.send({ success: false, error: { name: "invalidPassword" } });
 

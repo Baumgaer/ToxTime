@@ -12,7 +12,10 @@
 </head>
 
 <body>
-    <script nonce="{{ nonce }}">window.userInformation = {{ userInformation | json }};</script>
+    <script nonce="{{ nonce }}">
+        window.userInformation = {{ userInformation | json }};
+        window.environment = {{ environment | json }};
+    </script>
     <noscript>
         <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
                 Please enable it to continue.</strong>

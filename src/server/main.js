@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import express, { json, urlencoded } from 'express';
+import express, { json, urlencoded, static as expressStatic, Router } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -18,11 +18,12 @@ import i18nextMiddleware from "i18next-http-middleware";
 import nunjucks from "nunjucks";
 import pmx from "@pm2/io";
 import normalizeURL from "normalize-url";
+import arp from "app-root-path";
+import path from "path";
 
-import { toURIPathPart } from "~common/utils";
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
-import Register from "~server/routes/Register";
+import { toURIPathPart } from "~common/utils";
 
 // @ts-ignore
 import nunjucksConfig from "./../../nunjucks.config";
@@ -32,7 +33,7 @@ import nunjucksConfig from "./../../nunjucks.config";
  *
  * @class WebServer
  */
-class WebServer {
+export default class WebServer {
 
     constructor() {
         console.info("1. Setting up server");
@@ -201,21 +202,35 @@ class WebServer {
 
     setupRoutes() {
         console.info("5. Collecting routes");
-        const apps = require.context('~server/app', true, /[A-Za-z0-9-_,\s]+\.js$/i);
+        const routes = require.context("~server/routes", true, /\.js$/i, "sync");
 
-        // Collect apps which will collect their routes
-        apps.keys().forEach((key) => {
-            /** @type {import("./lib/DefaultApp")["default"]} */
-            const app = apps(key).default;
-            const clApp = new app(this.app, this.server, this.templateEnvironment);
-            clApp.routerNamespace = toURIPathPart(clApp.routerNamespace);
-            clApp.collectRoutes();
-            this.app.use(clApp.routerNamespace, clApp.router);
-        });
+        // If route not found, try to find a static file
+        this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
 
-        // Route not found
-        this.app.use((_request, _response, next) => {
-            next(httpErrors.NotFound());
+        // First register all routes
+        routes.keys().forEach((key) => {
+            /** @type {import("~server/lib/DefaultRoute")["default"]} */
+            const route = routes(key).default;
+            const clRoute = new route(this, this.templateEnvironment);
+            const namespace = clRoute.namespace || "/" + route.name.toLowerCase();
+            const registeredRoutes = Reflect.getMetadata("routes", clRoute);
+            const router = Router();
+            for (const aRoute of registeredRoutes) {
+                if (process.environment.DEBUG) {
+                    console.debug(`5.1 adding route ${aRoute.method} ${toURIPathPart(namespace + aRoute.path)} ${JSON.stringify(aRoute.options)}`);
+                }
+                router[aRoute.method](aRoute.path, async (request, response, next) => {
+                    console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
+                    const options = aRoute.options;
+                    if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
+                    if (request.user?.passwordResetToken) {
+                        request.user.passwordResetToken = undefined;
+                        await request.user.save();
+                    }
+                    aRoute.handler.call(clRoute, request, response, next);
+                });
+            }
+            this.app.use(namespace, router);
         });
     }
 
@@ -234,19 +249,6 @@ class WebServer {
     }
 }
 
-pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
-    const data = JSON.parse(parameter.replace(/'/g, "\""));
-    const password = data.password;
-    console.info(`registering user ${data.email} via command`);
-    try {
-        const result = await Register.registerUser(data, password);
-        reply(result);
-    } catch (error) {
-        console.error(error);
-        reply({ success: false, error });
-    }
-});
-
 process.environment = {};
 // First convert all environment variables to their right type
 for (const key in process.env) {
@@ -259,6 +261,20 @@ for (const key in process.env) {
         }
     }
 }
+
+pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
+    const data = JSON.parse(parameter.replace(/'/g, "\""));
+    const password = data.password;
+    const Users = require("~server/routes/Users");
+    console.info(`registering user ${data.email} via command`);
+    try {
+        const result = await Users.registerUser(data, password);
+        reply(result);
+    } catch (error) {
+        console.error(error);
+        reply({ success: false, error });
+    }
+});
 
 const server = new WebServer();
 server.start();
