@@ -213,33 +213,8 @@ export default class WebServer {
             const registeredRoutes = Reflect.getMetadata("routes", clRoute);
             const router = Router();
             for (const aRoute of registeredRoutes) {
-                if (process.environment.DEBUG) {
-                    console.debug(`5.1 adding route ${aRoute.method} ${toURIPathPart(namespace + aRoute.path)} ${JSON.stringify(aRoute.options)}`);
-                }
-                router[aRoute.method](aRoute.path, ...aRoute.middlewares, async (request, response, next) => {
-                    console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
-                    const options = aRoute.options;
-                    if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
-                    if (request.user?.passwordResetToken) {
-                        request.user.passwordResetToken = undefined;
-                        await request.user.save();
-                    }
-                    try {
-                        const result = await aRoute.handler.call(clRoute, request, response, next);
-                        if (response.headersSent) return;
-                        if (!result) {
-                            response.json({ success: true, data: {} });
-                        } else if (result instanceof Error) {
-                            next(result);
-                        } else if (typeof result === "string") {
-                            response.send(result);
-                        } else if (typeof result === "object") {
-                            response.json({ success: true, data: result });
-                        } else if (result != null) next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
-                    } catch (error) {
-                        next(httpErrors(500, error.message));
-                    }
-                });
+                if (process.environment.DEBUG) console.debug(`5.1 adding route ${aRoute.method} ${toURIPathPart(namespace + aRoute.path)} ${JSON.stringify(aRoute.options)}`);
+                router[aRoute.method](aRoute.path, ...aRoute.middlewares, (request, response, next) => clRoute.handle(aRoute, request, response, next));
             }
             this.app.use(namespace, router);
         });

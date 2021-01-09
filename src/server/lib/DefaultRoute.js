@@ -1,6 +1,7 @@
 import fs from "graceful-fs";
 import arp from "app-root-path";
 import path from "path";
+import httpErrors from "http-errors";
 
 
 /**
@@ -41,7 +42,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static all(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -61,7 +62,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static get(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -77,7 +78,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static post(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -93,7 +94,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static put(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -109,7 +110,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static patch(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -125,7 +126,7 @@ export default class DefaultRoute {
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
      * @returns {MethodDecorator}
-     * @memberof Route
+     * @memberof DefaultRoute
      */
     static delete(uri, options = {}, ...middlewares) {
         return (target, method) => {
@@ -143,7 +144,8 @@ export default class DefaultRoute {
      * @param { HttpMethods } method
      * @param { string } path
      * @param { import("express").RequestHandler[] } middlewares
-     * @memberof Route
+     * @returns {void}
+     * @memberof DefaultRoute
      */
     static _registerRoute(target, handlerName, options, method, path, middlewares) {
         const handler = target[handlerName];
@@ -153,14 +155,51 @@ export default class DefaultRoute {
     }
 
     /**
+     * Registers a new route in the metadata storage which can then be collected
+     * by an app.
+     *
+     * @static
+     * @param {RouteObject} routeObject
+     * @param {import("express").Request} request
+     * @param {import("express").Response} response
+     * @param {import("express").NextFunction} next
+     * @returns {void}
+     * @memberof DefaultRoute
+     */
+    async handle(routeObject, request, response, next) {
+        console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
+        const options = routeObject.options;
+        if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
+        if (request.user?.passwordResetToken) {
+            request.user.passwordResetToken = undefined;
+            await request.user.save();
+        }
+        try {
+            const result = await routeObject.handler.call(this, request, response, next);
+            if (response.headersSent) return;
+            if (!result) {
+                response.json({ success: true, data: {} });
+            } else if (result instanceof Error) {
+                next(result);
+            } else if (typeof result === "string") {
+                response.send(result);
+            } else if (typeof result === "object") {
+                response.json({ success: true, data: result });
+            } else if (result != null) next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
+        } catch (error) {
+            next(httpErrors(500, error));
+        }
+    }
+
+    /**
      * Renders a page depending on the current route namespace or the given
      * name as file name without extension.
      * It will include user information, a nonce and environment variables which are
      * allowed to be exposed to the frontend by adding then to FRONTEND_EXPOSED_CONFIG.
      *
-     * @param { import("express").Request } request
-     * @param { import("express").Response } response
-     * @param { string } [name]
+     * @param {import("express").Request} request
+     * @param {import("express").Response} response
+     * @param {string} [name]
      * @returns {string}
      * @memberof DefaultRoute
      */
