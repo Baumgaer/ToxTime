@@ -19,6 +19,7 @@ import pmx from "@pm2/io";
 import normalizeURL from "normalize-url";
 import arp from "app-root-path";
 import path from "path";
+import httpErrors from "http-errors";
 
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
@@ -220,6 +221,10 @@ export default class WebServer {
 
         // If route not found, try to find a static file
         this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
+
+        this.app.use("*", (request, response, next) => {
+            next(httpErrors.NotFound());
+        });
     }
 
     async start() {
