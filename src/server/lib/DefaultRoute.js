@@ -162,11 +162,11 @@ export default class DefaultRoute {
      * @param { import("express").RequestHandler[] } middlewares
      * @memberof Route
      */
-    static _registerRoute(target, handlerName, options, method, path) {
+    static _registerRoute(target, handlerName, options, method, path, middlewares) {
         const handler = target[handlerName];
         if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
         const routes = Reflect.getMetadata("routes", target);
-        routes.push({ method: method.toLowerCase(), path, handler, options });
+        routes.push({ method: method.toLowerCase(), path, handler, options, middlewares });
     }
 
 }

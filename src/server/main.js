@@ -219,7 +219,7 @@ export default class WebServer {
                 if (process.environment.DEBUG) {
                     console.debug(`5.1 adding route ${aRoute.method} ${toURIPathPart(namespace + aRoute.path)} ${JSON.stringify(aRoute.options)}`);
                 }
-                router[aRoute.method](aRoute.path, async (request, response, next) => {
+                router[aRoute.method](aRoute.path, ...aRoute.middlewares, async (request, response, next) => {
                     console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
                     const options = aRoute.options;
                     if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
