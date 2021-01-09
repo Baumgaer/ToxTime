@@ -7,59 +7,57 @@ export default class Users extends DefaultRoute {
     /**
      * test
      *
-     * @param {import("express").Request} _request the request
-     * @param {import("express").Response} response the response
+     * @param {import("express").Request} request the request
      * @returns {void}
      * @memberof Register
      */
     @Users.get("/")
-    async getAll(_request, response) {
+    async getAll(request) {
+        request.body;
         let users = null;
         try {
             users = await User.find({}).exec();
         } catch (error) {
-            return response.send({ success: false, error });
+            return error;
         }
-        response.send({ success: true, data: { models: users || [] } });
+        return { models: users || [] };
     }
 
     /**
      * test
      *
      * @param {import("express").Request} request the request
-     * @param {import("express").Response} response the response
      * @returns {void}
      * @memberof Register
      */
     @Users.get("/:id")
-    async getById(request, response) {
+    async getById(request) {
         let user = null;
         try {
             user = User.findById(request.params.id);
         } catch (error) {
-            return response.send({ success: false, error });
+            return error;
         }
-        response.send({ success: true, data: { models: [user] } });
+        return { models: [user] };
     }
 
     /**
      * test
      *
      * @param {import("express").Request} request the request
-     * @param {import("express").Response} response the response
      * @returns {void}
      * @memberof Register
      */
     @Users.post("/register")
-    async register(request, response) {
-        if (!request.body.email || !isEmail(request.body.email)) return response.send({ success: false, error: { name: "notAnEmail" } });
+    async register(request) {
+        if (!request.body.email || !isEmail(request.body.email)) return new Error("notAnEmail");
         const result = await Users.registerUser({
             email: request.body.email,
             password: request.body.password,
             matriculationNumber: request.body.matr,
             locale: request.headers["accept-language"]
         }, request.body.password);
-        response.send(result);
+        return result;
     }
 
     static registerUser(data, password) {

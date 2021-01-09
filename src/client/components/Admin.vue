@@ -80,7 +80,7 @@ export default {
 
         async onNavButtonClick(name) {
             this.category = name;
-            const result = await ApiClient.get(`/admin/${name}`);
+            const result = await ApiClient.get(`/${name}`);
             if (!result.success) {
                 return this.items = [];
             }

@@ -143,11 +143,11 @@ export default class DefaultRoute {
         for (const configName of process.environment.FRONTEND_EXPOSED_CONFIG.split(",")) {
             environment[configName] = process.environment[configName];
         }
-        response.send(this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
+        return this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
             userInformation: JSON.parse(JSON.stringify((request.user || {}))),
             nonce: response.locals.cspNonce,
             environment: environment
-        }));
+        });
     }
 
     /**

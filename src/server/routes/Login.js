@@ -32,7 +32,7 @@ export default class Login extends DefaultRoute {
      */
     @Login.get("/reset", { public: true })
     sendLoginFile(request, response) {
-        this.renderPage(request, response, "index");
+        return this.renderPage(request, response, "index");
     }
 
     /**
@@ -40,12 +40,11 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @param {import("express").NextFunction} next the next middleware
      * @returns {void}
      * @memberof Login
      */
     @Login.post("/reset", { public: true })
-    async requestPasswordReset(request, response, next) {
+    async requestPasswordReset(request, response) {
         const email = request.body.email;
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
@@ -66,9 +65,9 @@ export default class Login extends DefaultRoute {
                     }
                 });
             } else console.info(`ignored email ${email} because no user was found`);
-            response.send({ success: true, data: {} });
+            return {};
         } catch (error) {
-            next(httpErrors.InternalServerError(error));
+            return httpErrors.InternalServerError(error);
         }
     }
 
@@ -76,22 +75,14 @@ export default class Login extends DefaultRoute {
      * test
      *
      * @param {import("express").Request} request the request
-     * @param {import("express").Response} _response the response
-     * @param {import("express").NextFunction} next the next middleware
      * @returns {void}
      * @memberof Login
      */
-    async checkPasswordResetToken(request, _response, next) {
+    async checkPasswordResetToken(request) {
         const token = request.params.token;
-        if (!token || !isUUID(token, "4")) {
-            next(httpErrors.NotAcceptable());
-            return null;
-        }
+        if (!token || !isUUID(token, "4")) return httpErrors.BadRequest();
         const user = await User.findOne({ passwordResetToken: token }).exec();
-        if (!user) {
-            next(httpErrors.NotFound());
-            return null;
-        }
+        if (!user) return httpErrors.NotFound();
         return user;
     }
 
@@ -100,15 +91,14 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @param {import("express").NextFunction} next the next middleware
      * @returns {void}
      * @memberof Login
      */
     @Login.get("/reset/:token", { public: true })
-    async renderPasswordResetPage(request, response, next) {
-        const result = await this.checkPasswordResetToken(request, response, next);
-        if (!result) return;
-        this.renderPage(request, response, "index");
+    async renderPasswordResetPage(request, response) {
+        const result = await this.checkPasswordResetToken(request);
+        if (result instanceof Error) return result;
+        return this.renderPage(request, response, "index");
     }
 
     /**
@@ -132,9 +122,9 @@ export default class Login extends DefaultRoute {
             await user.setPassword(password);
             user.passwordResetToken = undefined;
             await user.save();
-            response.send({ success: true, data: {} });
+            return {};
         } catch (error) {
-            next(httpErrors.InternalServerError(error));
+            return httpErrors.InternalServerError(error);
         }
     }
 
@@ -148,19 +138,21 @@ export default class Login extends DefaultRoute {
      */
     @Login.post("/", { public: true })
     async authenticate(request, response) {
-        if (!request.body.email) return response.send({ success: false, error: { name: "invalidEmail" } });
-        if (!request.body.password) return response.send({ success: false, error: { name: "invalidPassword" } });
+        if (!request.body.email) return new Error("invalidEmail");
+        if (!request.body.password) return new Error("invalidPassword");
 
-        passport.authenticate("local", (error, user) => {
-            if (error) return response.send({ success: false, error });
-            if (!user) return response.send({ success: false, error: { name: "emailOrPasswordIncorrect" } });
-            request.logIn(user, (error) => {
-                if (error) return response.send({ success: false, error });
-                const theUser = Object.assign({}, user.toObject());
-                delete theUser.hash;
-                delete theUser.salt;
-                response.send({ success: true, data: { models: [theUser] } });
-            });
-        })(request, response);
+        return new Promise((resolve, reject) => {
+            passport.authenticate("local", (error, user) => {
+                if (error) return reject(error);
+                if (!user) return reject(new Error("emailOrPasswordIncorrect"));
+                request.logIn(user, (error) => {
+                    if (error) return response.send({ success: false, error });
+                    const theUser = Object.assign({}, user.toObject());
+                    delete theUser.hash;
+                    delete theUser.salt;
+                    resolve({ models: [theUser] });
+                });
+            })(request, response);
+        });
     }
 }

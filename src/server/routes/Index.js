@@ -14,6 +14,6 @@ export default class Index extends DefaultRoute {
      */
     @Index.get("/", { public: true })
     sendIndexFile(request, response) {
-        this.renderPage(request, response);
+        return this.renderPage(request, response);
     }
 }

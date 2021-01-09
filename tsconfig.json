@@ -41,13 +41,6 @@
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "typeRoots": [],
-        "types": [
-            "node",
-            "express",
-            "webpack",
-            "webpack-env",
-            "reflect-metadata"
-        ],
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true

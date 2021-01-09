@@ -12,6 +12,6 @@ export default class Admin extends DefaultRoute {
      */
     @Admin.get("/")
     sendAdminFile(request, response) {
-        this.renderPage(request, response);
+        return this.renderPage(request, response);
     }
 }

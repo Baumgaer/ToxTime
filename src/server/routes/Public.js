@@ -12,6 +12,6 @@ export default class Public extends DefaultRoute {
      */
     @Public.get("/", { allowUser: true })
     sendPublicFile(request, response) {
-        this.renderPage(request, response);
+        return this.renderPage(request, response);
     }
 }

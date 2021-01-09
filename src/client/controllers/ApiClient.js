@@ -1,5 +1,7 @@
 import validator from "validator";
 import User from "~client/models/User";
+import httpErrors from "http-errors";
+import stripHTML from "string-strip-html";
 
 export default class ApiClient {
 
@@ -68,6 +70,7 @@ export default class ApiClient {
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
 
+        if (response.status >= 400) defaultResponse.error = httpErrors(response.status, stripHTML(await response.text()).result.match(/:(.*?)at/)[1]);
         if (response.status < 200 || response.status >= 300) return defaultResponse;
         const theJson = await response.json();
         let mapped = {};

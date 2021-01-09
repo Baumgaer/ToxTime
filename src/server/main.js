@@ -204,9 +204,6 @@ export default class WebServer {
         console.info("5. Collecting routes");
         const routes = require.context("~server/routes", true, /\.js$/i, "sync");
 
-        // If route not found, try to find a static file
-        this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
-
         // First register all routes
         routes.keys().forEach((key) => {
             /** @type {import("~server/lib/DefaultRoute")["default"]} */
@@ -227,11 +224,28 @@ export default class WebServer {
                         request.user.passwordResetToken = undefined;
                         await request.user.save();
                     }
-                    aRoute.handler.call(clRoute, request, response, next);
+                    try {
+                        const result = await aRoute.handler.call(clRoute, request, response, next);
+                        if (response.headersSent) return;
+                        if (!result) {
+                            response.json({ success: true, data: {} });
+                        } else if (result instanceof Error) {
+                            next(result);
+                        } else if (typeof result === "string") {
+                            response.send(result);
+                        } else if (typeof result === "object") {
+                            response.json({ success: true, data: result });
+                        } else if (result != null) next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
+                    } catch (error) {
+                        next(httpErrors(500, error.message));
+                    }
                 });
             }
             this.app.use(namespace, router);
         });
+
+        // If route not found, try to find a static file
+        this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
     }
 
     async start() {
