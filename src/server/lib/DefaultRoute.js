@@ -2,6 +2,7 @@ import fs from "graceful-fs";
 import arp from "app-root-path";
 import path from "path";
 import httpErrors from "http-errors";
+import CustomError from "~common/lib/CustomError";
 
 
 /**
@@ -179,7 +180,9 @@ export default class DefaultRoute {
             if (response.headersSent) return;
             if (!result) {
                 response.json({ success: true, data: {} });
-            } else if (result instanceof Error) {
+            } else if (result instanceof CustomError) {
+                response.status((new httpErrors.BadRequest()).statusCode).json({ success: false, error: result });
+            } else if (httpErrors.isHttpError(result)) {
                 next(result);
             } else if (typeof result === "string") {
                 response.send(result);

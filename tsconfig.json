@@ -41,6 +41,9 @@
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "typeRoots": [],
+        "types": [
+            "webpack-env"
+        ],
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true

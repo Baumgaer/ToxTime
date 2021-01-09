@@ -71,9 +71,15 @@ export default class ApiClient {
         const defaultResponse = { success: false, error: { name: "unknownError" } };
 
         if (response.status >= 400) {
-            const result = stripHTML(await response.text()).result;
-            const matches = result.match(/:(.*?)at/);
-            defaultResponse.error = httpErrors(response.status, matches ? matches[1] : result);
+            let result = null;
+            let matches = null;
+            if (response.headers.get("Content-Type").includes("application/json")) {
+                result = await response.json();
+            } else {
+                result = stripHTML(await response.text()).result;
+                matches = result.match(/:(.*?)at/);
+            }
+            defaultResponse.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;
         }
         if (response.status < 200 || response.status >= 300) return defaultResponse;
         const theJson = await response.json();

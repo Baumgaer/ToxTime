@@ -156,7 +156,7 @@ export default class Login extends DefaultRoute {
         return new Promise((resolve, reject) => {
             passport.authenticate("local", (error, user) => {
                 if (error) return reject(error);
-                if (!user) return reject(new CustomError("emailOrPasswordIncorrect"));
+                if (!user) return resolve(new CustomError("emailOrPasswordIncorrect"));
                 request.logIn(user, (error) => {
                     if (error) return response.send({ success: false, error });
                     const theUser = Object.assign({}, user.toObject());

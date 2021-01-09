@@ -12,7 +12,6 @@ import { createHash } from 'crypto';
 import passport from "passport";
 import { Strategy as PassportStrategy } from "passport-local";
 import mongoose from "mongoose";
-import httpErrors from "http-errors";
 import i18next from "i18next";
 import i18nextMiddleware from "i18next-http-middleware";
 import nunjucks from "nunjucks";
