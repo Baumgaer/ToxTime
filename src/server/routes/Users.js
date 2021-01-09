@@ -1,14 +1,15 @@
 import { isEmail } from "validator";
 import DefaultRoute from "~server/lib/DefaultRoute";
 import User from "~server/models/User";
+import { randomBytes } from "crypto";
 
 export default class Users extends DefaultRoute {
 
     /**
-     * test
+     * collects all users and returns them in a list.
      *
      * @param {import("express").Request} request the request
-     * @returns {void}
+     * @returns {Promise<{models: User[]} | Error>}
      * @memberof Register
      */
     @Users.get("/")
@@ -24,10 +25,10 @@ export default class Users extends DefaultRoute {
     }
 
     /**
-     * test
+     * collects one user by its id if found
      *
      * @param {import("express").Request} request the request
-     * @returns {void}
+     * @returns {Promise<{models: [user]} | Error>}
      * @memberof Register
      */
     @Users.get("/:id")
@@ -42,7 +43,7 @@ export default class Users extends DefaultRoute {
     }
 
     /**
-     * test
+     * registers a new user with email, a password if given and a matriculation number
      *
      * @param {import("express").Request} request the request
      * @returns {void}
@@ -51,25 +52,26 @@ export default class Users extends DefaultRoute {
     @Users.post("/register")
     async register(request) {
         if (!request.body.email || !isEmail(request.body.email)) return new Error("notAnEmail");
-        const result = await Users.registerUser({
-            email: request.body.email,
-            password: request.body.password,
-            matriculationNumber: request.body.matr,
-            locale: request.headers["accept-language"]
-        }, request.body.password);
-        return result;
+        const password = request.body.password || randomBytes(64);
+        try {
+            return await Users.registerUser({
+                email: request.body.email,
+                password: password,
+                matriculationNumber: request.body.matriculationNumber,
+                locale: request.i18n.language
+            }, password);
+        } catch (error) {
+            return error;
+        }
     }
 
     static registerUser(data, password) {
         return new Promise((resolve, reject) => {
             const user = new User(data);
-
             User.register(user, password, (error) => {
                 if (error) {
-                    reject({ success: false, error });
-                } else {
-                    resolve({ success: true });
-                }
+                    reject(error);
+                } else resolve({ models: [user] });
             });
         });
     }

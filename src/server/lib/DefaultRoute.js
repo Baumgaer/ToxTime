@@ -22,15 +22,15 @@ export default class DefaultRoute {
     /** @type {string} */
     namespace = "";
 
+    /** @type {Record<string, string>} */
+    _renderedPages = {};
+
     constructor(webServer, renderEngine) {
         /** @type {import("~server/main").default} */
         this.webServer = webServer;
 
         /** @type {import("nunjucks").Environment} */
         this.renderEngine = renderEngine;
-
-        /** @type {Record<string, string>} */
-        this._renderedPages = {};
     }
 
     /**
@@ -133,23 +133,6 @@ export default class DefaultRoute {
         };
     }
 
-    async renderPage(request, response, name) {
-        const staticPath = path.resolve(arp.path, process.environment.PATH_STATIC_FILES);
-        const proto = Reflect.getPrototypeOf(this);
-        const namespace = this.namespace || "/" + proto.constructor.name.toLowerCase();
-        const ownHtmlName = `${name || namespace.substring(1) || "index"}.html`;
-        if (!this._renderedPages[ownHtmlName]) this._renderedPages[ownHtmlName] = fs.readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
-        const environment = {};
-        for (const configName of process.environment.FRONTEND_EXPOSED_CONFIG.split(",")) {
-            environment[configName] = process.environment[configName];
-        }
-        return this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
-            userInformation: JSON.parse(JSON.stringify((request.user || {}))),
-            nonce: response.locals.cspNonce,
-            environment: environment
-        });
-    }
-
     /**
      * Registers a new route in the metadata storage which can then be collected
      * by an app.
@@ -167,6 +150,35 @@ export default class DefaultRoute {
         if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
         const routes = Reflect.getMetadata("routes", target);
         routes.push({ method: method.toLowerCase(), path, handler, options, middlewares });
+    }
+
+    /**
+     * Renders a page depending on the current route namespace or the given
+     * name as file name without extension.
+     * It will include user information, a nonce and environment variables which are
+     * allowed to be exposed to the frontend by adding then to FRONTEND_EXPOSED_CONFIG.
+     *
+     * @param { import("express").Request } request
+     * @param { import("express").Response } response
+     * @param { string } [name]
+     * @returns {string}
+     * @memberof DefaultRoute
+     */
+    async renderPage(request, response, name) {
+        const staticPath = path.resolve(arp.path, process.environment.PATH_STATIC_FILES);
+        const proto = Reflect.getPrototypeOf(this);
+        const namespace = this.namespace || "/" + proto.constructor.name.toLowerCase();
+        const ownHtmlName = `${name || namespace.substring(1) || "index"}.html`;
+        if (!this._renderedPages[ownHtmlName]) this._renderedPages[ownHtmlName] = fs.readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
+        const environment = {};
+        for (const configName of process.environment.FRONTEND_EXPOSED_CONFIG.split(",")) {
+            environment[configName] = process.environment[configName];
+        }
+        return this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
+            userInformation: JSON.parse(JSON.stringify((request.user || {}))),
+            nonce: response.locals.cspNonce,
+            environment: environment
+        });
     }
 
 }

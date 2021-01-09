@@ -5,12 +5,14 @@ import { v4 as uuIDv4 } from "uuid";
 import DefaultRoute from "~server/lib/DefaultRoute";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import User from "~server/models/User";
+import CustomError from "~common/lib/CustomError";
 import { isUUID } from "validator";
 import normalizeURL from "normalize-url";
 
 export default class Login extends DefaultRoute {
+
     /**
-     * test
+     * redirects to the index page to show the login
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
@@ -23,7 +25,8 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * just returns the index page to enable the frontend to route to the
+     * corresponding component.
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
@@ -36,7 +39,12 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * Receives an email address and searches a user with this address.
+     * If found, a token will be generated which will be sent in an email to
+     * the received email address. If clicking on the link in that email,
+     * the user can set a new password.
+     * If no user was found, the server will just ignore that and tell the
+     * frontend, dat an email was sent. This has some privacy and security reasons.
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
@@ -72,7 +80,9 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * Checks if the received token is a token and a user has this token as a
+     * value in passwordResetToken. If so, the user will be returned and an
+     * http error else.
      *
      * @param {import("express").Request} request the request
      * @returns {void}
@@ -87,7 +97,8 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * checks if the token in the params is valid and renders the index page to
+     * enable the frontend to show the corresponding component.
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
@@ -102,7 +113,8 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * Receives a password and a repetition. If they are filled and equal and
+     * the token exists on a user, the password of that user will be changed
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
@@ -114,9 +126,9 @@ export default class Login extends DefaultRoute {
     async resetPassword(request, response, next) {
         const password = request.body.password;
         const repeatPassword = request.body.repeatPassword;
-        if (!passport) return response.send({ success: false, error: { name: "passwordNotFilled", field: "password" } });
-        if (!repeatPassword) return response.send({ success: false, error: { name: "passwordNotFilled", field: "repeatPassword" } });
-        if (password !== repeatPassword) return response.send({ success: false, error: { name: "passwordsNotEqual", field: "repeatPassword" } });
+        if (!passport) return new CustomError("passwordNotFilled", "The password was not filled", { field: "password" });
+        if (!repeatPassword) return new CustomError("passwordNotFilled", "The password repeat was not filled", { field: "repeatPassword" });
+        if (password !== repeatPassword) return new CustomError("passwordsNotEqual", "Password and password repeat are not equal", { field: "repeatPassword" });
         const user = await this.checkPasswordResetToken(request, response, next);
         try {
             await user.setPassword(password);
@@ -129,22 +141,22 @@ export default class Login extends DefaultRoute {
     }
 
     /**
-     * test
+     * Does the login for a user
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {Promise<{models: User[]} | CustomError>}
      * @memberof Login
      */
     @Login.post("/", { public: true })
     async authenticate(request, response) {
-        if (!request.body.email) return new Error("invalidEmail");
-        if (!request.body.password) return new Error("invalidPassword");
+        if (!request.body.email) return new CustomError("invalidEmail");
+        if (!request.body.password) return new CustomError("invalidPassword");
 
         return new Promise((resolve, reject) => {
             passport.authenticate("local", (error, user) => {
                 if (error) return reject(error);
-                if (!user) return reject(new Error("emailOrPasswordIncorrect"));
+                if (!user) return reject(new CustomError("emailOrPasswordIncorrect"));
                 request.logIn(user, (error) => {
                     if (error) return response.send({ success: false, error });
                     const theUser = Object.assign({}, user.toObject());

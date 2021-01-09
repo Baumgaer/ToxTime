@@ -9,7 +9,7 @@ export default class Index extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {string}
      * @memberof Index
      */
     @Index.get("/", { public: true })

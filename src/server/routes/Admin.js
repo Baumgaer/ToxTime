@@ -3,11 +3,11 @@ import DefaultRoute from "~server/lib/DefaultRoute";
 export default class Admin extends DefaultRoute {
 
     /**
-     * Sends the initial file when not logged in.
+     * Sends the initial file when logged in.
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {string}
      * @memberof Admin
      */
     @Admin.get("/")
