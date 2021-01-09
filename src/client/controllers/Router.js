@@ -52,7 +52,7 @@ export default class Router {
             if (component?.components?.default?.props?.subTitle) {
                 title = `${component.components.default.props.subTitle} - ${title}`;
             }
-            document.title = title;
+            document.title = `${title} - ${window.environment.APP_NAME}`;
             next();
         });
         return router;

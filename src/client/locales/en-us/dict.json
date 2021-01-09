@@ -1,7 +1,6 @@
 {
     "helloWorld": "Hello World",
-    "helloAdmin": "Hello Administrator",
-    "helloLogin": "Hello Login",
+    "welcome": "Welcome to {to}",
     "email": "E-mail",
     "emailIncorrect": "E-mail incorrect",
     "errorWhileSendingEmail": "Error while sending e-mail",

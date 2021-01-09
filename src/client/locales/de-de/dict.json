@@ -1,5 +1,6 @@
 {
     "helloWorld": "Hallo Welt",
+    "welcome": "Willkommen bei {to}",
     "email": "E-Mail",
     "emailIncorrect": "E-Mail inkorrekt",
     "errorWhileSendingEmail": "Fehler beim Senden der E-Mail",

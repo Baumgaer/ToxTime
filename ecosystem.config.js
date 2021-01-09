@@ -145,7 +145,7 @@ const defaults = {
 
 const staticConfig = {
     "PATH_STATIC_FILES": path.resolve(arp.path, "dist"),
-    "FRONTEND_EXPOSED_CONFIG": "'APP_NAME', 'APP_DOMAIN'"
+    "FRONTEND_EXPOSED_CONFIG": "APP_NAME, APP_DOMAIN"
 };
 
 const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();

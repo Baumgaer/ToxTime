@@ -27,6 +27,7 @@ Vue.component('arrow-collapse-left-icon', ArrowCollapseLeftIcon);
 Vue.component('arrow-collapse-right-icon', ArrowCollapseRightIcon);
 
 Vue.config.productionTip = false;
+Vue.prototype.window = window;
 
 Router.extendRoutes([{
     name: "admin",

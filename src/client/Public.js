@@ -7,6 +7,7 @@ import App from '~client/App.vue';
 import HelloWorld from "~client/components/HelloWorld.vue";
 
 Vue.config.productionTip = false;
+Vue.prototype.window = window;
 
 Router.extendRoutes([{
     name: "public",

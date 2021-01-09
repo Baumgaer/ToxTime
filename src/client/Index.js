@@ -5,6 +5,7 @@ import i18n from "~client/controllers/i18n";
 import App from '~client/App.vue';
 
 Vue.config.productionTip = false;
+Vue.prototype.window = window;
 
 const router = Router.init();
 

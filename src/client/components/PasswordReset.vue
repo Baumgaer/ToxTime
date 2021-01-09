@@ -1,5 +1,6 @@
 <template>
     <section class="login">
+        <div class="welcomeBox">{{ $t("resetPassword") }}</div>
         <form
             action="/login/reset"
             v-on:submit="doReset($event)"
@@ -24,6 +25,7 @@
             </div>
         </form>
         <form v-on:submit="setPassword($event)" v-else>
+            <div class="welcomeBox">{{ $t("resetPassword") }}</div>
             <div ref="hintBox" class="fail hintBox"></div>
             <section>
                 <input
