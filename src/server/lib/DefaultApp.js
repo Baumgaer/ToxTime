@@ -20,12 +20,6 @@ export default class DefaultApp {
         /** @type {string} */
         this.routerNamespace = "/";
 
-        /** @type {boolean} */
-        this.adminRightsNeeded = true;
-
-        /** @type {boolean} */
-        this.authenticatedOnly = true;
-
         /** @type {string | null} */
         this.loadedIndex = null;
 
@@ -61,10 +55,10 @@ export default class DefaultApp {
      * @returns {void}
      * @memberof DefaultApp
      */
-    addRoute(method, url, handler) {
+    addRoute(method, url, handler, options) {
         const methodName = method.toLowerCase();
         const normalizedURL = toURIPathPart(url);
-        this.router[methodName](normalizedURL, (request, response, next) => this.handle(handler, request, response, next));
+        this.router[methodName](normalizedURL, (request, response, next) => this.handle(handler, options, request, response, next));
         if (process.environment.DEBUG) console.debug(`5.1 adding route ${methodName} ${toURIPathPart(`${this.routerNamespace}${normalizedURL}`)}`);
     }
 
@@ -76,9 +70,12 @@ export default class DefaultApp {
             const clRoute = new route(this.app, this);
             if (!clRoute.routeOf || (clRoute.routeOf.length && !clRoute.routeOf.includes(this.routerNamespace))) return;
             clRoute.routerNameSpace = toURIPathPart(clRoute.routerNameSpace);
-            const collectedRoutes = clRoute.collectRoutes();
+            const collectedRoutes = Reflect.getMetadata("routes", clRoute) || [];
+            collectedRoutes.sort((a, b) => {
+                return b.path.split("/").length - a.path.split("/").length;
+            });
             for (const collectedRoute of collectedRoutes) {
-                this.addRoute(collectedRoute.method, collectedRoute.path, collectedRoute.handler);
+                this.addRoute(collectedRoute.method, toURIPathPart(clRoute.routerNameSpace + collectedRoute.path), clRoute[collectedRoute.handlerName].bind(clRoute), collectedRoute.options);
             }
         });
     }
@@ -93,10 +90,9 @@ export default class DefaultApp {
      * @returns {void}
      * @memberof DefaultApp
      */
-    handle(handler, request, response, next) {
+    handle(handler, options, request, response, next) {
         console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
-        if ((this.authenticatedOnly && !request.user) ||
-            (this.adminRightsNeeded && (!request.user || request.user && !request.user.isAdmin))) return next(httpErrors.Unauthorized());
+        if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
         handler(request, response, next);
     }
 

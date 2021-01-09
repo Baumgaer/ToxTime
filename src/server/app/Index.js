@@ -4,8 +4,6 @@ export default class IndexApp extends DefaultApp {
 
     constructor(app, server, renderEngine) {
         super(app, server, renderEngine);
-        this.adminRightsNeeded = false;
-        this.authenticatedOnly = false;
     }
 
 }

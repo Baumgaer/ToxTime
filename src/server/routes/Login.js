@@ -24,6 +24,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.get("/", { public: true })
     async routeGet(request, response) {
         response.redirect("/");
     }
@@ -37,7 +38,9 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.get("/reset", { public: true })
     routeGetReset(request, response, next) {
+        console.log(JSON.stringify(this));
         this.parentApp.sendStaticFile(request, response, next, true);
     }
 
@@ -50,6 +53,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.post("/reset", { public: true })
     async routePostReset(request, response, next) {
         const email = request.body.email;
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
@@ -109,6 +113,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.get("/reset/:token", { public: true })
     async routeGetReset8token(request, response, next) {
         const result = await this.checkPasswordResetToken(request, response, next);
         if (!result) return;
@@ -124,6 +129,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.post("/reset/:token", { public: true })
     async routePostReset8token(request, response, next) {
         const password = request.body.password;
         const repeatPassword = request.body.repeatPassword;
@@ -149,6 +155,7 @@ export default class Login extends DefaultRoute {
      * @returns {void}
      * @memberof Login
      */
+    @Login.post("/", { public: true })
     async routePost(request, response) {
         if (!request.body.email) return response.send({ success: false, error: { name: "invalidEmail" } });
         if (!request.body.password) return response.send({ success: false, error: { name: "invalidPassword" } });

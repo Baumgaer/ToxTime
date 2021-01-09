@@ -1,11 +1,16 @@
-import { camelCaseToKebabCase, getAllFuncs, toURIPathPart } from "~common/utils";
-import { flattenDeep } from "lodash";
-
 /**
+ * @typedef {Object} RouteOptions
+ * @property {boolean} public
+ * @property {boolean} allowUser
+ *
  * @typedef {Object} RouteObject
  * @property {string} path
  * @property {string} method
- * @property {import("express").RequestHandler} handler
+ * @property {string} handlerName
+ * @property {RouteOptions} options
+ *
+ * @typedef {[import("express").Request, import("express").Response, import("express").NextFunction]} RequestHandlerArgs
+ * @typedef { "GET" | "POST" | "PUT" | "PATCH" | "DELETE" } HttpMethods
  */
 export default class DefaultRoute {
 
@@ -17,52 +22,121 @@ export default class DefaultRoute {
     }
 
     /**
-     * collects all routes defined by the methods starting with get, post, put, patch or delete.
-     * Path parts are splitted by camel case and parameters are marked by an 8 in front of them.
+     * Registers a new route in the metadata storage which can then be collected
+     * by an app.
      *
-     * @returns {RouteObject[]}
-     * @memberof DefaultRoute
+     * @static
+     * @param { typeof import("~server/lib/DefaultRoute").default } target
+     * @param { string } handlerName
+     * @param { HttpMethods } method
+     * @param { string } path
+     * @param { import("express").RequestHandler[] } middlewares
+     * @memberof Route
      */
-    collectRoutes() {
-        const routes = [];
+    static _registerRoute(target, handlerName, options, method, path) {
+        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
+        const routes = Reflect.getMetadata("routes", target);
+        routes.push({ method, path, handlerName, options });
+    }
 
-        getAllFuncs(this).forEach(name => {
-            const route = {};
-            const method = this[name];
-            if (typeof method !== "function" || !name.startsWith("route")) return;
+    /**
+     * Registers a ALL route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static all(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "GET", uri, middlewares);
+            this._registerRoute(target, method, options, "POST", uri, middlewares);
+            this._registerRoute(target, method, options, "PUT", uri, middlewares);
+            this._registerRoute(target, method, options, "PATCH", uri, middlewares);
+            this._registerRoute(target, method, options, "DELETE", uri, middlewares);
+        };
+    }
 
-            let convertedName = camelCaseToKebabCase(method.name).split("-");
-            convertedName.shift();
-            for (let [index, part] of convertedName.entries()) {
-                convertedName[index] = `/${part.split("8").join("/:")}`;
-            }
-            convertedName = convertedName.map((part) => {
-                return part.split("/").filter((item) => !!item);
-            });
+    /**
+     * Registers a GET route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static get(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "GET", uri, middlewares);
+        };
+    }
 
-            convertedName = flattenDeep(convertedName);
+    /**
+     * Registers a POST route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static post(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "POST", uri, middlewares);
+        };
+    }
 
-            if (!["get", "post", "put", "patch", "delete"].includes(convertedName[0])) return;
+    /**
+     * Registers a PUT route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static put(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "PUT", uri, middlewares);
+        };
+    }
 
-            let path = this.routerNameSpace;
-            for (const [index, part] of convertedName.entries()) {
-                if (!index) {
-                    route.method = part;
-                    continue;
-                }
-                path += `/${part.replace(/8/g, "/:")}`;
-            }
+    /**
+     * Registers a PATCH route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static patch(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "PATCH", uri, middlewares);
+        };
+    }
 
-            route.path = toURIPathPart(path);
-            route.handler = method.bind(this);
-            routes.push(route);
-        });
-
-        routes.sort((a, b) => {
-            return b.path.split("/").length - a.path.split("/").length;
-        });
-
-        return routes;
+    /**
+     * Registers a DELETE route with its uri, options and assigns middlewares
+     *
+     * @static
+     * @param {string} uri
+     * @param {RouteOptions} [options={}]
+     * @param {import("express").RequestHandler[]} middlewares
+     * @returns {MethodDecorator}
+     * @memberof Route
+     */
+    static delete(uri, options = {}, ...middlewares) {
+        return (target, method) => {
+            this._registerRoute(target, method, options, "DELETE", uri, middlewares);
+        };
     }
 
 }
