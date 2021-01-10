@@ -69,3 +69,38 @@ export function dataTransformer(doc, ret, modelClass) {
 export function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+/**
+ * Converts a csv string into an array of objects
+ *
+ * @export
+ * @param {string} csv
+ * @param {{colSeparator?: string, rowSeparator?: string}} params
+ * @returns {Record<string, any>[]}
+ */
+export function csvToObject(csv, params) {
+
+    csv = csv.trim();
+    const colSeparator = params?.colSeparator || ",";
+    const rowSeparator = params?.rowSeparator || "\n";
+
+    const lines = csv.split(rowSeparator).map((entry) => entry.trim());
+    const result = [];
+    const headers = lines[0].split(colSeparator).map((entry) => entry.trim().substring(1, entry.trim().length - 1));
+
+    for (let i = 1; i < lines.length; i++) {
+        const obj = {};
+        let currentLine = lines[i].split(colSeparator).map((entry) => entry.trim());
+        for (let j = 0; j < headers.length; j++) {
+            try {
+                obj[headers[j]] = JSON.parse(currentLine[j]);
+            } catch (error) {
+                obj[headers[j]] = currentLine[j];
+            }
+        }
+        if (params?.onData) params.onData(obj);
+        result.push(obj);
+    }
+
+    return result;
+}

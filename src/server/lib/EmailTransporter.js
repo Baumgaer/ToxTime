@@ -5,22 +5,32 @@ import { path as rootPath } from "app-root-path";
 import stripHTML from "string-strip-html";
 
 /**
+ * @typedef {Object} locales
+ * @property {import("~server/models/User")["default"]} user
+ *
  * @typedef {Object} SendParams
- * @property {string} from the sender email address
+ * @property {string} [from] the sender email address
  * @property {string} to the receiver email address
  * @property {string} subject the translation string of the subject. Will be used to decide which email template will be used.
- * @property {Record<string, any>} locales The locales which are used to render the template
+ * @property {Locales & Record<string, any>} locales The locales which are used to render the template
  */
 
 export default class EmailTransporter {
 
     constructor() {
         if (!EmailTransporter.usedGetInstance) throw new Error("Use Emailtransporter.getInstance() instead of new EmailTransporter()");
-        /** @type {Record<string, Record<string, import("nunjucks").Template>>} */
         this.templates = this.collectEmailTemplates();
         this.transporter = this.createTransporter();
     }
 
+    /**
+     * Creates a new instance of an EmailTransporter if bot exists and returns
+     * the existing one else.
+     *
+     * @static
+     * @returns {EmailTransporter}
+     * @memberof EmailTransporter
+     */
     static getInstance() {
         if (!EmailTransporter.instance) {
             EmailTransporter.usedGetInstance = true;
@@ -87,17 +97,18 @@ export default class EmailTransporter {
      *
      * @param {import("express").Request} request the request
      * @param {SendParams} params parameters to send the email
-     * @returns {void}
+     * @returns {Promise<any>}
      * @memberof EmailTransporter
      */
-    async send(request, params = {}) {
-        params = Object.assign({ from: `${process.environment.MAIL_NAME} <${process.environment.MAIL_ADDRESS}>`, to: "", subject: "" }, params);
+    async send(request, params) {
         console.info(`Sending e-mail to ${params.to}`);
-        const content = this.templates[params.locales.user.locale || "en-us"][params.subject].render(params.locales);
+        params = Object.assign({ from: `${process.environment.MAIL_NAME} <${process.environment.MAIL_ADDRESS}>`, to: "", subject: "" }, params || {});
+        const locales = Object.assign(params.locales, process.environment);
+        const content = this.templates[locales.user.locale || process.environment.APP_DEFAULT_LANGUAGE][params.subject].render(locales);
         return await (await this.transporter).sendMail({
             from: params.from,
             to: params.to,
-            subject: request.t(params.subject),
+            subject: request.t(params.subject, locales),
             text: stripHTML(content).result,
             html: content
         });

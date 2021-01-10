@@ -213,7 +213,8 @@ export default class DefaultRoute {
         const ownHtmlName = `${name || namespace.substring(1) || "index"}.html`;
         if (!this._renderedPages[ownHtmlName]) this._renderedPages[ownHtmlName] = fs.readFileSync(path.resolve(staticPath, ownHtmlName)).toString();
         const environment = {};
-        for (const configName of process.environment.FRONTEND_EXPOSED_CONFIG.split(",")) {
+        const configNames = process.environment.FRONTEND_EXPOSED_CONFIG.split(",").map((configName) => configName.trim());
+        for (const configName of configNames) {
             environment[configName] = process.environment[configName];
         }
         return this.renderEngine.renderString(this._renderedPages[ownHtmlName], {

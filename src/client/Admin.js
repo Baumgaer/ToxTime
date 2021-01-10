@@ -15,6 +15,7 @@ import CogIcon from "vue-material-design-icons/Cog";
 import PlusIcon from "vue-material-design-icons/Plus";
 import ArrowCollapseLeftIcon from "vue-material-design-icons/ArrowCollapseLeft";
 import ArrowCollapseRightIcon from "vue-material-design-icons/ArrowCollapseRight";
+import SendIcon from "vue-material-design-icons/Send";
 
 Vue.component('account-icon', AccountIcon);
 Vue.component('school-icon', SchoolIcon);
@@ -25,6 +26,7 @@ Vue.component('cog-icon', CogIcon);
 Vue.component('plus-icon', PlusIcon);
 Vue.component('arrow-collapse-left-icon', ArrowCollapseLeftIcon);
 Vue.component('arrow-collapse-right-icon', ArrowCollapseRightIcon);
+Vue.component('send-icon', SendIcon);
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;

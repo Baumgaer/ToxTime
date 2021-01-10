@@ -105,7 +105,7 @@ export default class WebServer {
             defaultNS: "dict",
             lng: "cimode",
             lowerCaseLng: true,
-            fallbackLng: "en-us",
+            fallbackLng: process.environment.APP_DEFAULT_LANGUAGE,
             resources
         });
         this.app.use(i18nextMiddleware.handle(i18next));

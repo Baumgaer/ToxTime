@@ -1,3 +1,4 @@
 {
-    "resetPassword": "Reset password"
+    "resetPassword": "Reset password",
+    "registrationEmail": "New user account at {{ APP_NAME }}"
 }

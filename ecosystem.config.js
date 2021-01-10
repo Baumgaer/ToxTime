@@ -18,6 +18,18 @@ const defaults = {
     "APP_DOMAIN": "localhost",
 
     /**
+     * The default language of the application. Will also be used to determine
+     * the default language of users while registering new users. Doesn't have
+     * any effect to automatic language detection but will be used as fallback
+     * when a translation string is missing.
+     *
+     * @type {select}
+     * @property {"de-de"} German
+     * @property {"en-us"} English
+     */
+    "APP_DEFAULT_LANGUAGE": "de-de",
+
+    /**
      * Enables or disables HTTPS.
      */
     "APP_SECURE": true,
@@ -56,6 +68,51 @@ const defaults = {
 
 
     /**
+     * The secret to secure the session token. Will be randomly generated on
+     * each server restart by default.
+     */
+    "SESSION_SECRET": crypto.randomBytes(512).toString(),
+
+    /**
+     * Maximum timeout of the session in human readable value e.g. 1h for one
+     * hour or 1m for one minute or 2.5 hrs for two and a half day.
+     * Notice the space between 2.5 and hrs.
+     */
+    "SESSION_MAX_AGE": "1h",
+
+    /**
+     * The name of the field in the csv which describes the role (e.g. admin or tutor)
+     */
+    "ECAMPUS_MEMBER_CSV_ROLE_FIELD_NAME": "Rolle/Status",
+
+    /**
+     * The name of the field in the csv which holds the user name
+     */
+    "ECAMPUS_MEMBER_CSV_USER_NAME_FIELD_NAME": "Benutzername",
+
+    /**
+     * A comma separated list of values in the role field which will
+     * determine wether or not to create an user as administrator.
+     */
+    "ECAMPUS_ADMIN_CONDITION": "Administrator",
+
+    /**
+     * A domain which will be used to extend the CSV field "userName" to an email
+     * e.g. userName@ECAMPUS_USERNAME_EMAIL_DOMAIN
+     */
+    "ECAMPUS_USERNAME_EMAIL_DOMAIN": "uni-bonn.de",
+
+    /**
+     * Comma separated list of mappings <csv-field>:<database-field>.
+     * If empty, no field will be mapped. the csv field name must be equal to
+     * a field name in the ECAMPUS_MEMBER_CSV_FORMAT.
+     *
+     * e.g. name:lastName, firstName:nickname
+     */
+    "ECAMPUS_FIELD_MAPPING": "Benutzername:nickname",
+
+
+    /**
      * The IP address of the database server
      */
     "DB_HOST": "localhost",
@@ -79,20 +136,6 @@ const defaults = {
      * The database login password
      */
     "DB_USER_PASSWORD": "",
-
-
-    /**
-     * The secret to secure the session token. Will be randomly generated on
-     * each server restart by default.
-     */
-    "SESSION_SECRET": crypto.randomBytes(512).toString(),
-
-    /**
-     * Maximum timeout of the session in human readable value e.g. 1h for one
-     * hour or 1m for one minute or 2.5 hrs for two and a half day.
-     * Notice the space between 2.5 and hrs.
-     */
-    "SESSION_MAX_AGE": "1h",
 
 
     /**
@@ -145,7 +188,7 @@ const defaults = {
 
 const staticConfig = {
     "PATH_STATIC_FILES": path.resolve(arp.path, "dist"),
-    "FRONTEND_EXPOSED_CONFIG": "APP_NAME, APP_DOMAIN"
+    "FRONTEND_EXPOSED_CONFIG": "APP_NAME, APP_DOMAIN, APP_DEFAULT_LANGUAGE, ECAMPUS_MEMBER_CSV_ROLE_FIELD_NAME, ECAMPUS_MEMBER_CSV_USER_NAME_FIELD_NAME, ECAMPUS_ADMIN_CONDITION, ECAMPUS_USERNAME_EMAIL_DOMAIN, ECAMPUS_FIELD_MAPPING"
 };
 
 const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();

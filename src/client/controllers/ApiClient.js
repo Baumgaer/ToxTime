@@ -7,6 +7,7 @@ export default class ApiClient {
 
     static get modelMap() {
         return {
+            Error,
             User: User
         };
     }
@@ -92,12 +93,9 @@ export default class ApiClient {
                 const newModel = new ApiClient.modelMap[model.className]();
                 Object.assign(newModel, model);
                 mapped.data.models.push(newModel);
-                this.store = {
-                    name: "add",
-                    collection: model.collection,
-                    key: model._id,
-                    value: newModel
-                };
+                if (!(newModel instanceof Error)) {
+                    this.store = { name: "add", collection: model.collection, key: model._id, value: newModel };
+                }
             }
         } else mapped = theJson;
 

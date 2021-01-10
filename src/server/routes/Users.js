@@ -1,7 +1,11 @@
 import { isEmail } from "validator";
 import DefaultRoute from "~server/lib/DefaultRoute";
 import User from "~server/models/User";
+import CustomError from "~common/lib/CustomError";
 import { randomBytes } from "crypto";
+import EmailTransporter from "~server/lib/EmailTransporter";
+import { v4 as uuid } from "uuid";
+import normalizeURL from "normalize-url";
 
 export default class Users extends DefaultRoute {
 
@@ -51,18 +55,64 @@ export default class Users extends DefaultRoute {
      */
     @Users.post("/register")
     async register(request) {
-        if (!request.body.email || !isEmail(request.body.email)) return new Error("notAnEmail");
-        const password = request.body.password || randomBytes(64);
-        try {
-            return await Users.registerUser({
-                email: request.body.email,
-                password: password,
-                matriculationNumber: request.body.matriculationNumber,
-                locale: request.i18n.language
-            }, password);
-        } catch (error) {
-            return error;
+        if (!(request.body instanceof Array)) request.body = [request.body];
+        const results = [];
+        for (const userData of request.body) {
+            if (!userData.email || !isEmail(userData.email)) {
+                results.push(new CustomError("notAnEmail", "", { field: `email` }));
+                continue;
+            }
+            const password = request.body.password || randomBytes(64);
+            const token = uuid();
+            try {
+                // Create the user
+                const originalUser = await Users.registerUser(Object.assign(userData, {
+                    password: password,
+                    locale: process.environment.APP_DEFAULT_LANGUAGE,
+                    passwordResetToken: token
+                }), password);
+
+                // Copy and modify for response
+                const modifiedUser = Object.assign({}, originalUser.toObject());
+                delete modifiedUser.hash;
+                delete modifiedUser.salt;
+                delete modifiedUser.passwordResetToken;
+
+                try {
+                    // Send confirmation email
+                    const isSecure = process.environment.APP_SECURE;
+                    const emailTransporter = EmailTransporter.getInstance();
+                    await emailTransporter.send(request, {
+                        subject: "registrationEmail",
+                        to: modifiedUser.email,
+                        locales: {
+                            user: modifiedUser,
+                            url: normalizeURL(`${process.environment.APP_DOMAIN}/login/confirm/${token}`, { forceHttps: isSecure, forceHttp: !isSecure })
+                        }
+                    });
+                    results.push(modifiedUser);
+                } catch (error) {
+                    try {
+                        // revert inserting model because sending email failed
+                        await User.findByIdAndDelete(originalUser._id);
+                        console.error(error);
+                        error.className = "Error";
+                        results.push(error);
+                    } catch (error) {
+                        // Reverting failed... OMG...
+                        console.error(error);
+                        error.className = "Error";
+                        results.push(error);
+                    }
+                }
+            } catch (error) {
+                // Creating user failed
+                console.error(error);
+                error.className = "Error";
+                results.push(error);
+            }
         }
+        return { success: true, models: results };
     }
 
     static registerUser(data, password) {
@@ -71,7 +121,7 @@ export default class Users extends DefaultRoute {
             User.register(user, password, (error) => {
                 if (error) {
                     reject(error);
-                } else resolve({ models: [user] });
+                } else resolve(user);
             });
         });
     }

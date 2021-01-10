@@ -1,6 +1,7 @@
 <template>
     <label class="switch">
-        <input ref="input" type="checkbox" :name="name" :value="value" v-on:focus="$emit('focus')" v-on:change="$emit('change')">
+        <input v-if="checked" ref="input" type="checkbox" checked :name="name" :value="value" v-on:focus="$emit('focus')" v-on:change="$emit('change')">
+        <input v-else ref="input" type="checkbox" :name="name" :value="value" v-on:focus="$emit('focus')" v-on:change="$emit('change')">
         <span class="slider"></span>
     </label>
 </template>
@@ -9,12 +10,8 @@
 export default {
     props: {
         name: String,
-        value: String
-    },
-    computed: {
-        checked() {
-            return this.$refs.input.checked;
-        }
+        value: String,
+        checked: Boolean
     }
 };
 </script>

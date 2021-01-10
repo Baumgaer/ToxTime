@@ -14,12 +14,8 @@ const schema = new Schema({
     nickname: {
         type: String
     },
-    matriculationNumber: {
-        type: Number,
-        required: true,
-        unique: true,
-        sparse: true
-    },
+    firstName: String,
+    lastName: String,
     locale: {
         type: String,
         required: true,

@@ -30,7 +30,7 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {string}
      * @memberof Login
      */
     @Login.get("/reset", { public: true })
@@ -48,7 +48,7 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {Promise<{} | Error>}
      * @memberof Login
      */
     @Login.post("/reset", { public: true })
@@ -85,15 +85,19 @@ export default class Login extends DefaultRoute {
      * http error else.
      *
      * @param {import("express").Request} request the request
-     * @returns {void}
+     * @returns {Promise<User | Error>}
      * @memberof Login
      */
-    async checkPasswordResetToken(request) {
+    static async checkPasswordResetToken(request, isConfirmed = true) {
         const token = request.params.token;
         if (!token || !isUUID(token, "4")) return httpErrors.BadRequest();
-        const user = await User.findOne({ passwordResetToken: token }).exec();
-        if (!user) return httpErrors.NotFound();
-        return user;
+        try {
+            const user = await User.findOne({ passwordResetToken: token, isConfirmed, isActive: true }).exec();
+            if (!user) return httpErrors.NotFound();
+            return user;
+        } catch (error) {
+            return error;
+        }
     }
 
     /**
@@ -102,12 +106,12 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {void}
+     * @returns {Promise<string | Error>}
      * @memberof Login
      */
     @Login.get("/reset/:token", { public: true })
     async renderPasswordResetPage(request, response) {
-        const result = await this.checkPasswordResetToken(request);
+        const result = await Login.checkPasswordResetToken(request);
         if (result instanceof Error) return result;
         return this.renderPage(request, response, "index");
     }
@@ -117,22 +121,66 @@ export default class Login extends DefaultRoute {
      * the token exists on a user, the password of that user will be changed
      *
      * @param {import("express").Request} request the request
-     * @param {import("express").Response} response the response
-     * @param {import("express").NextFunction} next the next middleware
-     * @returns {void}
+     * @returns {Promise<{} | Error>}
      * @memberof Login
      */
     @Login.post("/reset/:token", { public: true })
-    async resetPassword(request, response, next) {
+    resetPassword(request) {
+        return Login.reset(request);
+    }
+
+    /**
+     * checks if the token in the params is valid and renders the index page to
+     * enable the frontend to show the corresponding component.
+     *
+     * @param {import("express").Request} request the request
+     * @param {import("express").Response} response the response
+     * @returns {Promise<string | Error>}
+     * @memberof Login
+     */
+    @Login.get("/confirm/:token", { public: true })
+    async sendConfirmPage(request, response) {
+        const result = await Login.checkPasswordResetToken(request, false);
+        if (result instanceof Error) return result;
+        return this.renderPage(request, response, "index");
+    }
+
+    /**
+     * Receives a password and a repetition. If they are filled and equal and
+     * the token exists on a user, the password of that user will be changed
+     * and the account will be confirmed.
+     *
+     * @param {import("express").Request} request the request
+     * @returns {Promise<{} | Error>}
+     * @memberof Login
+     */
+    @Login.post("/confirm/:token", { public: true })
+    confirm(request) {
+        return Login.reset(request, false, (user) => { user.isConfirmed = true; });
+    }
+
+    /**
+     * Does the Password reset with checks and essential user manipulations
+     *
+     * @static
+     * @param {import("express").Request} request
+     * @param {boolean} [isConfirmed=true]
+     * @param {(user: User) => void} [additionalUserManipulations]
+     * @returns {Promise<{} | Error>}
+     * @memberof Login
+     */
+    static async reset(request, isConfirmed = true, additionalUserManipulations) {
         const password = request.body.password;
         const repeatPassword = request.body.repeatPassword;
         if (!passport) return new CustomError("passwordNotFilled", "The password was not filled", { field: "password" });
         if (!repeatPassword) return new CustomError("passwordNotFilled", "The password repeat was not filled", { field: "repeatPassword" });
         if (password !== repeatPassword) return new CustomError("passwordsNotEqual", "Password and password repeat are not equal", { field: "repeatPassword" });
-        const user = await this.checkPasswordResetToken(request, response, next);
+        const user = await Login.checkPasswordResetToken(request, isConfirmed);
+        if (user instanceof Error) return user;
         try {
             await user.setPassword(password);
             user.passwordResetToken = undefined;
+            if (additionalUserManipulations) additionalUserManipulations(user);
             await user.save();
             return {};
         } catch (error) {
