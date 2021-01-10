@@ -16,6 +16,8 @@ import PlusIcon from "vue-material-design-icons/Plus";
 import ArrowCollapseLeftIcon from "vue-material-design-icons/ArrowCollapseLeft";
 import ArrowCollapseRightIcon from "vue-material-design-icons/ArrowCollapseRight";
 import SendIcon from "vue-material-design-icons/Send";
+import CloseThickIcon from "vue-material-design-icons/CloseThick";
+import CheckBoldIcon from "vue-material-design-icons/CheckBold";
 
 Vue.component('account-icon', AccountIcon);
 Vue.component('school-icon', SchoolIcon);
@@ -27,6 +29,8 @@ Vue.component('plus-icon', PlusIcon);
 Vue.component('arrow-collapse-left-icon', ArrowCollapseLeftIcon);
 Vue.component('arrow-collapse-right-icon', ArrowCollapseRightIcon);
 Vue.component('send-icon', SendIcon);
+Vue.component('close-thick-icon', CloseThickIcon);
+Vue.component('check-bold-icon', CheckBoldIcon);
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;

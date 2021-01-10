@@ -30,5 +30,11 @@
     "addItem": "Artikel hinzufügen",
     "addUsers": "Benutzer hinzufügen",
     "matriculationNumber": "Matrikelnummer",
-    "isAdmin": "Administrator"
+    "isAdmin": "Administrator",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "nickname": "Pseudonym",
+    "isConfirmed": "Bestätigt",
+    "isActive": "Aktiv",
+    "remove": "Entfernen"
 }

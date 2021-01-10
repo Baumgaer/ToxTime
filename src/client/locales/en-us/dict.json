@@ -30,5 +30,11 @@
     "addItem": "Add item",
     "addUsers": "Add user",
     "matriculationNumber": "Matriculation number",
-    "isAdmin": "Administrator"
+    "isAdmin": "Administrator",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "nickname": "Pseudonym",
+    "isConfirmed": "Confirmed",
+    "isActive": "Aktive",
+    "remove": "Remove"
 }

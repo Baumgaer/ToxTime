@@ -46,6 +46,10 @@ input:checked + .slider {
 
 input:focus + .slider {
     box-shadow: 0 0 1px var(--checked-color, @primaryColor);
+
+    &::before {
+        background-color: var(--focus-color, @infoColor);
+    }
 }
 
 input:checked + .slider:before {

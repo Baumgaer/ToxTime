@@ -4,15 +4,19 @@
             <h2>{{ $t('addUsers') }}</h2>
             <div class="buttons">
                 <Button ref="send" class="sendButton" name="addUsers" v-on:click="onSendButtonClick()" >
-                    <send-icon />
+                    <check-bold-icon />
                 </Button>
             </div>
         </header>
         <form class="form">
+            <div class="head"></div>
             <div v-for="(field, fieldKey) of fieldList" :key="`header${fieldKey}`">
                 <div :class="`head ${field.name}`">{{ $t(field.name) }}</div>
             </div>
             <div class="row" v-for="(item, index) in this.tempUserList" :key="index">
+                <Button :ref="`delete${index}`" @click="onDeleteButtonClick(index)" name="remove" :showLabel="false" class="deleteButton">
+                    <close-thick-icon />
+                </Button>
                 <div v-for="(field, fieldKey) of fieldList" :key="fieldKey">
                     <input
                         v-if="field.type === 'text'"
@@ -22,7 +26,8 @@
                         :ref="`${field.name}${index}`"
                         :class="`input ${field.name}`"
                         @focus="onInputFieldFocus(index)"
-                        @change="onInputFieldChange(index, field.name)" />
+                        @change="onInputFieldChange(index, field.name)"
+                    />
                     <ToggleSwitch
                         v-if="field.type === 'toggle'"
                         :name="`${field.name}${index}`"
@@ -30,7 +35,8 @@
                         :checked="field.value != null ? field.value : item[field.name]"
                         :class="`input ${field.name}`"
                         @focus="onInputFieldFocus(index)"
-                        @change="onInputFieldChange(index, field.name)" />
+                        @change="onInputFieldChange(index, field.name)"
+                    />
                 </div>
             </div>
         </form>
@@ -71,8 +77,17 @@ export default {
             this.tempUserList[index][name] = this.$refs[`${name}${index}`][0].value;
         },
 
+        onDeleteButtonClick(index) {
+            if (this.tempUserList.length <= 1) {
+                this.tempUserList = [{}];
+            } else this.tempUserList.splice(index, 1);
+        },
+
         async onSendButtonClick() {
-            const users = this.tempUserList.filter((user) => Boolean(Object.keys(user)));
+            // Destroy reference and filter items
+            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => {
+                return Boolean(Object.keys(user).length);
+            });
             const result = await ApiClient.post("/users/register", users);
             console.log(result);
         },

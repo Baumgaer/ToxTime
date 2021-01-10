@@ -3,8 +3,8 @@
 .addUsers {
     height: 100%;
 
-    @gridTemplate: 1fr 1fr 1fr 1fr 100px 100px 100px;
-    @gridTemplateAreas: "email nickname firstName lastName isAdmin isConfirmed isActive";
+    @gridTemplate: 25px 1fr 1fr 1fr 1fr 100px 100px 100px;
+    @gridTemplateAreas: "removeButton email nickname firstName lastName isAdmin isConfirmed isActive";
 
     header {
         display: grid;
@@ -21,6 +21,7 @@
             grid-area: headline;
             box-sizing: border-box;
             width: calc(100% - 60px);
+            margin-left: 10px;
         }
         .buttons {
             grid-area: buttons;
@@ -82,6 +83,17 @@
             grid-area: isActive;
         }
 
+        .deleteButton {
+            --background-color: var(--white-color, @white);
+            --button-height: 25px;
+            --hover-color: var(--primary-color, @primaryColor);
+            border: 1px solid var(--gray-color, @gray);
+
+            &:hover {
+                color: var(--white-color, @white);
+            }
+        }
+
         .isAdmin,
         .isConfirmed,
         .isActive {
@@ -93,7 +105,7 @@
             display: grid;
             grid-template-columns: @gridTemplate;
             grid-template-areas: @gridTemplateAreas;
-            grid-column: auto / span 7;
+            grid-column: auto / span 8;
 
             .input {
                 border: 1px solid var(--gray-color, @gray);
