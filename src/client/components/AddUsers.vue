@@ -90,17 +90,20 @@ export default {
 
         async onSendButtonClick() {
             // Destroy reference and filter items
-            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => Boolean(Object.keys(user).length - 1));
+            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => {
+                user.errors = [];
+                return Boolean(Object.keys(user).length - 1);
+            });
             const result = await ApiClient.post("/users/register", users);
 
             let subtract = 0;
             for (const [index, model] of result.data.models.entries()) {
                 if (model instanceof Error) {
-                    if (model.name === "MongoError" && model.code === 11000) {
-                        this.tempUserList[index].errors.push(i18n.t("userAlreadyExists"));
-                    } else if (model.name === "notAnEmail") {
-                        this.tempUserList[index].errors.push(i18n.t("notAnEmail"));
-                    } else this.tempUserList[index].errors.push(i18n.t("unknownError"));
+                    let errorToPush = i18n.t("unknownError");
+                    if (model.name === "MongoError" && model.code === 11000 || model.name === "UserExistsError") {
+                        errorToPush = i18n.t("userAlreadyExists");
+                    } else if (model.name === "notAnEmail") errorToPush = i18n.t("notAnEmail");
+                    this.tempUserList[index - subtract].errors.push(errorToPush);
                 } else {
                     this.tempUserList.splice(index - subtract, 1);
                     subtract++;
@@ -149,6 +152,7 @@ export default {
                                 }
                             }
                         }
+                        data.errors = [];
                         delete data[roleFieldName];
                         delete data[userNameFieldName];
                     }
