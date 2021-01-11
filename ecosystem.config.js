@@ -24,8 +24,8 @@ const defaults = {
      * when a translation string is missing.
      *
      * @type {select}
-     * @property {"de-de"} German
-     * @property {"en-us"} English
+     * @property {"de-de"} German de-de
+     * @property {"en-us"} English en-us
      */
     "APP_DEFAULT_LANGUAGE": "de-de",
 

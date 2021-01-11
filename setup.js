@@ -14,6 +14,12 @@ const defaults = defaultsRegEx.exec(ecosystemString)[1];
 const questionsRegEx = /\/\*(?<question>.*?)\*\/\n(?<id>.*?):\s(?<default>.*?),/gis;
 const selectRegex = /@property \{(?<value>.*?)\} (?<title>.*?) (?<description>.*?)\n/gis;
 
+const alreadyConfigured = {};
+if (fs.existsSync(configFilePath)) {
+    const configYml = fs.readFileSync(configFilePath).toString();
+    Object.assign(alreadyConfigured, yaml.parse(configYml));
+}
+
 // Match questions
 const questions = [];
 let matches = questionsRegEx.exec(defaults);
@@ -27,9 +33,9 @@ while (matches) {
 
     // Set initial value
     try {
-        question.initial = JSON.parse(matches.groups.default);
+        question.initial = alreadyConfigured[question.name] !== undefined ? alreadyConfigured[question.name] : JSON.parse(matches.groups.default);
     } catch (error) {
-        question.initial = matches.groups.default;
+        question.initial = alreadyConfigured[question.name] !== undefined ? alreadyConfigured[question.name] : matches.groups.default;
     }
 
     // Select type
@@ -41,8 +47,12 @@ while (matches) {
             choices.push(selections.groups);
             selections = selectRegex.exec(matches.groups.question);
         }
+
+        const preChosenIndex = choices.findIndex((choice) => {
+            return JSON.parse(choice.value) === alreadyConfigured[question.name];
+        });
         question.choices = choices;
-        question.initial = 0;
+        question.initial = preChosenIndex >= 0 ? preChosenIndex : 0;
     } else if (typeof question.initial === "boolean") {
         question.type = "confirm";
     } else if (question.name.includes("PASSWORD")) {
@@ -61,6 +71,8 @@ while (matches) {
 
 (async () => {
     const results = await prompts(questions);
+
+    if (Object.keys(results).length !== questions.length) return console.info("ABORTED!");
 
     // Fix types
     for (const question of questions) {
@@ -81,7 +93,7 @@ while (matches) {
 
     console.info(`\n\nWriting config to ${configFilePath}`);
 
-    const config = yaml.stringify(results);
+    const config = yaml.stringify(Object.assign(alreadyConfigured, results));
     fs.writeFileSync(configFilePath, config, { encoding: "utf-8" });
 
     console.log("Now the administration user will be created. Please enter an email address and a password");
@@ -99,6 +111,7 @@ while (matches) {
 
     const adminResults = await prompts(adminUserQuestions);
 
+    if (!adminResults.email || !adminResults.password) return console.info("ABORTED!");
     pm2.connect((error) => {
         if (error) {
             console.error(error);

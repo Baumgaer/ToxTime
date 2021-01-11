@@ -1,0 +1,12 @@
+APP_NAME: ToxTime
+APP_DOMAIN: localhost:1337
+APP_SECURE: false
+APP_HTTP_PORT: 1337
+APP_HTTPS_PORT: 1338
+APP_TRUST_PROXY: false
+DB_DATABASE_NAME: ToxTime
+MAIL_NAME: University of Bonn - ToxTime
+MAIL_ADDRESS: noreply@uni-bonn.de
+MAIL_SSL: false
+MAIL_PORT: 0
+DEBUG: true
