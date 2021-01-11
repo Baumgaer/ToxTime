@@ -24,6 +24,7 @@ import httpErrors from "http-errors";
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import { toURIPathPart } from "~common/utils";
+import Users from "~server/routes/Users";
 
 // @ts-ignore
 import nunjucksConfig from "./../../nunjucks.config";
@@ -257,13 +258,12 @@ for (const key in process.env) {
 }
 
 pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
-    const data = JSON.parse(parameter.replace(/'/g, "\""));
-    const password = data.password;
-    const Users = require("~server/routes/Users");
-    console.info(`registering user ${data.email} via command`);
     try {
+        const data = JSON.parse(parameter.replace(/'/g, "\""));
+        const password = data.password;
+        console.info(`registering user ${data.email} via command`);
         const result = await Users.registerUser(data, password);
-        reply(result);
+        reply({ success: true, result });
     } catch (error) {
         console.error(error);
         reply({ success: false, error });
