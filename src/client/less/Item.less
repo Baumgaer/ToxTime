@@ -30,9 +30,13 @@
 
         .action {
             --button-height: 25px;
-            --hover-color: var(--info-color, @infoColor);
+            --hover-color: none;
             margin-left: 3px;
             float: right;
+
+            &:hover {
+                color: var(--action-hover-color, @black);
+            }
         }
     }
 }

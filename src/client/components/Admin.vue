@@ -1,27 +1,34 @@
 <template>
     <main class="admin" v-bind:style="itemsCollapsed ? 'gridTemplateColumns: 200px 30px 1fr' : ''">
         <nav class="navigation" ref="navigation">
-            <header>
-                <h2>{{ $t('navigation') }}</h2>
-            </header>
-            <Button ref="users" name="users" :active="this.category === 'users'" v-on:click="onNavButtonClick('users')" >
-                <account-icon />
-            </Button>
-            <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" v-on:click="onNavButtonClick('lessons')" >
-                <school-icon />
-            </Button>
-            <Button ref="scenes" name="scenes" :active="this.category === 'scenes'" v-on:click="onNavButtonClick('scenes')" >
-                <theater-icon />
-            </Button>
-            <Button ref="objects" name="objects" :active="this.category === 'objects'" v-on:click="onNavButtonClick('objects')" >
-                <ufo-icon />
-            </Button>
-            <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" v-on:click="onNavButtonClick('recipes')" >
-                <graph-icon />
-            </Button>
-            <Button ref="settings" name="settings" :active="this.category === 'settings'" v-on:click="onNavButtonClick('settings')" >
-                <cog-icon />
-            </Button>
+            <div class="top">
+                <header>
+                    <h2>{{ $t('navigation') }}</h2>
+                </header>
+                <Button ref="users" name="users" :active="this.category === 'users'" @click="onNavButtonClick('users')" >
+                    <account-icon />
+                </Button>
+                <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" @click="onNavButtonClick('lessons')" >
+                    <school-icon />
+                </Button>
+                <Button ref="scenes" name="scenes" :active="this.category === 'scenes'" @click="onNavButtonClick('scenes')" >
+                    <theater-icon />
+                </Button>
+                <Button ref="objects" name="objects" :active="this.category === 'objects'" @click="onNavButtonClick('objects')" >
+                    <ufo-icon />
+                </Button>
+                <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" @click="onNavButtonClick('recipes')" >
+                    <graph-icon />
+                </Button>
+            </div>
+            <div class="bottom">
+                <Button ref="settings" name="settings" :active="this.category === 'settings'" @click="onNavButtonClick('settings')" >
+                    <cog-icon />
+                </Button>
+                <Button ref="settings" name="logout" @click="onLogoutButtonClick()" >
+                    <logout-icon />
+                </Button>
+            </div>
         </nav>
         <section class="items" ref="items">
             <header :style="itemsCollapsed ? 'display: block' : ''">
@@ -31,12 +38,12 @@
                         <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
                         <arrow-collapse-left-icon v-else />
                     </Button>
-                    <Button class="addButton" v-show="!itemsCollapsed" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
+                    <Button class="addButton" v-show="!itemsCollapsed && category !== 'settings'" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
                         <plus-icon />
                     </Button>
                 </div>
             </header>
-            <section ref="itemList" class="list" v-show="!itemsCollapsed">
+            <section ref="itemList" class="list" v-show="!itemsCollapsed && category !== 'settings'">
                 <div v-if="Object.keys(store).length">
                     <Item v-for="item in store" :key="item._id" :model="item" />
                 </div>
@@ -90,6 +97,10 @@ export default {
 
         onAddItemButtonClick() {
             this.activeEditor = `add${capitalize(this.category)}`;
+        },
+
+        onLogoutButtonClick() {
+            location.href = "/logout";
         }
     }
 };

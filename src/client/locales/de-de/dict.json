@@ -43,5 +43,6 @@
     "unlock": "Entsperren",
     "lock": "Sperren",
     "resentConfirm": "Bestätigungsmail erneut senden",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "logout": "Abmelden"
 }

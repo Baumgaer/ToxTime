@@ -43,5 +43,6 @@
     "unlock": "Unlock",
     "lock": "Lock",
     "resentConfirm": "Send the confirmation email again",
-    "edit": "Edit"
+    "edit": "Edit",
+    "logout": "Sign out"
 }

@@ -18,9 +18,26 @@
     .navigation {
         background-color: var(--dark-color, @dark);
         grid-area: nav;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr minmax(min-content, max-content);
+        grid-template-areas: "top" "bottom";
+        height: 100%;
+
+        &.top {
+            grid-area: top;
+        }
+        &.bottom {
+            grid-area: bottom;
+        }
 
         .button {
+            grid-area: top;
             color: var(--white-color, @white);
+        }
+
+        header {
+            grid-area: top;
         }
     }
 
