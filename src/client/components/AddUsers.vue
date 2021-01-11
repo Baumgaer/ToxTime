@@ -38,6 +38,10 @@
                         @change="onInputFieldChange(index, field.name)"
                     />
                 </div>
+                <div class="errors" v-for="(error, errorIndex) of item.errors" :key="`error${errorIndex}`">
+                    <div class="space">{{ `${errorIndex + 1}.` }}</div>
+                    <div class="error">{{ error }}</div>
+                </div>
             </div>
         </form>
     </div>
@@ -48,6 +52,7 @@ import ToggleSwitch from "~client/components/ToggleSwitch";
 import Button from "~client/components/Button";
 import ApiClient from "~client/controllers/ApiClient";
 import { csvToObject } from "~common/utils";
+import i18n from "~client/controllers/i18n";
 
 export default {
     components: {
@@ -56,7 +61,7 @@ export default {
     },
     data() {
         return {
-            tempUserList: [{}],
+            tempUserList: [{ errors: [] }],
             fieldList: [
                 {name: "email", type: "text"},
                 {name: "nickname", type: "text"},
@@ -70,7 +75,7 @@ export default {
     },
     methods: {
         onInputFieldFocus(index) {
-            if ((index + 1) === this.tempUserList.length) this.tempUserList.push({});
+            if ((index + 1) === this.tempUserList.length) this.tempUserList.push({ errors: [] });
         },
 
         onInputFieldChange(index, name) {
@@ -79,17 +84,28 @@ export default {
 
         onDeleteButtonClick(index) {
             if (this.tempUserList.length <= 1) {
-                this.tempUserList = [{}];
+                this.tempUserList = [{ errors: [] }];
             } else this.tempUserList.splice(index, 1);
         },
 
         async onSendButtonClick() {
             // Destroy reference and filter items
-            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => {
-                return Boolean(Object.keys(user).length);
-            });
+            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => Boolean(Object.keys(user).length - 1));
             const result = await ApiClient.post("/users/register", users);
-            console.log(result);
+
+            let subtract = 0;
+            for (const [index, model] of result.data.models.entries()) {
+                if (model instanceof Error) {
+                    if (model.name === "MongoError" && model.code === 11000) {
+                        this.tempUserList[index].errors.push(i18n.t("userAlreadyExists"));
+                    } else if (model.name === "notAnEmail") {
+                        this.tempUserList[index].errors.push(i18n.t("notAnEmail"));
+                    } else this.tempUserList[index].errors.push(i18n.t("unknownError"));
+                } else {
+                    this.tempUserList.splice(index - subtract, 1);
+                    subtract++;
+                }
+            }
         },
 
         /**

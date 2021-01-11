@@ -17,6 +17,8 @@
     "login": "Log in",
     "backToLogin": "Back to log in",
     "unknownError": "Unknown error",
+    "userAlreadyExists": "This user already exists",
+    "notAnEmail": "This is not a valid email address",
     "adminArea": "Administration area",
     "navigation": "Navigation",
     "items": "Items",

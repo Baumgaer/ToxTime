@@ -218,6 +218,7 @@ module.exports = {
         "pid_file": path.resolve(arp.path, "var", "pid", "process.pid"),
 
         watch: shouldWatch ? ["./src/server", "./src/common"] : false,
+        "watch_delay": 1500,
         "restart_delay": 2000,
         "max_restarts": 6,
 
