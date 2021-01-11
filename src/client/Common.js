@@ -20,6 +20,7 @@ import LeadPencilIcon from "vue-material-design-icons/LeadPencil";
 import LockIcon from "vue-material-design-icons/Lock";
 import LockOpenIcon from "vue-material-design-icons/LockOpen";
 import DeleteIcon from "vue-material-design-icons/Delete";
+import LogoutIcon from "vue-material-design-icons/Logout";
 
 window.activeUser = new ApiClient.modelMap.User();
 Object.assign(window.activeUser, window.userInformation);
@@ -43,3 +44,4 @@ Vue.component('lead-pencil-icon', LeadPencilIcon);
 Vue.component('lock-icon', LockIcon);
 Vue.component('lock-open-icon', LockOpenIcon);
 Vue.component('delete-icon', DeleteIcon);
+Vue.component('logout-icon', LogoutIcon);

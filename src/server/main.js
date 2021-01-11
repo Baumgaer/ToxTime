@@ -185,7 +185,7 @@ export default class WebServer {
                 maxAge: ms(process.environment.SESSION_MAX_AGE)
             },
             store,
-            resave: false,
+            resave: true,
             saveUninitialized: false,
             name: process.environment.APP_NAME,
             rolling: true,

@@ -25,6 +25,17 @@ export default class User extends CommonUser {
         return true;
     }
 
+    @CommonUser.action("logout", { type: "component", name: "logout-icon" }, (instance) => instance.isAdmin || instance === window.activeUser)
+    async kick() {
+        if (this === window.activeUser) {
+            location.href = "/logout";
+            return true;
+        }
+        const result = await ApiClient.get(`/logout/${this._id}`);
+        if (!result.success) return result.error;
+        return true;
+    }
+
     @CommonUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => instance.isAdmin || instance === window.activeUser)
     async edit() {
         // Empty...
