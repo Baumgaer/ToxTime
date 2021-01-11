@@ -24,4 +24,9 @@ export default class User extends CommonUser {
         if (!result.success) return result.error;
         return true;
     }
+
+    @CommonUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => instance.isAdmin || instance === window.activeUser)
+    async edit() {
+        // Empty...
+    }
 }

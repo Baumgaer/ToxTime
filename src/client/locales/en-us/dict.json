@@ -38,5 +38,10 @@
     "nickname": "Pseudonym",
     "isConfirmed": "Confirmed",
     "isActive": "Aktive",
-    "remove": "Remove"
+    "remove": "Remove",
+    "delete": "Delete",
+    "unlock": "Unlock",
+    "lock": "Lock",
+    "resentConfirm": "Send the confirmation email again",
+    "edit": "Edit"
 }
