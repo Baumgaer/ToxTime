@@ -39,9 +39,10 @@ export default class Users extends DefaultRoute {
      */
     @Users.get("/:id")
     async getById(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         let user = null;
         try {
-            user = User.findById(request.params.id);
+            user = User.findById(request.params.id).exec();
         } catch (error) {
             return error;
         }
@@ -52,8 +53,31 @@ export default class Users extends DefaultRoute {
     async delete(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         try {
-            const result = await User.findByIdAndDelete(request.params.id);
+            const result = await User.findByIdAndDelete(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
+            return {};
+        } catch (error) {
+            return error;
+        }
+    }
+
+    @Users.patch("/resentConfirm/:id")
+    async resentConfirm(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        const token = uuid();
+        try {
+            const result = await User.findByIdAndUpdate(request.params.id, { passwordResetToken: token, isConfirmed: false }).exec();
+            if (!result) return httpErrors.NotFound();
+            const isSecure = process.environment.APP_SECURE;
+            const emailTransporter = EmailTransporter.getInstance();
+            await emailTransporter.send(request, {
+                subject: "registrationEmail",
+                to: result.email,
+                locales: {
+                    user: result,
+                    url: normalizeURL(`${process.environment.APP_DOMAIN}/login/confirm/${token}`, { forceHttps: isSecure, forceHttp: !isSecure })
+                }
+            });
             return {};
         } catch (error) {
             return error;

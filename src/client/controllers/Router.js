@@ -30,6 +30,14 @@ let routes = [
         },
         path: "/login/reset/:token",
         component: PasswordReset
+    },
+    {
+        name: "loginConfirm",
+        meta: {
+            title: i18n.tc("resetPassword")
+        },
+        path: "/login/confirm/:token",
+        component: PasswordReset
     }
 ];
 
