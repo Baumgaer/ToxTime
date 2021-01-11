@@ -22,19 +22,20 @@ export default class ApiClient {
         if (command.name === "add") {
             if (!ApiClient._store[command.collection]) ApiClient._store[command.collection] = {};
             ApiClient._store[command.collection][command.key] = command.value;
+            if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
         }
+
         if (command.name === "remove") {
             if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
             delete ApiClient._store[command.collection][command.key];
+            if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
         }
 
         if (command.name === "update") {
             if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
             Object.assign(ApiClient._store[command.collection][command.key], command.value);
+            if (ApiClient._store[command.collection][command.key].__ob__) ApiClient._store[command.collection][command.key].__ob__.dep.notify();
         }
-
-        // Notify vue components
-        if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
     }
 
     static post(target, data = {}, additionalHeaders = {}) {
@@ -99,7 +100,9 @@ export default class ApiClient {
                 Object.assign(newModel, model);
                 mapped.data.models.push(newModel);
                 if (!(newModel instanceof Error)) {
-                    this.store = { name: "add", collection: model.collection, key: model._id, value: newModel };
+                    if (!this.store[model.collection][model._id]) {
+                        this.store = { name: "add", collection: model.collection, key: model._id, value: newModel };
+                    } else this.store = { name: "update", collection: model.collection, key: model._id, value: newModel };
                 }
             }
         } else mapped = theJson;

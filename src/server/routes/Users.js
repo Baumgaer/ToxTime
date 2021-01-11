@@ -84,6 +84,20 @@ export default class Users extends DefaultRoute {
         }
     }
 
+    @Users.patch("/toggleLock/:id")
+    async toggleLock(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        try {
+            const result = await User.findById(request.params.id).exec();
+            if (!result) return httpErrors.NotFound();
+            result.isActive = !result.isActive;
+            await result.save();
+            return { models: [result] };
+        } catch (error) {
+            return error;
+        }
+    }
+
     /**
      * registers a new user with email, a password if given and a matriculation number
      *
