@@ -14,7 +14,7 @@ export default class BaseModel {
         const actions = cloneDeep(Reflect.getMetadata("actions", this) || []);
         for (const action of actions) {
             Object.defineProperty(action, "condition", { get: () => action.conditionFunc ? action.conditionFunc(this) : true });
-            Object.defineProperty(action, "func", { value: () => action._handler.call(this) });
+            Object.defineProperty(action, "func", { value: (...args) => action._handler.call(this, ...args) });
         }
         this._cachedActions = actions;
         return actions;
