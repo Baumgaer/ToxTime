@@ -223,6 +223,7 @@ export default class WebServer {
         this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
 
         this.app.use("*", (request, response, next) => {
+            console.info(`${request.connection.remoteAddress} ${request.method} NOT FOUND ${request.originalUrl}`);
             next(httpErrors.NotFound());
         });
     }
