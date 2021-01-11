@@ -17,6 +17,8 @@ export default class ApiClient {
     }
 
     static set store(command) {
+        if (!command || !command.name || !command.collection || !command.key) return;
+
         if (command.name === "add") {
             if (!ApiClient._store[command.collection]) ApiClient._store[command.collection] = {};
             ApiClient._store[command.collection][command.key] = command.value;
@@ -30,6 +32,9 @@ export default class ApiClient {
             if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
             Object.assign(ApiClient._store[command.collection][command.key], command.value);
         }
+
+        // Notify vue components
+        if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
     }
 
     static post(target, data = {}, additionalHeaders = {}) {
@@ -66,7 +71,7 @@ export default class ApiClient {
                 "Content-Type": "application/json"
             })
         };
-        if (!["GET", "HEAD"].includes(method)) Object.assign(fetchObject, { body: JSON.stringify(data) });
+        if (!["GET", "HEAD"].includes(method) && Object.keys(data).length) Object.assign(fetchObject, { body: JSON.stringify(data) });
         const response = await fetch(theTarget, fetchObject);
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
@@ -103,3 +108,9 @@ export default class ApiClient {
     }
 }
 ApiClient._store = {};
+for (const key in ApiClient.modelMap) {
+    if (Object.hasOwnProperty.call(ApiClient.modelMap, key)) {
+        const model = ApiClient.modelMap[key];
+        if (model.collection && !(model.collection in ApiClient._store)) ApiClient._store[model.collection] = {};
+    }
+}

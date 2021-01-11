@@ -1,21 +1,29 @@
 <template>
     <section class="item">
-        <div class="avatar" v-if="this.hasAvatar">
-            <div v-if="this.hasImageAvatar" :style="`background-image: url(${this.model.getAvatar().name})`"></div>
-            <component v-else :is="this.model.getAvatar().name"></component>
+        <div class="avatar" v-if="hasAvatar">
+            <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
+            <component v-else :is="model.getAvatar().name"></component>
         </div>
         <div class="info">
-            <div class="name"><strong>{{ this.model.getName() }}</strong></div>
+            <div class="name"><strong>{{ model.getName() }}</strong></div>
             <div class="actions">
-                <div class="action" v-for="action of this.model.getActions()" :key="action.name" :title="$t(action.name)">{{ action.symbol }} {{ $t(action.name) }}</div>
+                <div v-for="action of model.actions" :key="action.name" class="action">
+                    <Button  v-if="action.symbol.type === 'component' && [undefined, true].includes(action.if)" class="action" :name="action.name" :showLabel="false" @click="action.func()">
+                        <component :is="action.symbol.name"></component>
+                    </Button>
+                </div>
             </div>
         </div>
     </section>
 </template>
 
 <script>
+import Button from "~client/components/Button";
 
 export default {
+    components: {
+        Button
+    },
     props: {
         model: {
             type: Object,

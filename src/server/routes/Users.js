@@ -6,6 +6,8 @@ import { randomBytes } from "crypto";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import { v4 as uuid } from "uuid";
 import normalizeURL from "normalize-url";
+import { isMongoId } from "validator";
+import httpErrors from "http-errors";
 
 export default class Users extends DefaultRoute {
 
@@ -44,6 +46,18 @@ export default class Users extends DefaultRoute {
             return error;
         }
         return { models: [user] };
+    }
+
+    @Users.delete("/delete/:id")
+    async delete(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        try {
+            const result = await User.findByIdAndDelete(request.params.id);
+            if (!result) return httpErrors.NotFound();
+            return {};
+        } catch (error) {
+            return error;
+        }
     }
 
     /**

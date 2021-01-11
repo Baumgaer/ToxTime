@@ -18,6 +18,11 @@ import ArrowCollapseRightIcon from "vue-material-design-icons/ArrowCollapseRight
 import SendIcon from "vue-material-design-icons/Send";
 import CloseThickIcon from "vue-material-design-icons/CloseThick";
 import CheckBoldIcon from "vue-material-design-icons/CheckBold";
+import EmailCheckIcon from "vue-material-design-icons/EmailCheck";
+import LeadPencilIcon from "vue-material-design-icons/LeadPencil";
+import LockIcon from "vue-material-design-icons/Lock";
+import LockOpenIcon from "vue-material-design-icons/LockOpen";
+import DeleteIcon from "vue-material-design-icons/Delete";
 
 Vue.component('account-icon', AccountIcon);
 Vue.component('school-icon', SchoolIcon);
@@ -31,6 +36,11 @@ Vue.component('arrow-collapse-right-icon', ArrowCollapseRightIcon);
 Vue.component('send-icon', SendIcon);
 Vue.component('close-thick-icon', CloseThickIcon);
 Vue.component('check-bold-icon', CheckBoldIcon);
+Vue.component('email-check-icon', EmailCheckIcon);
+Vue.component('lead-pencil-icon', LeadPencilIcon);
+Vue.component('lock-icon', LockIcon);
+Vue.component('lock-open-icon', LockOpenIcon);
+Vue.component('delete-icon', DeleteIcon);
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;

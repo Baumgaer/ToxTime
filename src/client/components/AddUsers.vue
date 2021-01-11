@@ -109,6 +109,7 @@ export default {
                     subtract++;
                 }
             }
+            if (!this.tempUserList.length) this.tempUserList = [{ errors: [] }];
         },
 
         /**

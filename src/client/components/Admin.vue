@@ -37,8 +37,8 @@
                 </div>
             </header>
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
-                <div v-if="this.items.length">
-                    <Item v-for="item of this.items" :key="item.id" :model="item" />
+                <div v-if="Object.keys(store).length">
+                    <Item v-for="item in store" :key="item._id" :model="item" />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
                 <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
@@ -67,9 +67,9 @@ export default {
     },
     data() {
         return {
+            store: {},
             category: "users",
             itemsCollapsed: false,
-            items: [],
             activeEditor: null
         };
     },
@@ -80,12 +80,8 @@ export default {
 
         async onNavButtonClick(name) {
             this.category = name;
-            const result = await ApiClient.get(`/${name}`);
-            if (!result.success) {
-                return this.items = [];
-            }
-            console.log(ApiClient.store);
-            this.items = result.data.models;
+            await ApiClient.get(`/${name}`);
+            this.store = ApiClient.store[this.category] || {};
         },
 
         onCollapseButtonClick() {

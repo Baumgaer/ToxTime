@@ -8,7 +8,7 @@ export default class BaseModel {
         return null;
     }
 
-    getActions() {
+    get actions() {
         return [];
     }
 
