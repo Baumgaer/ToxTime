@@ -130,31 +130,33 @@ export default class Users extends DefaultRoute {
                 delete modifiedUser.salt;
                 delete modifiedUser.passwordResetToken;
 
-                try {
-                    // Send confirmation email
-                    const isSecure = process.environment.APP_SECURE;
-                    const emailTransporter = EmailTransporter.getInstance();
-                    await emailTransporter.send(request, {
-                        subject: "registrationEmail",
-                        to: modifiedUser.email,
-                        locales: {
-                            user: modifiedUser,
-                            url: normalizeURL(`${process.environment.APP_DOMAIN}/login/confirm/${token}`, { forceHttps: isSecure, forceHttp: !isSecure })
-                        }
-                    });
-                    results.push(modifiedUser);
-                } catch (error) {
+                if (!request.body.isConfirmed) {
                     try {
-                        // revert inserting model because sending email failed
-                        await User.findByIdAndDelete(originalUser._id);
-                        console.error(error);
-                        error.className = "Error";
-                        results.push(error);
+                        // Send confirmation email
+                        const isSecure = process.environment.APP_SECURE;
+                        const emailTransporter = EmailTransporter.getInstance();
+                        await emailTransporter.send(request, {
+                            subject: "registrationEmail",
+                            to: modifiedUser.email,
+                            locales: {
+                                user: modifiedUser,
+                                url: normalizeURL(`${process.environment.APP_DOMAIN}/login/confirm/${token}`, { forceHttps: isSecure, forceHttp: !isSecure })
+                            }
+                        });
+                        results.push(modifiedUser);
                     } catch (error) {
-                        // Reverting failed... OMG...
-                        console.error(error);
-                        error.className = "Error";
-                        results.push(error);
+                        try {
+                            // revert inserting model because sending email failed
+                            await User.findByIdAndDelete(originalUser._id).exec();
+                            console.error(error);
+                            error.className = "Error";
+                            results.push(error);
+                        } catch (error) {
+                            // Reverting failed... OMG...
+                            console.error(error);
+                            error.className = "Error";
+                            results.push(error);
+                        }
                     }
                 }
             } catch (error) {
