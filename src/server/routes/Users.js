@@ -15,7 +15,7 @@ export default class Users extends DefaultRoute {
      * collects all users and returns them in a list.
      *
      * @param {import("express").Request} request the request
-     * @returns {Promise<{models: User[]} | Error>}
+     * @returns {Promise<{models: User["Model][]} | Error>}
      * @memberof Register
      */
     @Users.get("/")
@@ -23,7 +23,7 @@ export default class Users extends DefaultRoute {
         request.body;
         let users = null;
         try {
-            users = await User.find({}).exec();
+            users = await User.Model.find({}).exec();
         } catch (error) {
             return error;
         }
@@ -34,7 +34,7 @@ export default class Users extends DefaultRoute {
      * collects one user by its id if found
      *
      * @param {import("express").Request} request the request
-     * @returns {Promise<{models: [user]} | Error>}
+     * @returns {Promise<{models: [User["Model"]]} | Error>}
      * @memberof Register
      */
     @Users.get("/:id")
@@ -42,7 +42,7 @@ export default class Users extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         let user = null;
         try {
-            user = User.findById(request.params.id).exec();
+            user = User.Model.findById(request.params.id).exec();
         } catch (error) {
             return error;
         }
@@ -53,7 +53,7 @@ export default class Users extends DefaultRoute {
     async delete(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         try {
-            const result = await User.findByIdAndDelete(request.params.id).exec();
+            const result = await User.Model.findByIdAndDelete(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
             return {};
         } catch (error) {
@@ -66,7 +66,7 @@ export default class Users extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         const token = uuid();
         try {
-            const result = await User.findByIdAndUpdate(request.params.id, { passwordResetToken: token, isConfirmed: false }).exec();
+            const result = await User.Model.findByIdAndUpdate(request.params.id, { passwordResetToken: token, isConfirmed: false }).exec();
             if (!result) return httpErrors.NotFound();
             const isSecure = process.environment.APP_SECURE;
             const emailTransporter = EmailTransporter.getInstance();
@@ -88,7 +88,7 @@ export default class Users extends DefaultRoute {
     async toggleLock(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         try {
-            const result = await User.findById(request.params.id).exec();
+            const result = await User.Model.findById(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
             result.isActive = !result.isActive;
             await result.save();
@@ -147,7 +147,7 @@ export default class Users extends DefaultRoute {
                     } catch (error) {
                         try {
                             // revert inserting model because sending email failed
-                            await User.findByIdAndDelete(originalUser._id).exec();
+                            await User.Model.findByIdAndDelete(originalUser._id).exec();
                             console.error(error);
                             error.className = "Error";
                             results.push(error);
@@ -171,8 +171,8 @@ export default class Users extends DefaultRoute {
 
     static registerUser(data, password) {
         return new Promise((resolve, reject) => {
-            const user = new User(data);
-            User.register(user, password, (error) => {
+            const user = new User.Model(data);
+            User.Model.register(user, password, (error) => {
                 if (error) {
                     reject(error);
                 } else resolve(user);

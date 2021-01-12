@@ -6,10 +6,6 @@ import App from '~client/App.vue';
 
 import Admin from "~client/components/Admin.vue";
 
-
-Vue.config.productionTip = false;
-Vue.prototype.window = window;
-
 Router.extendRoutes([{
     name: "admin",
     meta: {

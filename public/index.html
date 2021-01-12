@@ -14,7 +14,7 @@
 <body>
     <script nonce="{{ nonce }}">
         window.userInformation = {{ userInformation | json }};
-        window.environment = {{ environment | json }};
+        window.process = {{ process | json }};
     </script>
     <noscript>
         <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.

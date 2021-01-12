@@ -24,6 +24,6 @@ function loadLocaleMessages() {
 
 export default new VueI18n({
     locale: window.userInformation.locale || navigator.language.toLowerCase(),
-    fallbackLocale: window.environment.APP_DEFAULT_LANGUAGE,
+    fallbackLocale: global.process.environment.APP_DEFAULT_LANGUAGE,
     messages: loadLocaleMessages()
 });

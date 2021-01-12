@@ -26,6 +26,10 @@ window.activeUser = new ApiClient.modelMap.User();
 Object.assign(window.activeUser, window.userInformation);
 ApiClient.store = { name: "add", collection: window.activeUser.collection, key: window.activeUser._id, value: window.activeUser };
 
+Vue.config.productionTip = false;
+Vue.prototype.window = window;
+Vue.prototype.global = window;
+
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
 Vue.component('school-icon', SchoolIcon);

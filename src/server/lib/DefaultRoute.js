@@ -220,7 +220,7 @@ export default class DefaultRoute {
         return this.renderEngine.renderString(this._renderedPages[ownHtmlName], {
             userInformation: JSON.parse(JSON.stringify((request.user || {}))),
             nonce: response.locals.cspNonce,
-            environment: environment
+            process: { environment }
         });
     }
 

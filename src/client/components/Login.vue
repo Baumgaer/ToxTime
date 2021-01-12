@@ -1,7 +1,7 @@
 <template>
     <section class="login">
         <form action="/login" v-on:submit="doLogin($event)">
-            <div class="welcomeBox">{{ $t("welcome", { to: window.environment.APP_NAME }) }}</div>
+            <div class="welcomeBox">{{ $t("welcome", { to: global.process.environment.APP_NAME }) }}</div>
             <div ref="hintBox" class="fail hintBox"></div>
             <input
                 type="text"

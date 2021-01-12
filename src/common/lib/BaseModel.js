@@ -1,6 +1,12 @@
 import { cloneDeep } from "lodash";
 export default class BaseModel {
 
+    static className = "BaseModel";
+
+    static collection = "unknown";
+
+    static schema = {};
+
     getName(preferredField) {
         return this[preferredField] || "";
     }
@@ -31,6 +37,3 @@ export default class BaseModel {
     }
 
 }
-
-BaseModel.className = "BaseModel";
-BaseModel.collection = "unknown";

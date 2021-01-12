@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "~server/convertEnvironment";
 import express, { json, urlencoded, static as expressStatic, Router } from 'express';
 import hpp from 'hpp';
 import helmet from 'helmet';
@@ -196,9 +197,9 @@ export default class WebServer {
         this.app.use(passport.initialize());
         this.app.use(passport.session());
 
-        passport.use("local", new PassportStrategy({ usernameField: "email" }, User.authenticate()));
-        passport.serializeUser(User.serializeUser());
-        passport.deserializeUser(User.deserializeUser());
+        passport.use("local", new PassportStrategy({ usernameField: "email" }, User.Model.authenticate()));
+        passport.serializeUser(User.Model.serializeUser());
+        passport.deserializeUser(User.Model.deserializeUser());
     }
 
     setupRoutes() {
@@ -244,20 +245,8 @@ export default class WebServer {
     }
 }
 
-process.environment = {};
-// First convert all environment variables to their right type
-for (const key in process.env) {
-    if (Object.hasOwnProperty.call(process.env, key)) {
-        const value = process.env[key];
-        try {
-            process.environment[key] = JSON.parse(value);
-        } catch (error) {
-            process.environment[key] = value;
-        }
-    }
-}
-
 pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
+    console.log(parameter);
     try {
         const data = JSON.parse(parameter.replace(/'/g, "\""));
         const password = data.password;

@@ -8,7 +8,7 @@ export default class ApiClient {
     static get modelMap() {
         return {
             Error,
-            User: User
+            User: User.Model
         };
     }
 

@@ -125,15 +125,15 @@ export default {
             }
 
             /** @type {string[]} */
-            const adminConditions = window.environment.ECAMPUS_ADMIN_CONDITION.split(",").map((condition) => condition.trim());
+            const adminConditions = global.process.environment.ECAMPUS_ADMIN_CONDITION.split(",").map((condition) => condition.trim());
             /** @type {string} */
-            const /** @type {string} */ emailDomain = window.environment.ECAMPUS_USERNAME_EMAIL_DOMAIN.trim();
+            const /** @type {string} */ emailDomain = global.process.environment.ECAMPUS_USERNAME_EMAIL_DOMAIN.trim();
             /** @type {string} */
-            const userNameFieldName = window.environment.ECAMPUS_MEMBER_CSV_USER_NAME_FIELD_NAME.trim();
+            const userNameFieldName = global.process.environment.ECAMPUS_MEMBER_CSV_USER_NAME_FIELD_NAME.trim();
             /** @type {string} */
-            const roleFieldName = window.environment.ECAMPUS_MEMBER_CSV_ROLE_FIELD_NAME.trim();
+            const roleFieldName = global.process.environment.ECAMPUS_MEMBER_CSV_ROLE_FIELD_NAME.trim();
             /** @type {Record<string, string>} */
-            const fieldMappings = Object.fromEntries(window.environment.ECAMPUS_FIELD_MAPPING.split(",").map((mapping) => mapping.trim()).map((mapping) => mapping.split(":")));
+            const fieldMappings = Object.fromEntries(global.process.environment.ECAMPUS_FIELD_MAPPING.split(",").map((mapping) => mapping.trim()).map((mapping) => mapping.split(":")));
 
             let tempUserList = [];
             const fileContents = await Promise.all(awaitingFileContents);
