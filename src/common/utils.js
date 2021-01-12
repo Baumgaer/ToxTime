@@ -104,3 +104,24 @@ export function csvToObject(csv, params) {
 
     return result;
 }
+
+/**
+ * Generates an excluding filter to avoid to send data to other environment,
+ * which is not allowed to send to.
+ *
+ * @export
+ * @param environmentExport
+ */
+export function dbEnvironmentFilter(environmentExport) {
+    let keysToExclude = Object.keys(environmentExport.RawClass.schema || {}).map((key) => `-${key}`);
+
+    let commonProto = Object.getPrototypeOf(environmentExport.RawClass);
+    let environmentProto = Object.getPrototypeOf(commonProto);
+    while (environmentProto) {
+        keysToExclude = keysToExclude.concat(Object.keys(environmentExport.RawClass.schema || {}).map((key) => `-${key}`));
+        commonProto = Object.getPrototypeOf(environmentProto);
+        if (!commonProto) break;
+        environmentProto = Object.getPrototypeOf(commonProto);
+    }
+    return keysToExclude;
+}

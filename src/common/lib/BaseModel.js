@@ -1,10 +1,13 @@
 import { cloneDeep } from "lodash";
 export default class BaseModel {
 
+    /** @type {string} the name of the current class. Schuld not differ */
     static className = "BaseModel";
 
+    /** @type {string} The name of the collection where the model will be stored in */
     static collection = "unknown";
 
+    /** @type {import("mongoose").SchemaDefinition} Contains a part of the model schema. Do NOT mix. This will be happen automatically*/
     static schema = {};
 
     getName(preferredField) {

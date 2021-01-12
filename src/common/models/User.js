@@ -14,7 +14,7 @@ export function UserMixinClass(MixinClass) {
         static className = "User";
         static collection = "users";
 
-        static schema = Object.assign(MixinClass.schema, {
+        static schema = {
             email: {
                 type: String,
                 required: true,
@@ -55,17 +55,8 @@ export function UserMixinClass(MixinClass) {
                 type: Boolean,
                 required: true,
                 default: true
-            },
-            passwordResetToken: {
-                type: String,
-                unique: true,
-                sparse: true
             }
-        });
-
-        getSomething() {
-            return true;
-        }
+        };
 
         getName(preferredField) {
             return `${this[preferredField] || this.email}`;

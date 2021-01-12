@@ -5,13 +5,15 @@ import ServerModel from "~server/lib/ServerModel";
 const CommonServerUser = UserMixinClass(ServerModel);
 export default ServerModel.buildServerExport(class User extends CommonServerUser {
 
-    static schema = Object.assign(CommonServerUser.schema, {
+    /** @type {import("mongoose").SchemaDefinition} */
+    static schema = {
         passwordResetToken: {
             type: String,
             unique: true,
-            sparse: true
+            sparse: true,
+            select: false
         }
-    });
+    };
 
 }, [[passportLocalMongoose, {
     usernameUnique: false,

@@ -19,7 +19,15 @@ export default class ServerModel extends BaseModel {
      * @returns { {RawClass: T, Schema: import("mongoose").Schema<T>, Model: import("mongoose").Model} }
      */
     static buildServerExport(RawClass, plugins = []) {
-        const schema = new Schema(RawClass.schema, {
+        const schemaDeclaration = {};
+        const prototypeSchemas = [RawClass.schema || {}];
+        let proto = Object.getPrototypeOf(RawClass);
+        while (proto) {
+            prototypeSchemas.unshift(proto.schema || {});
+            proto = Object.getPrototypeOf(proto);
+        }
+        for (const prototypeSchema of prototypeSchemas) Object.assign(schemaDeclaration, prototypeSchema);
+        const schema = new Schema(schemaDeclaration, {
             collection: RawClass.collection,
             toObject: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) },
             toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) }
@@ -28,6 +36,6 @@ export default class ServerModel extends BaseModel {
         for (const plugin of plugins) schema.plugin(...plugin);
         const Model = connection.model(RawClass.className, schema);
         Model.className = RawClass.className;
-        return { RawClass, Schema: schema, Model };
+        return { RawClass, Schema: schema, Model, isServerModel: true };
     }
 }

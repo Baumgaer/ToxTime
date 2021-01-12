@@ -42,7 +42,7 @@ export default class Users extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         let user = null;
         try {
-            user = User.Model.findById(request.params.id).exec();
+            user = await User.Model.findById(request.params.id).exec();
         } catch (error) {
             return error;
         }
