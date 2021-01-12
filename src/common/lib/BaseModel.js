@@ -18,6 +18,12 @@ export default class BaseModel {
         return null;
     }
 
+    /**
+     * Collects and caches all registered actions while assigning the context and returns them
+     *
+     * @readonly
+     * @memberof BaseModel
+     */
     get actions() {
         if (this._cachedActions) return this._cachedActions;
         const actions = cloneDeep(Reflect.getMetadata("actions", this) || []);
@@ -29,6 +35,17 @@ export default class BaseModel {
         return actions;
     }
 
+    /**
+     * Registers a new action on the model
+     *
+     * @static
+     * @decorator
+     * @param {string} name
+     * @param { {type: "component" | "image", name: string} } symbol
+     * @param {(instance: this) => boolean} conditionFunc
+     * @returns
+     * @memberof BaseModel
+     */
     static action(name, symbol, conditionFunc) {
         return (target, methodName) => {
             const _handler = target[methodName];

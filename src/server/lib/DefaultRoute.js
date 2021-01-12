@@ -39,6 +39,7 @@ export default class DefaultRoute {
      * Registers a ALL route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
@@ -59,6 +60,7 @@ export default class DefaultRoute {
      * Registers a GET route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
@@ -75,6 +77,7 @@ export default class DefaultRoute {
      * Registers a POST route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
@@ -91,6 +94,7 @@ export default class DefaultRoute {
      * Registers a PUT route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
@@ -107,6 +111,7 @@ export default class DefaultRoute {
      * Registers a PATCH route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
@@ -123,6 +128,7 @@ export default class DefaultRoute {
      * Registers a DELETE route with its uri, options and assigns middlewares
      *
      * @static
+     * @decorator
      * @param {string} uri
      * @param {RouteOptions} [options={}]
      * @param {import("express").RequestHandler[]} middlewares
