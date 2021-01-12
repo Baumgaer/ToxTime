@@ -26,27 +26,13 @@ export default class ClientModel extends BaseModel {
             toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) }
         });
         schema.loadClass(RawClass);
-        const cloneClass = class CloneClass extends RawClass { };
-        for (const key in RawClass.schema) {
-            if (Object.hasOwnProperty.call(RawClass.schema, key)) {
-                console.log(`define property ${key} overwrite ${Object.getOwnPropertyDescriptor(cloneClass, key)}`);
-                const fieldDefinition = RawClass.schema[key];
-                Object.defineProperty(cloneClass, key, {
-                    get: function () {
-                        const value = this[`__${key}__`];
-                        return fieldDefinition.default && value === undefined ? fieldDefinition.default : value;
-                    },
-                    set: function (value) {
-                        this[`__${key}__`] = value;
-                        if (!Reflect.hasMetadata(stagedChangesKey, this)) Reflect.defineMetadata(stagedChangesKey, {}, this);
-                        const stagedChanges = Reflect.getMetadata(stagedChangesKey, this);
-                        stagedChanges[key] = value;
-                        if (this.__ob__) this.__ob__.dep.notify();
-                    }
-                });
+        const modelClass = class ModelClass extends RawClass {
+            constructor(params) {
+                super();
+                Object.assign(this, params);
             }
-        }
-        return { RawClass, Schema: schema, Model: cloneClass, isClientModel: true };
+        };
+        return { RawClass, Schema: schema, Model: modelClass, isClientModel: true };
     }
 
     save() {

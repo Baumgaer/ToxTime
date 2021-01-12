@@ -96,8 +96,7 @@ export default class ApiClient {
             mapped.data = { models: [] };
             for (const model of theJson.data.models) {
                 if (!model.className) continue;
-                const newModel = new ApiClient.modelMap[model.className]();
-                Object.assign(newModel, model);
+                const newModel = new ApiClient.modelMap[model.className](model);
                 mapped.data.models.push(newModel);
                 if (!(newModel instanceof Error)) {
                     if (!this.store[model.collection][model._id]) {
