@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import i18n from "~client/controllers/i18n";
+import i18n from "~client/lib/i18n";
 
 // import components
 import Login from "~client/components/Login.vue";

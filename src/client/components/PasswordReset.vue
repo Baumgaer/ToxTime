@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import ApiClient from "~client/controllers/ApiClient";
+import ApiClient from "~client/lib/ApiClient";
 import { isEmail } from "validator";
-import i18n from "~client/controllers/i18n";
+import i18n from "~client/lib/i18n";
 
 export default {
     methods: {

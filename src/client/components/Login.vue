@@ -34,8 +34,8 @@
 
 <script>
 import { isEmail } from "validator";
-import ApiClient from "~client/controllers/ApiClient";
-import i18n from "~client/controllers/i18n";
+import ApiClient from "~client/lib/ApiClient";
+import i18n from "~client/lib/i18n";
 
 export default {
     methods: {

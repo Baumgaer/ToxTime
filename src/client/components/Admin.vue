@@ -62,7 +62,7 @@
 <script>
 import Button from "~client/components/Button.vue";
 import Item from "~client/components/Item.vue";
-import ApiClient from "~client/controllers/ApiClient";
+import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import { capitalize } from "~common/utils";
 

@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import Vue from 'vue';
-import ApiClient from "~client/controllers/ApiClient";
+import ApiClient from "~client/lib/ApiClient";
 
 // Import Icons
 import AccountIcon from "vue-material-design-icons/Account";

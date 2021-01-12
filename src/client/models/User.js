@@ -1,5 +1,5 @@
 import { UserMixinClass } from "~common/models/User";
-import ApiClient from "~client/controllers/ApiClient";
+import ApiClient from "~client/lib/ApiClient";
 import ClientModel from "~client/lib/ClientModel";
 
 const CommonClientUser = UserMixinClass(ClientModel);

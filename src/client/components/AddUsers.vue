@@ -50,9 +50,9 @@
 <script>
 import ToggleSwitch from "~client/components/ToggleSwitch";
 import Button from "~client/components/Button";
-import ApiClient from "~client/controllers/ApiClient";
+import ApiClient from "~client/lib/ApiClient";
 import { csvToObject } from "~common/utils";
-import i18n from "~client/controllers/i18n";
+import i18n from "~client/lib/i18n";
 
 export default {
     components: {
