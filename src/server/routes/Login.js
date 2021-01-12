@@ -57,7 +57,7 @@ export default class Login extends DefaultRoute {
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
         try {
-            const user = await User.findOne({ email }).exec();
+            const user = await User.Model.findOne({ email }).exec();
             if (user) {
                 const token = uuIDv4();
                 const isSecure = process.environment.APP_SECURE;
@@ -85,14 +85,14 @@ export default class Login extends DefaultRoute {
      * http error else.
      *
      * @param {import("express").Request} request the request
-     * @returns {Promise<User | Error>}
+     * @returns {Promise<User["Model"] | Error>}
      * @memberof Login
      */
     static async checkPasswordResetToken(request, isConfirmed = true) {
         const token = request.params.token;
         if (!token || !isUUID(token, "4")) return httpErrors.BadRequest();
         try {
-            const user = await User.findOne({ passwordResetToken: token, isConfirmed, isActive: true }).exec();
+            const user = await User.Model.findOne({ passwordResetToken: token, isConfirmed, isActive: true }).exec();
             if (!user) return httpErrors.NotFound();
             return user;
         } catch (error) {
@@ -165,7 +165,7 @@ export default class Login extends DefaultRoute {
      * @static
      * @param {import("express").Request} request
      * @param {boolean} [isConfirmed=true]
-     * @param {(user: User) => void} [additionalUserManipulations]
+     * @param {(user: User["Model"]) => void} [additionalUserManipulations]
      * @returns {Promise<{} | Error>}
      * @memberof Login
      */
@@ -193,7 +193,7 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {Promise<{models: User[]} | CustomError>}
+     * @returns {Promise<{models: User["Model"][]} | CustomError>}
      * @memberof Login
      */
     @Login.post("/", { public: true })

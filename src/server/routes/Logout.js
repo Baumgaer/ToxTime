@@ -33,7 +33,7 @@ export default class Logout extends DefaultRoute {
     async kickUser(request, response) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         try {
-            const result = await User.findById(request.params.id).exec();
+            const result = await User.Model.findById(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
             if (String(result._id).valueOf() === String(request.user._id).valueOf()) return this.logout(request, response);
             await connection.db.collection("sessions").findOneAndDelete({ "session.passport.user": result.email });
