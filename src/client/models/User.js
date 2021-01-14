@@ -27,7 +27,7 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         return true;
     }
 
-    @CommonClientUser.action("logout", { type: "component", name: "logout-icon" }, (instance) => instance.isAdmin || instance === window.activeUser)
+    @CommonClientUser.action("logout", { type: "component", name: "logout-icon" }, (instance) => window.activeUser.isAdmin || instance === window.activeUser)
     async kick() {
         if (this === window.activeUser) {
             location.href = "/logout";
@@ -38,7 +38,7 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         return true;
     }
 
-    @CommonClientUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => instance.isAdmin || instance === window.activeUser)
+    @CommonClientUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin || instance === window.activeUser)
     async edit() {
         // Empty...
     }
