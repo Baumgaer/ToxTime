@@ -1,42 +1,12 @@
 import validator from "validator";
-import User from "~client/models/User";
 import httpErrors from "http-errors";
 import stripHTML from "string-strip-html";
 
+import { Store } from "~client/lib/Store";
+
 export default class ApiClient {
 
-    static get modelMap() {
-        return {
-            Error,
-            User: User.Model
-        };
-    }
-
-    static get store() {
-        return ApiClient._store;
-    }
-
-    static set store(command) {
-        if (!command || !command.name || !command.collection || !command.key) return;
-
-        if (command.name === "add") {
-            if (!ApiClient._store[command.collection]) ApiClient._store[command.collection] = {};
-            ApiClient._store[command.collection][command.key] = command.value;
-            if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
-        }
-
-        if (command.name === "remove") {
-            if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
-            delete ApiClient._store[command.collection][command.key];
-            if (ApiClient._store[command.collection].__ob__) ApiClient._store[command.collection].__ob__.dep.notify();
-        }
-
-        if (command.name === "update") {
-            if (!ApiClient._store[command.collection] || !ApiClient._store[command.collection][command.key]) return;
-            Object.assign(ApiClient._store[command.collection][command.key], command.value);
-            if (ApiClient._store[command.collection][command.key].__ob__) ApiClient._store[command.collection][command.key].__ob__.dep.notify();
-        }
-    }
+    static store = Store.getInstance();
 
     static post(target, data = {}, additionalHeaders = {}) {
         return this.request("POST", target, data, additionalHeaders);
@@ -76,7 +46,6 @@ export default class ApiClient {
         const response = await fetch(theTarget, fetchObject);
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
-
         if (response.status >= 400) {
             let result = null;
             let matches = null;
@@ -96,23 +65,9 @@ export default class ApiClient {
             mapped.data = { models: [] };
             for (const model of theJson.data.models) {
                 if (!model.className) continue;
-                const newModel = new ApiClient.modelMap[model.className](model);
-                mapped.data.models.push(newModel);
-                if (!(newModel instanceof Error)) {
-                    if (!this.store[model.collection][model._id]) {
-                        this.store = { name: "add", collection: model.collection, key: model._id, value: newModel };
-                    } else this.store = { name: "update", collection: model.collection, key: model._id, value: newModel };
-                }
+                mapped.data.models.push(this.store.addModel(model));
             }
         } else mapped = theJson;
-
         return Object.keys(mapped).length ? mapped : defaultResponse;
-    }
-}
-ApiClient._store = {};
-for (const key in ApiClient.modelMap) {
-    if (Object.hasOwnProperty.call(ApiClient.modelMap, key)) {
-        const model = ApiClient.modelMap[key];
-        if (model.collection && !(model.collection in ApiClient._store)) ApiClient._store[model.collection] = {};
     }
 }

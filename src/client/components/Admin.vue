@@ -88,7 +88,7 @@ export default {
         async onNavButtonClick(name) {
             this.category = name;
             await ApiClient.get(`/${name}`);
-            this.store = ApiClient.store[this.category] || {};
+            this.store = ApiClient.store.collection(this.category);
         },
 
         onCollapseButtonClick() {

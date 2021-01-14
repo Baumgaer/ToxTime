@@ -22,8 +22,7 @@ import LockOpenIcon from "vue-material-design-icons/LockOpen";
 import DeleteIcon from "vue-material-design-icons/Delete";
 import LogoutIcon from "vue-material-design-icons/Logout";
 
-window.activeUser = new ApiClient.modelMap.User(window.userInformation);
-ApiClient.store = { name: "add", collection: window.activeUser.collection, key: window.activeUser._id, value: window.activeUser };
+if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;
