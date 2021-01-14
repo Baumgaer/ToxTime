@@ -1,5 +1,5 @@
 import { isEmail } from "validator";
-import DefaultRoute from "~server/lib/DefaultRoute";
+import ApiRoute from "~server/lib/ApiRoute";
 import User from "~server/models/User";
 import CustomError from "~common/lib/CustomError";
 import { randomBytes } from "crypto";
@@ -9,57 +9,9 @@ import normalizeURL from "normalize-url";
 import { isMongoId } from "validator";
 import httpErrors from "http-errors";
 
-export default class Users extends DefaultRoute {
+export default class Users extends ApiRoute {
 
-    /**
-     * collects all users and returns them in a list.
-     *
-     * @param {import("express").Request} request the request
-     * @returns {Promise<{models: User["Model][]} | Error>}
-     * @memberof Register
-     */
-    @Users.get("/")
-    async getAll(request) {
-        request.body;
-        let users = null;
-        try {
-            users = await User.Model.find({}).exec();
-        } catch (error) {
-            return error;
-        }
-        return { models: users || [] };
-    }
-
-    /**
-     * collects one user by its id if found
-     *
-     * @param {import("express").Request} request the request
-     * @returns {Promise<{models: [User["Model"]]} | Error>}
-     * @memberof Register
-     */
-    @Users.get("/:id")
-    async getById(request) {
-        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
-        let user = null;
-        try {
-            user = await User.Model.findById(request.params.id).exec();
-        } catch (error) {
-            return error;
-        }
-        return { models: [user] };
-    }
-
-    @Users.delete("/delete/:id")
-    async delete(request) {
-        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
-        try {
-            const result = await User.Model.findByIdAndDelete(request.params.id).exec();
-            if (!result) return httpErrors.NotFound();
-            return {};
-        } catch (error) {
-            return error;
-        }
-    }
+    claimedExport = User;
 
     @Users.patch("/resentConfirm/:id")
     async resentConfirm(request) {

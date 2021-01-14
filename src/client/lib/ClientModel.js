@@ -1,9 +1,9 @@
 import BaseModel from "~common/lib/BaseModel";
 import { dataTransformer } from "~common/utils";
 import { Schema } from "mongoose";
-import { } from "vue";
+import onChange from "on-change";
+import ApiClient from "~client/lib/ApiClient";
 
-const stagedChangesKey = "stagedChanges";
 export default class ClientModel extends BaseModel {
 
     static className = "ClientModel";
@@ -36,8 +36,18 @@ export default class ClientModel extends BaseModel {
     }
 
     save() {
-        if (!Reflect.hasMetadata(stagedChangesKey, this)) Reflect.defineMetadata(stagedChangesKey, {}, this);
-        const stagedChanges = Reflect.getMetadata(stagedChangesKey, this);
-        console.log(stagedChanges);
+        const that = onChange.target(this);
+        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
+        const stagedChanges = Reflect.getMetadata("stagedChanges", that);
+        let method = ApiClient.post;
+        if (!that._id && that.__dummyId) method = ApiClient.patch;
+        const data = {};
+        for (const key in stagedChanges) {
+            if (Object.hasOwnProperty.call(that, key)) {
+                const value = that[key];
+                data[key] = value;
+            }
+        }
+        method(`/users/${that._id || that.__dummyId}`, data);
     }
 }

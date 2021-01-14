@@ -90,10 +90,10 @@ export default {
 
         async onSendButtonClick() {
             // Destroy reference and filter items
-            const users = JSON.parse(JSON.stringify(this.tempUserList)).filter((user) => {
+            const users = JSON.parse(JSON.stringify(this.tempUserList.filter((user) => {
                 user.errors = [];
                 return Boolean(Object.keys(user).length - 1);
-            });
+            })));
             const result = await ApiClient.post("/users/register", users);
 
             let subtract = 0;

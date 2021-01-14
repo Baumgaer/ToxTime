@@ -1,4 +1,5 @@
 import onChange from "on-change";
+import lodash from "lodash";
 import User from "~client/models/User";
 
 export const modelMap = {
@@ -86,11 +87,10 @@ export class Store {
         let model = modelLike;
         if (!this.hasModel(model)) {
             if (!(modelLike instanceof modelMap[modelLike.className])) {
-                model = onChange(new modelMap[modelLike.className](modelLike), function (path, value, prevValue) {
-                    console.log(path, value, prevValue);
-                }, { pathAsArray: true, ignoreUnderscores: true });
+                model = this._installChangeObserver(new modelMap[modelLike.className](modelLike));
             }
             if (!(model instanceof Error)) this.collection(collectionName)[id] = model;
+            if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
             return model;
         } else return this.updateModel(model);
     }
@@ -112,6 +112,8 @@ export class Store {
             delete modelLike.__dummyId;
             realModel = this.addModel(dummyModel);
         }
+        const collectionName = realModel.collection;
+        if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
         return Object.assign(realModel, modelLike);
     }
 
@@ -124,5 +126,21 @@ export class Store {
      */
     removeModel(modelLike) {
         delete this.collection(modelLike.collection)[modelLike.__dummyId || modelLike._id];
+        const collectionName = modelLike.collection;
+        if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
+    }
+
+    _installChangeObserver(model) {
+        const initializedFields = {};
+        return onChange(model, function (path) {
+            const fieldName = path[0];
+            if (!Object.getPrototypeOf(this).constructor.schema[fieldName]) return;
+            if (fieldName in initializedFields) {
+                if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
+                const stagedChanges = Reflect.getMetadata("stagedChanges", model);
+                stagedChanges[fieldName] = true;
+            } else initializedFields[fieldName] = true;
+
+        }, { pathAsArray: true, ignoreUnderscores: true, equals: lodash.isEqual });
     }
 }
