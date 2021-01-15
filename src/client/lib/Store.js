@@ -19,6 +19,7 @@ export class Store {
 
     constructor() {
         if (!Store.usedInstanceGetter) throw new Error("This is a singleton, use Store.getInstance()!");
+        this.collection("localStorage");
     }
 
     /**

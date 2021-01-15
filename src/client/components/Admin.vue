@@ -56,6 +56,7 @@
         <section class="editor">
             <AddUsers v-if="activeEditor === 'addUsers'" />
         </section>
+        <UploadHint />
     </main>
 </template>
 
@@ -64,13 +65,15 @@ import Button from "~client/components/Button.vue";
 import Item from "~client/components/Item.vue";
 import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
+import UploadHint from "~client/components/UploadHint";
 import { capitalize } from "~common/utils";
 
 export default {
     components: {
         Button,
         Item,
-        AddUsers
+        AddUsers,
+        UploadHint
     },
     data() {
         return {

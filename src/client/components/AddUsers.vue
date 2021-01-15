@@ -1,5 +1,5 @@
 <template>
-    <div class="addUsers" v-cloak @drop.prevent="onDrop($event)" @dragover.prevent>
+    <div class="addUsers">
         <header>
             <h2>{{ $t('addUsers') }}</h2>
             <div class="buttons">
@@ -13,7 +13,7 @@
             <div v-for="(field, fieldKey) of fieldList" :key="`header${fieldKey}`">
                 <div :class="`head ${field.name}`">{{ $t(field.name) }}</div>
             </div>
-            <div class="row" v-for="(item, index) in this.tempUserList" :key="index">
+            <div class="row" v-for="(item, index) in model.tempUserList" :key="index">
                 <Button :ref="`delete${index}`" @click="onDeleteButtonClick(index)" name="remove" :showLabel="false" class="deleteButton">
                     <close-thick-icon />
                 </Button>
@@ -44,24 +44,29 @@
                 </div>
             </div>
         </form>
+        <UploadHint :ownUploadHandling="onDrop.bind(this)" />
     </div>
 </template>
 
 <script>
+import UploadHint from "~client/components/UploadHint";
 import ToggleSwitch from "~client/components/ToggleSwitch";
 import Button from "~client/components/Button";
 import ApiClient from "~client/lib/ApiClient";
 import { csvToObject } from "~common/utils";
 import i18n from "~client/lib/i18n";
 
+window._apiClient = ApiClient;
+
 export default {
     components: {
         ToggleSwitch,
-        Button
+        Button,
+        UploadHint
     },
     data() {
         return {
-            tempUserList: [{ errors: [] }],
+            model: {},
             fieldList: [
                 {name: "email", type: "text"},
                 {name: "nickname", type: "text"},
@@ -73,24 +78,29 @@ export default {
             ]
         };
     },
+    mounted() {
+        const storeLocalStorage = ApiClient.store.collection("localStorage");
+        if (!storeLocalStorage.tempUserList) storeLocalStorage.tempUserList = [{ errors: [] }];
+        this.model = storeLocalStorage;
+    },
     methods: {
         onInputFieldFocus(index) {
-            if ((index + 1) === this.tempUserList.length) this.tempUserList.push({ errors: [] });
+            if ((index + 1) === this.model.tempUserList.length) this.model.tempUserList.push({ errors: [] });
         },
 
         onInputFieldChange(index, name) {
-            this.tempUserList[index][name] = this.$refs[`${name}${index}`][0].value;
+            this.model.tempUserList[index][name] = this.$refs[`${name}${index}`][0].value;
         },
 
         onDeleteButtonClick(index) {
-            if (this.tempUserList.length <= 1) {
-                this.tempUserList = [{ errors: [] }];
-            } else this.tempUserList.splice(index, 1);
+            if (this.model.tempUserList.length <= 1) {
+                this.model.tempUserList = [{ errors: [] }];
+            } else this.model.tempUserList.splice(index, 1);
         },
 
         async onSendButtonClick() {
             // Destroy reference and filter items
-            const users = JSON.parse(JSON.stringify(this.tempUserList.filter((user) => {
+            const users = JSON.parse(JSON.stringify(this.model.tempUserList.filter((user) => {
                 user.errors = [];
                 return Boolean(Object.keys(user).length - 1);
             })));
@@ -103,13 +113,13 @@ export default {
                     if (model.name === "MongoError" && model.code === 11000 || model.name === "UserExistsError") {
                         errorToPush = i18n.t("userAlreadyExists");
                     } else if (model.name === "notAnEmail") errorToPush = i18n.t("notAnEmail");
-                    this.tempUserList[index - subtract].errors.push(errorToPush);
+                    this.model.tempUserList[index - subtract].errors.push(errorToPush);
                 } else {
-                    this.tempUserList.splice(index - subtract, 1);
+                    this.model.tempUserList.splice(index - subtract, 1);
                     subtract++;
                 }
             }
-            if (!this.tempUserList.length) this.tempUserList = [{ errors: [] }];
+            if (!this.model.tempUserList.length) this.model.tempUserList = [{ errors: [] }];
         },
 
         /**
@@ -160,7 +170,7 @@ export default {
                 });
                 tempUserList = tempUserList.concat(usersData);
             }
-            this.tempUserList = tempUserList;
+            this.model.tempUserList = tempUserList;
         }
     }
 };

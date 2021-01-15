@@ -21,6 +21,7 @@ import LockIcon from "vue-material-design-icons/Lock";
 import LockOpenIcon from "vue-material-design-icons/LockOpen";
 import DeleteIcon from "vue-material-design-icons/Delete";
 import LogoutIcon from "vue-material-design-icons/Logout";
+import FileUploadIcon from "vue-material-design-icons/FileUpload";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -47,3 +48,4 @@ Vue.component('lock-icon', LockIcon);
 Vue.component('lock-open-icon', LockOpenIcon);
 Vue.component('delete-icon', DeleteIcon);
 Vue.component('logout-icon', LogoutIcon);
+Vue.component('file-upload-icon', FileUploadIcon);
