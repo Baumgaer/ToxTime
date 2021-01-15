@@ -13,9 +13,15 @@ const defaults = {
 
     /**
      * The domain on which the application is reachable. This should contain a
-     * port if no reverse proxy or default HTTP/S port is used.
+     * port if _no_ reverse proxy or default HTTP/S port is used.
      */
     "APP_DOMAIN": "localhost",
+
+    /**
+     * Has to be a valid e-Mail address which is used for Let's Encrypt
+     * certificates if HTTPS is enabled AND no reverse proxy is used.
+     */
+    "APP_MAINTAINER_MAIL": "name@example.com",
 
     /**
      * The default language of the application. Will also be used to determine
@@ -33,7 +39,6 @@ const defaults = {
      * Enables or disables HTTPS.
      */
     "APP_SECURE": true,
-
 
     /**
      * The IP address on which the application will accept requests.

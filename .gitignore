@@ -11,6 +11,7 @@ node_modules
 .env
 .env.local
 .env.*.local
+.greenlockrc
 
 # Log files
 npm-debug.log*

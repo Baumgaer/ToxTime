@@ -234,12 +234,48 @@ export default class WebServer {
         try {
             await Promise.race(this.awaitingActions);
             console.info("6. Starting server");
-            this.server.listen(process.environment.APP_HTTP_PORT, process.environment.APP_HOST, null, () => {
-                console.info(`6.1 server is running and reachable on http://${process.environment.APP_HOST}:${process.environment.APP_HTTP_PORT}`);
-                process.send('ready');
-            });
-        } catch (_error) {
-            console.error(`Server not started! Not all awaiting actions are resolved`);
+            if (process.environment.APP_SECURE && !process.environment.APP_TRUST_PROXY) {
+
+                const httpsWorker = (glx) => {
+                    let serverListenCount = 0;
+                    const msg = "server is running and reachable on";
+                    const env = process.environment;
+                    const host = env.APP_HOST;
+                    const httpPort = env.APP_HTTP_PORT;
+                    const httpsPort = env.APP_HTTPS_PORT;
+
+                    const httpsServer = glx.httpsServer(null, this.app);
+                    httpsServer.listen(httpsPort, host, () => {
+                        console.info(`6.1a ${msg} https://${host}:${httpsPort} ${!serverListenCount ? "Waiting for http server" : ""}`);
+                        serverListenCount++;
+                        if (serverListenCount === 2) process.send('ready');
+                    });
+
+                    const httpServer = glx.httpServer(this.app);
+                    httpServer.listen(httpPort, host, () => {
+                        console.info(`6.1b ${msg} http://${host}:${httpPort} ${!serverListenCount ? "Waiting for https server" : ""}`);
+                        serverListenCount++;
+                        if (serverListenCount === 2) process.send('ready');
+                    });
+                };
+                const greenLockExpress = require("greenlock-express");
+                greenLockExpress.init({
+                    staging: process.env.NODE_ENV === "development",
+                    manager: "@greenlock/manager",
+                    packageRoot: arp.path,
+                    configDir: path.resolve(arp.path, "var", "greenLock"),
+                    cluster: false,
+                    maintainerEmail: process.environment.APP_MAINTAINER_MAIL
+                }).ready(httpsWorker);
+
+            } else {
+                this.server.listen(process.environment.APP_HTTP_PORT, process.environment.APP_HOST, null, () => {
+                    console.info(`6.1 server is running and reachable on http://${process.environment.APP_HOST}:${process.environment.APP_HTTP_PORT}`);
+                    process.send('ready');
+                });
+            }
+        } catch (error) {
+            console.error(`Server not started! Not all awaiting actions are resolved. Error: ${error}`);
             process.exit(1);
         }
     }
