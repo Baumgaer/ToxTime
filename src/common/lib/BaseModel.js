@@ -3,7 +3,7 @@ export default class BaseModel {
 
     _id = "";
 
-    __dummyId = "";
+    _dummyId = "";
 
     /** @type {string} the name of the current class. Schuld not differ */
     static className = "BaseModel";

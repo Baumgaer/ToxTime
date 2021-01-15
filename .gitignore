@@ -6,6 +6,7 @@ node_modules
 /server.js
 /server.js.map
 /config.yaml
+/uploads
 
 # local env files
 .env

@@ -22,6 +22,7 @@ import arp from "app-root-path";
 import path from "path";
 import httpErrors from "http-errors";
 import childProcess from "child_process";
+import fileUpload from "express-fileupload";
 
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
@@ -83,6 +84,14 @@ export default class WebServer {
         this.app.use(json());
         this.app.use(urlencoded({ extended: true }));
         this.app.use(compression());
+        this.app.use(fileUpload({
+            createParentPath: true,
+            // safeFileNames: true,
+            useTempFiles: true,
+            tempFileDir: path.resolve(arp.path, "var", "tmp"),
+            parseNested: true,
+            debug: process.environment.DEBUG
+        }));
         if (process.environment.APP_TRUST_PROXY) {
             this.app.set("trust proxy", process.environment.APP_TRUST_PROXY);
         }
@@ -213,12 +222,26 @@ export default class WebServer {
             const route = routes(key).default;
             const clRoute = new route(this, this.templateEnvironment);
             const namespace = clRoute.namespace || "/" + route.name.toLowerCase();
-            const registeredRoutes = Reflect.getMetadata("routes", clRoute);
             const router = Router();
-            for (const aRoute of registeredRoutes) {
-                if (process.environment.DEBUG) console.debug(`5.1 adding route ${aRoute.method} ${toURIPathPart(namespace + aRoute.path)} ${JSON.stringify(aRoute.options)}`);
-                router[aRoute.method](aRoute.path, ...aRoute.middlewares, (request, response, next) => clRoute.handle(aRoute, request, response, next));
+
+            /** @type {import("~server/lib/DefaultRoute").RouteCollection} */
+            const registeredRoutes = Reflect.getMetadata("routes", clRoute);
+            for (const registeredRoute in registeredRoutes) {
+                if (Object.hasOwnProperty.call(registeredRoutes, registeredRoute)) {
+
+                    const methods = registeredRoutes[registeredRoute];
+                    for (const method in methods) {
+                        if (Object.hasOwnProperty.call(methods, method)) {
+                            /** @type {import("~server/lib/DefaultRoute").RouteObject} */
+                            const args = methods[method];
+                            if (process.environment.DEBUG) console.debug(`5.1 adding route ${method} ${toURIPathPart(namespace + registeredRoute)} ${JSON.stringify(args.options)}`);
+                            router[method](registeredRoute, ...args.middlewares, (request, response, next) => clRoute.handle(args, request, response, next));
+                        }
+                    }
+
+                }
             }
+
             this.app.use(namespace, router);
         });
 

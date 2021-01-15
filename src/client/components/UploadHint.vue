@@ -9,6 +9,8 @@
 
 <script>
 import ApiClient from "~client/lib/ApiClient";
+import File from "~client/models/File";
+
 export default {
     props: {
         icon: {
@@ -61,13 +63,23 @@ export default {
         /**
          * @param {DragEvent} event
          */
-        onDrop(event) {
+        async onDrop(event) {
             if (ApiClient.store.collection("localStorage").isInternalDnD) return;
             event.preventDefault();
             event.stopPropagation();
             if (this.ownUploadHandling) return this.ownUploadHandling(event);
-            console.log(event.dataTransfer.types);
             this.$refs.uploadHint.style.display = "none";
+            for (const file of Array.from(event.dataTransfer.files)) {
+                const fileModel = new File.Model({
+                    fileName: file.name,
+                    size: file.size,
+                    mime: file.type,
+                    name: file.name
+                });
+                fileModel.formData.append("file", file);
+                ApiClient.store.addModel(fileModel);
+                fileModel.save();
+            }
         },
 
         removeEventListeners() {

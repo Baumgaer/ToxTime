@@ -1,10 +1,12 @@
 import onChange from "on-change";
 import lodash from "lodash";
 import User from "~client/models/User";
+import File from "~client/models/File";
 
 export const modelMap = {
     Error,
-    User: User.Model
+    User: User.Model,
+    File: File.Model
 };
 
 /**
@@ -71,7 +73,7 @@ export class Store {
      * @memberof Store
      */
     hasModel(modelLike) {
-        return Boolean(this.getModelById(modelLike.collection, modelLike.__dummyId || modelLike._id));
+        return Boolean(this.getModelById(modelLike.collection, modelLike._dummyId || modelLike._id));
     }
 
     /**
@@ -105,14 +107,16 @@ export class Store {
      */
     updateModel(modelLike) {
         if (modelLike instanceof modelMap[modelLike.className]) throw new Error("You should not pass an instance here");
-        const dummyModel = this.getModelById(modelLike.collection, modelLike.__dummyId);
+        const dummyModel = this.getModelById(modelLike.collection, modelLike._dummyId);
         let realModel = this.getModelById(modelLike.collection, modelLike._id);
-        if (dummyModel) {
+        if (dummyModel && modelLike._id) {
             this.removeModel(dummyModel);
-            delete dummyModel.__dummyId;
-            delete modelLike.__dummyId;
+            delete dummyModel._dummyId;
+            delete modelLike._dummyId;
+            dummyModel._id = modelLike._id;
             realModel = this.addModel(dummyModel);
         }
+        if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
         return Object.assign(realModel, modelLike);
@@ -126,7 +130,7 @@ export class Store {
      * @memberof Store
      */
     removeModel(modelLike) {
-        delete this.collection(modelLike.collection)[modelLike.__dummyId || modelLike._id];
+        delete this.collection(modelLike.collection)[modelLike._dummyId || modelLike._id];
         const collectionName = modelLike.collection;
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }

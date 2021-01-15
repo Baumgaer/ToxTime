@@ -11,13 +11,11 @@ export default class ApiRoute extends DefaultRoute {
     /**
      * collects all users and returns them in a list.
      *
-     * @param {import("express").Request} request the request
      * @returns {Promise<{models: User["Model][]} | Error>}
      * @memberof Register
      */
     @ApiRoute.get("/")
-    async getAll(request) {
-        request.body;
+    async getAll() {
         let models = null;
         try {
             models = await this.claimedExport.Model.find({}).exec();
@@ -57,7 +55,9 @@ export default class ApiRoute extends DefaultRoute {
     async create(request) {
         try {
             const model = await this.claimedExport.Model.create(request.body);
-            return { models: [model.toObject()] };
+            const dummyModelId = request.header("X-DUMMY-MODEL-ID");
+            const modelObject = Object.assign({}, model.toObject(), { _dummyId: dummyModelId || "" });
+            return { models: [modelObject] };
         } catch (error) {
             return error;
         }

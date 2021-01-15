@@ -61,13 +61,17 @@ export default class ApiClient {
         const theJson = await response.json();
         let mapped = {};
         if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
-            mapped.success = true;
-            mapped.data = { models: [] };
-            for (const model of theJson.data.models) {
-                if (!model.className) continue;
-                mapped.data.models.push(this.store.addModel(model));
-            }
+            this.handleModels(theJson, mapped);
         } else mapped = theJson;
         return Object.keys(mapped).length ? mapped : defaultResponse;
+    }
+
+    static handleModels(responseJson, mapping = {}) {
+        mapping.success = true;
+        mapping.data = { models: [] };
+        for (const model of responseJson.data.models) {
+            if (!model.className) continue;
+            mapping.data.models.push(this.store.addModel(model));
+        }
     }
 }

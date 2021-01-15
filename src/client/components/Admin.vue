@@ -20,6 +20,9 @@
                 <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" @click="onNavButtonClick('recipes')" >
                     <graph-icon />
                 </Button>
+                <Button ref="files" name="files" :active="this.category === 'files'" @click="onNavButtonClick('files')" >
+                    <file-multiple-icon />
+                </Button>
             </div>
             <div class="bottom">
                 <Button ref="settings" name="settings" :active="this.category === 'settings'" @click="onNavButtonClick('settings')" >

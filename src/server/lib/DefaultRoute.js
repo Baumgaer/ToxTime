@@ -2,6 +2,7 @@ import fs from "graceful-fs";
 import arp from "app-root-path";
 import path from "path";
 import httpErrors from "http-errors";
+import lodash from "lodash";
 import CustomError from "~common/lib/CustomError";
 
 
@@ -11,13 +12,14 @@ import CustomError from "~common/lib/CustomError";
  * @property {boolean} allowUser
  *
  * @typedef {Object} RouteObject
- * @property {string} path
- * @property {string} method
- * @property {string} handlerName
+ * @property {import("express").RequestHandler} handler
  * @property {RouteOptions} options
+ * @property {import("express").RequestHandler[]} middlewares
  *
  * @typedef {[import("express").Request, import("express").Response, import("express").NextFunction]} RequestHandlerArgs
  * @typedef { "GET" | "POST" | "PUT" | "PATCH" | "DELETE" } HttpMethods
+ * @typedef {Record<string, Record<HttpMethods, RouteObject>>} RouteCollection
+ *
  */
 export default class DefaultRoute {
 
@@ -148,6 +150,7 @@ export default class DefaultRoute {
      * @static
      * @param { typeof import("~server/lib/DefaultRoute").default } target
      * @param { string } handlerName
+     * @param {RouteOptions} options
      * @param { HttpMethods } method
      * @param { string } path
      * @param { import("express").RequestHandler[] } middlewares
@@ -156,9 +159,10 @@ export default class DefaultRoute {
      */
     static _registerRoute(target, handlerName, options, method, path, middlewares) {
         const handler = target[handlerName];
-        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", [], target);
+        if (!Reflect.hasMetadata("routes", target)) Reflect.defineMetadata("routes", {}, target);
+        /** @type {RouteCollection} */
         const routes = Reflect.getMetadata("routes", target);
-        routes.push({ method: method.toLowerCase(), path, handler, options, middlewares });
+        lodash.merge(routes, { [path]: { [method.toLowerCase()]: { handler, options, middlewares } } });
     }
 
     /**
