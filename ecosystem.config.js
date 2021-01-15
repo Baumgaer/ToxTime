@@ -18,6 +18,12 @@ const defaults = {
     "APP_DOMAIN": "localhost",
 
     /**
+     * A comma separated list of subdomains. Needed for HTTPS. NOTE: "www"
+     * is also a subdomain!
+     */
+    "APP_ALT_NAMES": "",
+
+    /**
      * Has to be a valid e-Mail address which is used for Let's Encrypt
      * certificates if HTTPS is enabled AND no reverse proxy is used.
      */

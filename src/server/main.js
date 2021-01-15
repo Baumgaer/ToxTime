@@ -21,6 +21,7 @@ import normalizeURL from "normalize-url";
 import arp from "app-root-path";
 import path from "path";
 import httpErrors from "http-errors";
+import childProcess from "child_process";
 
 import User from "~server/models/User";
 import EmailTransporter from "~server/lib/EmailTransporter";
@@ -243,6 +244,10 @@ export default class WebServer {
                     const host = env.APP_HOST;
                     const httpPort = env.APP_HTTP_PORT;
                     const httpsPort = env.APP_HTTPS_PORT;
+
+                    const altNames = env.APP_ALT_NAMES.split(",").map((altname) => altname.trim().toLowerCase());
+                    altNames.unshift(env.APP_DOMAIN.trim().toLowerCase());
+                    childProcess.execSync(`npx greenlock update --subject ${env.APP_DOMAIN} --altnames ${altNames.join(",")}`, { stdio: "ignore" });
 
                     const httpsServer = glx.httpsServer(null, this.app);
                     httpsServer.listen(httpsPort, host, () => {
