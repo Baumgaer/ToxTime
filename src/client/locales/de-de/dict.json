@@ -46,5 +46,12 @@
     "lock": "Sperren",
     "resentConfirm": "Bestätigungsmail erneut senden",
     "edit": "Bearbeiten",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "fileUploaded": "{name} erfolgreich hochgeladen",
+    "fileUploadExists": "{name} existiert bereits",
+    "fileUploadError": "Fehler beim Hochladen von {name}",
+    "fileUploadAborted": "Hochladen von {name} abgebrochen",
+    "notFound": "Resource konnte nicht gefunden werden",
+    "errorAddingUsers": "Fehler beim Hinzufügen von Benutzern",
+    "usersAdded": "Benutzer hinzugefügt"
 }

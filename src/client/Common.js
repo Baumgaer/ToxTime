@@ -1,6 +1,12 @@
 import "reflect-metadata";
 import Vue from 'vue';
 import ApiClient from "~client/lib/ApiClient";
+import "~client/less/common.less";
+import Toasted from 'vue-toasted';
+
+Vue.use(Toasted, {
+    duration: 5000
+});
 
 // Import Icons
 import AccountIcon from "vue-material-design-icons/Account";

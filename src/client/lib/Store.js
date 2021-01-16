@@ -90,12 +90,17 @@ export class Store {
         const id = modelLike._dummyId || modelLike._id;
         let model = modelLike;
         if (!this.hasModel(model)) {
-            if (!(modelLike instanceof modelMap[modelLike.className])) {
-                model = this._installChangeObserver(new modelMap[modelLike.className](modelLike));
-            } else if (modelLike instanceof modelMap[modelLike.className] && !isProxy(modelLike)) {
-                model = this._installChangeObserver(modelLike);
+            if (modelMap[modelLike.className] !== Error) {
+                if (!(modelLike instanceof modelMap[modelLike.className])) {
+                    model = this._installChangeObserver(new modelMap[modelLike.className](modelLike));
+                } else if (modelLike instanceof modelMap[modelLike.className] && !isProxy(modelLike)) {
+                    model = this._installChangeObserver(modelLike);
+                }
+                this.collection(collectionName)[id] = model;
+            } else {
+                model = new Error();
+                Object.assign(model, modelLike);
             }
-            if (!(model instanceof Error)) this.collection(collectionName)[id] = model;
             if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
             return model;
         } else return this.updateModel(model);

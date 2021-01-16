@@ -119,6 +119,7 @@ export default {
             const result = await ApiClient.post("/users/register", users);
 
             let subtract = 0;
+            let errorOccurred = false;
             for (const [index, model] of result.data.models.entries()) {
                 if (model instanceof Error) {
                     let errorToPush = i18n.t("unknownError");
@@ -126,11 +127,15 @@ export default {
                         errorToPush = i18n.t("userAlreadyExists");
                     } else if (model.name === "notAnEmail") errorToPush = i18n.t("notAnEmail");
                     this.model.tempUserList[index - subtract].errors.push(errorToPush);
+                    errorOccurred = true;
                 } else {
                     this.model.tempUserList.splice(index - subtract, 1);
                     subtract++;
                 }
             }
+            if (errorOccurred) {
+                this.$toasted.error(this.$t("errorAddingUsers"), { className: "errorToaster" });
+            } else this.$toasted.info(this.$t("usersAdded"), { className: "infoToaster" });
             if (!this.model.tempUserList.length) this.model.tempUserList = [{ errors: [] }];
             this.progressModel.loadingStatus = 0;
         },

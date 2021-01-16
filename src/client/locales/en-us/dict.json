@@ -46,5 +46,12 @@
     "lock": "Lock",
     "resentConfirm": "Send the confirmation email again",
     "edit": "Edit",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "fileUploaded": "{name} successfully uploaded",
+    "fileUploadExists": "{name} already exists",
+    "fileUploadError": "Error while uploading {name}",
+    "fileUploadAborted": "Upload of {name} aborted",
+    "notFound": "Could not find resource",
+    "errorAddingUsers": "Error while adding users",
+    "usersAdded": "Users added"
 }

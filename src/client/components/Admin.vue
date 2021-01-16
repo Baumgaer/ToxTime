@@ -5,7 +5,7 @@
                 <header>
                     <h2>{{ $t('navigation') }}</h2>
                 </header>
-                <Button ref="users" name="users" :active="this.category === 'users'" @click="onNavButtonClick('users')" >
+                <Button ref="users" name="users" :active="this.category === 'users'" :showLoadingSpinner="Boolean(this.$refs.addUsers && this.$refs.addUsers.progressModel.loadingStatus)" @click="onNavButtonClick('users')" >
                     <account-icon />
                 </Button>
                 <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" @click="onNavButtonClick('lessons')" >
@@ -20,7 +20,7 @@
                 <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" @click="onNavButtonClick('recipes')" >
                     <graph-icon />
                 </Button>
-                <Button ref="files" name="files" :active="this.category === 'files'" @click="onNavButtonClick('files')" >
+                <Button ref="files" name="files" :active="this.category === 'files'" :showLoadingSpinner="filesLoading" @click="onNavButtonClick('files')" >
                     <file-multiple-icon />
                 </Button>
             </div>
@@ -61,7 +61,7 @@
             </section>
         </section>
         <section class="editor">
-            <AddUsers v-if="activeEditor === 'addUsers'" />
+            <AddUsers ref="addUsers" v-show="activeEditor === 'addUsers'" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -86,6 +86,7 @@ export default {
     data() {
         return {
             store: {},
+            filesStore: {},
             category: "users",
             itemsCollapsed: false,
             activeEditor: null
@@ -97,9 +98,13 @@ export default {
                 if (b === window.activeUser) return 1;
                 return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || b.isActive - a.isActive || natSort()(a.getName(), b.getName());
             });
+        },
+        filesLoading() {
+            return Object.values(this.filesStore).some((file) => file.loadingStatus);
         }
     },
     mounted() {
+        this.filesStore = ApiClient.store.collection("files");
         this.onNavButtonClick("users");
     },
     methods: {

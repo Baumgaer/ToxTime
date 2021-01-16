@@ -1,5 +1,5 @@
 <template>
-    <div :class="active ? 'button active' : 'button'" :title="$t(this.name)" v-on:click="$emit('click')">
+    <div :class="`${active ? 'button active' : 'button'} ${showLoadingSpinner ? 'buttonLoading' : ''}`" :title="$t(this.name)" v-on:click="$emit('click')">
         <div class="icon"><slot></slot></div>
         <div v-show="showLabel" class="label">{{ $t(this.name) }}</div>
     </div>
@@ -11,6 +11,7 @@ export default {
         name: String,
         icon: Object,
         active: Boolean,
+        showLoadingSpinner: Boolean,
         showLabel: {
             type: Boolean,
             default: true

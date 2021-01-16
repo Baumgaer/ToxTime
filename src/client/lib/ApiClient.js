@@ -57,7 +57,12 @@ export default class ApiClient {
             }
             defaultResponse.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;
         }
-        if (response.status < 200 || response.status >= 300) return defaultResponse;
+        if (response.status < 200 || response.status >= 300) {
+            if (response.status === 404) {
+                window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
+            } else window.vm.$toasted.error(window.vm.$t(defaultResponse.error.name), { className: "errorToaster" });
+            return defaultResponse;
+        }
         const theJson = await response.json();
         let mapped = {};
         if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {

@@ -40,11 +40,17 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
             });
             this._xhr.addEventListener("readystatechange", () => {
                 if (this._xhr.readyState === 4 && this._xhr.status === 200) {
+                    window.vm.$toasted.success(window.vm.$t("fileUploaded", { name: this.getName() }), { className: "successToaster" });
                     const responseJson = JSON.parse(this._xhr.response);
                     ApiClient.handleModels(responseJson);
                     this.loadingStatus = 0;
                     this._xhr = null;
                 } else if (this._xhr.readyState === 4 && this._xhr.status !== 200) {
+                    if (this._xhr.status === 409) {
+                        window.vm.$toasted.error(window.vm.$t("fileUploadExists", { name: this.getName() }), { className: "errorToaster" });
+                    } else if (this._xhr.status) {
+                        window.vm.$toasted.error(window.vm.$t("fileUploadError", { name: this.getName() }), { className: "errorToaster" });
+                    } else window.vm.$toasted.info(window.vm.$t("fileUploadAborted", { name: this.getName() }), { className: "infoToaster" });
                     ApiClient.store.removeModel(this);
                     this.loadingStatus = 0;
                     this._xhr = null;
