@@ -47,8 +47,12 @@
                 </div>
             </header>
             <section ref="itemList" class="list" v-show="!itemsCollapsed && category !== 'settings'">
-                <div v-if="Object.keys(store).length">
-                    <Item v-for="item in store" :key="item._dummyId || item._id" :model="item" />
+                <div v-if="items.length">
+                    <Item v-for="item in items"
+                          :key="item._dummyId || item._id"
+                          :model="item"
+                          :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
+                          :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"/>
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
                 <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
@@ -70,6 +74,7 @@ import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
 import { capitalize } from "~common/utils";
+import natSort from "natsort";
 
 export default {
     components: {
@@ -85,6 +90,14 @@ export default {
             itemsCollapsed: false,
             activeEditor: null
         };
+    },
+    computed: {
+        items() {
+            return Object.values(this.store).sort((a, b) => {
+                if (b === window.activeUser) return 1;
+                return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || natSort()(a.getName(), b.getName());
+            });
+        }
     },
     mounted() {
         this.onNavButtonClick("users");

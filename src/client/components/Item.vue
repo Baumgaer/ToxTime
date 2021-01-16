@@ -3,6 +3,9 @@
         <div class="avatar" v-if="hasAvatar">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name"></component>
+            <div class="overlayIcons" v-if="overlayIcons">
+                <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
+            </div>
         </div>
         <div class="info">
             <div class="name"><strong>{{ model.getName() }}</strong></div>
@@ -31,7 +34,8 @@ export default {
         model: {
             type: Object,
             required: true
-        }
+        },
+        overlayIcons: String
     },
     data() {
         return {

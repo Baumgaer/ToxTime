@@ -24,6 +24,8 @@ import LogoutIcon from "vue-material-design-icons/Logout";
 import FileUploadIcon from "vue-material-design-icons/FileUpload";
 import FileMultipleIcon from "vue-material-design-icons/FileMultiple";
 import FileDocumentIcon from "vue-material-design-icons/FileDocument";
+import CheckIcon from "vue-material-design-icons/Check";
+import CrownIcon from "vue-material-design-icons/Crown";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -51,5 +53,7 @@ Vue.component('lock-open-icon', LockOpenIcon);
 Vue.component('delete-icon', DeleteIcon);
 Vue.component('logout-icon', LogoutIcon);
 Vue.component('file-upload-icon', FileUploadIcon);
-Vue.component('file-document-icon', FileDocumentIcon);
 Vue.component('file-multiple-icon', FileMultipleIcon);
+Vue.component('file-document-icon', FileDocumentIcon);
+Vue.component('check-icon', CheckIcon);
+Vue.component('crown-icon', CrownIcon);

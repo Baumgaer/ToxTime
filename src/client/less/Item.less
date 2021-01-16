@@ -4,14 +4,17 @@
 .item {
     @height: 50px;
     @halfHeight: 25px;
+    @transitionConfig: ease-in-out 0.3s;
 
     display: grid;
     grid-template-columns: @height 1fr;
     grid-template-rows: @height;
     grid-template-areas: "avatar info" "avatar info";
+    transition: opacity @transitionConfig, background-color @transitionConfig;
 
     &:hover {
         background-color: var(--gray-color, @gray);
+        opacity: 1 !important;
     }
 
     .avatar {
@@ -19,6 +22,19 @@
         text-align: center;
         line-height: @height;
         font-size: 24px;
+
+        > div.overlayIcons {
+            position: absolute;
+            bottom: 0;
+            text-align: right;
+            font-size: 16px;
+            color: var(--primary-color, @warningColor);
+            width: calc(@height - 10px);
+
+            > span {
+                margin: 2px;
+            }
+        }
 
         > div {
             height: 75%;
