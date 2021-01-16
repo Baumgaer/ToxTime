@@ -148,7 +148,7 @@ export default class WebServer {
             const contentSecurityNonce = uuidV4();
             response.locals.cspNonce = contentSecurityNonce;
 
-            const styleSrc = ["'self'"];
+            const styleSrc = ["'self'", "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='", "'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='"];
             const scriptSrc = styleSrc;
             const imgSrc = [].concat(styleSrc);
             if (process.environment.NODE_ENV === 'development') {
