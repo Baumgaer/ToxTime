@@ -31,6 +31,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
                     this.loadingStatus = 0;
                 } else if (xhr.readyState == 4 && xhr.status != 200) {
                     console.log(xhr.responseText);
+                    ApiClient.store.removeModel(this);
                     this.loadingStatus = 0;
                 }
             });

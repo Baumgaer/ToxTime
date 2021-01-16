@@ -4,6 +4,7 @@
             <component v-if="icon" :is="icon" class="icon"></component>
             <div class="text">{{ $t(this.text) }}</div>
         </div>
+        <input type="file" name="file" style="display: none" ref="fileInput" multiple @change="onDrop($event)"/>
     </div>
 </template>
 
@@ -69,7 +70,7 @@ export default {
             event.stopPropagation();
             if (this.ownUploadHandling) return this.ownUploadHandling(event);
             this.$refs.uploadHint.style.display = "none";
-            for (const file of Array.from(event.dataTransfer.files)) {
+            for (const file of Array.from((event.dataTransfer || event.target).files)) {
                 const fileModel = new File.Model({
                     fileName: file.name,
                     size: file.size,

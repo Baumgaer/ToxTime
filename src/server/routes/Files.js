@@ -26,7 +26,13 @@ export default class Files extends ApiRoute {
         const result = await super.getById(request);
         if (result instanceof Error) return result;
         const model = result.models[0];
-        response.sendFile(path.resolve(arp.path, "uploads", model.fileName));
+        if (!model) return httpErrors.NotFound();
+        return new Promise((resolve, reject) => {
+            response.sendFile(path.resolve(arp.path, "uploads", model.fileName), (error) => {
+                if (error) reject(error);
+                resolve();
+            });
+        });
     }
 
     /**
@@ -43,8 +49,9 @@ export default class Files extends ApiRoute {
         for (const fileNameField in request.files) {
             if (Object.hasOwnProperty.call(request.files, fileNameField)) {
                 const file = request.files[fileNameField];
-                const fileName = `${file.md5}${path.extname(file.name)}`;
-                const filePath = path.resolve(arp.path, "uploads", fileName);
+                let fileName = `${file.md5}${path.extname(file.name)}`;
+                let filePath = path.resolve(arp.path, "uploads", fileName);
+                if (fs.existsSync(filePath)) return httpErrors.Conflict();
                 try {
                     await file.mv(filePath);
                     request.body = { name: file.name, mime: file.mimetype, fileName: fileName, size: file.size, uploader: request.user._id };

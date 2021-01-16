@@ -59,7 +59,7 @@
         <section class="editor">
             <AddUsers v-if="activeEditor === 'addUsers'" />
         </section>
-        <UploadHint />
+        <UploadHint ref="uploadHint" />
     </main>
 </template>
 
@@ -93,6 +93,7 @@ export default {
 
         async onNavButtonClick(name) {
             this.category = name;
+            this.store = ApiClient.store.collection(this.category);
             await ApiClient.get(`/${name}`);
             this.store = ApiClient.store.collection(this.category);
         },
@@ -102,6 +103,7 @@ export default {
         },
 
         onAddItemButtonClick() {
+            if (this.category === "files") this.$refs.uploadHint.$refs.fileInput.click();
             this.activeEditor = `add${capitalize(this.category)}`;
         },
 

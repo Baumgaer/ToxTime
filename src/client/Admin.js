@@ -17,7 +17,7 @@ Router.extendRoutes([{
 
 const router = Router.init();
 
-new Vue({
+window.vm = new Vue({
     i18n,
     router,
     render: h => h(App)
