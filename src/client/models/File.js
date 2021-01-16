@@ -15,6 +15,17 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
         ApiClient.store.removeModel(this);
     }
 
+    @CommonClientFile.action("download", { type: "component", name: "file-download-icon" }, (instance) => window.activeUser.isAdmin && instance._id)
+    download() {
+        const element = document.createElement('a');
+        element.setAttribute('href', `/files/${this._id}`);
+        element.setAttribute('download', this.getName());
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
     async save() {
         if (!this._id) {
             this.loadingStatus = -1;
