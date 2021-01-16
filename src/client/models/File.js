@@ -5,11 +5,13 @@ import ClientModel from "~client/lib/ClientModel";
 const CommonClientFile = FileMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class File extends CommonClientFile {
 
+    _xhr = null;
     loadingStatus = 0;
     formData = new FormData();
 
     @CommonClientFile.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
     async delete() {
+        if (this._xhr) return this._xhr.abort();
         const result = await ApiClient.delete(`/files/${this._id}`);
         if (!result.success) return result.error;
         ApiClient.store.removeModel(this);
@@ -26,28 +28,29 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
         document.body.removeChild(element);
     }
 
+
     async save() {
         if (!this._id) {
             this.loadingStatus = -1;
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/files", true);
-            xhr.setRequestHeader("X-DUMMY-MODEL-ID", this._dummyId);
-            xhr.upload.addEventListener("progress", (event) => {
+            this._xhr = new XMLHttpRequest();
+            this._xhr.open("POST", "/files", true);
+            this._xhr.setRequestHeader("X-DUMMY-MODEL-ID", this._dummyId);
+            this._xhr.upload.addEventListener("progress", (event) => {
                 if (event.lengthComputable) this.loadingStatus = Math.round((event.loaded * 100 / event.total) || 1);
             });
-            xhr.addEventListener("readystatechange", () => {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    const responseJson = JSON.parse(xhr.response);
+            this._xhr.addEventListener("readystatechange", () => {
+                if (this._xhr.readyState === 4 && this._xhr.status === 200) {
+                    const responseJson = JSON.parse(this._xhr.response);
                     ApiClient.handleModels(responseJson);
                     this.loadingStatus = 0;
-                } else if (xhr.readyState == 4 && xhr.status != 200) {
-                    console.log(xhr.responseText);
+                    this._xhr = null;
+                } else if (this._xhr.readyState === 4 && this._xhr.status !== 200) {
                     ApiClient.store.removeModel(this);
                     this.loadingStatus = 0;
+                    this._xhr = null;
                 }
             });
-            xhr.upload.addEventListener("abort", () => this.delete());
-            xhr.send(this.formData);
+            this._xhr.send(this.formData);
         } else super.save();
     }
 
