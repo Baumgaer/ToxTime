@@ -11,7 +11,11 @@
         <form class="form">
             <ProgressBar :model="progressModel" class="progressBar" />
             <!-- this head is used for the empty corner in the top left -->
-            <div class="head"></div>
+            <div class="head clear">
+                <Button ref="clear" @click="onDeleteButtonClick(-1)" name="clear" :showLabel="false" class="deleteButton">
+                    <close-thick-icon />
+                </Button>
+            </div>
             <div v-for="(field, fieldKey) of fieldList" :key="`header${fieldKey}`">
                 <div :class="`head ${field.name}`">{{ $t(field.name) }}</div>
             </div>
@@ -100,7 +104,7 @@ export default {
         },
 
         onDeleteButtonClick(index) {
-            if (this.model.tempUserList.length <= 1) {
+            if (this.model.tempUserList.length <= 1 || index === -1) {
                 this.model.tempUserList = [{ errors: [] }];
             } else this.model.tempUserList.splice(index, 1);
         },

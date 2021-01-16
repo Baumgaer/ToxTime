@@ -41,6 +41,7 @@
     "isActive": "Aktive",
     "remove": "Remove",
     "delete": "Delete",
+    "clear": "Clear",
     "unlock": "Unlock",
     "lock": "Lock",
     "resentConfirm": "Send the confirmation email again",

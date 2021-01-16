@@ -95,7 +95,7 @@ export default {
         items() {
             return Object.values(this.store).sort((a, b) => {
                 if (b === window.activeUser) return 1;
-                return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || natSort()(a.getName(), b.getName());
+                return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || b.isActive - a.isActive || natSort()(a.getName(), b.getName());
             });
         }
     },

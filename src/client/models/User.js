@@ -19,8 +19,8 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         return true;
     }
 
-    @CommonClientUser.action("lock", { type: "component", name: "lock-icon" }, (instance) => instance.isActive && instance !== window.activeUser)
-    @CommonClientUser.action("unlock", { type: "component", name: "lock-open-icon" }, (instance) => !instance.isActive && instance !== window.activeUser)
+    @CommonClientUser.action("lock", { type: "component", name: "lock-icon" }, (instance) => instance.isActive && instance !== window.activeUser && window.activeUser.isAdmin)
+    @CommonClientUser.action("unlock", { type: "component", name: "lock-open-icon" }, (instance) => !instance.isActive && instance !== window.activeUser && window.activeUser.isAdmin)
     async toggleLock() {
         const result = await ApiClient.patch(`/users/toggleLock/${this._id}`);
         if (!result.success) return result.error;

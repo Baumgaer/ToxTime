@@ -150,13 +150,15 @@ export default class WebServer {
 
             const styleSrc = ["'self'"];
             const scriptSrc = styleSrc;
+            const imgSrc = [].concat(styleSrc);
             if (process.environment.NODE_ENV === 'development') {
                 styleSrc.push("'unsafe-eval'", "'unsafe-inline'");
+                imgSrc.push("data:");
             } else styleSrc.push(`'nonce-${contentSecurityNonce}'`);
 
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {
-                    directives: { defaultSrc: ["'self'"], scriptSrc, styleSrc }
+                    directives: { defaultSrc: ["'self'"], scriptSrc, styleSrc, imgSrc }
                 }
             });
             helmetMiddleWare(request, response, next);
