@@ -2,6 +2,7 @@ import onChange from "on-change";
 import lodash from "lodash";
 import User from "~client/models/User";
 import File from "~client/models/File";
+import { isProxy } from "~common/utils";
 
 export const modelMap = {
     Error,
@@ -91,6 +92,8 @@ export class Store {
         if (!this.hasModel(model)) {
             if (!(modelLike instanceof modelMap[modelLike.className])) {
                 model = this._installChangeObserver(new modelMap[modelLike.className](modelLike));
+            } else if (modelLike instanceof modelMap[modelLike.className] && !isProxy(modelLike)) {
+                model = this._installChangeObserver(modelLike);
             }
             if (!(model instanceof Error)) this.collection(collectionName)[id] = model;
             if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();

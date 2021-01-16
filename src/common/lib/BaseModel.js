@@ -1,4 +1,4 @@
-import { cloneDeep } from "lodash";
+import { cloneDeep, merge } from "lodash";
 export default class BaseModel {
 
     _id = "";
@@ -30,10 +30,14 @@ export default class BaseModel {
      */
     get actions() {
         if (this._cachedActions) return this._cachedActions;
-        const actions = cloneDeep(Reflect.getMetadata("actions", this) || []);
-        for (const action of actions) {
-            Object.defineProperty(action, "condition", { get: () => action.conditionFunc ? action.conditionFunc(this) : true });
-            Object.defineProperty(action, "func", { value: (...args) => action._handler.call(this, ...args) });
+        const actions = cloneDeep(Reflect.getMetadata("actions", this) || {});
+        for (const actionName in actions) {
+            if (Object.hasOwnProperty.call(actions, actionName)) {
+                const actionArgs = actions[actionName];
+                actionArgs.name = actionName;
+                Object.defineProperty(actionArgs, "condition", { get: () => actionArgs.conditionFunc ? actionArgs.conditionFunc(this) : true });
+                Object.defineProperty(actionArgs, "func", { value: (...args) => actionArgs._handler.call(this, ...args) });
+            }
         }
         this._cachedActions = actions;
         return actions;
@@ -53,10 +57,9 @@ export default class BaseModel {
     static action(name, symbol, conditionFunc) {
         return (target, methodName) => {
             const _handler = target[methodName];
-            if (!Reflect.hasMetadata("actions", target)) Reflect.defineMetadata("actions", [], target);
+            if (!Reflect.hasMetadata("actions", target)) Reflect.defineMetadata("actions", {}, target);
             const actions = Reflect.getMetadata("actions", target);
-            const action = { name, symbol, _handler, conditionFunc };
-            actions.push(action);
+            merge(actions, { [name]: { symbol, _handler, conditionFunc } });
         };
     }
 

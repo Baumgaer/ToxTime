@@ -1,3 +1,6 @@
+import { isUndefined, isNull } from "lodash";
+import onChange from "on-change";
+
 /**
  * Removes multiple slashes from a path part and converts the result to a
  * correct part starting with a "/" and ending with not a "/".
@@ -124,4 +127,18 @@ export function dbEnvironmentFilter(environmentExport) {
         environmentProto = Object.getPrototypeOf(commonProto);
     }
     return keysToExclude;
+}
+
+/**
+ * Checks if value is a real value and compares the proxy target with the given value
+ * if target and value are equal, it is not a proxy.
+ *
+ * @export
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isProxy(value) {
+    if (isUndefined(value) || isNull(value)) return false;
+    if (onChange.target(value) === value) return false;
+    return true;
 }

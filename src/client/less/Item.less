@@ -1,4 +1,5 @@
 @import (less) "variables.less";
+@import (less) "animations.less";
 
 .item {
     @height: 50px;
@@ -22,10 +23,17 @@
 
     .info {
         grid-area: info;
+        overflow: auto;
 
         > * {
             height: @halfHeight;
             line-height: @halfHeight;
+        }
+
+        .name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .action {
@@ -36,6 +44,39 @@
 
             &:hover {
                 color: var(--action-hover-color, @black);
+            }
+        }
+    }
+
+    .loader {
+        height: 3px;
+        width: 100%;
+        overflow: hidden;
+        grid-column: auto / span 2;
+        position: absolute;
+        bottom: 0;
+
+        .bar {
+            height: 3px;
+            background-color: var(--primary-color, @primaryColor);
+        }
+
+        &.loading {
+            .bar {
+                position: relative;
+                transition: width 1s;
+                transition-timing-function: ease-in-out;
+            }
+        }
+
+        &.pending {
+            .bar {
+                position: absolute !important;
+                width: 100% !important;
+                animation-name: pending-loader-animation;
+                animation-duration: 3s;
+                animation-iteration-count: infinite;
+                animation-timing-function: ease-in-out;
             }
         }
     }

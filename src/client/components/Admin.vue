@@ -48,7 +48,7 @@
             </header>
             <section ref="itemList" class="list" v-show="!itemsCollapsed && category !== 'settings'">
                 <div v-if="Object.keys(store).length">
-                    <Item v-for="item in store" :key="item._id" :model="item" />
+                    <Item v-for="item in store" :key="item._dummyId || item._id" :model="item" />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
                 <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
