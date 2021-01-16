@@ -16,6 +16,7 @@
             "headline .";
         white-space: nowrap;
         height: 68px;
+        background-color: var(--white-color, @white);
 
         h2 {
             grid-area: headline;
@@ -43,6 +44,12 @@
         display: grid;
         grid-template-columns: @gridTemplate;
         grid-template-areas: @gridTemplateAreas;
+
+        .progressBar {
+            grid-column: auto / span 8;
+            position: absolute;
+            top: 68px;
+        }
 
         .head {
             padding: 5px;

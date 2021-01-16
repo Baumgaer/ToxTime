@@ -1,5 +1,4 @@
 @import (less) "variables.less";
-@import (less) "animations.less";
 
 .item {
     @height: 50px;
@@ -7,6 +6,7 @@
     @transitionConfig: ease-in-out 0.3s;
 
     display: grid;
+    border-bottom: 1px solid var(--gray-color, @gray);
     grid-template-columns: @height 1fr;
     grid-template-rows: @height;
     grid-template-areas: "avatar info" "avatar info";
@@ -15,6 +15,12 @@
     &:hover {
         background-color: var(--gray-color, @gray);
         opacity: 1 !important;
+    }
+
+    .progressBar {
+        position: absolute;
+        bottom: 0;
+        grid-column: auto / span 2;
     }
 
     .avatar {
@@ -68,39 +74,6 @@
 
             &:hover {
                 color: var(--action-hover-color, @black);
-            }
-        }
-    }
-
-    .loader {
-        height: 3px;
-        width: 100%;
-        overflow: hidden;
-        grid-column: auto / span 2;
-        position: absolute;
-        bottom: 0;
-
-        .bar {
-            height: 3px;
-            background-color: var(--primary-color, @primaryColor);
-        }
-
-        &.loading {
-            .bar {
-                position: relative;
-                transition: width 1s;
-                transition-timing-function: ease-in-out;
-            }
-        }
-
-        &.pending {
-            .bar {
-                position: absolute !important;
-                width: 100% !important;
-                animation-name: pending-loader-animation;
-                animation-duration: 3s;
-                animation-iteration-count: infinite;
-                animation-timing-function: ease-in-out;
             }
         }
     }

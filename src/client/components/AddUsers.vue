@@ -9,6 +9,8 @@
             </div>
         </header>
         <form class="form">
+            <ProgressBar :model="progressModel" class="progressBar" />
+            <!-- this head is used for the empty corner in the top left -->
             <div class="head"></div>
             <div v-for="(field, fieldKey) of fieldList" :key="`header${fieldKey}`">
                 <div :class="`head ${field.name}`">{{ $t(field.name) }}</div>
@@ -52,6 +54,7 @@
 import UploadHint from "~client/components/UploadHint";
 import ToggleSwitch from "~client/components/ToggleSwitch";
 import Button from "~client/components/Button";
+import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
 import { csvToObject } from "~common/utils";
 import i18n from "~client/lib/i18n";
@@ -62,11 +65,15 @@ export default {
     components: {
         ToggleSwitch,
         Button,
-        UploadHint
+        UploadHint,
+        ProgressBar
     },
     data() {
         return {
             model: {},
+            progressModel: {
+                loadingStatus: 0
+            },
             fieldList: [
                 {name: "email", type: "text"},
                 {name: "nickname", type: "text"},
@@ -99,6 +106,7 @@ export default {
         },
 
         async onSendButtonClick() {
+            this.progressModel.loadingStatus = -1;
             // Destroy reference and filter items
             const users = JSON.parse(JSON.stringify(this.model.tempUserList.filter((user) => {
                 user.errors = [];
@@ -120,6 +128,7 @@ export default {
                 }
             }
             if (!this.model.tempUserList.length) this.model.tempUserList = [{ errors: [] }];
+            this.progressModel.loadingStatus = 0;
         },
 
         /**

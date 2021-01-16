@@ -17,18 +17,18 @@
                 </div>
             </div>
         </div>
-        <div v-if="watchedModel.loadingStatus" :class="`loader ${watchedModel.loadingStatus === -1 ? 'pending' : 'loading'}`">
-            <div class="bar" :style="`width: ${watchedModel.loadingStatus}%`"></div>
-        </div>
+        <ProgressBar :model="model" class="progressBar" />
     </section>
 </template>
 
 <script>
 import Button from "~client/components/Button";
+import ProgressBar from "~client/components/ProgressBar";
 
 export default {
     components: {
-        Button
+        Button,
+        ProgressBar
     },
     props: {
         model: {
@@ -36,14 +36,6 @@ export default {
             required: true
         },
         overlayIcons: String
-    },
-    data() {
-        return {
-            watchedModel: {}
-        };
-    },
-    mounted() {
-        this.watchedModel = this.model;
     },
     computed: {
         hasAvatar() {

@@ -1,0 +1,32 @@
+@import (less) "variables.less";
+@import (less) "animations.less";
+
+.loader {
+    height: 3px;
+    width: 100%;
+    overflow: hidden;
+
+    .bar {
+        height: 3px;
+        background-color: var(--primary-color, @primaryColor);
+    }
+
+    &.loading {
+        .bar {
+            position: relative;
+            transition: width 1s;
+            transition-timing-function: ease-in-out;
+        }
+    }
+
+    &.pending {
+        .bar {
+            position: absolute !important;
+            width: 100% !important;
+            animation-name: pending-loader-animation;
+            animation-duration: 3s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+    }
+}

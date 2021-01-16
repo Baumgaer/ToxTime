@@ -86,7 +86,20 @@
         }
 
         .list {
-            height: 100%;
+            height: calc(100% - 65px);
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                width: 0.35em;
+            }
+
+            &::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 6px var(--dark-color, @dark);
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: var(--gray-color, @gray);
+            }
 
             .empty {
                 margin: 0 10px;
