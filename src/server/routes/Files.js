@@ -59,7 +59,7 @@ export default class Files extends ApiRoute {
                         return await super.create(request);
                     } catch (error) {
                         try {
-                            fs.rmSync(filePath);
+                            fs.unlinkSync(filePath);
                             return error;
                         } catch (error) {
                             return error;
@@ -69,6 +69,19 @@ export default class Files extends ApiRoute {
                     return error;
                 }
             }
+        }
+    }
+
+    @Files.delete("/:id")
+    async delete(request) {
+        const result = await super.delete(request);
+        if (result instanceof Error) return result;
+        const model = result.models[0];
+        try {
+            fs.unlinkSync(path.resolve(arp.path, "uploads", model.fileName));
+            return result;
+        } catch (error) {
+            return error;
         }
     }
 }

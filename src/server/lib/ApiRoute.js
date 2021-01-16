@@ -86,7 +86,7 @@ export default class ApiRoute extends DefaultRoute {
         try {
             const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
-            return {};
+            return { models: [result] };
         } catch (error) {
             return error;
         }
