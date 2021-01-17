@@ -1,6 +1,4 @@
 import BaseModel from "~common/lib/BaseModel";
-import { dataTransformer } from "~common/utils";
-import { Schema } from "mongoose";
 import onChange from "on-change";
 import { v4 as uuid } from "uuid";
 import ApiClient from "~client/lib/ApiClient";
@@ -21,12 +19,7 @@ export default class ClientModel extends BaseModel {
      * @returns { {RawClass: T, Schema: import("mongoose").Schema<T>, Model: T} }
      */
     static buildClientExport(RawClass) {
-        const schema = new Schema(RawClass.schema, {
-            collection: RawClass.collection,
-            toObject: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) },
-            toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) }
-        });
-        schema.loadClass(RawClass);
+        const schema = this.buildSchema(RawClass);
         const modelClass = class ModelClass extends RawClass {
             constructor(params) {
                 super();

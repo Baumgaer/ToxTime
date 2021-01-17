@@ -25,6 +25,7 @@ import childProcess from "child_process";
 import fileUpload from "express-fileupload";
 
 import User from "~server/models/User";
+import SystemUser from "~server/models/SystemUser";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import { toURIPathPart } from "~common/utils";
 import Users from "~server/routes/Users";
@@ -316,12 +317,11 @@ export default class WebServer {
 }
 
 pmx.action('register:user', { comment: "registers a new user" }, async (parameter, reply) => {
-    console.log(parameter);
     try {
         const data = JSON.parse(parameter.replace(/'/g, "\""));
         const password = data.password;
         console.info(`registering user ${data.email} via command`);
-        const result = await Users.registerUser(data, password);
+        const result = await Users.registerUser(data, password, SystemUser.Model);
         reply({ success: true, result });
     } catch (error) {
         console.error(error);

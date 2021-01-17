@@ -57,7 +57,7 @@ export default class Login extends DefaultRoute {
         if (!isEmail(email)) return response.send({ success: false, error: { name: "emailIncorrect" } });
         const emailTransporter = EmailTransporter.getInstance();
         try {
-            const user = await User.Model.findOne({ email }).exec();
+            let user = await User.Model.findOne({ email }).exec();
             if (user) {
                 const token = uuIDv4();
                 const isSecure = process.environment.APP_SECURE;

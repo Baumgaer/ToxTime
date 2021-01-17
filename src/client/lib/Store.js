@@ -1,12 +1,14 @@
 import onChange from "on-change";
 import lodash from "lodash";
 import User from "~client/models/User";
+import SystemUser from "~client/models/SystemUser";
 import File from "~client/models/File";
 import { isProxy } from "~common/utils";
 
 export const modelMap = {
     Error,
     User: User.Model,
+    SystemUser: SystemUser.Model,
     File: File.Model
 };
 

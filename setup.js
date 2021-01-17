@@ -138,8 +138,7 @@ while (matches) {
                 isAdmin: true,
                 isConfirmed: true,
                 isActive: true,
-                matriculationNumber: 0,
-                locale: "en-us"
+                locale: results.APP_DEFAULT_LANGUAGE
             });
 
             try {

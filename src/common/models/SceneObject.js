@@ -1,4 +1,4 @@
-// import { Schema } from "mongoose";
+import { Schema } from "mongoose";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -6,34 +6,31 @@
  * @export
  * @template T
  * @param {T} MixinClass
- * @returns {File & T}
+ * @returns {SceneObject & T}
  */
-export function FileMixinClass(MixinClass) {
-    class File extends MixinClass {
+export function SceneObjectMixinClass(MixinClass) {
+    class SceneObject extends MixinClass {
 
-        static className = "File";
-        static collection = "files";
+        static className = "SceneObject";
+        static collection = "sceneObjects";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
-                type: String,
-                required: true
-            },
-            fileName: {
-                type: String,
-                required: true
-            },
-            size: {
-                type: Number,
-                required: true
-            },
-            mime: {
-                type: String,
-                required: true
+                unique: true
             },
             creator: {
                 required: true
+            },
+            file: {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: "File"
+            },
+            clickAreas: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "ClickArea" }
+                ]
             }
         };
 
@@ -47,5 +44,5 @@ export function FileMixinClass(MixinClass) {
             } else return { type: "component", name: "file-document-icon" };
         }
     }
-    return File;
+    return SceneObject;
 }

@@ -121,10 +121,11 @@ export default class Users extends ApiRoute {
         return { success: true, models: results };
     }
 
-    static registerUser(data, password) {
+    static registerUser(data, password, altModel) {
         return new Promise((resolve, reject) => {
-            const user = new User.Model(data);
-            User.Model.register(user, password, (error) => {
+            const TheModel = (altModel || User.Model);
+            const user = new TheModel(data);
+            TheModel.register(user, password, (error) => {
                 if (error) {
                     reject(error);
                 } else resolve(user);

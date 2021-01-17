@@ -14,6 +14,7 @@ export function UserMixinClass(MixinClass) {
         static className = "User";
         static collection = "users";
 
+        /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             email: {
                 type: String,
@@ -22,7 +23,9 @@ export function UserMixinClass(MixinClass) {
                 lowercase: true,
                 trim: true
             },
-            nickname: String,
+            name: {
+                required: false
+            },
             firstName: String,
             lastName: String,
             locale: {
@@ -40,11 +43,6 @@ export function UserMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.ObjectId }],
                 required: true,
                 default: []
-            },
-            registrationDate: {
-                type: Date,
-                required: true,
-                default: new Date()
             },
             isConfirmed: {
                 type: Boolean,
