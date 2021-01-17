@@ -60,6 +60,8 @@ export default class ApiClient {
         if (response.status < 200 || response.status >= 300) {
             if (response.status === 404) {
                 window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
+            } else if (!defaultResponse.error.name && defaultResponse.error.message) {
+                window.vm.$toasted.error(defaultResponse.error.message, { className: "errorToaster" });
             } else window.vm.$toasted.error(window.vm.$t(defaultResponse.error.name), { className: "errorToaster" });
             return defaultResponse;
         }

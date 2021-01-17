@@ -73,7 +73,8 @@ export default class Users extends ApiRoute {
                 const originalUser = await Users.registerUser(Object.assign(userData, {
                     password: password,
                     locale: process.environment.APP_DEFAULT_LANGUAGE,
-                    passwordResetToken: token
+                    passwordResetToken: token,
+                    creator: request.user._id
                 }), password);
 
                 // Copy and modify for response

@@ -120,7 +120,7 @@ const defaults = {
      *
      * e.g. name:lastName, firstName:nickname
      */
-    "ECAMPUS_FIELD_MAPPING": "Benutzername:nickname",
+    "ECAMPUS_FIELD_MAPPING": "Benutzername:name",
 
 
     /**

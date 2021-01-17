@@ -17,7 +17,7 @@
                 </Button>
             </div>
             <div v-for="(field, fieldKey) of fieldList" :key="`header${fieldKey}`">
-                <div :class="`head ${field.name}`">{{ $t(field.name) }}</div>
+                <div :class="`head ${field.name}`">{{ $t(field.displayName || field.name) }}</div>
             </div>
             <div class="row" v-for="(item, index) in model.tempUserList" :key="index">
                 <Button :ref="`delete${index}`" @click="onDeleteButtonClick(index)" name="remove" :showLabel="false" class="deleteButton">
@@ -80,7 +80,7 @@ export default {
             },
             fieldList: [
                 {name: "email", type: "text"},
-                {name: "nickname", type: "text"},
+                {name: "name", displayName: "nickname", type: "text"},
                 {name: "firstName", type: "text"},
                 {name: "lastName", type: "text"},
                 {name: "isAdmin", type: "toggle"},
