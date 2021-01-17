@@ -12,7 +12,7 @@ export function SceneObjectMixinClass(MixinClass) {
     class SceneObject extends MixinClass {
 
         static className = "SceneObject";
-        static collection = "sceneObjects";
+        static collection = "sceneobjects";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
