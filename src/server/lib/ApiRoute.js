@@ -55,6 +55,7 @@ export default class ApiRoute extends DefaultRoute {
     @ApiRoute.post("/")
     async create(request) {
         try {
+            Object.assign(request.body, { creator: request.user._id });
             const model = await this.claimedExport.Model.create(request.body);
             const dummyModelId = request.header("X-DUMMY-MODEL-ID");
             const modelObject = Object.assign({}, model.toObject(), { _dummyId: dummyModelId || "" });
@@ -74,6 +75,7 @@ export default class ApiRoute extends DefaultRoute {
     @ApiRoute.patch("/:id")
     update(request) {
         try {
+            Object.assign(request.body, { lastModified: new Date() });
             return this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body);
         } catch (error) {
             return error;

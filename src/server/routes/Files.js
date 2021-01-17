@@ -55,16 +55,15 @@ export default class Files extends ApiRoute {
                 try {
                     await file.mv(filePath);
                     request.body = { name: file.name, mime: file.mimetype, fileName: fileName, size: file.size, uploader: request.user._id };
-                    try {
-                        return await super.create(request);
-                    } catch (error) {
+                    const result = await super.create(request);
+                    if (result instanceof Error) {
                         try {
                             fs.unlinkSync(filePath);
-                            return error;
                         } catch (error) {
                             return error;
                         }
                     }
+                    return result;
                 } catch (error) {
                     return error;
                 }

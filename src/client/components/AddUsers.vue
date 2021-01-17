@@ -125,7 +125,9 @@ export default {
                     let errorToPush = i18n.t("unknownError");
                     if (model.name === "MongoError" && model.code === 11000 || model.name === "UserExistsError") {
                         errorToPush = i18n.t("userAlreadyExists");
-                    } else if (model.name === "notAnEmail") errorToPush = i18n.t("notAnEmail");
+                    } else if (model.name === "notAnEmail") {
+                        errorToPush = i18n.t("notAnEmail");
+                    } else errorToPush = i18n.t(model.name);
                     this.model.tempUserList[index - subtract].errors.push(errorToPush);
                     errorOccurred = true;
                 } else {

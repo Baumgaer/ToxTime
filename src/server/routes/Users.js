@@ -83,7 +83,7 @@ export default class Users extends ApiRoute {
                 delete modifiedUser.salt;
                 delete modifiedUser.passwordResetToken;
 
-                if (!request.body.isConfirmed) {
+                if (!userData.isConfirmed) {
                     try {
                         // Send confirmation email
                         const isSecure = process.environment.APP_SECURE;
@@ -111,7 +111,7 @@ export default class Users extends ApiRoute {
                             results.push(error);
                         }
                     }
-                }
+                } else results.push(modifiedUser);
             } catch (error) {
                 // Creating user failed
                 console.error(error);

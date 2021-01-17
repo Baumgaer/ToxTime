@@ -40,9 +40,16 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
             });
             this._xhr.addEventListener("readystatechange", () => {
                 if (this._xhr.readyState === 4 && this._xhr.status === 200) {
-                    window.vm.$toasted.success(window.vm.$t("fileUploaded", { name: this.getName() }), { className: "successToaster" });
                     const responseJson = JSON.parse(this._xhr.response);
-                    ApiClient.handleModels(responseJson);
+                    const errorMapping = {};
+                    ApiClient.handleDatabaseError(responseJson, errorMapping);
+                    if (errorMapping.data?.models?.length) {
+                        window.vm.$toasted.error(window.vm.$t("fileUploadError", { name: this.getName() }), { className: "errorToaster" });
+                        ApiClient.store.removeModel(this);
+                    } else {
+                        ApiClient.handleModels(responseJson);
+                        window.vm.$toasted.success(window.vm.$t("fileUploaded", { name: this.getName() }), { className: "successToaster" });
+                    }
                     this.loadingStatus = 0;
                     this._xhr = null;
                 } else if (this._xhr.readyState === 4 && this._xhr.status !== 200) {

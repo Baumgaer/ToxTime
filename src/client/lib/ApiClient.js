@@ -1,6 +1,7 @@
 import validator from "validator";
 import httpErrors from "http-errors";
 import stripHTML from "string-strip-html";
+import { capitalize } from "~common/utils";
 
 import { Store } from "~client/lib/Store";
 
@@ -46,6 +47,36 @@ export default class ApiClient {
         const response = await fetch(theTarget, fetchObject);
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
+        const httpError = this.handleHttpErrors(response, defaultResponse);
+        if (httpError) return httpError;
+
+        const theJson = await response.json();
+        let mapped = {};
+        if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
+            this.handleModels(theJson, mapped);
+        } else if (theJson.data?.errors && theJson.data.errors instanceof Object) {
+            this.handleHttpErrors(theJson, mapped);
+        } else mapped = theJson;
+        return Object.keys(mapped).length ? mapped : defaultResponse;
+    }
+
+    static handleDatabaseError(responseJson, mapping = {}) {
+        if (!responseJson.data.errors) return;
+        mapping.success = false;
+        mapping.data = { models: [] };
+        for (const key in responseJson.data.errors) {
+            if (Object.hasOwnProperty.call(responseJson.data.errors, key)) {
+                const rawError = responseJson.data.errors[key];
+                rawError.className = "Error";
+                delete rawError.properties;
+                const error = new Error();
+                Object.assign(error, rawError);
+                mapping.data.models.push(error);
+            }
+        }
+    }
+
+    static async handleHttpErrors(response, mapping = {}) {
         if (response.status >= 400) {
             let result = null;
             let matches = null;
@@ -55,28 +86,31 @@ export default class ApiClient {
                 result = stripHTML(await response.text()).result;
                 matches = result.match(/:(.*?)at/);
             }
-            defaultResponse.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;
+            mapping.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;
         }
         if (response.status < 200 || response.status >= 300) {
             if (response.status === 404) {
                 window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
-            } else if (!defaultResponse.error.name && defaultResponse.error.message) {
-                window.vm.$toasted.error(defaultResponse.error.message, { className: "errorToaster" });
-            } else window.vm.$toasted.error(window.vm.$t(defaultResponse.error.name), { className: "errorToaster" });
-            return defaultResponse;
+            } else if (!mapping.error.name && mapping.error.message) {
+                window.vm.$toasted.error(mapping.error.message, { className: "errorToaster" });
+            } else window.vm.$toasted.error(window.vm.$t(mapping.error.name), { className: "errorToaster" });
+            return mapping;
         }
-        const theJson = await response.json();
-        let mapped = {};
-        if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
-            this.handleModels(theJson, mapped);
-        } else mapped = theJson;
-        return Object.keys(mapped).length ? mapped : defaultResponse;
     }
 
     static handleModels(responseJson, mapping = {}) {
+        if (!responseJson.data.models || !(responseJson.data.models instanceof Array)) return;
         mapping.success = true;
         mapping.data = { models: [] };
         for (const model of responseJson.data.models) {
+            if (model.errors) {
+                const errorMap = {};
+                this.handleDatabaseError(model, errorMap);
+                const errorModel = errorMap.data.models[0];
+                errorModel.name = `${errorModel.name}${capitalize(errorModel.path)}${capitalize(errorModel.kind)}`;
+                mapping.data.models.push(errorModel);
+                continue;
+            }
             if (!model.className) continue;
             mapping.data.models.push(this.store.addModel(model));
         }
