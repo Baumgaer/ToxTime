@@ -1,15 +1,9 @@
 import onChange from "on-change";
 import lodash from "lodash";
-import User from "~client/models/User";
-import SystemUser from "~client/models/SystemUser";
-import File from "~client/models/File";
 import { isProxy } from "~common/utils";
 
 export const modelMap = {
-    Error,
-    User: User.Model,
-    SystemUser: SystemUser.Model,
-    File: File.Model
+    Error
 };
 
 /**
@@ -24,6 +18,11 @@ export class Store {
 
     constructor() {
         if (!Store.usedInstanceGetter) throw new Error("This is a singleton, use Store.getInstance()!");
+        const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
+        modelContext.keys().forEach((key) => {
+            const staticModel = modelContext(key).default.Model;
+            modelMap[staticModel.className] = staticModel;
+        });
         this.collection("localStorage");
     }
 
