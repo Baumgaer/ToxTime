@@ -47,7 +47,8 @@ export default class ApiClient {
         const response = await fetch(theTarget, fetchObject);
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
-        const httpError = this.handleHttpErrors(response, defaultResponse);
+        const httpError = await this.handleHttpErrors(response, defaultResponse);
+        console.log(httpError);
         if (httpError) return httpError;
 
         const theJson = await response.json();
@@ -55,7 +56,7 @@ export default class ApiClient {
         if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
             this.handleModels(theJson, mapped);
         } else if (theJson.data?.errors && theJson.data.errors instanceof Object) {
-            this.handleHttpErrors(theJson, mapped);
+            this.handleDatabaseError(theJson, mapped);
         } else mapped = theJson;
         return Object.keys(mapped).length ? mapped : defaultResponse;
     }
