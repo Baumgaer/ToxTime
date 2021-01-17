@@ -1,9 +1,11 @@
 import onChange from "on-change";
 import lodash from "lodash";
 import { isProxy } from "~common/utils";
+import BaseModel from "~common/lib/BaseModel";
 
 export const modelMap = {
-    Error
+    Error,
+    BaseModel: BaseModel
 };
 
 /**
