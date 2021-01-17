@@ -33,6 +33,7 @@ import FileMultipleIcon from "vue-material-design-icons/FileMultiple";
 import FileDocumentIcon from "vue-material-design-icons/FileDocument";
 import CheckIcon from "vue-material-design-icons/Check";
 import CrownIcon from "vue-material-design-icons/Crown";
+import ContentSaveIcon from "vue-material-design-icons/ContentSave";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -65,3 +66,4 @@ Vue.component('file-multiple-icon', FileMultipleIcon);
 Vue.component('file-document-icon', FileDocumentIcon);
 Vue.component('check-icon', CheckIcon);
 Vue.component('crown-icon', CrownIcon);
+Vue.component('content-save-icon', ContentSaveIcon);

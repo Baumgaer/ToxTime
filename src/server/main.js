@@ -148,13 +148,17 @@ export default class WebServer {
             const contentSecurityNonce = uuidV4();
             response.locals.cspNonce = contentSecurityNonce;
 
-            const styleSrc = ["'self'", "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='", "'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='"];
+            const styleSrc = ["'self'"];
             const scriptSrc = styleSrc;
             const imgSrc = [].concat(styleSrc);
             if (process.environment.NODE_ENV === 'development') {
                 styleSrc.push("'unsafe-eval'", "'unsafe-inline'");
                 imgSrc.push("data:");
-            } else styleSrc.push(`'nonce-${contentSecurityNonce}'`);
+            } else {
+                styleSrc.push(`'nonce-${contentSecurityNonce}'`);
+                styleSrc.push("'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='");
+                styleSrc.push("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
+            }
 
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {

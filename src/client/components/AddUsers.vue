@@ -4,7 +4,7 @@
             <h2>{{ $t('addUsers') }}</h2>
             <div class="buttons">
                 <Button ref="send" class="sendButton" name="addUsers" v-on:click="onSendButtonClick()" >
-                    <check-bold-icon />
+                    <content-save-icon />
                 </Button>
             </div>
         </header>
