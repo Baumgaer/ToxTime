@@ -48,7 +48,6 @@ export default class ApiClient {
 
         const defaultResponse = { success: false, error: { name: "unknownError" } };
         const httpError = await this.handleHttpErrors(response, defaultResponse);
-        console.log(httpError);
         if (httpError) return httpError;
 
         const theJson = await response.json();
