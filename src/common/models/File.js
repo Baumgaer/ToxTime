@@ -31,9 +31,6 @@ export function FileMixinClass(MixinClass) {
             mime: {
                 type: String,
                 required: true
-            },
-            creator: {
-                required: true
             }
         };
 

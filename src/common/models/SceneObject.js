@@ -19,9 +19,6 @@ export function SceneObjectMixinClass(MixinClass) {
             name: {
                 unique: true
             },
-            creator: {
-                required: true
-            },
             file: {
                 type: Schema.Types.ObjectId,
                 required: true,

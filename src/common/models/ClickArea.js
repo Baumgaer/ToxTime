@@ -19,9 +19,6 @@ export function ClickAreaMixinClass(MixinClass) {
             name: {
                 unique: true
             },
-            creator: {
-                required: true
-            },
             shape: {
                 type: String,
                 required: true
