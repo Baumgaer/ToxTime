@@ -22,7 +22,8 @@ export default {
             type: String,
             default: "upload"
         },
-        ownUploadHandling: Function
+        ownUploadHandling: Function,
+        uploadReadyFunc: Function
     },
     data() {
         return {
@@ -63,6 +64,7 @@ export default {
 
         /**
          * @param {DragEvent} event
+         * @returns {Promise<File>[]}
          */
         async onDrop(event) {
             if (ApiClient.store.collection("localStorage").isInternalDnD) return;
@@ -70,6 +72,7 @@ export default {
             event.stopPropagation();
             if (this.ownUploadHandling) return this.ownUploadHandling(event);
             this.$refs.uploadHint.style.display = "none";
+            const promises = [];
             for (const file of Array.from((event.dataTransfer || event.target).files)) {
                 const fileModel = new File.Model({
                     fileName: file.name,
@@ -79,8 +82,10 @@ export default {
                 });
                 fileModel.formData.append("file", file);
                 ApiClient.store.addModel(fileModel);
-                fileModel.save();
+                promises.push(fileModel.save());
             }
+            const result = (await Promise.all(promises)).filter((model) => Boolean(model));
+            if (this.uploadReadyFunc) this.uploadReadyFunc(result);
         },
 
         removeEventListeners() {

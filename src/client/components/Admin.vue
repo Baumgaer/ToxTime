@@ -14,7 +14,7 @@
                 <Button ref="scenes" name="scenes" :active="this.category === 'scenes'" @click="onNavButtonClick('scenes')" >
                     <theater-icon />
                 </Button>
-                <Button ref="objects" name="objects" :active="this.category === 'objects'" @click="onNavButtonClick('objects')" >
+                <Button ref="sceneObjects" name="sceneObjects" :active="this.category === 'sceneObjects'" @click="onNavButtonClick('sceneObjects')" >
                     <ufo-icon />
                 </Button>
                 <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" @click="onNavButtonClick('recipes')" >
@@ -62,6 +62,7 @@
         </section>
         <section class="editor">
             <AddUsers ref="addUsers" v-show="activeEditor === 'addUsers'" />
+            <GraphicEditor v-if="['addScenes', 'addSceneObjects'].includes(activeEditor)" :type="activeEditor === 'addScenes' ? 'scene' : 'sceneObject'" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -73,6 +74,8 @@ import Item from "~client/components/Item.vue";
 import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
+import GraphicEditor from "~client/components/GraphicEditor";
+
 import { capitalize } from "~common/utils";
 import natSort from "natsort";
 
@@ -81,7 +84,8 @@ export default {
         Button,
         Item,
         AddUsers,
-        UploadHint
+        UploadHint,
+        GraphicEditor
     },
     data() {
         return {

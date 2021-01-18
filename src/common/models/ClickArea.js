@@ -12,7 +12,7 @@ export function ClickAreaMixinClass(MixinClass) {
     class ClickArea extends MixinClass {
 
         static className = "ClickArea";
-        static collection = "clickareas";
+        static collection = "clickAreas";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {

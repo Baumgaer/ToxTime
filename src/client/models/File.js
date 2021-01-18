@@ -28,9 +28,15 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
         document.body.removeChild(element);
     }
 
-
+    /**
+     * Uploads the file and creates a corresponding model. A proxyfied model
+     * is returned.
+     *
+     * @returns {Promise<File | null>}
+     */
     async save() {
-        if (!this._id) {
+        if (this._id) return super.save();
+        return new Promise((resolve) => {
             this.loadingStatus = -1;
             this._xhr = new XMLHttpRequest();
             this._xhr.open("POST", "/files", true);
@@ -52,6 +58,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
                     }
                     this.loadingStatus = 0;
                     this._xhr = null;
+                    resolve(ApiClient.store.getModelById(this.collection, this._id));
                 } else if (this._xhr.readyState === 4 && this._xhr.status !== 200) {
                     if (this._xhr.status === 409) {
                         window.vm.$toasted.error(window.vm.$t("fileUploadExists", { name: this.getName() }), { className: "errorToaster" });
@@ -61,10 +68,11 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
                     ApiClient.store.removeModel(this);
                     this.loadingStatus = 0;
                     this._xhr = null;
+                    resolve(null);
                 }
             });
             this._xhr.send(this.formData);
-        } else super.save();
+        });
     }
 
 });

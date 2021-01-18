@@ -12,7 +12,7 @@ export function SceneObjectMixinClass(MixinClass) {
     class SceneObject extends MixinClass {
 
         static className = "SceneObject";
-        static collection = "sceneobjects";
+        static collection = "sceneObjects";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
@@ -30,10 +30,6 @@ export function SceneObjectMixinClass(MixinClass) {
                 ]
             }
         };
-
-        getName(preferredField) {
-            return `${this[preferredField] || this.name}`;
-        }
 
         getAvatar() {
             if (this.mime && this.mime.startsWith("image")) {

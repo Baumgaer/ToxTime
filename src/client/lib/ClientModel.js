@@ -21,7 +21,7 @@ export default class ClientModel extends BaseModel {
     static buildClientExport(RawClass) {
         const schema = this.buildSchema(RawClass);
         const modelClass = class ModelClass extends RawClass {
-            constructor(params) {
+            constructor(params = {}) {
                 super();
                 Object.assign(this, params, {
                     collection: RawClass.collection,
@@ -33,19 +33,41 @@ export default class ClientModel extends BaseModel {
         return { RawClass, Schema: schema, Model: modelClass, isClientModel: true };
     }
 
-    save() {
+    getName(preferredField) {
+        return this[preferredField] || this.name;
+    }
+
+    hasChanges() {
         const that = onChange.target(this);
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
         const stagedChanges = Reflect.getMetadata("stagedChanges", that);
-        let method = ApiClient.post;
-        if (!that._id && that._dummyId) method = ApiClient.patch;
-        const data = {};
-        for (const key in stagedChanges) {
-            if (Object.hasOwnProperty.call(that, key)) {
-                const value = that[key];
-                data[key] = value;
+        return Boolean(Object.keys(stagedChanges).length);
+    }
+
+    destroy() {
+        ApiClient.store.removeModel(this);
+    }
+
+    async save() {
+        const that = onChange.target(this);
+        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
+        const stagedChanges = Reflect.getMetadata("stagedChanges", that);
+        let additionalHeaders, data, method;
+        if (that._id) {
+            additionalHeaders = {};
+            data = {};
+            method = ApiClient.patch.bind(ApiClient);
+            for (const key in stagedChanges) {
+                if (Object.hasOwnProperty.call(that, key)) {
+                    const value = that[key];
+                    data[key] = value;
+                }
             }
+        } else {
+            additionalHeaders = { "X-DUMMY-MODEL-ID": this._dummyId };
+            data = JSON.parse(JSON.stringify(that));
+            method = ApiClient.post.bind(ApiClient);
         }
-        method(`/users/${that._id || that._dummyId}`, data, { "X-DUMMY-MODEL-ID": this._dummyId });
+        return method(`/${this.collection}/${that._id ? that._id : ''}`, data, additionalHeaders);
     }
 }
