@@ -232,7 +232,7 @@ export default class WebServer {
             const router = Router();
 
             /** @type {import("~server/lib/DefaultRoute").RouteCollection} */
-            const registeredRoutes = Reflect.getMetadata("routes", clRoute);
+            const registeredRoutes = clRoute.routes;
             for (const registeredRoute in registeredRoutes) {
                 if (Object.hasOwnProperty.call(registeredRoutes, registeredRoute)) {
 

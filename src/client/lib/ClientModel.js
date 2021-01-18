@@ -64,8 +64,10 @@ export default class ClientModel extends BaseModel {
                 }
             }
         } else {
+            data = {};
+            const schema = Object.getPrototypeOf(this).constructor.schema;
+            for (const key in schema) if (Object.hasOwnProperty.call(schema, key)) data[key] = that[key];
             additionalHeaders = { "X-DUMMY-MODEL-ID": this._dummyId };
-            data = JSON.parse(JSON.stringify(that));
             method = ApiClient.post.bind(ApiClient);
         }
         return method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data, additionalHeaders);
