@@ -147,18 +147,15 @@ export class Store {
     }
 
     _installChangeObserver(model) {
-        const initializedFields = {};
         const that = this;
         return onChange(model, function (path) {
             const id = model._dummyId || model._id;
             if (that.hasModel(model) && that.getModelById(model.collection, id).__ob__) that.getModelById(model.collection, id).__ob__.dep.notify();
             const fieldName = path[0];
             if (!Object.getPrototypeOf(this).constructor.schema[fieldName]) return;
-            if (fieldName in initializedFields) {
-                if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
-                const stagedChanges = Reflect.getMetadata("stagedChanges", model);
-                stagedChanges[fieldName] = true;
-            } else initializedFields[fieldName] = true;
+            if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
+            const stagedChanges = Reflect.getMetadata("stagedChanges", model);
+            stagedChanges[fieldName] = true;
 
         }, { pathAsArray: true, ignoreUnderscores: true, equals: lodash.isEqual });
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="graphicEditor">
+    <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <header>
             <h2>{{ $t('addUsers') }}</h2>
             <div class="buttons">
@@ -15,7 +15,7 @@
              :id="`${watchedModel.file.collection}${watchedModel.file._dummyId || watchedModel.file._id}`"
              @load="onBackgroundLoaded($event)"
         >
-        <canvas ref="canvas" resize @drop="onInternalDrop($event)"></canvas>
+        <canvas ref="canvas" resize></canvas>
         <UploadHint v-if="type !== 'scene'" ref="uploadHint" :uploadReadyFunc="onUploadReady.bind(this)" />
     </div>
 </template>
@@ -69,12 +69,13 @@ export default {
          */
         onInternalDrop(event) {
             if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
-            ApiClient.store.collection("localStorage").isInternalDnD = false;
 
             event.preventDefault();
             event.stopPropagation();
 
-            if (event.model) this.addObject(event.model);
+            let eventData = event.dataTransfer.getData("model");
+            if (eventData) eventData = JSON.parse(eventData);
+            if (eventData) this.addObject(ApiClient.store.getModelById(eventData.collection, eventData._id));
         },
 
         /**

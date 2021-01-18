@@ -22,7 +22,6 @@ export default class ServerModel extends BaseModel {
         for (const plugin of plugins) schema.plugin(...plugin);
         let Model;
         const protoClassName = Object.getPrototypeOf(Object.getPrototypeOf(RawClass)).className;
-        console.log(RawClass.className + " is " + protoClassName);
         if (mongooseBaseModels[protoClassName]) {
             Model = mongooseBaseModels[protoClassName].discriminator(RawClass.className, schema);
         } else Model = mongoose.model(RawClass.className, schema);

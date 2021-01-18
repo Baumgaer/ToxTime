@@ -52,7 +52,8 @@
                           :key="item._dummyId || item._id"
                           :model="item"
                           :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
-                          :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"/>
+                          :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
+                    />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
                 <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">

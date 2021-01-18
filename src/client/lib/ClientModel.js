@@ -68,6 +68,6 @@ export default class ClientModel extends BaseModel {
             data = JSON.parse(JSON.stringify(that));
             method = ApiClient.post.bind(ApiClient);
         }
-        return method(`/${this.collection}/${that._id ? that._id : ''}`, data, additionalHeaders);
+        return method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data, additionalHeaders);
     }
 }

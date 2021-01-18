@@ -1,5 +1,5 @@
 <template>
-    <section class="item">
+    <section class="item" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)">
         <div class="avatar" v-if="hasAvatar">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name"></component>
@@ -24,6 +24,7 @@
 <script>
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
+import ApiClient from "~client/lib/ApiClient";
 
 export default {
     components: {
@@ -47,6 +48,20 @@ export default {
             if (!avatarData) return false;
             if (avatarData.type === "image") return true;
             return false;
+        }
+    },
+    methods: {
+        /**
+         * @param {DragEvent} event
+         */
+        onDragStart(event) {
+            event.stopPropagation();
+            ApiClient.store.collection("localStorage").isInternalDnD = true;
+            event.dataTransfer.setData("model", JSON.stringify({collection: this.model.collection, _id: this.model._id}));
+        },
+
+        onDragEnd() {
+            ApiClient.store.collection("localStorage").isInternalDnD = false;
         }
     }
 };
