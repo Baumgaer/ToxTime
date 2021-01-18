@@ -8,7 +8,14 @@
                 </Button>
             </div>
         </header>
-        <canvas ref="canvas" resize @drop="onInternalDrop($event)" class="canvas"></canvas>
+        <img ref="background"
+             style="display: none;"
+             v-if="watchedModel.file"
+             :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
+             :id="`${watchedModel.file.collection}${watchedModel.file._dummyId || watchedModel.file._id}`"
+             @load="onBackgroundLoaded($event)"
+        >
+        <canvas ref="canvas" resize @drop="onInternalDrop($event)"></canvas>
         <UploadHint v-if="type !== 'scene'" ref="uploadHint" :uploadReadyFunc="onUploadReady.bind(this)" />
     </div>
 </template>
@@ -19,7 +26,7 @@ import UploadHint from "~client/components/UploadHint";
 import ApiClient from "~client/lib/ApiClient";
 import paper from "paper";
 import SceneObject from "~client/models/SceneObject";
-
+import FileModelExport from "~client/models/File";
 
 export default {
     components: {
@@ -31,26 +38,30 @@ export default {
             type: String,
             required: true,
             default: "scene"
-        }
+        },
+        model: Object
     },
     data() {
         return {
             paper: new paper.PaperScope(),
-            model: {}
+            watchedModel: {}
         };
     },
     mounted() {
-        this.model = ApiClient.store.addModel(new SceneObject.Model());
+        if (this.model) {
+            this.watchedModel = this.model;
+        } else this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
     },
     beforeDestroy() {
-        console.log("save it!");
-        if (this.model.hasChanges()) {
-            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
-            return this.model.save();
+        if (this.watchedModel.hasChanges()) {
+            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+            this.watchedModel.save();
+        } else if (!this.model) {
+            this.watchedModel.destroy();
+            this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
         }
-        this.model.destroy();
     },
     methods: {
         /**
@@ -67,7 +78,7 @@ export default {
         },
 
         /**
-         * @param {import("~client/models/File")["default"]["Model"]} files
+         * @param {FileModelExport["Model"]} files
          */
         onUploadReady(files) {
             for (const file of files) {
@@ -78,10 +89,23 @@ export default {
         },
 
         addObject(model) {
+            if (model instanceof FileModelExport.RawClass) this.addBackground(model);
             console.log(model);
+        },
+
+        addBackground(model) {
+            if (!(model instanceof FileModelExport.RawClass) || !model.mime.startsWith("image")) return;
+            this.watchedModel.file = model;
+        },
+
+        onBackgroundLoaded() {
+            this.paper.view.viewSize = new this.paper.Size(this.$refs.background.width, this.$refs.background.height);
+            const raster = new this.paper.Raster(this.$refs.background);
+            raster.position = this.paper.view.center;
+            this.paper.view.draw();
         }
     }
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped src="~client/less/GraphicEditor.less"></style>

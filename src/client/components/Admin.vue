@@ -117,7 +117,6 @@ export default {
             this.category = name;
             this.store = ApiClient.store.collection(this.category);
             await ApiClient.get(`/${name}`);
-            this.store = ApiClient.store.collection(this.category);
         },
 
         onCollapseButtonClick() {
