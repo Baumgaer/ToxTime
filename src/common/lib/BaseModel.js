@@ -1,10 +1,11 @@
-import { cloneDeep, merge } from "lodash";
+import { merge } from "lodash";
 import { Schema } from "mongoose";
-import { dataTransformer } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive } from "~common/utils";
+
+const globalActions = {};
 
 /** @type {Record<string, import("mongoose").Model>} */
 export const mongooseBaseModels = {};
-
 export default class BaseModel {
 
     _id = "";
@@ -57,7 +58,10 @@ export default class BaseModel {
      */
     get actions() {
         if (this._cachedActions) return this._cachedActions;
-        const actions = cloneDeep(Reflect.getMetadata("actions", this) || {});
+        const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in globalActions);
+        const actions = {};
+        for (const prototypeName of prototypeNames) merge(actions, globalActions[prototypeName]);
+
         for (const actionName in actions) {
             if (Object.hasOwnProperty.call(actions, actionName)) {
                 const actionArgs = actions[actionName];
@@ -84,9 +88,8 @@ export default class BaseModel {
     static action(name, symbol, conditionFunc) {
         return (target, methodName) => {
             const _handler = target[methodName];
-            if (!Reflect.hasMetadata("actions", target)) Reflect.defineMetadata("actions", {}, target);
-            const actions = Reflect.getMetadata("actions", target);
-            merge(actions, { [name]: { symbol, _handler, conditionFunc } });
+            if (!globalActions[target.constructor.name]) globalActions[target.constructor.name] = {};
+            merge(globalActions[target.constructor.name], { [name]: { symbol, _handler, conditionFunc } });
         };
     }
 

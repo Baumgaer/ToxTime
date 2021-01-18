@@ -142,3 +142,30 @@ export function isProxy(value) {
     if (onChange.target(value) === value) return false;
     return true;
 }
+
+/**
+ * Iterates an object's prototypes recursive and collects the names
+ *
+ * @param {Object} object The object where the prototype names should get from recursively
+ * @returns {string[]} The prototype names
+ */
+export function getPrototypeNamesRecursive(object) {
+
+    const prototypes = [];
+
+    /**
+     * Does the recursion
+     *
+     * @param theObject The recursive needed object
+     */
+    function getThem(theObject) {
+        const prototype = Object.getPrototypeOf(theObject);
+        if (prototype) {
+            prototypes.push(prototype.constructor.name);
+            getThem(prototype);
+        }
+    }
+
+    getThem(object);
+    return prototypes;
+}
