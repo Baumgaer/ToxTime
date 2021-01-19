@@ -1,14 +1,15 @@
 FROM resin/rpi-raspbian
 MAINTAINER gabrielrf
 # Originally made by: https://github.com/matteoredaelli/docker-mongodb-rpi
+# THIS VERSION: https://github.com/GabrielRF/Docker-MongoDB-RPi
 
 # Install required packages
 RUN apt-get update && apt-get -y dist-upgrade && \
     apt-get install -y --no-install-suggests mongodb # && \
     # rm -rf /var/lib/apt/lists/*
 
-# Volumes
-VOLUME ["/docker-shares"]
+    # Volumes
+    VOLUME ["/docker-shares"]
 VOLUME ["/var/lib/mongodb"]
 
 # Define default command.
