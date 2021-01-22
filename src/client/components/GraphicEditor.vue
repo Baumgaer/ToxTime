@@ -1,8 +1,14 @@
 <template>
     <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead :name="`add${type.charAt(0).toUpperCase() + type.slice(1)}`" :onSaveButtonClick="onSaveButtonClick.bind(this)" >
-            <Button name="move" :showLabel="false" :active="currentTool === 'move'" @click="setTool('move')">
+            <Button name="move" :showLabel="false" :active="currentTool && currentTool.name === 'move'" @click="setTool('move')">
                 <hand-left-icon />
+            </Button>
+            <Button name="polyClickArea" :showLabel="false" :active="currentTool && currentTool.name === 'polyClickArea'" @click="setTool('polyClickArea')">
+                <vector-polygon-icon />
+            </Button>
+            <Button name="select" :showLabel="false" :active="currentTool && currentTool.name === 'select'" @click="setTool('select')">
+                <cursor-default-click-icon />
             </Button>
         </EditorHead>
         <div ref="canvasWrapper" class="canvasWrapper" @contextmenu.prevent="setTool(null)">
@@ -24,9 +30,12 @@ import Button from "~client/components/Button";
 import UploadHint from "~client/components/UploadHint";
 import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
-import paper from "paper";
 import SceneObject from "~client/models/SceneObject";
 import FileModelExport from "~client/models/File";
+import PolyClickArea from "~client/lib/PolyClickArea";
+import Move from "~client/lib/Move";
+import Select from "~client/lib/Select";
+import paper from "paper";
 
 export default {
     components: {
@@ -47,13 +56,10 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: {},
             currentTool: null,
-            selectedItem: null,
-            background: null,
-            hitOptions: {
-                segments: true,
-                stroke: true,
-                fill: true,
-                tolerance: 5
+            toolMap: {
+                polyClickArea: PolyClickArea,
+                move: Move,
+                select: Select
             }
         };
     },
@@ -63,9 +69,7 @@ export default {
         } else this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
-        this.paper.settings.handleSize = 12;
-        this.paper.view.onMouseDrag = this.onMouseDrag.bind(this);
-        this.paper.view.onMouseDown = this.onMouseDown.bind(this);
+        this.paper.settings.handleSize = 10;
     },
     beforeDestroy() {
         if (this.watchedModel.hasChanges()) {
@@ -103,13 +107,6 @@ export default {
         },
 
         /**
-         * @param {import("paper")["MouseEvent"]} event
-         */
-        onMouseDrag(event) {
-            if (this.currentTool === "move") this.paper.view.translate(event.delta);
-        },
-
-        /**
          * @param {WheelEvent} event
          */
         onWheel(event) {
@@ -123,7 +120,8 @@ export default {
             if (this.background) this.background.remove();
             const raster = new this.paper.Raster(this.$refs.background, new this.paper.Point(0,0));
             raster.position = this.paper.view.center;
-            this.background = raster;
+            raster.sendToBack();
+            this.paper.view.background = raster;
             this.paper.view.draw();
         },
 
@@ -131,25 +129,12 @@ export default {
             this.watchedModel.save();
         },
 
-        onMouseDown(event) {
-            const hitResult = this.paper.project.hitTest(event.point, this.hitOptions);
-            if (!hitResult || this.currentTool || hitResult.item === this.background) return;
-            if (hitResult.type === "segment") {
-                // Add segment
-            } else if (hitResult.type === "stroke") {
-                // move stroke
-            } else {
-                // select item
-                hitResult.item.selected = true;
-                this.selectedItem = hitResult.item;
-            }
-        },
-
         setTool(toolName) {
             if (this.currentTool || typeof toolName === "string") {
-                let toolnameToSet = toolName;
-                if (this.currentTool === toolName) toolnameToSet = null;
-                this.currentTool = toolnameToSet;
+                let toolToSet = null;
+                if (toolName in this.toolMap && toolName !== this.currentTool?.name) toolToSet = new this.toolMap[toolName](this.paper);
+                if (this.currentTool) this.currentTool.remove();
+                this.currentTool = toolToSet;
             } else if (this.selectedItem) {
                 this.selectedItem.selected = false;
                 this.selectedItem = null;

@@ -36,6 +36,8 @@ import CrownIcon from "vue-material-design-icons/Crown";
 import ContentSaveIcon from "vue-material-design-icons/ContentSave";
 import CloseIcon from "vue-material-design-icons/Close";
 import HandLeftIcon from "vue-material-design-icons/HandLeft";
+import VectorPolygonIcon from "vue-material-design-icons/VectorPolygon";
+import CursorDefaultClickIcon from "vue-material-design-icons/CursorDefaultClick";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -71,3 +73,5 @@ Vue.component('crown-icon', CrownIcon);
 Vue.component('content-save-icon', ContentSaveIcon);
 Vue.component('close-icon', CloseIcon);
 Vue.component('hand-left-icon', HandLeftIcon);
+Vue.component('vector-polygon-icon', VectorPolygonIcon);
+Vue.component('cursor-default-click-icon', CursorDefaultClickIcon);
