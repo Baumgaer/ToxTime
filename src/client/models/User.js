@@ -5,6 +5,8 @@ import ClientModel from "~client/lib/ClientModel";
 const CommonClientUser = UserMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class User extends CommonClientUser {
 
+    activeEditor = null;
+
     @CommonClientUser.action("delete", { type: "component", name: "delete-icon" }, (instance) => instance !== window.activeUser)
     async delete() {
         const result = await ApiClient.delete(`/users/${this._id}`);

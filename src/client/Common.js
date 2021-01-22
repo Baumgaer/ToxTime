@@ -34,6 +34,8 @@ import FileDocumentIcon from "vue-material-design-icons/FileDocument";
 import CheckIcon from "vue-material-design-icons/Check";
 import CrownIcon from "vue-material-design-icons/Crown";
 import ContentSaveIcon from "vue-material-design-icons/ContentSave";
+import CloseIcon from "vue-material-design-icons/Close";
+import HandLeftIcon from "vue-material-design-icons/HandLeft";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -67,3 +69,5 @@ Vue.component('file-document-icon', FileDocumentIcon);
 Vue.component('check-icon', CheckIcon);
 Vue.component('crown-icon', CrownIcon);
 Vue.component('content-save-icon', ContentSaveIcon);
+Vue.component('close-icon', CloseIcon);
+Vue.component('hand-left-icon', HandLeftIcon);

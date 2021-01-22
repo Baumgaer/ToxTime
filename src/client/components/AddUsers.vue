@@ -1,13 +1,6 @@
 <template>
     <div class="addUsers">
-        <header>
-            <h2>{{ $t('addUsers') }}</h2>
-            <div class="buttons">
-                <Button ref="send" class="sendButton" name="addUsers" v-on:click="onSendButtonClick()" >
-                    <content-save-icon />
-                </Button>
-            </div>
-        </header>
+        <EditorHead name="addUsers" :onSaveButtonClick="onSendButtonClick.bind(this)" />
         <form class="form">
             <ProgressBar :model="progressModel" class="progressBar" />
             <!-- this head is used for the empty corner in the top left -->
@@ -59,6 +52,7 @@ import UploadHint from "~client/components/UploadHint";
 import ToggleSwitch from "~client/components/ToggleSwitch";
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
+import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
 import { csvToObject } from "~common/utils";
 import i18n from "~client/lib/i18n";
@@ -70,7 +64,8 @@ export default {
         ToggleSwitch,
         Button,
         UploadHint,
-        ProgressBar
+        ProgressBar,
+        EditorHead
     },
     data() {
         return {

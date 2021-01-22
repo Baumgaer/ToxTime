@@ -62,8 +62,8 @@
             </section>
         </section>
         <section class="editor">
-            <AddUsers ref="addUsers" v-show="activeEditor === 'addUsers'" />
-            <GraphicEditor v-if="['addScenes', 'addSceneObjects'].includes(activeEditor)" :type="activeEditor === 'addScenes' ? 'scene' : 'sceneObject'" />
+            <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
+            <GraphicEditor v-if="['addScenes', 'addSceneObjects'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor === 'addScenes' ? 'scene' : 'sceneObject'" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -93,8 +93,7 @@ export default {
             store: {},
             filesStore: {},
             category: "users",
-            itemsCollapsed: false,
-            activeEditor: null
+            itemsCollapsed: false
         };
     },
     computed: {
@@ -126,7 +125,7 @@ export default {
 
         onAddItemButtonClick() {
             if (this.category === "files") this.$refs.uploadHint.$refs.fileInput.click();
-            this.activeEditor = `add${capitalize(this.category)}`;
+            window.activeUser.activeEditor = `add${capitalize(this.category)}`;
         },
 
         onLogoutButtonClick() {
