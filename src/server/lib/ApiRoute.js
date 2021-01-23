@@ -73,10 +73,12 @@ export default class ApiRoute extends DefaultRoute {
      * @memberof ApiRoute
      */
     @ApiRoute.patch("/:id")
-    update(request) {
+    async update(request) {
         try {
             Object.assign(request.body, { lastModified: new Date() });
-            return this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body);
+            const result = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body).exec();
+            if (!result) return httpErrors.NotFound();
+            return { models: [result] };
         } catch (error) {
             return error;
         }
