@@ -31,7 +31,6 @@ export default class ClientModel extends BaseModel {
                     if (Object.hasOwnProperty.call(schema.paths, pathObject)) {
                         const element = schema.paths[pathObject];
                         if (element.options.default !== undefined) {
-                            console.log(pathObject, element);
                             this[pathObject] = element.options.default;
                         }
                     }
