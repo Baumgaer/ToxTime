@@ -1,5 +1,5 @@
 <template>
-    <section class="item" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)">
+    <section class="item" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
         <div class="avatar" v-if="hasAvatar">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name"></component>
@@ -9,7 +9,15 @@
         </div>
         <div class="info">
             <div class="name">
-                <input v-if="nameEditDBField" type="text" name="name" ref="nameInput" :value="model.getName() ? model.getName() : $t('unnamed')" @change="onNameChange($event)" />
+                <input
+                    v-if="nameEditDBField"
+                    type="text" name="name"
+                    ref="nameInput"
+                    :value="model.getName() ? model.getName() : $t('unnamed')"
+                    @change="onNameChange($event)"
+                    @mousedown="onMouseDown($event)"
+                    @mouseup="onMouseUp($event)"
+                />
                 <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
             </div>
             <div class="actions">
@@ -55,6 +63,16 @@ export default {
         }
     },
     methods: {
+        onMouseDown(event) {
+            event.stopPropagation();
+            this.$refs.itemRoot.setAttribute("draggable", "false");
+        },
+
+        onMouseUp(event) {
+            event.stopPropagation();
+            this.$refs.itemRoot.setAttribute("draggable", "true");
+        },
+
         /**
          * @param {DragEvent} event
          */
