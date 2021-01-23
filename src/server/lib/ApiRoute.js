@@ -78,7 +78,7 @@ export default class ApiRoute extends DefaultRoute {
             Object.assign(request.body, { lastModified: new Date() });
             const result = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body).exec();
             if (!result) return httpErrors.NotFound();
-            return { models: [result] };
+            return { models: [] };
         } catch (error) {
             return error;
         }

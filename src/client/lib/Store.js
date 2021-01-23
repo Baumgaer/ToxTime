@@ -148,8 +148,8 @@ export class Store {
 
     _installChangeObserver(model) {
         const that = this;
-        return onChange(model, function (path) {
-            if (!this.staging) return;
+        return onChange(model, function (path, value, prev, name) {
+            if ((value === undefined && prev === undefined && name === undefined) || !this.staging) return;
             const id = model._dummyId || model._id;
             if (that.hasModel(model) && that.getModelById(model.collection, id).__ob__) that.getModelById(model.collection, id).__ob__.dep.notify();
             const fieldName = path[0];
