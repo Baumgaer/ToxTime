@@ -53,6 +53,7 @@
                           :model="item"
                           :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
                           :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
+                          :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
                     />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
@@ -124,8 +125,11 @@ export default {
         },
 
         onAddItemButtonClick() {
-            if (this.category === "files") this.$refs.uploadHint.$refs.fileInput.click();
-            window.activeUser.activeEditor = `add${capitalize(this.category)}`;
+            window.activeUser.activeEditor = null;
+            setTimeout(() => {
+                if (this.category === "files") this.$refs.uploadHint.$refs.fileInput.click();
+                window.activeUser.activeEditor = `add${capitalize(this.category)}`;
+            });
         },
 
         onLogoutButtonClick() {

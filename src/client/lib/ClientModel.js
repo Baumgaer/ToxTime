@@ -1,13 +1,15 @@
 import BaseModel from "~common/lib/BaseModel";
+import ApiClient from "~client/lib/ApiClient";
 import onChange from "on-change";
 import { v4 as uuid } from "uuid";
-import ApiClient from "~client/lib/ApiClient";
 
 export default class ClientModel extends BaseModel {
 
     static className = "ClientModel";
 
     static collection = "clientModels";
+
+    staging = false;
 
     /**
      * Builds the essential export for client side with a RawClass, a Schema and the Model
@@ -23,11 +25,22 @@ export default class ClientModel extends BaseModel {
         const modelClass = class ModelClass extends RawClass {
             constructor(params = {}) {
                 super();
-                Object.assign(this, params, {
-                    collection: RawClass.collection,
-                    className: RawClass.className
-                });
+
+                // Assign defaults
+                for (const pathObject in schema.paths) {
+                    if (Object.hasOwnProperty.call(schema.paths, pathObject)) {
+                        const element = schema.paths[pathObject];
+                        if (element.options.default !== undefined) {
+                            console.log(pathObject, element);
+                            this[pathObject] = element.options.default;
+                        }
+                    }
+                }
+
+                // Assign given values
+                Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
                 if (!params._id) this._dummyId = uuid();
+                this.staging = true;
             }
         };
         return { RawClass, Schema: schema, Model: modelClass, isClientModel: true };
@@ -70,6 +83,13 @@ export default class ClientModel extends BaseModel {
             additionalHeaders = { "X-DUMMY-MODEL-ID": this._dummyId };
             method = ApiClient.post.bind(ApiClient);
         }
-        return method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data, additionalHeaders);
+
+        const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data, additionalHeaders);
+
+        if (result.data.models.some((model) => !(model instanceof Error))) {
+            // Toast Error
+        } else Reflect.defineMetadata("stagedChanges", {}, that);
+
+        return result;
     }
 }

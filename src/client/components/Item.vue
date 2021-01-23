@@ -8,7 +8,10 @@
             </div>
         </div>
         <div class="info">
-            <div class="name"><strong>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong></div>
+            <div class="name">
+                <input v-if="nameEditDBField" type="text" name="name" ref="nameInput" :value="model.getName() ? model.getName() : $t('unnamed')" @change="onNameChange($event)" />
+                <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
+            </div>
             <div class="actions">
                 <div v-for="action of model.actions" :key="`${model._id || model._dummyId}${action.name}`" class="action">
                     <Button  v-if="action.symbol.type === 'component' && action.condition" class="action" :name="action.name" :showLabel="false" @click="action.func()">
@@ -36,6 +39,7 @@ export default {
             type: Object,
             required: true
         },
+        nameEditDBField: String,
         overlayIcons: String
     },
     computed: {
@@ -62,6 +66,15 @@ export default {
 
         onDragEnd() {
             ApiClient.store.collection("localStorage").isInternalDnD = false;
+        },
+
+        /**
+         * @param {Event} event
+         */
+        onNameChange(event) {
+            if (!this.nameEditDBField) return;
+            this.model[this.nameEditDBField] = event.target.value;
+            this.model.save();
         }
     }
 };

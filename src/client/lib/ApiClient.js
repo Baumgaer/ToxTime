@@ -71,6 +71,8 @@ export default class ApiClient {
                 delete rawError.properties;
                 const error = new Error();
                 Object.assign(error, rawError);
+                error.name = `${error.name}${capitalize(error.path)}${capitalize(error.kind)}`;
+                window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
                 mapping.data.models.push(error);
             }
         }
@@ -106,9 +108,7 @@ export default class ApiClient {
             if (model.errors) {
                 const errorMap = {};
                 this.handleDatabaseError(model, errorMap);
-                const errorModel = errorMap.data.models[0];
-                errorModel.name = `${errorModel.name}${capitalize(errorModel.path)}${capitalize(errorModel.kind)}`;
-                mapping.data.models.push(errorModel);
+                mapping.data.models.push(errorMap.data.models[0]);
                 continue;
             }
             if (!model.className) continue;

@@ -138,7 +138,7 @@ export function dbEnvironmentFilter(environmentExport) {
  * @returns {boolean}
  */
 export function isProxy(value) {
-    if (isUndefined(value) || isNull(value)) return false;
+    if (!isValue(value)) return false;
     if (onChange.target(value) === value) return false;
     return true;
 }
@@ -168,4 +168,26 @@ export function getPrototypeNamesRecursive(object) {
 
     getThem(object);
     return prototypes;
+}
+
+/**
+ * Checks if a given value is not null and not undefined
+ *
+ * @template T
+ * @param value the value to check if it is a real value
+ * @returns true if value has another value than undefined or null and false else
+ */
+export function isValue(value) {
+    return !isUndefined(value) && !isNull(value);
+}
+
+/**
+ * Checks if the value is a wrapper version of a primitive
+ *
+ * @param value The value to check for primitive wrapper
+ * @returns true if it is a primitive wrapper and false else
+ */
+export function isPrimitiveWrapper(value) {
+    if (!isValue(value)) return false;
+    return [String, Number, Boolean, Symbol].includes(value);
 }

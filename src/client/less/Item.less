@@ -66,6 +66,26 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+
+            input {
+                width: calc(100% - 10px);
+                background-color: transparent;
+                border: none;
+                color: var(--white-color, @white);
+                font-weight: bold;
+                font-size: 16px;
+
+                &:hover {
+                    background-color: var(--white-color, fade(@white, 30%));
+                }
+
+                &:focus {
+                    user-select: none;
+                    outline: none;
+                    background-color: var(--white-color, @white);
+                    color: var(--black-color, @black);
+                }
+            }
         }
 
         .action {
