@@ -5,8 +5,8 @@ import ClientModel from "~client/lib/ClientModel";
 const CommonClientFile = FileMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class File extends CommonClientFile {
 
-    /** @type {XMLHttpRequest} */
-    _xhr = new XMLHttpRequest();
+    /** @type {XMLHttpRequest | null} */
+    _xhr = null;
     loadingStatus = 0;
     formData = new FormData();
 
@@ -39,6 +39,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
         if (this._id) return super.save();
         return new Promise((resolve) => {
             this.loadingStatus = -1;
+            this._xhr = new XMLHttpRequest();
             this._xhr.open("POST", "/files", true);
             this._xhr.setRequestHeader("X-DUMMY-MODEL-ID", this._dummyId);
             this._xhr.upload.addEventListener("progress", (event) => {

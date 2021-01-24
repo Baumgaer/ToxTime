@@ -33,12 +33,12 @@ export default class BaseModel {
         creationDate: {
             type: Date,
             required: true,
-            default: new Date()
+            default: Date
         },
         lastModifiedDate: {
             type: Date,
             required: true,
-            default: new Date()
+            default: Date
         }
     };
 

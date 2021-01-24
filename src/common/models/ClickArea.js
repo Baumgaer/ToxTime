@@ -15,8 +15,7 @@ export function ClickAreaMixinClass(MixinClass) {
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
-                unique: true,
-                default: `ClickArea ${new Date().toLocaleString()}`
+                default: `ClickArea`
             },
             shape: {
                 type: [

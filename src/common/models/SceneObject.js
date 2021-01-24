@@ -17,8 +17,7 @@ export function SceneObjectMixinClass(MixinClass) {
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
-                unique: true,
-                default: `SceneObject ${new Date().toLocaleString()}`
+                default: `SceneObject`
             },
             file: {
                 type: Schema.Types.ObjectId,

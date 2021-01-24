@@ -60,7 +60,6 @@ export function getAllFuncs(toCheck) {
 export function dataTransformer(doc, ret, modelClass) {
     ret.className = modelClass.className;
     ret.collection = modelClass.collection;
-    console.log(doc._id);
 }
 
 /**
