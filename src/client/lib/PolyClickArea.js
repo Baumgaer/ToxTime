@@ -1,22 +1,12 @@
-export default class PolyClickArea {
+import Tool from "~client/lib/Tool";
+import ClickAreaClientExport from "~client/models/ClickArea";
+
+export default class PolyClickArea extends Tool {
 
     name = "polyClickArea";
 
-    /** @type {import("paper")} */
-    paper = null;
-
-    /** @type {InstanceType<import("paper")["Tool"]>} */
-    tool = null;
-
     /** @type {InstanceType<import("paper")["Path"]>} */
     path = null;
-
-    constructor(paper) {
-        this.paper = paper;
-        this.tool = new paper.Tool();
-        this.tool.onMouseDown = this.onMouseDown.bind(this);
-        this.tool.onMouseMove = this.onMouseMove.bind(this);
-    }
 
     /**
      * @inheritdoc
@@ -24,7 +14,7 @@ export default class PolyClickArea {
      * @param {import("paper")["ToolEvent"]} event
      * @memberof PolyClickArea
      */
-    onMouseDown(event) {
+    onToolMouseDown(event) {
         if (event.event.button !== 0) return;
         if (!this.path) {
             this.path = new this.paper.Path();
@@ -43,13 +33,21 @@ export default class PolyClickArea {
      * @param {import("paper")["ToolEvent"]} event
      * @memberof PolyClickArea
      */
-    onMouseMove(event) {
-        if (!this.path) return this.onMouseDown(event);
+    onToolMouseMove(event) {
+        if (!this.path) return this.onToolMouseDown(event);
         this.path.lastSegment.point = event.point;
     }
 
     remove() {
+        super.remove();
+        if (!this.path) return;
         this.path.removeSegment(this.path.lastSegment.index);
-        this.tool.remove();
+        if (this.path.segments.length >= 3) {
+            const clickArea = new ClickAreaClientExport.Model({
+                shape: this.path.segments.map((segment) => [segment.point.x, segment.point.y])
+            });
+            this.model.clickAreas.push(clickArea);
+            this.path.model = clickArea;
+        } else this.path.remove();
     }
 }

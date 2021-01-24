@@ -1,5 +1,3 @@
-// import { Schema } from "mongoose";
-
 /**
  * Creates a new class with the returned class extended by the MixinClass
  *
@@ -21,8 +19,11 @@ export function ClickAreaMixinClass(MixinClass) {
                 default: `ClickArea ${new Date().toLocaleString()}`
             },
             shape: {
-                type: String,
-                required: true
+                type: [
+                    [Number]
+                ],
+                required: true,
+                default: []
             }
         };
 

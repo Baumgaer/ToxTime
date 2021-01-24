@@ -28,7 +28,8 @@ export function SceneObjectMixinClass(MixinClass) {
             clickAreas: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "ClickArea" }
-                ]
+                ],
+                default: []
             }
         };
 

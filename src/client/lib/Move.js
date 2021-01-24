@@ -1,24 +1,8 @@
-export default class Move {
+import Tool from "~client/lib/Tool";
+
+export default class Move extends Tool {
 
     name = "move";
-
-    /** @type {import("paper")} */
-    paper = null;
-
-    /** @type {import("paper")["view"]["onMouseDrag"]} */
-    originalOnMouseDrag = null;
-
-    /**
-     * Creates an instance of Move.
-     *
-     * @param {import("paper")} paper
-     * @memberof Move
-     */
-    constructor(paper) {
-        this.paper = paper;
-        this.originalOnMouseDrag = paper.view.onMouseDrag;
-        paper.view.onMouseDrag = this.onMouseDrag.bind(this);
-    }
 
     /**
      * Translates the whole view with the current mouse position
@@ -26,12 +10,8 @@ export default class Move {
      * @param {import("paper")["MouseEvent"]} event
      * @memberof Move
      */
-    onMouseDrag(event) {
-        console.log(event.target);
+    onPaperMouseDrag(event) {
         this.paper.view.translate(event.delta);
     }
 
-    remove() {
-        this.paper.view.onMouseDrag = this.originalOnMouseDrag;
-    }
 }

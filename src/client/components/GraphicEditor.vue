@@ -132,7 +132,7 @@ export default {
         setTool(toolName) {
             if (this.currentTool || typeof toolName === "string") {
                 let toolToSet = null;
-                if (toolName in this.toolMap && toolName !== this.currentTool?.name) toolToSet = new this.toolMap[toolName](this.paper);
+                if (toolName in this.toolMap && toolName !== this.currentTool?.name) toolToSet = new this.toolMap[toolName](this.paper, this.watchedModel);
                 if (this.currentTool) this.currentTool.remove();
                 this.currentTool = toolToSet;
             } else if (this.selectedItem) {
