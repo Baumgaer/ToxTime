@@ -57,7 +57,7 @@ export default class ApiRoute extends DefaultRoute {
         try {
             Object.assign(request.body, { creator: request.user._id });
             const model = await this.claimedExport.Model.create(request.body);
-            const dummyModelId = request.header("X-DUMMY-MODEL-ID");
+            const dummyModelId = request.header("X-DUMMY-MODEL-ID") || request.body._dummyId;
             const modelObject = Object.assign({}, model.toObject(), { _dummyId: dummyModelId || "" });
             return { models: [modelObject] };
         } catch (error) {

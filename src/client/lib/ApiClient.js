@@ -1,6 +1,6 @@
 import validator from "validator";
 import httpErrors from "http-errors";
-import { stripHTML } from "string-strip-html";
+import { stripHtml } from "string-strip-html";
 import { capitalize } from "~common/utils";
 
 import { Store } from "~client/lib/Store";
@@ -85,7 +85,7 @@ export default class ApiClient {
             if (response.headers.get("Content-Type").includes("application/json")) {
                 result = await response.json();
             } else {
-                result = stripHTML(await response.text()).result;
+                result = stripHtml(await response.text()).result;
                 matches = result.match(/:(.*?)at/);
             }
             mapping.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;

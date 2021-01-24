@@ -2,7 +2,7 @@ import { createTransport, createTestAccount } from "nodemailer";
 import { writeFileSync, readFileSync, existsSync } from "graceful-fs";
 import path from "path";
 import { path as rootPath } from "app-root-path";
-import stripHTML from "string-strip-html";
+import { stripHtml } from "string-strip-html";
 
 /**
  * @typedef {Object} locales
@@ -109,7 +109,7 @@ export default class EmailTransporter {
             from: params.from,
             to: params.to,
             subject: request.t(params.subject, locales),
-            text: stripHTML(content).result,
+            text: stripHtml(content).result,
             html: content
         });
     }
