@@ -127,6 +127,7 @@ export default class WebServer {
         try {
             await mongoose.connect(this.databaseURI, this.dbSettings);
             mongoose.set('useCreateIndex', true);
+            mongoose.set('useFindAndModify', false);
             console.info("2.1.1 Database connection established");
         } catch (error) {
             console.error(`2.1.1 Could not connect to database. Reason: ${error}`);

@@ -1,6 +1,6 @@
 import validator from "validator";
 import httpErrors from "http-errors";
-import stripHTML from "string-strip-html";
+import { stripHTML } from "string-strip-html";
 import { capitalize } from "~common/utils";
 
 import { Store } from "~client/lib/Store";
