@@ -46,6 +46,7 @@ export default class Tool {
                 this.tool[key] = this[`onTool${eventFuncName}`].bind(this);
             }
         }
+        this.tool.activate();
     }
 
     // Just some dummy functions

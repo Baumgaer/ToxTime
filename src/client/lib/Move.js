@@ -10,7 +10,7 @@ export default class Move extends Tool {
      * @param {import("paper")["MouseEvent"]} event
      * @memberof Move
      */
-    onPaperMouseDrag(event) {
+    onToolMouseDrag(event) {
         this.paper.view.translate(event.delta);
     }
 
