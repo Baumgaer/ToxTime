@@ -60,30 +60,49 @@ export default class ClientModel extends BaseModel {
         ApiClient.store.removeModel(this);
     }
 
+    toObject() {
+        const that = onChange.target(this);
+        const schema = ClientModel.buildSchema(Object.getPrototypeOf(that).constructor);
+
+        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
+        let changes = Reflect.getMetadata("stagedChanges", that);
+        if (!Object.keys(changes).length && that._dummyId) changes = schema.obj;
+
+        const data = {};
+        for (const key in changes) {
+            if (key in schema.obj) {
+                let value = that[key];
+                if (value instanceof ClientModel) value = value.toObject();
+                if (value instanceof Array) {
+                    const arrayValue = [];
+                    for (const entry of onChange.target(value)) {
+                        if (entry instanceof ClientModel) {
+                            arrayValue.push(entry.toObject());
+                        } else arrayValue.push(entry);
+                    }
+                    value = arrayValue;
+                }
+                data[key] = value;
+            }
+        }
+        if (that._dummyId) data._dummyId = that._dummyId;
+        return Object.keys(data).length ? data : that._id;
+    }
+
+    toJson() {
+        return JSON.stringify(this.toObject());
+    }
+
     async save() {
         const that = onChange.target(this);
-        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
-        const stagedChanges = Reflect.getMetadata("stagedChanges", that);
-        let additionalHeaders, data, method;
-        if (that._id) {
-            additionalHeaders = {};
-            data = {};
-            method = ApiClient.patch.bind(ApiClient);
-            for (const key in stagedChanges) {
-                if (Object.hasOwnProperty.call(that, key)) {
-                    const value = that[key];
-                    data[key] = value;
-                }
-            }
-        } else {
-            data = {};
-            const schema = Object.getPrototypeOf(this).constructor.schema;
-            for (const key in schema) if (Object.hasOwnProperty.call(schema, key)) data[key] = that[key];
-            additionalHeaders = { "X-DUMMY-MODEL-ID": this._dummyId };
-            method = ApiClient.post.bind(ApiClient);
-        }
+        const data = that.toObject();
+        let method;
 
-        const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data, additionalHeaders);
+        if (that._id) {
+            method = ApiClient.patch.bind(ApiClient);
+        } else method = ApiClient.post.bind(ApiClient);
+
+        const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data);
 
         if (!result.data.models.some((model) => model instanceof Error)) {
             Reflect.defineMetadata("stagedChanges", {}, that);

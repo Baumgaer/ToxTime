@@ -53,13 +53,14 @@ export function getAllFuncs(toCheck) {
  * Handles transformation of data of the database
  *
  * @export
- * @param {any} doc The database document
- * @param {any} ret The pre passed value which will be returned
- * @param {any} modelClass The model class (NOT INSTANCE!) which is dependant
+ * @param {InstanceType<import("mongoose")["Document"]>} doc The database document
+ * @param {Record<string, any>} ret The pre passed value which will be returned
+ * @param {typeof import("~common/lib/BaseModel").default} modelClass The model class (NOT INSTANCE!) which is dependant
  */
 export function dataTransformer(doc, ret, modelClass) {
     ret.className = modelClass.className;
     ret.collection = modelClass.collection;
+    console.log(doc._id);
 }
 
 /**
