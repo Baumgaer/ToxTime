@@ -20,7 +20,7 @@ export default class Select extends Tool {
      * @param {import("paper")["MouseEvent"]} event
      * @memberof Select
      */
-    onPaperMouseDown(event) {
+    onToolMouseDown(event) {
         const hitResult = this.paper.project.hitTest(event.point, this.hitOptions);
         if (!hitResult || hitResult.item === this.paper.view.background) return;
         if (hitResult.item === this.selection?.item) {
@@ -42,7 +42,7 @@ export default class Select extends Tool {
      * @param {import("paper")["MouseEvent"]} event
      * @memberof Select
      */
-    onPaperMouseDrag(event) {
+    onToolMouseDrag(event) {
         if (!this.selection) return;
         const hitResult = this.paper.project.hitTest(event.point, this.hitOptions);
         if (hitResult.item !== this.selection.item) return;
@@ -61,7 +61,7 @@ export default class Select extends Tool {
      * @param {import("paper")["KeyEvent"]} event
      * @memberof Select
      */
-    onPaperKeyDown(event) {
+    onToolKeyDown(event) {
         if (event.key !== "delete" || !this.selection) return;
         this.selection.item.remove();
         this.selection = null;

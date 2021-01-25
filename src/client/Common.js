@@ -4,6 +4,8 @@ import ApiClient from "~client/lib/ApiClient";
 import "~client/less/common.less";
 import Toasted from 'vue-toasted';
 
+window._store = ApiClient.store;
+
 Vue.use(Toasted, {
     duration: 5000
 });

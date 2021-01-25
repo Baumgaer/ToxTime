@@ -2,10 +2,10 @@
     <header>
         <h2>{{ $t(name) }}</h2>
         <div class="buttons">
-            <Button ref="send" class="close" name="close" :showLabel="false" v-on:click="onCloseButtonClick()" >
+            <Button class="close" name="close" :showLabel="false" v-on:click="onCloseButtonClick()" >
                 <close-icon />
             </Button>
-            <Button ref="send" class="save" :name="name" :showLabel="false" v-on:click="onSaveButtonClick()" >
+            <Button class="save" name="save" :showLabel="false" v-on:click="onSaveButtonClick()" >
                 <content-save-icon />
             </Button>
             <slot></slot>
@@ -29,8 +29,14 @@ export default {
             required: true
         }
     },
+    data() {
+        return {
+            closeButtonClicked: false
+        };
+    },
     methods: {
         onCloseButtonClick() {
+            this.closeButtonClicked = true;
             window.activeUser.activeEditor = null;
         }
     }

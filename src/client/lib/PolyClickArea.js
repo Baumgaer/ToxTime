@@ -1,5 +1,6 @@
 import Tool from "~client/lib/Tool";
 import ClickAreaClientExport from "~client/models/ClickArea";
+import { Store } from "~client/lib/Store";
 
 export default class PolyClickArea extends Tool {
 
@@ -43,9 +44,11 @@ export default class PolyClickArea extends Tool {
         if (!this.path) return;
         this.path.removeSegment(this.path.lastSegment.index);
         if (this.path.segments.length >= 3) {
+            const store = Store.getInstance();
             const clickArea = new ClickAreaClientExport.Model({
                 shape: this.path.segments.map((segment) => [segment.point.x, segment.point.y])
             });
+            store.addModel(clickArea);
             this.model.clickAreas.push(clickArea);
             this.path.model = clickArea;
         } else this.path.remove();

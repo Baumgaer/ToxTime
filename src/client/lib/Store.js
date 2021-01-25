@@ -156,7 +156,7 @@ export class Store {
             if (!Object.getPrototypeOf(this).constructor.schema[fieldName]) return;
             if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
             const stagedChanges = Reflect.getMetadata("stagedChanges", model);
-            stagedChanges[fieldName] = true;
+            if (!stagedChanges[fieldName]) stagedChanges[fieldName] = prev;
 
         }, { pathAsArray: true, ignoreUnderscores: true, equals: lodash.isEqual });
     }

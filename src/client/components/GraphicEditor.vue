@@ -1,6 +1,6 @@
 <template>
     <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
-        <EditorHead :name="`add${type.charAt(0).toUpperCase() + type.slice(1)}`" :onSaveButtonClick="onSaveButtonClick.bind(this)" >
+        <EditorHead ref="editorHead" :name="`add${type.charAt(0).toUpperCase() + type.slice(1)}`" :onSaveButtonClick="onSaveButtonClick.bind(this)" >
             <Button name="move" :showLabel="false" :active="currentTool && currentTool.name === 'move'" @click="setTool('move')">
                 <hand-left-icon />
             </Button>
@@ -72,11 +72,14 @@ export default {
         this.paper.settings.handleSize = 10;
     },
     beforeDestroy() {
-        if (this.watchedModel.hasChanges()) {
+        if (!this.$refs.editorHead.closeButtonClicked && this.watchedModel.hasChanges()) {
             this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
             this.watchedModel.save();
         } else if (!this.model) {
             this.watchedModel.destroy();
+            this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
+        } else if (this.$refs.editorHead.closeButtonClicked) {
+            this.watchedModel.discard();
             this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
         }
     },

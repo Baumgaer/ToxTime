@@ -57,7 +57,26 @@ export default class ClientModel extends BaseModel {
     }
 
     destroy() {
-        ApiClient.store.removeModel(this);
+        const that = onChange.target(this);
+        ApiClient.store.removeModel(that);
+        for (const key in that) {
+            if (Object.hasOwnProperty.call(that, key)) {
+                const element = onChange.target(that[key]);
+                if (element instanceof ClientModel && !element._id) element.destroy();
+                if (element instanceof Array) {
+                    for (const subElement of element) {
+                        if (subElement instanceof ClientModel && !subElement._id) subElement.destroy();
+                    }
+                }
+            }
+        }
+    }
+
+    discard() {
+        const that = onChange.target(this);
+        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
+        let changes = Reflect.getMetadata("stagedChanges", that);
+        console.log(changes);
     }
 
     toObject() {
