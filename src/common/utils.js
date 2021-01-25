@@ -1,4 +1,5 @@
 import { isUndefined, isNull } from "lodash";
+import { isMongoId as validatorIsMongoId } from "validator";
 import onChange from "on-change";
 
 /**
@@ -190,4 +191,17 @@ export function isValue(value) {
 export function isPrimitiveWrapper(value) {
     if (!isValue(value)) return false;
     return [String, Number, Boolean, Symbol].includes(value);
+}
+
+/**
+ * Checks if a given value is a mongo id format. Will also check if it is a string
+ * or not (what the original function does not...).
+ *
+ * @export
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isMongoId(value) {
+    if (typeof value !== "string") return false;
+    return validatorIsMongoId(value);
 }

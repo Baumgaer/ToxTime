@@ -6,7 +6,7 @@ import lodash from "lodash";
 import CustomError from "~common/lib/CustomError";
 import { getPrototypeNamesRecursive } from "~common/utils";
 
-const globalRoutes = {};
+export const registeredRoutes = {};
 
 /**
  * @typedef {Object} RouteOptions
@@ -161,14 +161,14 @@ export default class DefaultRoute {
      */
     static _registerRoute(target, handlerName, options, method, path, middlewares) {
         const handler = target[handlerName];
-        if (!globalRoutes[target.constructor.name]) globalRoutes[target.constructor.name] = {};
-        lodash.merge(globalRoutes[target.constructor.name], { [path]: { [method.toLowerCase()]: { handler, options, middlewares } } });
+        if (!registeredRoutes[target.constructor.name]) registeredRoutes[target.constructor.name] = {};
+        lodash.merge(registeredRoutes[target.constructor.name], { [path]: { [method.toLowerCase()]: { handler, options, middlewares } } });
     }
 
     get routes() {
-        const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in globalRoutes);
+        const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in registeredRoutes);
         const routes = {};
-        for (const prototypeName of prototypeNames) lodash.merge(routes, globalRoutes[prototypeName]);
+        for (const prototypeName of prototypeNames) lodash.merge(routes, registeredRoutes[prototypeName]);
         return routes;
     }
 

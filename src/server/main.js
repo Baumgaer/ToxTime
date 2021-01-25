@@ -29,6 +29,7 @@ import SystemUser from "~server/models/SystemUser";
 import EmailTransporter from "~server/lib/EmailTransporter";
 import { toURIPathPart } from "~common/utils";
 import Users from "~server/routes/Users";
+import ApiRoute from "~server/lib/ApiRoute";
 
 // @ts-ignore
 import nunjucksConfig from "./../../nunjucks.config";
@@ -39,6 +40,8 @@ import nunjucksConfig from "./../../nunjucks.config";
  * @class WebServer
  */
 export default class WebServer {
+
+    modelApiMapping = {};
 
     constructor() {
         console.info("1. Setting up server");
@@ -231,6 +234,10 @@ export default class WebServer {
             const clRoute = new route(this, this.templateEnvironment);
             const namespace = clRoute.namespace || "/" + route.name.toLowerCase();
             const router = Router();
+
+            if (clRoute instanceof ApiRoute) {
+                this.modelApiMapping[clRoute.claimedExport.RawClass.className] = clRoute;
+            }
 
             /** @type {import("~server/lib/DefaultRoute").RouteCollection} */
             const registeredRoutes = clRoute.routes;

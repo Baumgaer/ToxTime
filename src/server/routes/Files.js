@@ -54,7 +54,7 @@ export default class Files extends ApiRoute {
                 if (fs.existsSync(filePath)) return httpErrors.Conflict();
                 try {
                     await file.mv(filePath);
-                    request.body = { name: file.name, mime: file.mimetype, fileName: fileName, size: file.size, uploader: request.user._id };
+                    request.body = { name: file.name, mime: file.mimetype, fileName: fileName, size: file.size, _dummyId: request.header("X-DUMMY-MODEL-ID") };
                     const result = await super.create(request);
                     if (result instanceof Error) {
                         try {

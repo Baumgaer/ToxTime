@@ -1,25 +1,15 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import CustomError from "~common/lib/CustomError";
-import httpErrors from "http-errors";
-import { isMongoId } from "validator";
-import { isArray } from "lodash";
+import { isMongoId } from "~common/utils";
 
-/** @type {Record<string, ReturnType<import("~server/lib/ServerModel")["default"]["buildServerExport"]>>} */
-const modelExportMap = {};
+import httpErrors from "http-errors";
+import { isArray, merge, isPlainObject } from "lodash";
+
 export default class ApiRoute extends DefaultRoute {
 
     /** @type {ReturnType<typeof import("~server/lib/ServerModel")["default"]["buildServerExport"]>} */
     claimedExport = null;
 
-    constructor() {
-        super();
-        const modelContext = require.context("~server/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
-        modelContext.keys().forEach((key) => {
-            /** @type {ReturnType<import("~server/lib/ServerModel")["default"]["buildServerExport"]>} */
-            const modelExport = modelContext(key).default;
-            modelExportMap[modelExport.Model.className] = modelExport;
-        });
-    }
     /**
      * collects all users and returns them in a list.
      *
@@ -58,7 +48,11 @@ export default class ApiRoute extends DefaultRoute {
     }
 
     /**
-     * Sends the initial file when logged in.
+     * creates a model depending on the claimed export model with the given
+     * request body properties. The body will be cloned to be able to reflect
+     * all given properties to the client (especially the dummyId). The creator
+     * will also be assigned because every model is created by someone and it is
+     * not possible to assign request.user as default in mongoose schema.
      *
      * @param {import("express").Request} request the request
      * @returns {string}
@@ -66,115 +60,104 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.post("/")
     async create(request) {
+        if (!isPlainObject(request.body)) return httpErrors.NotAcceptable();
+        if (!("_dummyId" in request.body)) return httpErrors.BadRequest();
+
+        // Create a response body to reflect untouched properties (e.g. _dummyId)
+        let responseBody = {};
         try {
-            return await this.createRecursive(request, this.claimedExport.Model.className, request.body, {}, true);
+            responseBody = JSON.parse(JSON.stringify(request.body));
+        } catch (error) {
+            return error;
+        }
+
+        try {
+            const myRequestBody = await this.createChildModels(request);
+            if (myRequestBody instanceof Error) return myRequestBody;
+            Object.assign(myRequestBody, { creator: request.user._id });
+            const model = await this.claimedExport.Model.create(myRequestBody);
+            const modelObject = merge(responseBody, model.toObject());
+            return { models: [modelObject] };
         } catch (error) {
             return error;
         }
     }
 
     /**
-     * Creates all model references recursive, when a new model should be created
+     * Searches for references in the schema and request body and transforms all
+     * appearing model objects in the request body to modelIds by creating this models.
+     * In case any creation failed, all created models will be destroyed recursively
+     * and the error is returned.
      *
-     * @param {import("express").Request} request the request
-     * @param {string} modelName The name of the current model
-     * @param {Record<string, any>} modelBody The raw data of the model
-     * @param {Record<string, any>} returnBody TThe body which will be returned to the client
-     * @param {boolean} returnTheReturnBody Wether the returnBody should be returned or the original result
-     * @returns {string}
+     * @param {import("express").Request} request
+     * @returns {import("express").Request["body"] | Error}
      * @memberof ApiRoute
      */
-    async createRecursive(request, modelName, modelBody, returnBody = {}, returnTheReturnBody = false) {
-        console.log("processing model", modelName);
-        const schemaObject = modelExportMap[modelName].Schema.obj;
-        for (const key in schemaObject) {
-            if (key in modelBody) {
-                console.log("processing key", key);
-                if (schemaObject[key].ref) {
-                    // If this is already a mongo id, we don't have to process an "object"
-                    if (typeof modelBody[key] === "string" && isMongoId(modelBody[key])) continue;
-                    console.log(key, "is model reference");
+    async createChildModels(request) {
+        const createdModels = [];
+        const schemaObj = this.claimedExport.Schema.obj;
+        const modelApiMapping = this.webServer.modelApiMapping;
 
-                    // prepare empty return body fur sub model which will be returned to client
-                    const subReturnBody = {};
-                    returnBody[key] = subReturnBody;
+        // Clone the body to ensure that other api routes does not manipulate this
+        let myRequestBody = {};
+        try {
+            myRequestBody = JSON.parse(JSON.stringify(request.body));
+        } catch (error) {
+            return error;
+        }
 
-                    let result;
-                    try {
-                        result = await this.createRecursive(request, schemaObject[key].ref, modelBody[key], subReturnBody);
-                    } catch (error) {
-                        console.error(error);
-                        return error;
+        for (const key in schemaObj) {
+            if (!(key in myRequestBody)) continue;
+
+            if (schemaObj[key].ref in modelApiMapping && !isMongoId(myRequestBody[key])) {
+                request.body = myRequestBody[key];
+                try {
+                    const result = await modelApiMapping[schemaObj[key].ref].create(request);
+                    if (result instanceof Error) {
+                        this.revertModelCreation(createdModels);
+                        return result;
                     }
-
-                    console.log("continuing with model", modelName, "after model reference");
-                    // Set the ID for model reference to be able to create the parent model
-                    modelBody[key] = result.models[0]._id;
+                    myRequestBody[key] = result.models[0]._id;
+                    createdModels.push(result.models[0]);
+                } catch (error) {
+                    this.revertModelCreation(createdModels);
+                    return error;
                 }
-                if (isArray(schemaObject[key].type) && schemaObject[key].type[0].ref && isArray(modelBody[key])) {
-                    console.log(key, "is array model reference");
-                    for (const [index, subModelBody] of Object.entries(modelBody[key])) {
+            }
 
-                        // prepare empty return body fur sub model which will be returned to client
-                        const subReturnBody = {};
-                        if (!returnBody[key]) returnBody[key] = [];
-                        returnBody[key][index] = subReturnBody;
-
-                        console.log("LALALALA");
-
-                        // If this is already a mongo id, we don't have to process an "object"
-                        // but we need to insert the ID to hold the index and structure of the update response
-                        if (typeof modelBody[key] === "string" && isMongoId(subModelBody)) {
-                            returnBody[key][index] = subModelBody;
-                            continue;
+            if (isArray(schemaObj[key].type) && schemaObj[key].type[0].ref in modelApiMapping && isArray(myRequestBody[key])) {
+                for (const [index, childModel] of Object.entries(myRequestBody[key])) {
+                    if (isMongoId(childModel)) continue;
+                    request.body = childModel;
+                    try {
+                        const result = await modelApiMapping[schemaObj[key].type[0].ref].create(request);
+                        if (result instanceof Error) {
+                            this.revertModelCreation(createdModels);
+                            return result;
                         }
-
-                        console.log("processing index", index);
-
-                        let result;
-                        try {
-                            result = await this.createRecursive(request, schemaObject[key].type[0].ref, subModelBody, subReturnBody);
-                        } catch (error) {
-                            console.error(error);
-                            return error;
-                        }
-
-                        console.log("continuing with model", modelName, "after model array reference");
-
-                        // Set the ID for model reference to be able to create the parent model
-                        modelBody[key][index] = result.models[0]._id;
+                        myRequestBody[key][index] = result.models[0]._id;
+                        createdModels.push(result.models[0]);
+                    } catch (error) {
+                        this.revertModelCreation(createdModels);
+                        return error;
                     }
                 }
             }
         }
 
-        console.log("creating model", modelName);
-        const result = await this.doCreate(request, modelName, modelBody);
-        console.log("result", result);
-        if (!returnTheReturnBody) {
-            if (!(result instanceof Error)) Object.assign(returnBody, result.models[0]);
-            return result;
-        }
-        if (!(result instanceof Error)) Object.assign(result.models[0], returnBody);
-        return result;
+        return myRequestBody;
     }
 
     /**
-     * Sends the initial file when logged in.
+     * Reverts the creation of models in case of an error
      *
-     * @param {import("express").Request} request the request
-     * @returns {string}
+     * @param {import("mongoose").Document[]} models
      * @memberof ApiRoute
      */
-    async doCreate(request, modelName, body) {
-        try {
-            Object.assign(body, { creator: request.user._id });
-            const model = await modelExportMap[modelName].Model.create(body);
-            const modelObject = Object.assign({}, model.toObject(), { _dummyId: body._dummyId || request.header("X-DUMMY-MODEL-ID") });
-            return { models: [modelObject] };
-        } catch (error) {
-            return error;
-        }
+    async revertModelCreation(models) {
+        const promises = [];
+        for (const model of models) promises.push(model.delete().exec());
+        return Promise.all(promises);
     }
 
     /**
@@ -186,6 +169,8 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.patch("/:id")
     async update(request) {
+        if (!isPlainObject(request.body)) return httpErrors.NotAcceptable();
+
         try {
             Object.assign(request.body, { lastModified: new Date() });
             const result = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body).exec();
