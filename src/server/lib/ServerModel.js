@@ -1,5 +1,6 @@
 import BaseModel, { mongooseBaseModels } from "~common/lib/BaseModel";
 import mongoose from "mongoose";
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
 export default class ServerModel extends BaseModel {
 
@@ -20,6 +21,7 @@ export default class ServerModel extends BaseModel {
     static buildServerExport(RawClass, plugins = []) {
         const schema = this.buildSchema(RawClass);
         for (const plugin of plugins) schema.plugin(...plugin);
+        schema.plugin(mongooseAutoPopulate);
         let Model;
         const protoClassName = Object.getPrototypeOf(Object.getPrototypeOf(RawClass)).className;
         if (mongooseBaseModels[protoClassName]) {

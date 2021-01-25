@@ -85,24 +85,34 @@ export default class ApiRoute extends DefaultRoute {
      * @memberof ApiRoute
      */
     async createRecursive(request, modelName, modelBody, returnBody = {}, returnTheReturnBody = false) {
+        console.log("processing model", modelName);
         const schemaObject = modelExportMap[modelName].Schema.obj;
         for (const key in schemaObject) {
             if (key in modelBody) {
+                console.log("processing key", key);
                 if (schemaObject[key].ref) {
                     // If this is already a mongo id, we don't have to process an "object"
-                    if (isMongoId(modelBody[key])) continue;
+                    if (typeof modelBody[key] === "string" && isMongoId(modelBody[key])) continue;
+                    console.log(key, "is model reference");
 
                     // prepare empty return body fur sub model which will be returned to client
                     const subReturnBody = {};
                     returnBody[key] = subReturnBody;
 
-                    const result = await this.createRecursive(request, schemaObject[key].ref, modelBody[key], subReturnBody);
-                    if (result instanceof Error) return result;
+                    let result;
+                    try {
+                        result = await this.createRecursive(request, schemaObject[key].ref, modelBody[key], subReturnBody);
+                    } catch (error) {
+                        console.error(error);
+                        return error;
+                    }
 
+                    console.log("continuing with model", modelName, "after model reference");
                     // Set the ID for model reference to be able to create the parent model
                     modelBody[key] = result.models[0]._id;
                 }
                 if (isArray(schemaObject[key].type) && schemaObject[key].type[0].ref && isArray(modelBody[key])) {
+                    console.log(key, "is array model reference");
                     for (const [index, subModelBody] of Object.entries(modelBody[key])) {
 
                         // prepare empty return body fur sub model which will be returned to client
@@ -110,15 +120,26 @@ export default class ApiRoute extends DefaultRoute {
                         if (!returnBody[key]) returnBody[key] = [];
                         returnBody[key][index] = subReturnBody;
 
+                        console.log("LALALALA");
+
                         // If this is already a mongo id, we don't have to process an "object"
                         // but we need to insert the ID to hold the index and structure of the update response
-                        if (isMongoId(subModelBody)) {
+                        if (typeof modelBody[key] === "string" && isMongoId(subModelBody)) {
                             returnBody[key][index] = subModelBody;
                             continue;
                         }
 
-                        const result = await this.createRecursive(request, schemaObject[key].type[0].ref, subModelBody, subReturnBody);
-                        if (result instanceof Error) return result;
+                        console.log("processing index", index);
+
+                        let result;
+                        try {
+                            result = await this.createRecursive(request, schemaObject[key].type[0].ref, subModelBody, subReturnBody);
+                        } catch (error) {
+                            console.error(error);
+                            return error;
+                        }
+
+                        console.log("continuing with model", modelName, "after model array reference");
 
                         // Set the ID for model reference to be able to create the parent model
                         modelBody[key][index] = result.models[0]._id;
@@ -126,7 +147,10 @@ export default class ApiRoute extends DefaultRoute {
                 }
             }
         }
+
+        console.log("creating model", modelName);
         const result = await this.doCreate(request, modelName, modelBody);
+        console.log("result", result);
         if (!returnTheReturnBody) {
             if (!(result instanceof Error)) Object.assign(returnBody, result.models[0]);
             return result;

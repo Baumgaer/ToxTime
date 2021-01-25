@@ -22,11 +22,12 @@ export function SceneObjectMixinClass(MixinClass) {
             file: {
                 type: Schema.Types.ObjectId,
                 required: true,
-                ref: "File"
+                ref: "File",
+                autopopulate: true
             },
             clickAreas: {
                 type: [
-                    { type: Schema.Types.ObjectId, ref: "ClickArea" }
+                    { type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }
                 ],
                 default: []
             }
