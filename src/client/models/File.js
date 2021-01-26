@@ -51,14 +51,17 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
                 onProgress: (progress) => this.loadingStatus = progress,
                 onSuccess: (model) => {
                     reset();
+                    window.vm.$toasted.success(window.vm.$t("fileUploaded", { name: this.getName() }), { className: "successToaster" });
                     resolve(model);
                 },
                 onAbort: () => {
                     reset(true);
+                    window.vm.$toasted.info(window.vm.$t("fileUploadAborted", { name: this.getName() }), { className: "infoToaster" });
                     resolve(null);
                 },
                 onError: () => {
                     reset(true);
+                    window.vm.$toasted.error(window.vm.$t("fileUploadError", { name: this.getName() }), { className: "errorToaster" });
                     resolve(null);
                 }
             }, { "X-DUMMY-MODEL-ID": this._dummyId });
