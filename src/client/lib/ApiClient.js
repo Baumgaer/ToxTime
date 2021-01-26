@@ -131,8 +131,11 @@ export default class ApiClient {
                     return new CustomError(subError.properties.name, subError.properties.message, subError.properties);
                 })
             });
-        } else if (responseJson.className === "Error") error = new CustomError(responseJson.name, responseJson.message);
-        window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
+        } else if (responseJson.className === "Error") {
+            if (responseJson.name === "MongoError" && responseJson.code === 11000) {
+                error = new CustomError("DuplicateError", "", responseJson.keyValue);
+            } else error = new CustomError(responseJson.name, responseJson.message);
+        }
         return error;
     }
 

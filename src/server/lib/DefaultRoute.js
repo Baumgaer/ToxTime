@@ -187,33 +187,67 @@ export default class DefaultRoute {
      */
     async handle(routeObject, request, response, next) {
         console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl}`);
+
         const options = routeObject.options;
-        if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) return next(httpErrors.Unauthorized());
+        if (!options?.public && (!request.user || !options?.allowUser && !request.user.isAdmin)) {
+            return response.sendStatus(httpErrors.Unauthorized().statusCode);
+        }
+
+        // Reset every passwordResetToken, when the user navigates normally
+        // (password reset was may be not triggered by the real user or by mistake)
         if (request.user?.passwordResetToken) {
             request.user.passwordResetToken = undefined;
-            await request.user.save();
+            try {
+                await request.user.save();
+            } catch (error) {
+                console.error(error);
+            }
         }
+
         try {
             const result = await routeObject.handler.call(this, request, response, next);
             if (response.headersSent) return;
-            if (result == null || typeof result === "boolean") {
-                if (result === false) {
-                    next(httpErrors.NotAcceptable());
-                } else if (result === true) {
-                    response.status(202).json({}); // accepted
-                } else response.status(204).json({}); // no content
+
+            if (result === null || result === undefined) {
+                // Nothing was returned, so we assume, that the content is empty
+                // if no other status code was set
+                const code = response.statusCode;
+                response.status(code === 200 ? 204 : code).json({}); // no content
+            } else if (typeof result === "boolean") {
+                // When a boolean was set, we assume, that the request was
+                // accepted or not depending on boolean
+                if (!result) {
+                    const httpError = httpErrors.NotAcceptable();
+                    response.status(httpError.statusCode).send(httpError);
+                } else response.status(202).json({}); // accepted
             } else if (result instanceof Error || result instanceof CustomError) {
-                let theError = result;
-                if (!isHttpError(theError)) {
-                    response.status((new httpErrors.BadRequest()).statusCode);
-                    response.json(result);
+                // An error occurred. When this error is an http error, we don't
+                // want to print this error with trace because this was calculated and
+                // is visible in browser. all other errors should be printed.
+                if (!isHttpError(result)) {
                     console.error(result);
-                } else response.send(result);
+                    response.status(httpErrors.BadRequest().statusCode).json(result);
+                } else {
+                    console.error(result.message);
+                    response.send(result);
+                }
             } else if (typeof result === "string") {
+                // Normally a string will be returned if we want to send a page
+                // (html or text). It is also possible to send a file here.
+                // In this case the content type has to be set manually.
                 response.send(result);
             } else if (typeof result === "object") {
+                // This is a general response. Normally all responses should be
+                // a JSON since this is a rest service.
                 response.json(result);
-            } else if (result != null) next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
+            } else if (typeof result === "number") {
+                // A number means we just want to have a certain response code with no content
+                response.sendStatus(result);
+            } else if (result !== null && result !== undefined) {
+                // A return value which is not allowed is returned. This has to
+                // be printed with full trace because it's just wrong...
+                next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
+            }
         } catch (error) {
             next(httpErrors(500, error));
         }
