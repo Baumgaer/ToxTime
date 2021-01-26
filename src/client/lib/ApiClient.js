@@ -1,7 +1,9 @@
 import httpErrors from "http-errors";
 import { stripHtml } from "string-strip-html";
-import { isObjectLike, isArray } from "lodash";
+import { isObjectLike, isArray, isPlainObject } from "lodash";
 import { Store } from "~client/lib/Store";
+
+import CustomError from "~common/lib/CustomError";
 
 export default class ApiClient {
 
@@ -43,6 +45,54 @@ export default class ApiClient {
         return this.handleModels(await response.json());
     }
 
+    static upload(method, target, options = {}, additionalHeaders = {}) {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, target, true);
+
+        for (const headername in additionalHeaders) {
+            if (Object.hasOwnProperty.call(additionalHeaders, headername)) {
+                const value = additionalHeaders[headername];
+                xhr.setRequestHeader(headername, value);
+            }
+        }
+
+        xhr.upload.addEventListener("progress", (event) => {
+            if (event.lengthComputable && options.onProgress) options.onProgress(Math.round((event.loaded * 100 / event.total) || 1));
+        });
+
+        xhr.addEventListener("readystatechange", () => {
+            if (xhr.readyState === 4) {
+                const customResponse = {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    headers: {
+                        get: xhr.getResponseHeader
+                    },
+                    text: () => xhr.responseText,
+                    json: () => JSON.parse(xhr.response)
+                };
+
+                if (xhr.status >= 400) {
+                    const errors = this.handleHttpError(customResponse);
+                    if (options.onError) options.onError(errors);
+                    return;
+                }
+
+                if (xhr.response) {
+                    const models = this.handleModels(JSON.parse(xhr.response));
+                    if (options.onSuccess) options.onSuccess(models);
+                }
+            }
+        });
+
+        xhr.upload.addEventListener("abort", () => {
+            if (options.onAbort) options.onAbort();
+        });
+
+        xhr.send(options.formData);
+        return xhr;
+    }
+
     /**
      *
      *
@@ -72,6 +122,20 @@ export default class ApiClient {
         return error;
     }
 
+    static handleOtherErrors(responseJson) {
+        let error = null;
+        if ("errors" in responseJson && isPlainObject(responseJson.errors) && Object.keys(responseJson.errors).every((key) => responseJson.errors[key].name === "ValidatorError")) {
+            error = new CustomError("ValidatorError", "", {
+                bulk: Object.keys(responseJson.errors).map((key) => {
+                    const subError = responseJson.errors[key];
+                    return new CustomError(subError.properties.name, subError.properties.message, subError.properties);
+                })
+            });
+        } else if (responseJson.className === "Error") error = new CustomError(responseJson.name, responseJson.message);
+        window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
+        return error;
+    }
+
     /**
      *
      *
@@ -90,13 +154,15 @@ export default class ApiClient {
         } else if (this.store.isModel(responseJson)) {
             // Seems to be a model, watch into every key to get submodels
             for (const key in responseJson) {
-                if (Object.hasOwnProperty.call(responseJson, key)) {
-                    const element = responseJson[key];
-                    if (isObjectLike(element)) responseJson[key] = this.handleModels(responseJson[key]);
+                if (Object.hasOwnProperty.call(responseJson, key) && isObjectLike(responseJson[key])) {
+                    responseJson[key] = this.handleModels(responseJson[key]);
                 }
             }
             return this.store.addModel(responseJson);
         }
+
+        const mayError = this.handleOtherErrors(responseJson);
+        if (mayError) return mayError;
 
         // We have something different...
         return responseJson;

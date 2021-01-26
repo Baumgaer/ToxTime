@@ -63,11 +63,6 @@ export default class Users extends ApiRoute {
         if (!(request.body instanceof Array)) request.body = [request.body];
         const results = [];
         for (const userData of request.body) {
-            if (!userData.email || !isEmail(userData.email)) {
-                results.push(new CustomError("notAnEmail", "", { field: `email` }));
-                response.status(207);
-                continue;
-            }
             const password = request.body.password || randomBytes(64);
             const token = uuid();
             try {

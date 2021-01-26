@@ -37,6 +37,7 @@ export default {
         this.$parent.$once("hook:beforeDestroy", this.removeEventListeners.bind(this));
     },
     methods: {
+
         /**
          *
          * @param {DragEvent} event

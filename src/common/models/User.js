@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { isEmail } from "validator";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -21,7 +22,14 @@ export function UserMixinClass(MixinClass) {
                 required: true,
                 unique: true,
                 lowercase: true,
-                trim: true
+                trim: true,
+                validate: {
+                    validator: (value) => {
+                        return typeof value === "string" && isEmail(value);
+                    },
+                    name: "notAnEmail",
+                    type: "invalid"
+                }
             },
             name: {
                 required: false

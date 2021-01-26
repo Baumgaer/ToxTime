@@ -39,7 +39,7 @@
                 </div>
                 <div class="errors" v-for="(error, errorIndex) of item.errors" :key="`error${errorIndex}`">
                     <div class="space">{{ `${errorIndex + 1}.` }}</div>
-                    <div class="error">{{ error }}</div>
+                    <div class="error">{{ $t(error.name) }}</div>
                 </div>
             </div>
         </form>
@@ -55,7 +55,6 @@ import ProgressBar from "~client/components/ProgressBar";
 import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
 import { csvToObject } from "~common/utils";
-import i18n from "~client/lib/i18n";
 
 window._apiClient = ApiClient;
 
@@ -117,13 +116,7 @@ export default {
             let errorOccurred = false;
             for (const [index, model] of result.entries()) {
                 if (model instanceof Error) {
-                    let errorToPush = i18n.t("unknownError");
-                    if (model.name === "MongoError" && model.code === 11000 || model.name === "UserExistsError") {
-                        errorToPush = i18n.t("userAlreadyExists");
-                    } else if (model.name === "notAnEmail") {
-                        errorToPush = i18n.t("notAnEmail");
-                    } else errorToPush = i18n.t(model.name);
-                    this.model.tempUserList[index - subtract].errors.push(errorToPush);
+                    this.model.tempUserList[index - subtract].errors = model.bulk || [model];
                     errorOccurred = true;
                 } else {
                     this.model.tempUserList.splice(index - subtract, 1);
