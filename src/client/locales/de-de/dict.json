@@ -54,5 +54,6 @@
     "fileUploadAborted": "Hochladen von {name} abgebrochen",
     "notFound": "Resource konnte nicht gefunden werden",
     "errorAddingUsers": "Fehler beim Hinzufügen von Benutzern",
-    "usersAdded": "Benutzer hinzugefügt"
+    "usersAdded": "Benutzer hinzugefügt",
+    "discarded": "Änderungen an {name} verworfen"
 }

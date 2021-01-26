@@ -54,5 +54,6 @@
     "fileUploadAborted": "Upload of {name} aborted",
     "notFound": "Could not find resource",
     "errorAddingUsers": "Error while adding users",
-    "usersAdded": "Users added"
+    "usersAdded": "Users added",
+    "discarded": "Changes to {name} discarded"
 }
