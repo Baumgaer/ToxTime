@@ -25,7 +25,7 @@ export default class Files extends ApiRoute {
     async getById(request, response) {
         const result = await super.getById(request);
         if (result instanceof Error) return result;
-        const model = result.models[0];
+        const model = result;
         if (!model) return httpErrors.NotFound();
         return new Promise((resolve, reject) => {
             response.sendFile(path.resolve(arp.path, "uploads", model.fileName), (error) => {
@@ -75,7 +75,7 @@ export default class Files extends ApiRoute {
     async delete(request) {
         const result = await super.delete(request);
         if (result instanceof Error) return result;
-        const model = result.models[0];
+        const model = result;
         try {
             fs.unlinkSync(path.resolve(arp.path, "uploads", model.fileName));
             return result;

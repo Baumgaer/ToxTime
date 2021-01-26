@@ -64,20 +64,17 @@ export default {
             }
 
             const result = await ApiClient.post("/login", { email, password });
-            if (!result.success) {
-                if (result.error.name === "emailOrPasswordIncorrect") {
+            if (result instanceof Error) {
+                if (result.name === "emailOrPasswordIncorrect") {
                     this.$refs.email.classList.add("fail");
                     this.$refs.password.classList.add("fail");
                     this.$refs.password.value = "";
-                    this.$refs.hintBox.innerText = i18n.t(
-                        "emailOrPasswordIncorrect"
-                    );
+                    this.$refs.hintBox.innerText = i18n.t("emailOrPasswordIncorrect");
                     this.$refs.hintBox.style.display = "block";
                 }
                 return;
             }
-            const userData = result.data.models[0];
-            window.location.href = userData.isAdmin ? "/admin" : "/public";
+            window.location.href = result.isAdmin ? "/admin" : "/public";
         }
     }
 };

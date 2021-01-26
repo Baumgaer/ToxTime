@@ -123,7 +123,7 @@ export default class ClientModel extends BaseModel {
 
         const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data);
 
-        if (!result.data.models.some((model) => model instanceof Error)) {
+        if (!result.some((model) => model instanceof Error)) {
             Reflect.defineMetadata("stagedChanges", {}, that);
         }
 

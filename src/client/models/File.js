@@ -14,7 +14,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
     async delete() {
         if (this._xhr) return this._xhr.abort();
         const result = await ApiClient.delete(`/files/${this._id}`);
-        if (!result.success) return result.error;
+        if (result instanceof Error) return result;
         ApiClient.store.removeModel(this);
     }
 
@@ -50,7 +50,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
                     const responseJson = JSON.parse(this._xhr.response);
                     const errorMapping = {};
                     ApiClient.handleDatabaseError(responseJson, errorMapping);
-                    if (errorMapping.data?.models?.length) {
+                    if (errorMapping.length) {
                         window.vm.$toasted.error(window.vm.$t("fileUploadError", { name: this.getName() }), { className: "errorToaster" });
                         ApiClient.store.removeModel(this);
                     } else {

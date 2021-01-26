@@ -81,6 +81,17 @@ export class Store {
     }
 
     /**
+     *
+     *
+     * @param {ModelLike} modelLike
+     * @returns {boolean}
+     * @memberof Store
+     */
+    isModel(modelLike) {
+        return modelLike.collection && modelLike.className && (modelLike._dummyId || modelLike._id);
+    }
+
+    /**
      * Adds a given model like object as initialized model to the store.
      * The object musst contain at least _id or _dummyId and a collection
      *

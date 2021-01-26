@@ -1,8 +1,6 @@
-import validator from "validator";
 import httpErrors from "http-errors";
 import { stripHtml } from "string-strip-html";
-import { capitalize } from "~common/utils";
-
+import { isObjectLike, isArray } from "lodash";
 import { Store } from "~client/lib/Store";
 
 export default class ApiClient {
@@ -30,89 +28,77 @@ export default class ApiClient {
     }
 
     static async request(method, target, data, additionalHeaders) {
+        const defaultHeaders = { redirect: 'follow', mode: 'cors', Accept: "application/json", "Content-Type": "application/json" };
+        const fetchObject = { method, headers: Object.assign(additionalHeaders, defaultHeaders) };
 
-        let theTarget = target;
-        if (validator.isMongoId(target)) theTarget = `api/${target}`;
-
-        const fetchObject = {
-            method: method,
-            headers: Object.assign(additionalHeaders, {
-                redirect: 'follow',
-                mode: 'cors',
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            })
-        };
+        // HEAD and GET doesn't allow body, so apply body only when method is different
         if (!["GET", "HEAD"].includes(method) && Object.keys(data).length) Object.assign(fetchObject, { body: JSON.stringify(data) });
-        const response = await fetch(theTarget, fetchObject);
 
-        const defaultResponse = { success: false, error: { name: "unknownError" } };
-        const httpError = await this.handleHttpErrors(response, defaultResponse);
-        if (httpError) return httpError;
+        const response = await fetch(target, fetchObject);
 
-        const theJson = await response.json();
-        let mapped = {};
-        if (theJson.success && theJson.data?.models && theJson.data.models instanceof Array) {
-            this.handleModels(theJson, mapped);
-        } else if (theJson.data?.errors && theJson.data.errors instanceof Object) {
-            this.handleDatabaseError(theJson, mapped);
-        } else mapped = theJson;
-        return Object.keys(mapped).length ? mapped : defaultResponse;
+        // Errors can be receives as JSON or text, so we have to pass the whole response
+        if (response.status >= 400) return this.handleHttpError(response);
+
+        // Models always comes as JSON, so we can safely get the JSON
+        return this.handleModels(await response.json());
     }
 
-    static handleDatabaseError(responseJson, mapping = {}) {
-        if (!responseJson.data.errors) return;
-        mapping.success = false;
-        mapping.data = { models: [] };
-        for (const key in responseJson.data.errors) {
-            if (Object.hasOwnProperty.call(responseJson.data.errors, key)) {
-                const rawError = responseJson.data.errors[key];
-                rawError.className = "Error";
-                delete rawError.properties;
-                const error = new Error();
-                Object.assign(error, rawError);
-                error.name = `${error.name}${capitalize(error.path)}${capitalize(error.kind)}`;
-                window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
-                mapping.data.models.push(error);
-            }
+    /**
+     *
+     *
+     * @static
+     * @param {Response} response
+     * @memberof ApiClient
+     */
+    static async handleHttpError(response) {
+        let error = null;
+        if (!response.headers.get("Content-Type").includes("application/json")) {
+            const result = stripHtml(await response.text()).result;
+            const matches = result.match(/:(.*?)at/);
+            error = httpErrors(response.status, matches ? matches[1] : result);
+        } else {
+            error = new Error();
+            Object.assign(error, await response.json());
         }
+
+        if (response.status === 404) {
+            window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
+        } else if (!error.name && error.message) {
+            window.vm.$toasted.error(error.message, { className: "errorToaster" });
+        } else if (!error.name && !error.message) {
+            window.vm.$toasted.error("unknownError", { className: "errorToaster" });
+        } else window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
+
+        return error;
     }
 
-    static async handleHttpErrors(response, mapping = {}) {
-        if (response.status >= 400) {
-            let result = null;
-            let matches = null;
-            if (response.headers.get("Content-Type").includes("application/json")) {
-                result = await response.json();
-            } else {
-                result = stripHtml(await response.text()).result;
-                matches = result.match(/:(.*?)at/);
-            }
-            mapping.error = matches ? httpErrors(response.status, matches ? matches[1] : result) : result.error;
-        }
-        if (response.status < 200 || response.status >= 300) {
-            if (response.status === 404) {
-                window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
-            } else if (!mapping.error.name && mapping.error.message) {
-                window.vm.$toasted.error(mapping.error.message, { className: "errorToaster" });
-            } else window.vm.$toasted.error(window.vm.$t(mapping.error.name), { className: "errorToaster" });
-            return mapping;
-        }
-    }
+    /**
+     *
+     *
+     * @static
+     * @param {any} responseJson
+     * @returns {any}
+     * @memberof ApiClient
+     */
+    static handleModels(responseJson) {
 
-    static handleModels(responseJson, mapping = {}) {
-        if (!responseJson.data.models || !(responseJson.data.models instanceof Array)) return;
-        mapping.success = true;
-        mapping.data = { models: [] };
-        for (const model of responseJson.data.models) {
-            if (model.errors) {
-                const errorMap = {};
-                this.handleDatabaseError(model, errorMap);
-                mapping.data.models.push(errorMap.data.models[0]);
-                continue;
+        if (isArray(responseJson)) {
+            // We maybe have an array of models
+            const processedModels = [];
+            for (const model of responseJson) processedModels.push(this.handleModels(model));
+            return processedModels;
+        } else if (this.store.isModel(responseJson)) {
+            // Seems to be a model, watch into every key to get submodels
+            for (const key in responseJson) {
+                if (Object.hasOwnProperty.call(responseJson, key)) {
+                    const element = responseJson[key];
+                    if (isObjectLike(element)) responseJson[key] = this.handleModels(responseJson[key]);
+                }
             }
-            if (!model.className) continue;
-            mapping.data.models.push(this.store.addModel(model));
+            return this.store.addModel(responseJson);
         }
+
+        // We have something different...
+        return responseJson;
     }
 }

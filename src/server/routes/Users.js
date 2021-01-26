@@ -1,12 +1,12 @@
-import { isEmail } from "validator";
 import ApiRoute from "~server/lib/ApiRoute";
 import User from "~server/models/User";
-import CustomError from "~common/lib/CustomError";
-import { randomBytes } from "crypto";
+import { isMongoId } from "~common/utils";
 import EmailTransporter from "~server/lib/EmailTransporter";
+import CustomError from "~common/lib/CustomError";
+import { isEmail } from "validator";
+import { randomBytes } from "crypto";
 import { v4 as uuid } from "uuid";
 import normalizeURL from "normalize-url";
-import { isMongoId } from "validator";
 import httpErrors from "http-errors";
 
 export default class Users extends ApiRoute {
@@ -15,7 +15,7 @@ export default class Users extends ApiRoute {
 
     @Users.patch("/resentConfirm/:id")
     async resentConfirm(request) {
-        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        if (!isMongoId(request.params.id)) return httpErrors.BadRequest();
         const token = uuid();
         try {
             const result = await User.Model.findByIdAndUpdate(request.params.id, { passwordResetToken: token, isConfirmed: false }).exec();
@@ -38,7 +38,7 @@ export default class Users extends ApiRoute {
 
     @Users.patch("/toggleLock/:id")
     async toggleLock(request) {
-        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        if (!isMongoId(request.params.id)) return httpErrors.BadRequest();
         try {
             const result = await User.Model.findById(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
@@ -54,16 +54,18 @@ export default class Users extends ApiRoute {
      * registers a new user with email, a password if given and a matriculation number
      *
      * @param {import("express").Request} request the request
+     * @param {import("express").Response} response
      * @returns {void}
      * @memberof Register
      */
     @Users.post("/register")
-    async register(request) {
+    async register(request, response) {
         if (!(request.body instanceof Array)) request.body = [request.body];
         const results = [];
         for (const userData of request.body) {
             if (!userData.email || !isEmail(userData.email)) {
                 results.push(new CustomError("notAnEmail", "", { field: `email` }));
+                response.status(207);
                 continue;
             }
             const password = request.body.password || randomBytes(64);
@@ -104,11 +106,13 @@ export default class Users extends ApiRoute {
                             console.error(error);
                             error.className = "Error";
                             results.push(error);
+                            response.status(207);
                         } catch (error) {
                             // Reverting failed... OMG...
                             console.error(error);
                             error.className = "Error";
                             results.push(error);
+                            response.status(207);
                         }
                     }
                 } else results.push(modifiedUser);
@@ -117,9 +121,10 @@ export default class Users extends ApiRoute {
                 console.error(error);
                 error.className = "Error";
                 results.push(error);
+                response.status(207);
             }
         }
-        return { success: true, models: results };
+        return results;
     }
 
     static registerUser(data, password, altModel) {

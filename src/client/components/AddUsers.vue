@@ -115,7 +115,7 @@ export default {
 
             let subtract = 0;
             let errorOccurred = false;
-            for (const [index, model] of result.data.models.entries()) {
+            for (const [index, model] of result.entries()) {
                 if (model instanceof Error) {
                     let errorToPush = i18n.t("unknownError");
                     if (model.name === "MongoError" && model.code === 11000 || model.name === "UserExistsError") {

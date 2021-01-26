@@ -193,7 +193,7 @@ export default class Login extends DefaultRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {Promise<{models: User["Model"][]} | CustomError>}
+     * @returns {Promise<User["Model"][]> | CustomError>}
      * @memberof Login
      */
     @Login.post("/", { public: true })
@@ -213,7 +213,7 @@ export default class Login extends DefaultRoute {
                     const theUser = Object.assign({}, user.toObject());
                     delete theUser.hash;
                     delete theUser.salt;
-                    resolve({ models: [theUser] });
+                    resolve(theUser);
                 });
             })(request, response);
         });

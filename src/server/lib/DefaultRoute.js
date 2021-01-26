@@ -1,10 +1,11 @@
 import fs from "graceful-fs";
 import arp from "app-root-path";
 import path from "path";
-import httpErrors from "http-errors";
+import httpErrors, { isHttpError } from "http-errors";
 import lodash from "lodash";
 import CustomError from "~common/lib/CustomError";
 import { getPrototypeNamesRecursive } from "~common/utils";
+import { Error } from "mongoose";
 
 export const registeredRoutes = {};
 
@@ -195,16 +196,23 @@ export default class DefaultRoute {
         try {
             const result = await routeObject.handler.call(this, request, response, next);
             if (response.headersSent) return;
-            if (!result) {
-                response.json({ success: true, data: {} });
-            } else if (result instanceof CustomError) {
-                response.status((new httpErrors.BadRequest()).statusCode).json({ success: false, error: result });
-            } else if (httpErrors.isHttpError(result)) {
-                next(result);
+            if (result == null || typeof result === "boolean") {
+                if (result === false) {
+                    next(httpErrors.NotAcceptable());
+                } else if (result === true) {
+                    response.status(202).json({}); // accepted
+                } else response.status(204).json({}); // no content
+            } else if (result instanceof Error || result instanceof CustomError) {
+                let theError = result;
+                if (!isHttpError(theError)) {
+                    response.status((new httpErrors.BadRequest()).statusCode);
+                    response.json(result);
+                    console.error(result);
+                } else response.send(result);
             } else if (typeof result === "string") {
                 response.send(result);
             } else if (typeof result === "object") {
-                response.json({ success: true, data: result });
+                response.json(result);
             } else if (result != null) next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));
         } catch (error) {
             next(httpErrors(500, error));

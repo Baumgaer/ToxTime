@@ -24,7 +24,7 @@ export default class ApiRoute extends DefaultRoute {
         } catch (error) {
             return error;
         }
-        return { models: models || [] };
+        return models || [];
     }
 
     /**
@@ -44,7 +44,7 @@ export default class ApiRoute extends DefaultRoute {
         } catch (error) {
             return error;
         }
-        return { models: [model] };
+        return model;
     }
 
     /**
@@ -77,7 +77,7 @@ export default class ApiRoute extends DefaultRoute {
             Object.assign(myRequestBody, { creator: request.user._id });
             const model = await this.claimedExport.Model.create(myRequestBody);
             const modelObject = merge(responseBody, model.toObject());
-            return { models: [modelObject] };
+            return modelObject;
         } catch (error) {
             return error;
         }
@@ -117,8 +117,8 @@ export default class ApiRoute extends DefaultRoute {
                         this.revertModelCreation(createdModels);
                         return result;
                     }
-                    myRequestBody[key] = result.models[0]._id;
-                    createdModels.push(result.models[0]);
+                    myRequestBody[key] = result._id;
+                    createdModels.push(result);
                 } catch (error) {
                     this.revertModelCreation(createdModels);
                     return error;
@@ -135,8 +135,8 @@ export default class ApiRoute extends DefaultRoute {
                             this.revertModelCreation(createdModels);
                             return result;
                         }
-                        myRequestBody[key][index] = result.models[0]._id;
-                        createdModels.push(result.models[0]);
+                        myRequestBody[key][index] = result._id;
+                        createdModels.push(result);
                     } catch (error) {
                         this.revertModelCreation(createdModels);
                         return error;
@@ -175,7 +175,7 @@ export default class ApiRoute extends DefaultRoute {
             Object.assign(request.body, { lastModified: new Date() });
             const result = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body).exec();
             if (!result) return httpErrors.NotFound();
-            return { models: [] };
+            return null;
         } catch (error) {
             return error;
         }
@@ -187,7 +187,7 @@ export default class ApiRoute extends DefaultRoute {
         try {
             const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
             if (!result) return httpErrors.NotFound();
-            return { models: [result] };
+            return result;
         } catch (error) {
             return error;
         }
