@@ -123,6 +123,7 @@ export default class ApiClient {
     }
 
     static handleOtherErrors(responseJson) {
+        if (!isPlainObject(responseJson)) return null;
         let error = null;
         if ("errors" in responseJson && isPlainObject(responseJson.errors) && Object.keys(responseJson.errors).every((key) => responseJson.errors[key].name === "ValidatorError")) {
             error = new CustomError("ValidatorError", "", {
