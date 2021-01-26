@@ -39,7 +39,7 @@
                 </div>
                 <div class="errors" v-for="(error, errorIndex) of item.errors" :key="`error${errorIndex}`">
                     <div class="space">{{ `${errorIndex + 1}.` }}</div>
-                    <div class="error">{{ $t(error.name) }}</div>
+                    <div class="error">{{ error.name === "DuplicateError" ? $t(error.name, { name: error.email }) : $t(error.name) }}</div>
                 </div>
             </div>
         </form>
