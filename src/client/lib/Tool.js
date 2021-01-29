@@ -23,6 +23,8 @@ export default class Tool {
         onMouseLeave: null,
         onMouseMove: null,
         onMouseUp: null,
+        onKeyDown: null,
+        onKeyUp: null,
         onResize: null
     };
 
