@@ -30,6 +30,12 @@ export function SceneObjectMixinClass(MixinClass) {
                     { type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }
                 ],
                 default: []
+            },
+            subObjects: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }
+                ],
+                default: []
             }
         };
 

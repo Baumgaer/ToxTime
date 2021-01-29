@@ -10,6 +10,25 @@ export default class PolyClickArea extends Tool {
     path = null;
 
     /**
+     * Creates a visible path in its default form
+     *
+     * @static
+     * @param {import("paper")} paper
+     * @param {number[]} pathPoints
+     * @returns {InstanceType<import("paper")["Path"]>}
+     * @memberof PolyClickArea
+     */
+    static build(paper, pathPoints) {
+        const path = new paper.Path(pathPoints);
+        path.closed = true;
+        path.strokeColor = "red";
+        path.strokeWidth = 3;
+        path.fillColor = "white";
+        path.fillColor.alpha = 0.1;
+        return path;
+    }
+
+    /**
      * @inheritdoc
      *
      * @param {import("paper")["ToolEvent"]} event
@@ -17,14 +36,7 @@ export default class PolyClickArea extends Tool {
      */
     onToolMouseDown(event) {
         if (event.event.button !== 0) return;
-        if (!this.path) {
-            this.path = new this.paper.Path();
-            this.path.closed = true;
-            this.path.strokeColor = "red";
-            this.path.strokeWidth = 3;
-            this.path.fillColor = "white";
-            this.path.fillColor.alpha = 0.1;
-        }
+        if (!this.path) this.path = PolyClickArea.build(this.paper);
         this.path.add(event.point);
     }
 

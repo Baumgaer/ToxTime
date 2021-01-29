@@ -16,9 +16,15 @@
                  style="display: none;"
                  v-if="watchedModel.file"
                  :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
-                 :id="`${watchedModel.file.collection}${watchedModel.file._dummyId || watchedModel.file._id}`"
                  @load="onBackgroundLoaded($event)"
-            >
+            />
+            <img v-for="subObject of subObjects"
+                 style="display: none;"
+                 :ref="`subObjectBackground${subObject.model._id}`"
+                 :key="subObject.model._id"
+                 :src="`/files/${subObject.model.file._id}`"
+                 @load="onSubObjectBackgroundLoaded(subObject)"
+            />
             <canvas ref="canvas" resize @wheel="onWheel($event)"></canvas>
         </div>
         <UploadHint v-if="type !== 'scene'" ref="uploadHint" :uploadReadyFunc="onUploadReady.bind(this)" />
@@ -30,8 +36,10 @@ import Button from "~client/components/Button";
 import UploadHint from "~client/components/UploadHint";
 import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
+
 import SceneObject from "~client/models/SceneObject";
 import FileModelExport from "~client/models/File";
+
 import PolyClickArea from "~client/lib/PolyClickArea";
 import Move from "~client/lib/Move";
 import Select from "~client/lib/Select";
@@ -56,6 +64,7 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: {},
             currentTool: null,
+            subObjects: [],
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -121,10 +130,20 @@ export default {
 
         onBackgroundLoaded() {
             if (this.background) this.background.remove();
-            const raster = new this.paper.Raster(this.$refs.background, new this.paper.Point(0,0));
+            const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.sendToBack();
             this.paper.view.background = raster;
+            this.paper.view.draw();
+        },
+
+        onSubObjectBackgroundLoaded(subObject) {
+            const index = this.subObjects.indexOf(subObject);
+            /** @type {InstanceType<import("paper")["Group"]>} */
+            const group = this.subObjects[index];
+            if (!group) return;
+            const raster = new this.paper.Raster(this.$refs[`subObjectBackground${subObject.model._id}`][0]);
+            group.children = [raster, ...group.children];
             this.paper.view.draw();
         },
 
@@ -146,12 +165,30 @@ export default {
 
         addObject(model) {
             if (model instanceof FileModelExport.RawClass) this.addBackground(model);
-            console.log(model);
+            if (model instanceof SceneObject.RawClass) this.addSubObject(model);
         },
 
         addBackground(model) {
             if (!(model instanceof FileModelExport.RawClass) || !model.mime.startsWith("image")) return;
             this.watchedModel.file = model;
+        },
+
+        addSubObject(model) {
+            const children = [];
+            for (const clickArea of model.clickAreas) {
+                const child = PolyClickArea.build(this.paper, clickArea.shape);
+                child.locked = true;
+                children.push(child);
+            }
+            const group = new this.paper.Group({
+                children: children,
+                position: this.paper.view.center,
+                name: model.getName()
+                // scaling,
+                // rotation
+            });
+            group.model = model;
+            this.subObjects.push(group);
         }
     }
 };

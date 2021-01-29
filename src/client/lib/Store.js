@@ -169,6 +169,6 @@ export class Store {
             const stagedChanges = Reflect.getMetadata("stagedChanges", model);
             if (!stagedChanges[fieldName]) stagedChanges[fieldName] = prev;
 
-        }, { pathAsArray: true, ignoreUnderscores: true, equals: lodash.isEqual });
+        }, { pathAsArray: true, ignoreUnderscores: true, ignoreSymbols: true, equals: lodash.isEqual });
     }
 }
