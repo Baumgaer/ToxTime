@@ -1,4 +1,5 @@
 import Tool from "~client/lib/Tool";
+import { kebabCaseToCamelCase } from "~common/utils";
 
 export default class Select extends Tool {
 
@@ -8,7 +9,8 @@ export default class Select extends Tool {
         segments: true,
         stroke: true,
         fill: true,
-        tolerance: 5
+        bounds: true,
+        tolerance: 75
     };
 
     /** @type {InstanceType<import("paper")["HitResult"]>} */
@@ -53,21 +55,15 @@ export default class Select extends Tool {
         if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
         if (hitResult.item !== this.selection.item) return;
 
-        if (hitResult.item instanceof this.paper.Group) {
-            const maxDistance = 20;
-            if (event.point.getDistance(hitResult.item.firstChild.bounds.topLeft) < maxDistance) {
-                console.log("topLeft");
-            } else if (event.point.getDistance(hitResult.item.firstChild.bounds.topRight) < maxDistance) {
-                console.log("topRight");
-            } else if (event.point.getDistance(hitResult.item.firstChild.bounds.bottomRight) < maxDistance) {
-                console.log("bottomRight");
-            } else if (event.point.getDistance(hitResult.item.firstChild.bounds.bottomLeft) < maxDistance) {
-                console.log("bottomLeft");
-            } else if (hitResult.type === "pixel") hitResult.item.translate(event.delta);
+        if (hitResult.type === "bounds") {
+            const bounds = hitResult.item.bounds;
+            const hitPoint = bounds[kebabCaseToCamelCase(hitResult.name)];
+            const oppositePoint = hitResult.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(hitResult.name))];
+            hitResult.item.scale((bounds.width - (hitPoint.x - event.point.x)) / bounds.width, oppositePoint);
         } else if (hitResult.type === "segment") {
             // Move selection point
             hitResult.segment.point = event.point;
-        } else if (hitResult.type === "fill") {
+        } else if (["fill", "pixel"].includes(hitResult.type)) {
             hitResult.item.translate(event.delta);
         }
     }
@@ -86,6 +82,12 @@ export default class Select extends Tool {
 
     isGroup(hitResult) {
         return !(hitResult.item instanceof this.paper.Group) && hitResult.item.parent instanceof this.paper.Group && !(hitResult.item.parent instanceof this.paper.Layer);
+    }
+
+    getOppositeBoundary(name) {
+        const mapping = { top: "bottom", bottom: "top", left: "right", right: "left" };
+        const directions = name.split("-");
+        return `${mapping[directions[0]]}-${mapping[directions[1]]}`;
     }
 
     remove() {

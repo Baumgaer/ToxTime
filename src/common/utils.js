@@ -19,14 +19,17 @@ export function toURIPathPart(value) {
 }
 
 /**
- * Converts a camelCase string into a kebab-case string
+ * Converts a kebab-case string into a camelCase string
  *
  * @export
  * @param {string} string the string to convert
  * @returns {string} the converted string
  */
-export function camelCaseToKebabCase(string) {
-    return string.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+export function kebabCaseToCamelCase(str) {
+    let arr = str.split('-');
+    let capital = arr.map((item, index) => index ? capitalize(item) : item.toLowerCase());
+    let camelString = capital.join("");
+    return camelString;
 }
 
 /**
