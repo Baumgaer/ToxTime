@@ -75,6 +75,7 @@ export default class ApiRoute extends DefaultRoute {
             const myRequestBody = await this.createChildModels(request);
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(myRequestBody, { creator: request.user._id });
+            delete myRequestBody._id;
             const model = await this.claimedExport.Model.create(myRequestBody);
             const modelObject = merge(responseBody, model.toObject());
             return modelObject;
@@ -111,6 +112,7 @@ export default class ApiRoute extends DefaultRoute {
 
             if (schemaObj[key].ref in modelApiMapping && !isMongoId(myRequestBody[key])) {
                 request.body = myRequestBody[key];
+                delete myRequestBody[key]._id;
                 try {
                     const result = await modelApiMapping[schemaObj[key].ref].create(request);
                     if (result instanceof Error) {
@@ -129,6 +131,7 @@ export default class ApiRoute extends DefaultRoute {
                 for (const [index, childModel] of Object.entries(myRequestBody[key])) {
                     if (isMongoId(childModel)) continue;
                     request.body = childModel;
+                    delete childModel._id;
                     try {
                         const result = await modelApiMapping[schemaObj[key].type[0].ref].create(request);
                         if (result instanceof Error) {

@@ -81,15 +81,22 @@ export default {
         this.paper.settings.handleSize = 10;
     },
     beforeDestroy() {
-        if (!this.$refs.editorHead.closeButtonClicked && this.watchedModel.hasChanges()) {
-            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
-            this.watchedModel.save();
-        } else if (!this.model) {
-            this.watchedModel.destroy();
-            this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
-        } else if (this.$refs.editorHead.closeButtonClicked) {
-            this.watchedModel.discard();
-            this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
+        if (!this.$refs.editorHead.closeButtonClicked) {
+            // Cases editor was closed unexpected
+            if (this.watchedModel.hasChanges()) {
+                this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+                this.watchedModel.save();
+            }
+        } else {
+            if (this.model || this.watchedModel._id) {
+                if (this.watchedModel.hasChanges()) {
+                    this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
+                    this.watchedModel.discard();
+                }
+            } else {
+                this.watchedModel.destroy();
+                this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
+            }
         }
     },
     methods: {

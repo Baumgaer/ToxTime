@@ -105,7 +105,7 @@ export default class ClientModel extends BaseModel {
             }
         }
         if (that._dummyId) data._dummyId = that._dummyId;
-        return Object.keys(data).length ? data : that._id;
+        return Object.keys(data).length ? Object.assign(data, { _id: that._id }) : that._id;
     }
 
     toJson() {
