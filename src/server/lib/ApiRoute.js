@@ -72,7 +72,7 @@ export default class ApiRoute extends DefaultRoute {
         }
 
         try {
-            const myRequestBody = await this.createChildModels(request);
+            const myRequestBody = await this.ProcessChildModels(request);
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(myRequestBody, { creator: request.user._id });
             delete myRequestBody._id;
@@ -94,7 +94,7 @@ export default class ApiRoute extends DefaultRoute {
      * @returns {import("express").Request["body"] | Error}
      * @memberof ApiRoute
      */
-    async createChildModels(request) {
+    async ProcessChildModels(request) {
         const createdModels = [];
         const schemaObj = this.claimedExport.Schema.obj;
         const modelApiMapping = this.webServer.modelApiMapping;
@@ -112,9 +112,14 @@ export default class ApiRoute extends DefaultRoute {
 
             if (schemaObj[key].ref in modelApiMapping && !isMongoId(myRequestBody[key])) {
                 request.body = myRequestBody[key];
-                delete myRequestBody[key]._id;
+                let method = "create";
+                if (request.body._id) {
+                    method = "update";
+                    request.params.id = request.body._id;
+                    delete myRequestBody[key]._id;
+                }
                 try {
-                    const result = await modelApiMapping[schemaObj[key].ref].create(request);
+                    const result = await modelApiMapping[schemaObj[key].ref][method](request);
                     if (result instanceof Error) {
                         this.revertModelCreation(createdModels);
                         return result;
@@ -131,9 +136,14 @@ export default class ApiRoute extends DefaultRoute {
                 for (const [index, childModel] of Object.entries(myRequestBody[key])) {
                     if (isMongoId(childModel)) continue;
                     request.body = childModel;
-                    delete childModel._id;
+                    let method = "create";
+                    if (request.body._id) {
+                        method = "update";
+                        request.params.id = request.body._id;
+                        delete childModel._id;
+                    }
                     try {
-                        const result = await modelApiMapping[schemaObj[key].type[0].ref].create(request);
+                        const result = await modelApiMapping[schemaObj[key].type[0].ref][method](request);
                         if (result instanceof Error) {
                             this.revertModelCreation(createdModels);
                             return result;
@@ -174,11 +184,24 @@ export default class ApiRoute extends DefaultRoute {
     async update(request) {
         if (!isPlainObject(request.body)) return httpErrors.NotAcceptable();
 
+        // Create a response body to reflect untouched properties (e.g. _dummyId)
+        let responseBody = {};
         try {
+            responseBody = JSON.parse(JSON.stringify(request.body));
+        } catch (error) {
+            return error;
+        }
+
+        try {
+            const myRequestBody = await this.ProcessChildModels(request);
+            if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(request.body, { lastModified: new Date() });
-            const result = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, request.body).exec();
-            if (!result) return httpErrors.NotFound();
-            return null;
+            delete myRequestBody._id;
+            let model = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, myRequestBody).exec();
+            if (!model) return httpErrors.NotFound();
+            model = await this.claimedExport.Model.findById(request.params.id).exec();
+            const modelObject = merge(responseBody, model.toObject());
+            return modelObject;
         } catch (error) {
             return error;
         }
