@@ -17,6 +17,11 @@ export function ClickAreaMixinClass(MixinClass) {
             name: {
                 default: `ClickArea`
             },
+            position: {
+                type: [Number],
+                required: true,
+                default: []
+            },
             shape: {
                 type: [
                     [Number]

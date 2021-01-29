@@ -25,6 +25,11 @@ export function SceneObjectMixinClass(MixinClass) {
                 ref: "File",
                 autopopulate: true
             },
+            filePosition: {
+                type: [Number],
+                required: true,
+                default: []
+            },
             clickAreas: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }

@@ -122,11 +122,7 @@ export default class ClientModel extends BaseModel {
         } else method = ApiClient.post.bind(ApiClient);
 
         const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data);
-
-        if (!result.some((model) => model instanceof Error)) {
-            Reflect.defineMetadata("stagedChanges", {}, that);
-        }
-
+        if (!(result instanceof Error)) Reflect.defineMetadata("stagedChanges", {}, that);
         return result;
     }
 }

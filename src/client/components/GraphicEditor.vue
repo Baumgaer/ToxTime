@@ -133,6 +133,7 @@ export default {
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.sendToBack();
+            this.watchedModel.filePosition = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
         },
@@ -176,7 +177,7 @@ export default {
         addSubObject(model) {
             const children = [];
             for (const clickArea of model.clickAreas) {
-                const child = PolyClickArea.build(this.paper, clickArea.shape);
+                const child = PolyClickArea.build(this.paper, clickArea.shape.map((point) => [point[0] - (clickArea.position[0] - model.filePosition[0]), point[1] - (clickArea.position[1] - model.filePosition[1])]));
                 child.locked = true;
                 children.push(child);
             }

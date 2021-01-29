@@ -10,7 +10,7 @@ export default class Select extends Tool {
         stroke: true,
         fill: true,
         bounds: true,
-        tolerance: 75
+        tolerance: 50
     };
 
     /** @type {InstanceType<import("paper")["HitResult"]>} */
