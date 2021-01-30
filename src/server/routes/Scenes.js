@@ -1,7 +1,7 @@
-import ApiRoute from "~server/lib/ApiRoute";
+import Requisites from "~server/routes/Requisites";
 import Scene from "~server/models/Scene";
 
-export default class Scenes extends ApiRoute {
+export default class Scenes extends Requisites {
 
     claimedExport = Scene;
 

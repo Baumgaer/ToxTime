@@ -80,12 +80,13 @@ export default {
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
     },
-    beforeDestroy() {
+    async beforeDestroy() {
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
             if (this.watchedModel.hasChanges()) {
                 this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
-                this.watchedModel.save();
+                await this.watchedModel.save();
+                this.createAvatar();
             }
         } else {
             if (this.model || this.watchedModel._id) {
@@ -164,8 +165,9 @@ export default {
             this.paper.view.draw();
         },
 
-        onSaveButtonClick() {
-            this.watchedModel.save();
+        async onSaveButtonClick() {
+            await this.watchedModel.save();
+            this.createAvatar();
             this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
         },
 
@@ -201,6 +203,11 @@ export default {
                 sceneObject: model
             });
             this.watchedModel.actionObjects.push(actionObject);
+        },
+
+        createAvatar() {
+            const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
+            ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
         }
     }
 };
