@@ -31,9 +31,9 @@ export function RequisiteMixinClass(MixinClass) {
                 ],
                 default: []
             },
-            subObjects: {
+            actionObjects: {
                 type: [
-                    { type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }
+                    { type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }
                 ],
                 default: []
             }
