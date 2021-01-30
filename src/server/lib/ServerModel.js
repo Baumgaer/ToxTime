@@ -26,7 +26,6 @@ export default class ServerModel extends BaseModel {
         const protoModel = Object.getPrototypeOf(Object.getPrototypeOf(RawClass));
         const protoClassName = protoModel.className;
         const protoCollection = protoModel.collection;
-        console.log(RawClass.className, Boolean(mongooseBaseModels[protoClassName] && protoCollection === RawClass.collection));
         if (mongooseBaseModels[protoClassName] && protoCollection === RawClass.collection) {
             Model = mongooseBaseModels[protoClassName].discriminator(RawClass.className, schema);
         } else Model = mongoose.model(RawClass.className, schema);

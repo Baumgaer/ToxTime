@@ -89,10 +89,12 @@ export default {
         /**
          * @param {Event} event
          */
-        onNameChange(event) {
+        async onNameChange(event) {
             if (!this.nameEditDBField) return;
             this.model[this.nameEditDBField] = event.target.value;
-            this.model.save();
+            const result = await this.model.save();
+            if (result instanceof Error) return;
+            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         }
     }
 };

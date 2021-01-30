@@ -83,9 +83,10 @@ export default {
     async beforeDestroy() {
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
-            if (this.watchedModel.hasChanges()) {
+            if (this.watchedModel.hasChanges() || !this.watchedModel._id) {
+                const result = await this.watchedModel.save();
+                if (result instanceof Error) return;
                 this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
-                await this.watchedModel.save();
                 this.createAvatar();
             }
         } else {
@@ -166,7 +167,8 @@ export default {
         },
 
         async onSaveButtonClick() {
-            await this.watchedModel.save();
+            const result = await this.watchedModel.save();
+            if (result instanceof Error) return;
             this.createAvatar();
             this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
         },
@@ -206,6 +208,7 @@ export default {
         },
 
         async createAvatar() {
+            if (!this.watchedModel._id) return;
             const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
             await ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
             this.watchedModel.isCreatingAvatar = false;
