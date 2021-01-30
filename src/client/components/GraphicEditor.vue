@@ -75,7 +75,10 @@ export default {
     mounted() {
         if (this.model) {
             this.watchedModel = this.model;
-        } else this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
+        } else {
+            this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
+        }
+        console.log(this.watchedModel.actionObjects);
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
@@ -85,9 +88,13 @@ export default {
             // Cases editor was closed unexpected
             if (this.watchedModel.hasChanges() || !this.watchedModel._id) {
                 const result = await this.watchedModel.save();
-                if (result instanceof Error) return;
+                if (result instanceof Error) {
+                    this.paper.project.clear();
+                    return;
+                }
                 this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
                 this.createAvatar();
+                this.paper.project.clear();
             }
         } else {
             if (this.model || this.watchedModel._id) {
@@ -99,6 +106,7 @@ export default {
                 this.watchedModel.destroy();
                 this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
             }
+            this.paper.project.clear();
         }
     },
     methods: {

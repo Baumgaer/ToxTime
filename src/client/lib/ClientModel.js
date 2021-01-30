@@ -2,6 +2,7 @@ import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
 import onChange from "on-change";
 import { v4 as uuid } from "uuid";
+import { isObjectLike, cloneDeep } from "lodash";
 
 export default class ClientModel extends BaseModel {
 
@@ -31,7 +32,9 @@ export default class ClientModel extends BaseModel {
                     if (Object.hasOwnProperty.call(schema.paths, pathObject)) {
                         const element = schema.paths[pathObject];
                         if (element.options.default !== undefined) {
-                            this[pathObject] = element.options.default;
+                            let defaultValue = element.options.default;
+                            if (isObjectLike(defaultValue)) defaultValue = cloneDeep(defaultValue);
+                            this[pathObject] = defaultValue;
                         }
                     }
                 }
