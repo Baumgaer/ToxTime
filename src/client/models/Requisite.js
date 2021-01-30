@@ -11,4 +11,20 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         };
     }
 
+    async save() {
+        this.isCreatingAvatar = true;
+        const result = await super.save();
+
+        const start = Date.now();
+        const timeoutInterval = setInterval(() => {
+            if (!this.isCreatingAvatar) clearInterval(timeoutInterval);
+            if ((Date.now() - start) >= 8000) {
+                this.isCreatingAvatar = false;
+                clearInterval(timeoutInterval);
+            }
+        });
+
+        return result;
+    }
+
 });

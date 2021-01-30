@@ -5,7 +5,7 @@ const CommonSceneObjectRequisite = SceneObjectMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class SceneObject extends CommonSceneObjectRequisite {
 
     getAvatar() {
-        if (this._id) return super.getAvatar();
+        if (this._id && !this.isCreatingAvatar) return super.getAvatar();
         return {
             type: "component",
             name: "ufo-icon"

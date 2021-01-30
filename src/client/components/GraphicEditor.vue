@@ -205,9 +205,10 @@ export default {
             this.watchedModel.actionObjects.push(actionObject);
         },
 
-        createAvatar() {
+        async createAvatar() {
             const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
-            ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
+            await ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
+            this.watchedModel.isCreatingAvatar = false;
         }
     }
 };
