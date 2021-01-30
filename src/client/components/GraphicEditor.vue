@@ -157,6 +157,7 @@ export default {
 
         onSaveButtonClick() {
             this.watchedModel.save();
+            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
         },
 
         setTool(toolName) {

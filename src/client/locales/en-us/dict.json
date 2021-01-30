@@ -55,5 +55,6 @@
     "notFound": "Could not find resource",
     "errorAddingUsers": "Error while adding users",
     "usersAdded": "Users added",
-    "discarded": "Changes to {name} discarded"
+    "discarded": "Changes to {name} discarded",
+    "saved": "Changes to {name} saved"
 }

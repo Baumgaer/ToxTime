@@ -113,10 +113,12 @@ export default class ClientModel extends BaseModel {
     }
 
     async save() {
+        if (!this.hasChanges()) return;
+
         const that = onChange.target(this);
         const data = that.toObject();
-        let method;
 
+        let method;
         if (that._id) {
             method = ApiClient.patch.bind(ApiClient);
         } else method = ApiClient.post.bind(ApiClient);

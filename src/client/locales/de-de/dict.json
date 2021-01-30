@@ -55,5 +55,6 @@
     "notFound": "Resource konnte nicht gefunden werden",
     "errorAddingUsers": "Fehler beim Hinzufügen von Benutzern",
     "usersAdded": "Benutzer hinzugefügt",
-    "discarded": "Änderungen an {name} verworfen"
+    "discarded": "Änderungen an {name} verworfen",
+    "saved": "Änderungen an {name} gespeichert"
 }
