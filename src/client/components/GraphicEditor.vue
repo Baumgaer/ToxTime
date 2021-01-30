@@ -18,12 +18,12 @@
                  :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
                  @load="onBackgroundLoaded($event)"
             />
-            <img v-for="(subObject, index) of watchedModel.subObjects"
+            <img v-for="(actionObject, index) of watchedModel.actionObjects"
                  style="display: none;"
-                 :ref="index"
+                 :ref="`actionObjectBackground${index}`"
                  :key="index"
-                 :src="`/files/${subObject.file._id}`"
-                 @load="onSubObjectBackgroundLoaded(index)"
+                 :src="`/files/${actionObject.sceneObject.file._id}`"
+                 @load="onActionObjectBackgroundLoaded(index)"
             />
             <canvas ref="canvas" resize @wheel="onWheel($event)"></canvas>
         </div>
@@ -38,7 +38,8 @@ import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
 
 import SceneObject from "~client/models/SceneObject";
-import FileModelExport from "~client/models/File";
+import File from "~client/models/File";
+import ActionObject from "~client/models/ActionObject";
 
 import PolyClickArea from "~client/lib/PolyClickArea";
 import Move from "~client/lib/Move";
@@ -114,7 +115,7 @@ export default {
         },
 
         /**
-         * @param {FileModelExport["Model"]} files
+         * @param {File["Model"]} files
          */
         onUploadReady(files) {
             for (const file of files) {
@@ -139,18 +140,27 @@ export default {
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.sendToBack();
-            this.watchedModel.filePosition = [raster.position.x, raster.position.y];
+            this.watchedModel.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
         },
 
-        onSubObjectBackgroundLoaded(subObject) {
-            const index = this.subObjects.indexOf(subObject);
-            /** @type {InstanceType<import("paper")["Group"]>} */
-            const group = this.subObjects[index];
-            if (!group) return;
-            const raster = new this.paper.Raster(this.$refs[`subObjectBackground${subObject.model._id}`][0]);
-            group.children = [raster, ...group.children];
+        onActionObjectBackgroundLoaded(index) {
+            const actionObject = this.watchedModel.actionObjects[index];
+            const backGroundPos = new this.paper.Point(actionObject.sceneObject.position);
+            const raster = new this.paper.Raster(this.$refs[`actionObjectBackground${index}`][0]);
+            const group = new this.paper.Group({
+                children: [raster],
+                position: new this.paper.Point(actionObject.position),
+                rotation: actionObject.rotation
+            });
+            for (const clickArea of actionObject.sceneObject.clickAreas) {
+                const path = PolyClickArea.build(this.paper, clickArea.shape);
+                const oldPos = new this.paper.Point(clickArea.position);
+                path.position = raster.position.add((oldPos.subtract(backGroundPos)));
+                group.addChild(path);
+            }
+            group.model = actionObject;
             this.paper.view.draw();
         },
 
@@ -172,31 +182,25 @@ export default {
         },
 
         addObject(model) {
-            if (model instanceof FileModelExport.RawClass) this.addBackground(model);
-            if (model instanceof SceneObject.RawClass) this.addSubObject(model);
+            this.addBackground(model);
+            this.addActionObject(model);
         },
 
         addBackground(model) {
-            if (!(model instanceof FileModelExport.RawClass) || !model.mime.startsWith("image")) return;
+            if (!(model instanceof File.RawClass) || !model.mime.startsWith("image")) return;
             this.watchedModel.file = model;
         },
 
-        addSubObject(model) {
-            const children = [];
-            for (const clickArea of model.clickAreas) {
-                const child = PolyClickArea.build(this.paper, clickArea.shape);
-                child.locked = true;
-                children.push(child);
-            }
-            const group = new this.paper.Group({
-                children: children,
-                position: this.paper.view.center,
-                name: model.getName()
-                // scaling,
-                // rotation
+        addActionObject(model) {
+            // Has to be an Scene Object which can be passed into an action object
+            // Should not be the same model as the current watched model to avoid recursion loop
+            // has to be checked with the id because watched model can be an recursive proxy
+            if (!(model instanceof SceneObject.RawClass) || model._id === this.watchedModel._id) return;
+            const actionObject = new ActionObject.Model({
+                position: [this.paper.view.center.x, this.paper.view.center.y],
+                sceneObject: model
             });
-            group.model = model;
-            this.subObjects.push(group);
+            this.watchedModel.actionObjects.push(actionObject);
         }
     }
 };

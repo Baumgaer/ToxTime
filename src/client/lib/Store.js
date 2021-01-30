@@ -1,12 +1,9 @@
 import onChange from "on-change";
 import lodash from "lodash";
 import { isProxy } from "~common/utils";
-import BaseModel from "~common/lib/BaseModel";
 
-export const modelMap = {
-    Error,
-    BaseModel: BaseModel
-};
+/** @type {Record<string, ReturnType<import("~client/lib/ClientModel")["default"]["buildClientExport"]>>} */
+export const modelMap = { Error };
 
 /**
  * @typedef {import("~common/lib/BaseModel").default} Model
@@ -22,8 +19,8 @@ export class Store {
         if (!Store.usedInstanceGetter) throw new Error("This is a singleton, use Store.getInstance()!");
         const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
         modelContext.keys().forEach((key) => {
-            const staticModel = modelContext(key).default.Model;
-            modelMap[staticModel.className] = staticModel;
+            const staticModel = modelContext(key).default;
+            modelMap[staticModel.Model.className] = staticModel;
         });
         this.collection("localStorage");
     }
@@ -105,9 +102,9 @@ export class Store {
         let model = modelLike;
         if (!this.hasModel(model)) {
             if (modelMap[modelLike.className] !== Error) {
-                if (!(modelLike instanceof modelMap[modelLike.className])) {
-                    model = this._installChangeObserver(new modelMap[modelLike.className](modelLike));
-                } else if (modelLike instanceof modelMap[modelLike.className] && !isProxy(modelLike)) {
+                if (!(modelLike instanceof modelMap[modelLike.className].Model)) {
+                    model = this._installChangeObserver(new modelMap[modelLike.className].Model(modelLike));
+                } else if (modelLike instanceof modelMap[modelLike.className].Model && !isProxy(modelLike)) {
                     model = this._installChangeObserver(modelLike);
                 }
                 this.collection(collectionName)[id] = model;
@@ -128,7 +125,7 @@ export class Store {
      * @memberof Store
      */
     updateModel(modelLike) {
-        if (modelLike instanceof modelMap[modelLike.className]) throw new Error("You should not pass an instance here");
+        if (modelLike instanceof modelMap[modelLike.className].Model) throw new Error("You should not pass an instance here");
         const dummyModel = this.getModelById(modelLike.collection, modelLike._dummyId);
         let realModel = this.getModelById(modelLike.collection, modelLike._id);
         if (dummyModel && modelLike._id) {
@@ -161,14 +158,19 @@ export class Store {
         const that = this;
         return onChange(model, function (path, value, prev, name) {
             if ((value === undefined && prev === undefined && name === undefined) || !this.staging) return;
-            const id = model._dummyId || model._id;
-            if (that.hasModel(model) && that.getModelById(model.collection, id).__ob__) that.getModelById(model.collection, id).__ob__.dep.notify();
             const fieldName = path[0];
-            if (!Object.getPrototypeOf(this).constructor.schema[fieldName]) return;
+
+            // Notify all vue components about a change
+            const id = model._dummyId || model._id;
+            if (that.hasModel(model) && that.getModelById(model.collection, id).__ob__) {
+                that.getModelById(model.collection, id).__ob__.dep.notify();
+            }
+
+            if (!(fieldName in modelMap[this.className].Schema.obj)) return;
             if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
             const stagedChanges = Reflect.getMetadata("stagedChanges", model);
             if (!stagedChanges[fieldName]) stagedChanges[fieldName] = prev;
 
-        }, { pathAsArray: true, ignoreUnderscores: true, ignoreSymbols: true, equals: lodash.isEqual });
+        }, { pathAsArray: true, ignoreUnderscores: true, ignoreSymbols: true, isShallow: false, equals: lodash.isEqual });
     }
 }

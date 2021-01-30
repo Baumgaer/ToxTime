@@ -19,8 +19,7 @@ export function GameObjectMixinClass(MixinClass) {
             },
             position: {
                 type: [Number],
-                required: true,
-                default: []
+                required: true
             }
         };
     }

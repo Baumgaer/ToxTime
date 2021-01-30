@@ -23,8 +23,11 @@ export default class ServerModel extends BaseModel {
         for (const plugin of plugins) schema.plugin(...plugin);
         schema.plugin(mongooseAutoPopulate);
         let Model;
-        const protoClassName = Object.getPrototypeOf(Object.getPrototypeOf(RawClass)).className;
-        if (mongooseBaseModels[protoClassName]) {
+        const protoModel = Object.getPrototypeOf(Object.getPrototypeOf(RawClass));
+        const protoClassName = protoModel.className;
+        const protoCollection = protoModel.collection;
+        console.log(RawClass.className, Boolean(mongooseBaseModels[protoClassName] && protoCollection === RawClass.collection));
+        if (mongooseBaseModels[protoClassName] && protoCollection === RawClass.collection) {
             Model = mongooseBaseModels[protoClassName].discriminator(RawClass.className, schema);
         } else Model = mongoose.model(RawClass.className, schema);
         mongooseBaseModels[RawClass.className] = Model;

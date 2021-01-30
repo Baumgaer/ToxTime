@@ -31,7 +31,8 @@ export function ActionObjectMixinClass(MixinClass) {
             sceneObject: {
                 type: Schema.Types.ObjectId,
                 ref: "SceneObject",
-                required: true
+                required: true,
+                autopopulate: true
             }
         };
     }
