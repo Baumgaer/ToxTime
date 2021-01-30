@@ -18,12 +18,12 @@
                  :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
                  @load="onBackgroundLoaded($event)"
             />
-            <img v-for="subObject of subObjects"
+            <img v-for="(subObject, index) of watchedModel.subObjects"
                  style="display: none;"
-                 :ref="`subObjectBackground${subObject.model._id}`"
-                 :key="subObject.model._id"
-                 :src="`/files/${subObject.model.file._id}`"
-                 @load="onSubObjectBackgroundLoaded(subObject)"
+                 :ref="index"
+                 :key="index"
+                 :src="`/files/${subObject.file._id}`"
+                 @load="onSubObjectBackgroundLoaded(index)"
             />
             <canvas ref="canvas" resize @wheel="onWheel($event)"></canvas>
         </div>
@@ -64,7 +64,6 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: {},
             currentTool: null,
-            subObjects: [],
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -185,7 +184,7 @@ export default {
         addSubObject(model) {
             const children = [];
             for (const clickArea of model.clickAreas) {
-                const child = PolyClickArea.build(this.paper, clickArea.shape.map((point) => [point[0] - (clickArea.position[0] - model.filePosition[0]), point[1] - (clickArea.position[1] - model.filePosition[1])]));
+                const child = PolyClickArea.build(this.paper, clickArea.shape);
                 child.locked = true;
                 children.push(child);
             }

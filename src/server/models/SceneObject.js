@@ -1,5 +1,5 @@
 import { SceneObjectMixinClass } from "~common/models/SceneObject";
-import ServerModel from "~server/lib/ServerModel";
+import Requisite from "~server/models/Requisite";
 
-const CommonServerSceneObject = SceneObjectMixinClass(ServerModel);
-export default ServerModel.buildServerExport(class SceneObject extends CommonServerSceneObject { });
+const CommonSceneObjectRequisite = SceneObjectMixinClass(Requisite.RawClass);
+export default Requisite.RawClass.buildServerExport(class SceneObject extends CommonSceneObjectRequisite { });

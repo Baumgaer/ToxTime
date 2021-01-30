@@ -4,20 +4,20 @@
  * @export
  * @template T
  * @param {T} MixinClass
- * @returns {SceneObject & T}
+ * @returns {Scene & T}
  */
-export function SceneObjectMixinClass(MixinClass) {
-    class SceneObject extends MixinClass {
+export function SceneMixinClass(MixinClass) {
+    class Scene extends MixinClass {
 
-        static className = "SceneObject";
-        static collection = "sceneObjects";
+        static className = "Scene";
+        static collection = "scenes";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
-                default: `SceneObject`
+                default: `Scene`
             }
         };
     }
-    return SceneObject;
+    return Scene;
 }

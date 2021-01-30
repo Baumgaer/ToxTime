@@ -17,11 +17,6 @@ export function ClickAreaMixinClass(MixinClass) {
             name: {
                 default: `ClickArea`
             },
-            position: {
-                type: [Number],
-                required: true,
-                default: []
-            },
             shape: {
                 type: [
                     [Number]
@@ -30,14 +25,6 @@ export function ClickAreaMixinClass(MixinClass) {
                 default: []
             }
         };
-
-        getName(preferredField) {
-            return `${this[preferredField] || this.name}`;
-        }
-
-        getAvatar() {
-            return null;
-        }
     }
     return ClickArea;
 }

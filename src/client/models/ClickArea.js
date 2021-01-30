@@ -1,5 +1,5 @@
 import { ClickAreaMixinClass } from "~common/models/ClickArea";
-import ClientModel from "~client/lib/ClientModel";
+import GameObject from "~client/models/GameObject";
 
-const CommonClientClickArea = ClickAreaMixinClass(ClientModel);
-export default ClientModel.buildClientExport(class ClickArea extends CommonClientClickArea { });
+const CommonGameObjectClickArea = ClickAreaMixinClass(GameObject.RawClass);
+export default GameObject.RawClass.buildClientExport(class ClickArea extends CommonGameObjectClickArea { });
