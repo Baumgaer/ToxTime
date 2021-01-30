@@ -85,8 +85,8 @@ export default class WebServer {
         // parse the body to get post data and so on
         // NOTE: This is important for some middlewares to have directly.
         //       So this has to be the first middleware
-        this.app.use(json());
-        this.app.use(urlencoded({ extended: true }));
+        this.app.use(json({ limit: "50mb" }));
+        this.app.use(urlencoded({ extended: true, limit: "50mb" }));
         this.app.use(compression());
         this.app.use(fileUpload({
             createParentPath: true,
