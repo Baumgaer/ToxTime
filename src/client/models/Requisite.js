@@ -14,6 +14,11 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
 
     @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
     async delete() {
+        if (!this._id) {
+            this.destroy();
+            window.activeUser.activeEditor = null;
+            return;
+        }
         const result = await ApiClient.delete(`/${this.collection}/${this._id}`);
         if ((result instanceof Error)) return result;
         ApiClient.store.removeModel(this);

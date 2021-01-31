@@ -79,7 +79,7 @@ export default class ClientModel extends BaseModel {
         const that = onChange.target(this);
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
         let changes = Reflect.getMetadata("stagedChanges", that);
-        console.log(changes);
+        if (Object.keys(changes).length) Reflect.defineMetadata("stagedChanges", {}, that);
     }
 
     toObject() {
