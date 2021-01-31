@@ -41,6 +41,7 @@ import nunjucksConfig from "./../../nunjucks.config";
  */
 export default class WebServer {
 
+    /** @type {Record<string, import("~server/lib/ApiRoute").default>} */
     modelApiMapping = {};
 
     constructor() {

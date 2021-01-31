@@ -1,10 +1,11 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Requisite from "~server/models/Requisite";
 import { isMongoId } from "~common/utils";
-import { readFileSync, writeFileSync } from "graceful-fs";
+import { readFileSync, writeFileSync, unlinkSync } from "graceful-fs";
 import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
+import CustomError from "~common/lib/CustomError";
 
 export default class Requisites extends ApiRoute {
 
@@ -15,8 +16,8 @@ export default class Requisites extends ApiRoute {
      * as file content
      *
      * @param {import("express").Request} request the request
-     * @returns {void}
-     * @memberof Logout
+     * @returns {boolean}
+     * @memberof Requisites
      */
     @Requisites.put("/:id")
     async createAvatar(request) {
@@ -35,8 +36,8 @@ export default class Requisites extends ApiRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {Promise<User["Model"][]> | CustomError>}
-     * @memberof Login
+     * @returns {false | string>}
+     * @memberof Requisites
      */
     @Requisites.get("/:id", { allowUser: true })
     getAvatar(request, response) {
@@ -48,6 +49,56 @@ export default class Requisites extends ApiRoute {
             console.error(error);
             return false;
         }
+    }
+
+    /**
+     * Removes not only the requisite itself by calling the general delete function,
+     * but also all clickAreas and actionObjects associated with this object
+     *
+     * @param {import("express").Request} request the request
+     * @returns {void}
+     * @memberof Requisites
+     */
+    @Requisites.delete("/:id")
+    async delete(request) {
+        const result = await super.delete(request);
+        if (result instanceof Error) return result;
+
+        try {
+            unlinkSync(resolve(rootPath, "avatars", `${request.params.id}.svg`));
+        } catch (error) {
+            // Not interested in stopping progress on failed avatar deletion...
+            // It's may be not existent
+            console.error(error);
+        }
+
+        const promises = [];
+        for (const clickArea of result.clickAreas) {
+            request.params.id = clickArea._id.toString();
+            promises.push(this.webServer.modelApiMapping.ClickArea.delete(request));
+        }
+
+        for (const actionObject of result.actionObjects) {
+            request.params.id = actionObject._id.toString();
+            promises.push(this.webServer.modelApiMapping.ActionObject.delete(request));
+        }
+
+        // Check if there are errors and combine them into one error
+        const deletions = await Promise.all(promises);
+        if (deletions.some((deletion) => deletion instanceof Error)) {
+            const error = new CustomError("partialFail");
+            error.errors = {};
+            for (let index = 0; index < deletions.length; index++) {
+                const element = deletions[index];
+                if (!(element instanceof Error)) continue;
+                if (index < result.clickAreas.length) {
+                    error.errors[result.clickAreas[index]._id] = element;
+                } else error.errors[result.actionObjects[index - result.clickAreas.length]._id] = element;
+            }
+            return error;
+        }
+
+        return true;
     }
 
 }
