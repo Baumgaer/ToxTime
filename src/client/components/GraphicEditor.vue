@@ -65,7 +65,6 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: {},
             currentTool: null,
-            currentScaleFactor: 1,
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -152,6 +151,7 @@ export default {
             if (this.background) this.background.remove();
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
+            raster.scaling = this.paper.project.activeLayer.getScaling();
             raster.sendToBack();
             this.watchedModel.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
@@ -167,13 +167,13 @@ export default {
                 position: new this.paper.Point(actionObject.position),
                 rotation: actionObject.rotation
             });
+            group.scaling = this.paper.project.activeLayer.getScaling();
             for (const clickArea of actionObject.sceneObject.clickAreas) {
                 const path = PolyClickArea.build(this.paper, clickArea.shape);
                 const oldPos = new this.paper.Point(clickArea.position);
                 path.position = raster.position.add((oldPos.subtract(backGroundPos)));
                 group.addChild(path);
             }
-            group.scaling = this.paper.project.activeLayer.getScaling();
             group.model = actionObject;
             this.paper.view.draw();
         },
