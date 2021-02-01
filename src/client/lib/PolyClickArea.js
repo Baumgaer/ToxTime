@@ -59,11 +59,10 @@ export default class PolyClickArea extends Tool {
         this.path.removeSegment(this.path.lastSegment.index);
         if (this.path.segments.length >= 3) {
             const store = Store.getInstance();
-            const clickArea = new ClickAreaClientExport.Model({
+            const clickArea = store.addModel(new ClickAreaClientExport.Model({
                 shape: this.path.segments.map((segment) => [segment.point.x, segment.point.y]),
                 position: [this.path.position.x, this.path.position.y]
-            });
-            store.addModel(clickArea);
+            }));
             this.model.clickAreas.push(clickArea);
             this.path.model = clickArea;
         } else this.path.remove();
