@@ -221,7 +221,7 @@ export default {
                 group.scale(scaleFactor);
 
                 const oldPos = new this.paper.Point(actionObject.position);
-                group.position = ownerGroup.children[0].position.add(oldPos.subtract(backGroundPos));
+                group.position = ownerGroup.position.add(oldPos.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)).multiply(scaleFactor));
                 group.locked = true;
                 ownerGroup.addChild(group);
             }
