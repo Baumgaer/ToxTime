@@ -65,6 +65,7 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: {},
             currentTool: null,
+            currentScaleFactor: 1,
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -142,7 +143,9 @@ export default {
             const zoom = 0.1;
             let sign = 1;
             if (event.wheelDelta < 0) sign = -1;
-            this.paper.view.scale(1 + zoom * sign);
+            const scaleFactor = 1 + zoom * sign;
+            this.paper.view.scale(scaleFactor);
+            this.currentScaleFactor = this.currentScaleFactor * scaleFactor;
         },
 
         onBackgroundLoaded() {
@@ -170,6 +173,7 @@ export default {
                 path.position = raster.position.add((oldPos.subtract(backGroundPos)));
                 group.addChild(path);
             }
+            group.scaling = this.paper.project.activeLayer.getScaling();
             group.model = actionObject;
             this.paper.view.draw();
         },

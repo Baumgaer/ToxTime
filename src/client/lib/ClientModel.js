@@ -41,8 +41,12 @@ export default class ClientModel extends BaseModel {
 
                 // Assign given values
                 Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
-                if (!params._id) this._dummyId = uuid();
+                if (!params._id) {
+                    this._dummyId = uuid();
+                    Reflect.defineMetadata("stagedChanges", params, this);
+                }
                 this.staging = true;
+
             }
         };
         return { RawClass, Schema: schema, Model: modelClass, isClientModel: true };
