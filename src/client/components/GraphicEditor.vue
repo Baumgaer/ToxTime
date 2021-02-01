@@ -208,10 +208,10 @@ export default {
             // Should not be the same model as the current watched model to avoid recursion loop
             // has to be checked with the id because watched model can be an recursive proxy
             if (!(model instanceof SceneObject.RawClass) || model._id === this.watchedModel._id) return;
-            const actionObject = new ActionObject.Model({
+            const actionObject = ApiClient.store.addModel(new ActionObject.Model({
                 position: [this.paper.view.center.x, this.paper.view.center.y],
                 sceneObject: model
-            });
+            }));
             this.watchedModel.actionObjects.push(actionObject);
         },
 
