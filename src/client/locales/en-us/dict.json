@@ -56,5 +56,14 @@
     "errorAddingUsers": "Error while adding users",
     "usersAdded": "Users added",
     "discarded": "Changes to {name} discarded",
-    "saved": "Changes to {name} saved"
+    "saved": "Changes to {name} saved",
+    "download": "Download",
+    "collapse": "Collapse",
+    "select": "Manipulation tool",
+    "polyClickArea": "Define click area",
+    "move": "Move view",
+    "save": "Save",
+    "close": "Close",
+    "upload": "Upload",
+    "addSceneObject": "Add scene object"
 }

@@ -56,5 +56,14 @@
     "errorAddingUsers": "Fehler beim Hinzufügen von Benutzern",
     "usersAdded": "Benutzer hinzugefügt",
     "discarded": "Änderungen an {name} verworfen",
-    "saved": "Änderungen an {name} gespeichert"
+    "saved": "Änderungen an {name} gespeichert",
+    "download": "Herunterladen",
+    "collapse": "Einklappen",
+    "select": "Manipulationswerkzeug",
+    "polyClickArea": "Klickbereich definieren",
+    "move": "Ansicht verschieben",
+    "save": "Speichern",
+    "close": "schließen",
+    "upload": "Hochladen",
+    "addSceneObject": "Szenenobjekt hinzufügen"
 }
