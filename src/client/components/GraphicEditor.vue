@@ -208,12 +208,21 @@ export default {
                     match: (child) => child.model === actionObjectMap.ownerGroupModel
                 });
 
+                // Determine scaling factor recursive over all parents of the current group
+                let scaleFactor = actionObject.scale;
+                let scaleOwnerGroup = ownerGroup;
+                while(scaleOwnerGroup && scaleOwnerGroup instanceof this.paper.Group && !(scaleOwnerGroup instanceof this.paper.Layer)) {
+                    scaleFactor *= scaleOwnerGroup.model.scale;
+                    scaleOwnerGroup = scaleOwnerGroup.parent;
+                }
+
+                // Apply scaling of owner to be in same zoom and then scale current recursive
+                group.scaling = ownerGroup.getScaling();
+                group.scale(scaleFactor);
+
                 const oldPos = new this.paper.Point(actionObject.position);
                 group.position = ownerGroup.children[0].position.add(oldPos.subtract(backGroundPos));
-                group.scaling = ownerGroup.getScaling();
-                group.scale(actionObject.scale);
                 group.locked = true;
-
                 ownerGroup.addChild(group);
             }
 
