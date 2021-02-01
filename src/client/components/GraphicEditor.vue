@@ -18,12 +18,12 @@
                  :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
                  @load="onBackgroundLoaded($event)"
             />
-            <img v-for="(actionObject, index) of watchedModel.actionObjects"
+            <img v-for="(actionObjectMap, index) of actionObjectsMap"
                  style="display: none;"
-                 :ref="`actionObjectBackground${index}`"
-                 :key="index"
-                 :src="`/files/${actionObject.sceneObject.file._id}`"
-                 @load="onActionObjectBackgroundLoaded(index)"
+                 :ref="`actionObjectBackground${actionObjectMap.actionObject._id}${index}`"
+                 :key="`${actionObjectMap.actionObject._id}${index}`"
+                 :src="`/files/${actionObjectMap.actionObject.sceneObject.file._id}`"
+                 @load="onActionObjectBackgroundLoaded(actionObjectMap, index)"
             />
             <canvas ref="canvas" resize @wheel="onWheel($event)"></canvas>
         </div>
@@ -72,13 +72,33 @@ export default {
             }
         };
     },
+    computed: {
+        actionObjectsMap() {
+            if (!this.watchedModel) return [];
+            const map = [];
+
+            const getRecursive = (model, ownerGroupModel) => {
+                if (!model || !model.actionObjects) return;
+                for (const actionObject of model.actionObjects) {
+                    let promise = new Promise((resolve) => {
+                        const prev = map[map.length - 1];
+                        if (prev) prev.resolve = resolve;
+                    });
+                    if (!map[map.length - 1]) promise = null;
+                    map.push({ actionObject, ownerGroupModel, promise });
+                    getRecursive(actionObject.sceneObject, actionObject);
+                }
+            };
+
+            getRecursive(this.watchedModel);
+            return map;
+        }
+    },
     mounted() {
         if (this.model) {
             this.watchedModel = this.model;
-        } else {
-            this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
-        }
-        console.log(this.watchedModel.actionObjects);
+        } else this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
+
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
@@ -158,24 +178,49 @@ export default {
             this.paper.view.draw();
         },
 
-        onActionObjectBackgroundLoaded(index) {
-            const actionObject = this.watchedModel.actionObjects[index];
+        async onActionObjectBackgroundLoaded(actionObjectMap, index) {
+
+            // If not the first one (which does not have an awaiting promise),
+            // wait until the previous actionObject has fulfilled
+            if (actionObjectMap.promise) await actionObjectMap.promise;
+
+            const actionObject = actionObjectMap.actionObject;
             const backGroundPos = new this.paper.Point(actionObject.sceneObject.position);
-            const raster = new this.paper.Raster(this.$refs[`actionObjectBackground${index}`][0]);
-            const group = new this.paper.Group({
-                children: [raster],
-                position: new this.paper.Point(actionObject.position),
-                rotation: actionObject.rotation
-            });
+            const raster = new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0]);
+
+            const group = new this.paper.Group({ children: [raster], position: new this.paper.Point(actionObject.position), rotation: actionObject.rotation });
             group.scaling = this.paper.project.activeLayer.getScaling();
+            group.model = actionObject;
+
+            // Add clickAreas
             for (const clickArea of actionObject.sceneObject.clickAreas) {
                 const path = PolyClickArea.build(this.paper, clickArea.shape);
                 const oldPos = new this.paper.Point(clickArea.position);
-                path.position = raster.position.add((oldPos.subtract(backGroundPos)));
+                path.position = raster.position.add(oldPos.subtract(backGroundPos));
+                path.locked = true;
                 group.addChild(path);
             }
-            group.model = actionObject;
+
+            // Process sub action objects
+            if (actionObjectMap.ownerGroupModel) {
+                const ownerGroup = this.paper.project.getItem({
+                    recursive: true,
+                    match: (child) => child.model === actionObjectMap.ownerGroupModel
+                });
+
+                const oldPos = new this.paper.Point(actionObject.position);
+                group.position = ownerGroup.children[0].position.add(oldPos.subtract(backGroundPos));
+                group.scaling = ownerGroup.getScaling();
+                group.scale(actionObject.scale);
+                group.locked = true;
+
+                ownerGroup.addChild(group);
+            }
+
+            // Refresh view to be sure that the group is visible
             this.paper.view.draw();
+            // Poke next actionObject
+            if (actionObjectMap.resolve) actionObjectMap.resolve();
         },
 
         async onSaveButtonClick() {
