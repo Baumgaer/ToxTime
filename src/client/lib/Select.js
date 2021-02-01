@@ -35,11 +35,13 @@ export default class Select extends Tool {
                 // Remove point from a clickArea
                 hitResult.segment.remove();
                 hitResult.item.model.shape.splice(hitResult.segment.index, 1);
+                hitResult.item.model.position = [hitResult.item.position.x, hitResult.item.position.y];
             } else if (hitResult.type === "stroke") {
                 // Add point to a clickArea
                 const index = hitResult.location.index + 1;
                 hitResult.item.insert(index, event.point);
                 hitResult.item.model.shape.splice(index, 0, [event.point.x, event.point.y]);
+                hitResult.item.model.position = [hitResult.item.position.x, hitResult.item.position.y];
             }
         } else {
             // Just select the click item
@@ -86,7 +88,8 @@ export default class Select extends Tool {
         } else if (hitResult.type === "segment") {
             // Change point of a clickArea
             hitResult.segment.point = event.point;
-            hitResult.item.model[hitResult.segment.point._owner.index] = [hitResult.segment.point.x, hitResult.segment.point.y];
+            hitResult.item.model.shape[hitResult.segment.point._owner.index] = [hitResult.segment.point.x, hitResult.segment.point.y];
+            hitResult.item.model.position = [hitResult.item.position.x, hitResult.item.position.y];
         } else if (["fill", "pixel"].includes(hitResult.type)) {
             // Move clickArea or actionObject
             hitResult.item.translate(event.delta);
