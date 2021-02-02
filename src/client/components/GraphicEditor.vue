@@ -277,6 +277,10 @@ export default {
                 sceneObject: model
             }));
             this.watchedModel.actionObjects.push(actionObject);
+
+            const actionObjectsMap = this.actionObjectsMap;
+            const lastActionObject = actionObjectsMap[actionObjectsMap.length - 2];
+            if (lastActionObject && lastActionObject.resolve) lastActionObject.resolve();
         },
 
         async createAvatar() {
