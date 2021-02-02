@@ -155,8 +155,8 @@ export default class Select extends Tool {
     remove() {
         super.remove();
         if (this.selection) {
-            this.selection.item.selected = false;
             this.selection.item.model.isSelected = false;
+            this.selection.item.selected = false;
         }
     }
 }

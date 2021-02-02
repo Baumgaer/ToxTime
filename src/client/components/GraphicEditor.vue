@@ -185,6 +185,11 @@ export default {
             if (actionObjectMap.promise) await actionObjectMap.promise;
 
             const actionObject = actionObjectMap.actionObject;
+
+            // Prevent vue from inserting a model each time it gets an id update
+            const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === actionObject });
+            if (alreadyInserted) return;
+
             const backGroundPos = new this.paper.Point(actionObject.sceneObject.position);
             const raster = new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0]);
 

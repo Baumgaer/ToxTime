@@ -128,16 +128,19 @@ export class Store {
         if (modelLike instanceof modelMap[modelLike.className].Model) throw new Error("You should not pass an instance here");
         const dummyModel = this.getModelById(modelLike.collection, modelLike._dummyId);
         let realModel = this.getModelById(modelLike.collection, modelLike._id);
+
+        let notify = true;
         if (dummyModel && modelLike._id) {
             this.removeModel(dummyModel);
             delete dummyModel._dummyId;
             delete modelLike._dummyId;
             dummyModel._id = modelLike._id;
             realModel = this.addModel(dummyModel);
+            notify = false;
         }
         if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
-        if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
+        if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
         return Object.assign(realModel, modelLike);
     }
 
