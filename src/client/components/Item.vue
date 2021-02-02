@@ -14,7 +14,7 @@
                     type="text" name="name"
                     ref="nameInput"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
-                    @change="onNameChange($event)"
+                    @change="onNameChange($event, model)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
                 />
@@ -29,6 +29,25 @@
             </div>
         </div>
         <ProgressBar :model="model" class="progressBar" />
+        <div class="subObjects">
+            <div v-for="(subObject, index) of model.getSubObjects()" :key="index" :class="`subObject ${subObject.isSelected ? 'isSelected' : ''}`">
+                <div class="avatar" v-if="subObject.getAvatar()">
+                    <component :is="subObject.getAvatar().name"></component>
+                </div>
+                <div class="info">
+                    <div class="name">
+                        <input
+                            type="text" name="name"
+                            ref="nameInput"
+                            :value="subObject.getName() ? subObject.getName() : $t('unnamed')"
+                            @change="onNameChange($event, subObject)"
+                            @mousedown="onMouseDown($event)"
+                            @mouseup="onMouseUp($event)"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </template>
 
@@ -88,13 +107,14 @@ export default {
 
         /**
          * @param {Event} event
+         * @param {import("~client/lib/ClientModel").default} model
          */
-        async onNameChange(event) {
+        async onNameChange(event, model) {
             if (!this.nameEditDBField) return;
-            this.model[this.nameEditDBField] = event.target.value;
-            const result = await this.model.save();
+            model[this.nameEditDBField] = event.target.value;
+            const result = await model.save();
             if (result instanceof Error) return;
-            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+            this.$toasted.success(window.vm.$t("saved", { name: model.getName() }), { className: "successToaster" });
         }
     }
 };

@@ -148,6 +148,18 @@ export function isProxy(value) {
 }
 
 /**
+ * Iterates all proxy layers recursive to get the original object
+ *
+ * @export
+ * @param {any} value
+ * @returns {any}
+ */
+export function resolveProxy(value) {
+    if (!isProxy(value)) return value;
+    return resolveProxy(onChange.target(value));
+}
+
+/**
  * Iterates an object's prototypes recursive and collects the names
  *
  * @param {Object} object The object where the prototype names should get from recursively

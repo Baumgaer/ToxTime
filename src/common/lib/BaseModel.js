@@ -51,6 +51,10 @@ export default class BaseModel {
         return null;
     }
 
+    getSubObjects() {
+        return [];
+    }
+
     /**
      * Collects and caches all registered actions while assigning the context and returns them
      *

@@ -38,6 +38,10 @@ export function RequisiteMixinClass(MixinClass) {
                 default: []
             }
         };
+
+        getSubObjects() {
+            return this.clickAreas.concat(this.actionObjects);
+        }
     }
     return Requisite;
 }

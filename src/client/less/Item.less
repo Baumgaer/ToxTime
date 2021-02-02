@@ -103,4 +103,48 @@
             }
         }
     }
+
+    .subObjects {
+        grid-column: auto / span 2;
+
+        .subObject {
+            width: 100%;
+            height: @halfHeight;
+            border-top: 1px dashed var(--gray-color, @gray);
+
+            &.isSelected {
+                color: var(--primary-color, @primaryColor) !important;
+
+                .name {
+                    input {
+                        color: var(--primary-color, @primaryColor) !important;
+                    }
+                }
+            }
+
+            .avatar {
+                .avatar;
+                display: inline-block;
+                vertical-align: middle;
+                height: @halfHeight;
+                width: @height;
+                text-align: center;
+                line-height: @halfHeight;
+                font-size: 12px;
+            }
+
+            .info {
+                .info;
+                display: inline-block;
+                vertical-align: middle;
+                width: calc(100% - @height);
+
+                .name {
+                    input {
+                        font-weight: normal;
+                    }
+                }
+            }
+        }
+    }
 }

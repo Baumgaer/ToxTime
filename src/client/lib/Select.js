@@ -50,6 +50,7 @@ export default class Select extends Tool {
             // Just select the click item
             if (this.selection) this.selection.item.selected = false;
             hitResult.item.selected = true;
+            hitResult.item.model.isSelected = true;
             this.selection = hitResult;
         }
     }
@@ -153,6 +154,9 @@ export default class Select extends Tool {
 
     remove() {
         super.remove();
-        if (this.selection) this.selection.item.selected = false;
+        if (this.selection) {
+            this.selection.item.selected = false;
+            this.selection.item.model.isSelected = false;
+        }
     }
 }

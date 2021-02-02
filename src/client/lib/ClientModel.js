@@ -1,6 +1,6 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
-import onChange from "on-change";
+import { resolveProxy } from "~common/utils";
 import { v4 as uuid } from "uuid";
 import { isObjectLike, cloneDeep } from "lodash";
 
@@ -57,18 +57,18 @@ export default class ClientModel extends BaseModel {
     }
 
     hasChanges() {
-        const that = onChange.target(this);
+        const that = resolveProxy(this);
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
         const stagedChanges = Reflect.getMetadata("stagedChanges", that);
         return Boolean(Object.keys(stagedChanges).length);
     }
 
     destroy() {
-        const that = onChange.target(this);
+        const that = resolveProxy(this);
         ApiClient.store.removeModel(that);
         for (const key in that) {
             if (Object.hasOwnProperty.call(that, key)) {
-                const element = onChange.target(that[key]);
+                const element = resolveProxy(that[key]);
                 if (element instanceof ClientModel && !element._id) element.destroy();
                 if (element instanceof Array) {
                     for (const subElement of element) {
@@ -80,14 +80,14 @@ export default class ClientModel extends BaseModel {
     }
 
     discard() {
-        const that = onChange.target(this);
+        const that = resolveProxy(this);
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
         let changes = Reflect.getMetadata("stagedChanges", that);
         if (Object.keys(changes).length) Reflect.defineMetadata("stagedChanges", {}, that);
     }
 
     toObject() {
-        const that = onChange.target(this);
+        const that = resolveProxy(this);
         const schema = ClientModel.buildSchema(Object.getPrototypeOf(that).constructor);
 
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
@@ -101,7 +101,7 @@ export default class ClientModel extends BaseModel {
                 if (value instanceof ClientModel) value = value.toObject();
                 if (value instanceof Array) {
                     const arrayValue = [];
-                    for (const entry of onChange.target(value)) {
+                    for (const entry of resolveProxy(value)) {
                         if (entry instanceof ClientModel) {
                             arrayValue.push(entry.toObject());
                         } else arrayValue.push(entry);
@@ -122,7 +122,7 @@ export default class ClientModel extends BaseModel {
     async save() {
         if (!this.hasChanges()) return;
 
-        const that = onChange.target(this);
+        const that = resolveProxy(this);
         const data = that.toObject();
 
         let method;
