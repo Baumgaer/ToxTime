@@ -190,7 +190,6 @@ export default {
 
             const group = new this.paper.Group({ children: [raster], position: new this.paper.Point(actionObject.position), rotation: actionObject.rotation });
             group.scaling = this.paper.project.activeLayer.getScaling();
-            group.applyMatrix = false;
             group.model = actionObject;
 
             // Add clickAreas
@@ -230,6 +229,7 @@ export default {
                 const rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
                 group.addChild(rotator);
+                group.applyMatrix = false;
             }
 
             // Refresh view to be sure that the group is visible
@@ -280,7 +280,7 @@ export default {
 
             const actionObjectsMap = this.actionObjectsMap;
             const lastActionObject = actionObjectsMap[actionObjectsMap.length - 2];
-            if (lastActionObject && lastActionObject.resolve) lastActionObject.resolve();
+            if ((actionObjectsMap.length - 2) >= 0 && lastActionObject && lastActionObject.resolve) lastActionObject.resolve();
         },
 
         async createAvatar() {
