@@ -76,11 +76,13 @@ export default class Select extends Tool {
             const hitResult = this.paper.project.hitTest(event.point, hitTestOptions);
             if (!hitResult) return;
 
-            this.currentDrag = hitResult;
-
             // Select the group of the hit item if the parent is a group
             if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
             if (hitResult.item !== this.selection.item) return;
+
+            // Store in global variable to ensure smooth behavior and have access
+            // to data in other methods without passing the information to every method
+            this.currentDrag = hitResult;
         }
 
         if (this.currentDrag.item instanceof this.paper.Group && this.currentDrag.type === "bounds") {
@@ -93,6 +95,8 @@ export default class Select extends Tool {
     }
 
     onToolMouseUp() {
+        // Reset the current drag, when mouse is up again to be able to determine
+        // a new current drag
         this.currentDrag = null;
     }
 
