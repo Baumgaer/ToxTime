@@ -190,6 +190,7 @@ export default {
 
             const group = new this.paper.Group({ children: [raster], position: new this.paper.Point(actionObject.position), rotation: actionObject.rotation });
             group.scaling = this.paper.project.activeLayer.getScaling();
+            group.applyMatrix = false;
             group.model = actionObject;
 
             // Add clickAreas
@@ -224,6 +225,11 @@ export default {
                 group.position = ownerGroup.position.add(oldPos.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)).multiply(scaleFactor));
                 group.locked = true;
                 ownerGroup.addChild(group);
+            } else {
+                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
+                const rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
+                rotator.name = "rotator";
+                group.addChild(rotator);
             }
 
             // Refresh view to be sure that the group is visible
