@@ -72,40 +72,24 @@ export default class Select extends Tool {
             delete hitTestOptions.bounds;
         }
 
-        const hitResult = this.paper.project.hitTest(event.point, hitTestOptions);
-        if (!hitResult) return;
+        if (!this.currentDrag) {
+            const hitResult = this.paper.project.hitTest(event.point, hitTestOptions);
+            if (!hitResult) return;
 
-        if (!this.currentDrag) this.currentDrag = hitResult;
+            this.currentDrag = hitResult;
 
-        // Select the group of the hit item if the parent is a group
-        if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
-        if (hitResult.item !== this.selection.item) return;
+            // Select the group of the hit item if the parent is a group
+            if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
+            if (hitResult.item !== this.selection.item) return;
+        }
 
         if (this.currentDrag.item instanceof this.paper.Group && this.currentDrag.type === "bounds") {
             if (this.currentDrag.name === "top-center") {
-                // Rotate group
-                const delta = event.point.subtract(this.currentDrag.item.position);
-                this.currentDrag.item.rotation = delta.angle + 90;
-            } else {
-                // Scale actionObject
-                const bounds = this.currentDrag.item.bounds;
-                const hitPoint = bounds[kebabCaseToCamelCase(this.currentDrag.name)];
-                const oppositePoint = this.currentDrag.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(this.currentDrag.name))];
-                const scaleFactor = (bounds.width - (hitPoint.x - event.point.x)) / bounds.width;
-                this.currentDrag.item.scale(scaleFactor, oppositePoint);
-                this.currentDrag.item.model.scale = this.currentDrag.item.model.scale * scaleFactor;
-                this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
-            }
+                this.rotateGroup(event);
+            } else this.scaleGroup(event);
         } else if (this.currentDrag.type === "segment") {
-            // Change point of a clickArea
-            this.currentDrag.segment.point = event.point;
-            this.currentDrag.item.model.shape[this.currentDrag.segment.point._owner.index] = [this.currentDrag.segment.point.x, this.currentDrag.segment.point.y];
-            this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
-        } else if (["fill", "pixel"].includes(this.currentDrag.type)) {
-            // Move clickArea or actionObject
-            hitResult.item.translate(event.delta);
-            hitResult.item.model.position = [hitResult.item.position.x, hitResult.item.position.y];
-        }
+            this.moveClickAreaPoint(event);
+        } else if (["fill", "pixel"].includes(this.currentDrag.type)) this.moveItem(event);
     }
 
     onToolMouseUp() {
@@ -123,6 +107,33 @@ export default class Select extends Tool {
         this.model[this.selection.item.model.collection].splice(this.model[this.selection.item.model.collection].indexOf(this.selection.item.model), 1);
         this.selection.item.remove();
         this.selection = null;
+    }
+
+    moveItem(event) {
+        this.currentDrag.item.translate(event.delta);
+        this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
+    }
+
+    moveClickAreaPoint(event) {
+        this.currentDrag.segment.point = event.point;
+        this.currentDrag.item.model.shape[this.currentDrag.segment.point._owner.index] = [this.currentDrag.segment.point.x, this.currentDrag.segment.point.y];
+        this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
+    }
+
+    rotateGroup(event) {
+        const delta = event.point.subtract(this.currentDrag.item.position);
+        this.currentDrag.item.rotation = delta.angle + 90;
+        this.currentDrag.item.model.rotation = this.currentDrag.item.rotation;
+    }
+
+    scaleGroup(event) {
+        const bounds = this.currentDrag.item.bounds;
+        const hitPoint = bounds[kebabCaseToCamelCase(this.currentDrag.name)];
+        const oppositePoint = this.currentDrag.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(this.currentDrag.name))];
+        const scaleFactor = (bounds.width - (hitPoint.x - event.point.x)) / bounds.width;
+        this.currentDrag.item.scale(scaleFactor, oppositePoint);
+        this.currentDrag.item.model.scale = this.currentDrag.item.model.scale * scaleFactor;
+        this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
     }
 
     isGroup(hitResult) {
