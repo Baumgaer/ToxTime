@@ -203,11 +203,24 @@ export default {
 
             // Process sub action objects
             if (actionObjectMap.ownerGroupModel) {
-                const ownerGroup = this.paper.project.getItem({
-                    recursive: true,
-                    match: (child) => child.model === actionObjectMap.ownerGroupModel
-                });
 
+                const getOwnerGroup = (theActionObjectMap) => {
+                    return new Promise((resolve) => {
+                        const ownerGroupInterval = setInterval(() => {
+                            const ownerGroup = this.paper.project.getItem({
+                                recursive: true,
+                                match: (child) => child.model === theActionObjectMap.ownerGroupModel
+                            });
+
+                            if (ownerGroup) {
+                                clearInterval(ownerGroupInterval);
+                                resolve(ownerGroup);
+                            }
+                        });
+                    });
+                };
+
+                const ownerGroup = await getOwnerGroup(actionObjectMap);
                 // Determine scaling factor recursive over all parents of the current group
                 let scaleFactor = actionObject.scale;
                 let scaleOwnerGroup = ownerGroup;
