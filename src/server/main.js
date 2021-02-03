@@ -89,6 +89,7 @@ export default class WebServer {
         this.app.use(json({ limit: "50mb" }));
         this.app.use(urlencoded({ extended: true, limit: "50mb" }));
         this.app.use(compression());
+        this.app.enable('etag');
         this.app.use(fileUpload({
             createParentPath: true,
             // safeFileNames: true,

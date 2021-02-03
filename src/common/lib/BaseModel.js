@@ -3,7 +3,7 @@ import { Schema } from "mongoose";
 import { dataTransformer, getPrototypeNamesRecursive } from "~common/utils";
 
 const globalActions = {};
-
+global.globalActions = globalActions;
 /** @type {Record<string, import("mongoose").Model>} */
 export const mongooseBaseModels = {};
 export default class BaseModel {

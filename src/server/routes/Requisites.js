@@ -36,11 +36,12 @@ export default class Requisites extends ApiRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {false | string>}
+     * @returns {false | string | number>}
      * @memberof Requisites
      */
     @Requisites.get("/:id", { allowUser: true })
     getAvatar(request, response) {
+        if (this.isFresh(request, response)) return 304;
         if (!isMongoId(request.params.id)) return false;
         try {
             response.setHeader("Content-Type", "image/svg+xml");

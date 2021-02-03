@@ -23,6 +23,7 @@ export default class Files extends ApiRoute {
      */
     @Files.get("/:id", { allowUser: true })
     async getById(request, response) {
+        if (this.isFresh(request, response)) return 304;
         const result = await super.getById(request);
         if (result instanceof Error) return result;
         const model = result;

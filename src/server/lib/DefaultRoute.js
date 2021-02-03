@@ -6,6 +6,7 @@ import lodash from "lodash";
 import CustomError from "~common/lib/CustomError";
 import { getPrototypeNamesRecursive } from "~common/utils";
 import { Error } from "mongoose";
+import fresh from "fresh";
 
 export const registeredRoutes = {};
 
@@ -171,6 +172,23 @@ export default class DefaultRoute {
         const routes = {};
         for (const prototypeName of prototypeNames) lodash.merge(routes, registeredRoutes[prototypeName]);
         return routes;
+    }
+
+    /**
+     * Registers a new route in the metadata storage which can then be collected
+     * by an app.
+     *
+     * @param {import("express").Request} request
+     * @param {import("express").Response} response
+     * @returns {boolean}
+     * @memberof DefaultRoute
+     */
+    isFresh(request, response) {
+        console.log("response last modifyed:", response.getHeader('Last-Modified'));
+        return fresh(request.headers, {
+            'etag': response.getHeader('ETag'),
+            'last-modified': response.getHeader('Last-Modified')
+        });
     }
 
     /**
