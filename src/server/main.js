@@ -265,9 +265,10 @@ export default class WebServer {
         // If route not found, try to find a static file
         this.app.use(expressStatic(path.resolve(arp.path, process.environment.PATH_STATIC_FILES)));
 
-        this.app.use("*", (request, response, next) => {
+        this.app.use("*", (request, response) => {
             console.info(`${request.connection.remoteAddress} ${request.method} NOT FOUND ${request.originalUrl}`);
-            next(httpErrors.NotFound());
+            const httpError = httpErrors.NotFound();
+            response.status(httpError.statusCode).send(httpError);
         });
     }
 
