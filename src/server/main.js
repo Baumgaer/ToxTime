@@ -160,12 +160,13 @@ export default class WebServer {
             const imgSrc = [].concat(styleSrc);
             if (process.environment.NODE_ENV === 'development') {
                 styleSrc.push("'unsafe-eval'", "'unsafe-inline'");
-                imgSrc.push("data:");
             } else {
                 styleSrc.push(`'nonce-${contentSecurityNonce}'`);
                 styleSrc.push("'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='");
                 styleSrc.push("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
             }
+
+            imgSrc.push("data:");
 
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {
