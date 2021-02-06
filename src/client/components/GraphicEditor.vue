@@ -10,6 +10,9 @@
             <Button name="select" :showLabel="false" :active="currentTool && currentTool.name === 'select'" @click="setTool('select')">
                 <cursor-default-click-icon />
             </Button>
+            <Button name="arrange" :showLabel="false" :active="currentTool && currentTool.name === 'arrange'" @click="setTool('arrange')">
+                <arrange-bring-forward-icon />
+            </Button>
         </EditorHead>
         <div ref="canvasWrapper" class="canvasWrapper" @contextmenu.prevent="setTool(null)">
             <img ref="background"
@@ -44,6 +47,7 @@ import ActionObject from "~client/models/ActionObject";
 import PolyClickArea from "~client/lib/PolyClickArea";
 import Move from "~client/lib/Move";
 import Select from "~client/lib/Select";
+import Arrange from "~client/lib/Arrange";
 import paper from "paper";
 
 export default {
@@ -68,7 +72,8 @@ export default {
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
-                select: Select
+                select: Select,
+                arrange: Arrange
             }
         };
     },
@@ -104,6 +109,7 @@ export default {
         this.paper.settings.handleSize = 10;
     },
     async beforeDestroy() {
+        if (this.currentTool) this.currentTool.remove();
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
             if (this.watchedModel.hasChanges() || !this.watchedModel._id) {
@@ -168,7 +174,7 @@ export default {
         },
 
         onBackgroundLoaded() {
-            if (this.background) this.background.remove();
+            if (this.paper.view.background) this.paper.view.background.remove();
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.scaling = this.paper.project.activeLayer.getScaling();
@@ -203,7 +209,7 @@ export default {
                 const oldPos = new this.paper.Point(clickArea.position);
                 path.position = raster.position.add(oldPos.subtract(backGroundPos));
                 path.locked = true;
-                group.addChild(path);
+                group.insertChild(clickArea.layer + 1, path);
             }
 
             // Process sub action objects
@@ -225,6 +231,7 @@ export default {
                     });
                 };
 
+                /** @type {InstanceType<import("paper")["Group"]>} */
                 const ownerGroup = await getOwnerGroup(actionObjectMap);
                 // Determine scaling factor recursive over all parents of the current group
                 let scaleFactor = actionObject.scale;
@@ -241,7 +248,7 @@ export default {
                 const oldPos = new this.paper.Point(actionObject.position);
                 group.position = ownerGroup.position.add(oldPos.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)).multiply(scaleFactor));
                 group.locked = true;
-                ownerGroup.addChild(group);
+                ownerGroup.insertChild(group.model.layer + 1, group);
             } else {
                 const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
                 const rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
@@ -292,7 +299,8 @@ export default {
             if (!(model instanceof SceneObject.RawClass) || model._id === this.watchedModel._id) return;
             const actionObject = ApiClient.store.addModel(new ActionObject.Model({
                 position: [this.paper.view.center.x, this.paper.view.center.y],
-                sceneObject: model
+                sceneObject: model,
+                layer: this.actionObjectsMap.length
             }));
             this.watchedModel.actionObjects.push(actionObject);
 
