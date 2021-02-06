@@ -10,7 +10,7 @@ export default class Select extends Tool {
         stroke: true,
         fill: true,
         bounds: true,
-        tolerance: 50
+        tolerance: 10
     };
 
     /** @type {InstanceType<import("paper")["HitResult"]>} */
@@ -135,7 +135,11 @@ export default class Select extends Tool {
         const bounds = this.currentDrag.item.bounds;
         const hitPoint = bounds[kebabCaseToCamelCase(this.currentDrag.name)];
         const oppositePoint = this.currentDrag.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(this.currentDrag.name))];
-        const scaleFactor = (bounds.width - (hitPoint.x - event.point.x)) / bounds.width;
+
+        let diff = hitPoint.x - event.point.x;
+        if (this.currentDrag.name.endsWith("left")) diff = event.point.x - hitPoint.x;
+
+        const scaleFactor = (bounds.width - diff) / bounds.width;
         this.currentDrag.item.scale(scaleFactor, oppositePoint);
         this.currentDrag.item.model.scale = this.currentDrag.item.model.scale * scaleFactor;
         this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
