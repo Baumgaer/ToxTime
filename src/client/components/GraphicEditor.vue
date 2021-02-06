@@ -107,6 +107,7 @@ export default {
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
+        this.paper.project.activeLayer.applyMatrix = false;
     },
     async beforeDestroy() {
         if (this.currentTool) this.currentTool.remove();
@@ -196,18 +197,21 @@ export default {
             const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === actionObject });
             if (alreadyInserted) return;
 
-            const backGroundPos = new this.paper.Point(actionObject.sceneObject.position);
-            const raster = new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0]);
-
-            const group = new this.paper.Group({ children: [raster], position: new this.paper.Point(actionObject.position), rotation: actionObject.rotation });
-            group.scaling = this.paper.project.activeLayer.getScaling();
+            const sceneObjectOriginalPosition = new this.paper.Point(actionObject.sceneObject.position);
+            const group = new this.paper.Group({
+                applyMatrix: false,
+                scaling: this.paper.project.activeLayer.getScaling(),
+                rotation: actionObject.rotation,
+                children: [new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0])]
+            });
             group.model = actionObject;
+            group.scale(actionObject.scale);
 
             // Add clickAreas
             for (const clickArea of actionObject.sceneObject.clickAreas) {
                 const path = PolyClickArea.build(this.paper, clickArea.shape);
-                const oldPos = new this.paper.Point(clickArea.position);
-                path.position = raster.position.add(oldPos.subtract(backGroundPos));
+                const clickAreaOriginalPosition = new this.paper.Point(clickArea.position);
+                path.position = group.position.add(clickAreaOriginalPosition.subtract(sceneObjectOriginalPosition));
                 path.locked = true;
                 group.insertChild(clickArea.layer + 1, path);
             }
@@ -233,20 +237,8 @@ export default {
 
                 /** @type {InstanceType<import("paper")["Group"]>} */
                 const ownerGroup = await getOwnerGroup(actionObjectMap);
-                // Determine scaling factor recursive over all parents of the current group
-                let scaleFactor = actionObject.scale;
-                let scaleOwnerGroup = ownerGroup;
-                while(scaleOwnerGroup && scaleOwnerGroup instanceof this.paper.Group && !(scaleOwnerGroup instanceof this.paper.Layer)) {
-                    scaleFactor *= scaleOwnerGroup.model.scale;
-                    scaleOwnerGroup = scaleOwnerGroup.parent;
-                }
-
-                // Apply scaling of owner to be in same zoom and then scale current recursive
-                group.scaling = ownerGroup.getScaling();
-                group.scale(scaleFactor);
-
-                const oldPos = new this.paper.Point(actionObject.position);
-                group.position = ownerGroup.position.add(oldPos.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)).multiply(scaleFactor));
+                const actionObjectOriginalPosition = new this.paper.Point(actionObject.position);
+                group.position = ownerGroup.position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)));
                 group.locked = true;
                 ownerGroup.insertChild(group.model.layer + 1, group);
             } else {
@@ -254,7 +246,6 @@ export default {
                 const rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
                 group.addChild(rotator);
-                group.applyMatrix = false;
             }
 
             // Refresh view to be sure that the group is visible
