@@ -48,7 +48,10 @@ export default class Select extends Tool {
             }
         } else {
             // Just select the click item
-            if (this.selection) this.selection.item.selected = false;
+            if (this.selection) {
+                this.selection.item.model.isSelected = false;
+                this.selection.item.selected = false;
+            }
             hitResult.item.selected = true;
             hitResult.item.model.isSelected = true;
             this.selection = hitResult;

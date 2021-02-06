@@ -33,7 +33,7 @@ export default class PolyClickArea extends Tool {
     /**
      * @inheritdoc
      *
-     * @param {import("paper")["ToolEvent"]} event
+     * @param {InstanceType<import("paper")["ToolEvent"]>} event
      * @memberof PolyClickArea
      */
     onToolMouseDown(event) {
@@ -61,7 +61,8 @@ export default class PolyClickArea extends Tool {
             const store = Store.getInstance();
             const clickArea = store.addModel(new ClickAreaClientExport.Model({
                 shape: this.path.segments.map((segment) => [segment.point.x, segment.point.y]),
-                position: [this.path.position.x, this.path.position.y]
+                position: [this.path.position.x, this.path.position.y],
+                layer: this.path.index
             }));
             this.model.clickAreas.push(clickArea);
             this.path.model = clickArea;

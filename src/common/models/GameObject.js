@@ -20,6 +20,11 @@ export function GameObjectMixinClass(MixinClass) {
             position: {
                 type: [Number],
                 required: true
+            },
+            layer: {
+                type: Number,
+                required: true,
+                default: 0
             }
         };
     }

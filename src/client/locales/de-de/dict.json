@@ -65,5 +65,6 @@
     "save": "Speichern",
     "close": "schließen",
     "upload": "Hochladen",
-    "addSceneObject": "Szenenobjekt hinzufügen"
+    "addSceneObject": "Szenenobjekt hinzufügen",
+    "arrange": "Element in den Vordergrund bringen"
 }
