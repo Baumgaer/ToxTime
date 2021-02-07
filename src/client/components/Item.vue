@@ -1,5 +1,5 @@
 <template>
-    <section class="item" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
+    <section :class="`item ${activeClass}`" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
         <div class="avatar" v-if="hasAvatar">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name"></component>
@@ -55,6 +55,7 @@
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
+import { resolveProxy } from "~common/utils";
 
 export default {
     components: {
@@ -79,6 +80,10 @@ export default {
             if (!avatarData) return false;
             if (avatarData.type === "image") return true;
             return false;
+        },
+
+        activeClass() {
+            return resolveProxy(this.model) === resolveProxy(window.activeUser.editingModel) ? "active" : "";
         }
     },
     methods: {

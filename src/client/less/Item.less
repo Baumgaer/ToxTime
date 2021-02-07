@@ -22,6 +22,14 @@
         opacity: 1 !important;
     }
 
+    &.active {
+        background-color: var(--primary-color, @primaryColor);
+
+        &:hover {
+            background-color: var(--info-color, @infoColor);
+        }
+    }
+
     .progressBar {
         position: absolute;
         bottom: 0;
@@ -113,11 +121,11 @@
             border-top: 1px dashed var(--gray-color, @gray);
 
             &.isSelected {
-                color: var(--primary-color, @primaryColor) !important;
+                color: var(--black-color, @black) !important;
 
                 .name {
                     input {
-                        color: var(--primary-color, @primaryColor) !important;
+                        color: var(--black-color, @black) !important;
                     }
                 }
             }
