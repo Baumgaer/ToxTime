@@ -69,6 +69,7 @@ export default {
             paper: new paper.PaperScope(),
             watchedModel: window.activeUser.editingModel,
             currentTool: null,
+            isMounted: false,
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -79,7 +80,7 @@ export default {
     },
     computed: {
         actionObjectsMap() {
-            if (!this.watchedModel) return [];
+            if (!this.watchedModel || !this.isMounted) return [];
             const map = [];
 
             const getRecursive = (model, ownerGroupModel) => {
@@ -104,6 +105,14 @@ export default {
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
         this.paper.project.activeLayer.applyMatrix = false;
+        this.isMounted = true;
+
+        // Add clickAreas
+        for (const clickArea of this.watchedModel.clickAreas) {
+            const path = PolyClickArea.build(this.paper, clickArea.shape, clickArea.position);
+            path.model = clickArea;
+            this.paper.project.activeLayer.insertChild(clickArea.layer + 1, path);
+        }
     },
     async beforeDestroy() {
         if (this.currentTool) this.currentTool.remove();
@@ -195,20 +204,34 @@ export default {
             if (alreadyInserted) return;
 
             const sceneObjectOriginalPosition = new this.paper.Point(actionObject.sceneObject.position);
+
             const group = new this.paper.Group({
                 applyMatrix: false,
                 scaling: this.paper.project.activeLayer.getScaling(),
-                rotation: actionObject.rotation,
-                children: [new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0])]
+                children: [
+                    new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0])
+                ]
             });
             group.model = actionObject;
+
+            let rotator = null;
+            if (!actionObjectMap.ownerGroupModel) {
+                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
+                rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
+                rotator.name = "rotator";
+
+                group.position = new this.paper.Point(actionObject.position);
+            }
+
             group.scale(actionObject.scale);
+            group.rotation = actionObject.rotation;
 
             // Add clickAreas
             for (const clickArea of actionObject.sceneObject.clickAreas) {
                 const path = PolyClickArea.build(this.paper, clickArea.shape);
+                path.model = clickArea;
                 const clickAreaOriginalPosition = new this.paper.Point(clickArea.position);
-                path.position = group.position.add(clickAreaOriginalPosition.subtract(sceneObjectOriginalPosition));
+                path.position = group.children[0].position.add(clickAreaOriginalPosition.subtract(sceneObjectOriginalPosition));
                 path.locked = true;
                 group.insertChild(clickArea.layer + 1, path);
             }
@@ -235,15 +258,10 @@ export default {
                 /** @type {InstanceType<import("paper")["Group"]>} */
                 const ownerGroup = await getOwnerGroup(actionObjectMap);
                 const actionObjectOriginalPosition = new this.paper.Point(actionObject.position);
-                group.position = ownerGroup.position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(ownerGroup.model.sceneObject.position)));
+                group.position = ownerGroup.children[0].position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(actionObjectMap.ownerGroupModel.position)));
                 group.locked = true;
                 ownerGroup.insertChild(group.model.layer + 1, group);
-            } else {
-                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
-                const rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
-                rotator.name = "rotator";
-                group.addChild(rotator);
-            }
+            } else if (rotator) group.addChild(rotator);
 
             // Refresh view to be sure that the group is visible
             this.paper.view.draw();

@@ -40,7 +40,7 @@ export default class ApiRoute extends DefaultRoute {
         let model = null;
         try {
             model = await this.claimedExport.Model.findById(request.params.id).exec();
-            if (!model) return httpErrors.NotFound();
+            if (!model) return new httpErrors.NotFound();
         } catch (error) {
             return error;
         }
@@ -60,8 +60,8 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.post("/")
     async create(request) {
-        if (!isPlainObject(request.body)) return httpErrors.NotAcceptable();
-        if (!("_dummyId" in request.body)) return httpErrors.BadRequest();
+        if (!isPlainObject(request.body)) return new httpErrors.NotAcceptable();
+        if (!("_dummyId" in request.body)) return new httpErrors.BadRequest();
 
         // Create a response body to reflect untouched properties (e.g. _dummyId)
         let responseBody = {};
@@ -182,7 +182,7 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.patch("/:id")
     async update(request) {
-        if (!isPlainObject(request.body)) return httpErrors.NotAcceptable();
+        if (!isPlainObject(request.body)) return new httpErrors.NotAcceptable();
 
         // Create a response body to reflect untouched properties (e.g. _dummyId)
         let responseBody = {};
@@ -193,13 +193,14 @@ export default class ApiRoute extends DefaultRoute {
         }
 
         try {
+            const id = request.params.id;
             const myRequestBody = await this.ProcessChildModels(request);
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(request.body, { lastModified: new Date() });
             delete myRequestBody._id;
-            let model = await this.claimedExport.Model.findByIdAndUpdate(request.params.id, myRequestBody).exec();
-            if (!model) return httpErrors.NotFound();
-            model = await this.claimedExport.Model.findById(request.params.id).exec();
+            let model = await this.claimedExport.Model.findByIdAndUpdate(id, myRequestBody).exec();
+            if (!model) return new httpErrors.NotFound();
+            model = await this.claimedExport.Model.findById(id).exec();
             const modelObject = merge(responseBody, model.toObject());
             return modelObject;
         } catch (error) {
@@ -212,7 +213,7 @@ export default class ApiRoute extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         try {
             const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
-            if (!result) return httpErrors.NotFound();
+            if (!result) return new httpErrors.NotFound();
             return result;
         } catch (error) {
             return error;
