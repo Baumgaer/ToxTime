@@ -66,5 +66,6 @@
     "close": "schließen",
     "upload": "Hochladen",
     "addSceneObject": "Szenenobjekt hinzufügen",
-    "arrange": "Element in den Vordergrund bringen"
+    "arrange": "Element in den Vordergrund bringen",
+    "addScene": "Szene hinzufügen"
 }

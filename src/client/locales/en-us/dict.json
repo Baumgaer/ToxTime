@@ -66,5 +66,6 @@
     "close": "Close",
     "upload": "Upload",
     "addSceneObject": "Add scene object",
-    "arrange": "Bring element to front"
+    "arrange": "Bring element to front",
+    "addScene": "Add scene"
 }
