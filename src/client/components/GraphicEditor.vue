@@ -203,13 +203,56 @@ export default {
             const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === actionObject });
             if (alreadyInserted) return;
 
-            const sceneObjectOriginalPosition = new this.paper.Point(actionObject.sceneObject.position);
+            const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
 
+            // Add clickAreas
+            for (const clickArea of actionObject.sceneObject.clickAreas) {
+                const path = PolyClickArea.build(this.paper, clickArea.shape);
+                path.model = clickArea;
+                path.position = this.calcPosition(actionObject, group, clickArea.position);
+                path.locked = true;
+                group.insertChild(clickArea.layer + 1, path);
+            }
+
+            // Process sub action objects
+            if (actionObjectMap.ownerGroupModel) {
+                /** @type {InstanceType<import("paper")["Group"]>} */
+                const ownerGroup = await this.getOwnerGroup(actionObjectMap);
+                group.position = this.calcPosition(actionObjectMap.ownerGroupModel, ownerGroup, actionObject.position);
+                group.locked = true;
+                ownerGroup.insertChild(group.model.layer + 1, group);
+            } else if (rotator) group.addChild(rotator);
+
+            // Refresh view to be sure that the group is visible
+            this.paper.view.draw();
+            // Poke next actionObject
+            if (actionObjectMap.resolve) actionObjectMap.resolve();
+        },
+
+        async onSaveButtonClick() {
+            const result = await this.watchedModel.save();
+            if (result instanceof Error) return;
+            this.createAvatar();
+            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+        },
+
+        /**
+         * creates a new group for an action object with its background,
+         * which musst already be loaded, and scales and rotates it.
+         * If it is not in another group, the position will also be set.
+         * It also creates a "rotator" anchor for the group.
+         *
+         * @param {object} actionObjectMap
+         * @param {number} indexOfBackground
+         * @returns {[InstanceType<import("paper")["Group"]>, InstanceType<import("paper")["Path"]>]}
+         */
+        buildActionObjectGroup(actionObjectMap, indexOfBackground) {
+            const actionObject = actionObjectMap.actionObject;
             const group = new this.paper.Group({
                 applyMatrix: false,
                 scaling: this.paper.project.activeLayer.getScaling(),
                 children: [
-                    new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${index}`][0])
+                    new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${indexOfBackground}`][0])
                 ]
             });
             group.model = actionObject;
@@ -226,54 +269,44 @@ export default {
             group.scale(actionObject.scale);
             group.rotation = actionObject.rotation;
 
-            // Add clickAreas
-            for (const clickArea of actionObject.sceneObject.clickAreas) {
-                const path = PolyClickArea.build(this.paper, clickArea.shape);
-                path.model = clickArea;
-                const clickAreaOriginalPosition = new this.paper.Point(clickArea.position);
-                path.position = group.children[0].position.add(clickAreaOriginalPosition.subtract(sceneObjectOriginalPosition));
-                path.locked = true;
-                group.insertChild(clickArea.layer + 1, path);
-            }
-
-            // Process sub action objects
-            if (actionObjectMap.ownerGroupModel) {
-
-                const getOwnerGroup = (theActionObjectMap) => {
-                    return new Promise((resolve) => {
-                        const ownerGroupInterval = setInterval(() => {
-                            const ownerGroup = this.paper.project.getItem({
-                                recursive: true,
-                                match: (child) => child.model === theActionObjectMap.ownerGroupModel
-                            });
-
-                            if (ownerGroup) {
-                                clearInterval(ownerGroupInterval);
-                                resolve(ownerGroup);
-                            }
-                        });
-                    });
-                };
-
-                /** @type {InstanceType<import("paper")["Group"]>} */
-                const ownerGroup = await getOwnerGroup(actionObjectMap);
-                const actionObjectOriginalPosition = new this.paper.Point(actionObject.position);
-                group.position = ownerGroup.children[0].position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(actionObjectMap.ownerGroupModel.sceneObject.position)));
-                group.locked = true;
-                ownerGroup.insertChild(group.model.layer + 1, group);
-            } else if (rotator) group.addChild(rotator);
-
-            // Refresh view to be sure that the group is visible
-            this.paper.view.draw();
-            // Poke next actionObject
-            if (actionObjectMap.resolve) actionObjectMap.resolve();
+            return [group, rotator];
         },
 
-        async onSaveButtonClick() {
-            const result = await this.watchedModel.save();
-            if (result instanceof Error) return;
-            this.createAvatar();
-            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+        /**
+         * Calculates the position of an action object within a group relative
+         * to the rasters position (Raster has to be already loaded and the first
+         * child of the group).
+         *
+         * @param {import("~client/models/GameObject")} containerModel
+         * @param {InstanceType<import("paper")["Group"]>} group
+         * @param {[number, number]} position
+         * @returns {InstanceType<import("paper")["Point"]>}
+         */
+        calcPosition(containerModel, group, position) {
+            return group.children[0].position.add(new this.paper.Point(position).subtract(new this.paper.Point(containerModel.sceneObject.position)));
+        },
+
+        /**
+         * Calculates the group which should hold the current action object.
+         * It also waits until this group is rendered.
+         *
+         * @param {object} theActionObjectMap
+         * @returns {Promise<InstanceType<import("paper")["Group"]>>}
+         */
+        getOwnerGroup(theActionObjectMap) {
+            return new Promise((resolve) => {
+                const ownerGroupInterval = setInterval(() => {
+                    const ownerGroup = this.paper.project.getItem({
+                        recursive: true,
+                        match: (child) => child.model === theActionObjectMap.ownerGroupModel
+                    });
+
+                    if (ownerGroup) {
+                        clearInterval(ownerGroupInterval);
+                        resolve(ownerGroup);
+                    }
+                });
+            });
         },
 
         setTool(toolName) {
