@@ -19,6 +19,7 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         if (!this._id) {
             this.destroy();
             window.activeUser.activeEditor = null;
+            window.activeUser.editingModel = null;
             return;
         }
         const result = await ApiClient.delete(`/${this.collection}/${this._id}`);

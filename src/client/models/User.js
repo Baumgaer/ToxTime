@@ -5,7 +5,11 @@ import ClientModel from "~client/lib/ClientModel";
 const CommonClientUser = UserMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class User extends CommonClientUser {
 
+    /** @type {"addUsers" | "editUser" | "scene" | "sceneObject" | null} */
     activeEditor = null;
+
+    /** @type {ClientModel | null} */
+    editingModel = null;
 
     @CommonClientUser.action("delete", { type: "component", name: "delete-icon" }, (instance) => instance !== window.activeUser)
     async delete() {

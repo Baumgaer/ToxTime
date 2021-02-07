@@ -11,4 +11,10 @@ export default Requisite.RawClass.buildClientExport(class Scene extends CommonSc
             name: "theater-icon"
         };
     }
+
+    @CommonSceneRequisite.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
+    edit() {
+        window.activeUser.activeEditor = "scene";
+        window.activeUser.editingModel = this;
+    }
 });

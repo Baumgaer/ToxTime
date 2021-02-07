@@ -11,4 +11,10 @@ export default Requisite.RawClass.buildClientExport(class SceneObject extends Co
             name: "ufo-icon"
         };
     }
+
+    @CommonSceneObjectRequisite.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
+    edit() {
+        window.activeUser.activeEditor = "sceneObject";
+        window.activeUser.editingModel = this;
+    }
 });

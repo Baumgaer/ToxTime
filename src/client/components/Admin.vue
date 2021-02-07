@@ -64,7 +64,7 @@
         </section>
         <section class="editor">
             <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
-            <GraphicEditor v-if="['addScenes', 'addSceneObjects'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor === 'addScenes' ? 'scene' : 'sceneObject'" />
+            <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" :model="window.activeUser.editingModel" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -77,6 +77,8 @@ import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
 import GraphicEditor from "~client/components/GraphicEditor";
+import SceneObject from "~client/models/SceneObject";
+import Scene from "~client/models/Scene";
 
 import { capitalize } from "~common/utils";
 import natSort from "natsort";
@@ -125,10 +127,20 @@ export default {
         },
 
         onAddItemButtonClick() {
+            /** @type {string} */
+            const category = this.category;
             window.activeUser.activeEditor = null;
+            window.activeUser.editingModel = null;
             setTimeout(() => {
-                if (this.category === "files") this.$refs.uploadHint.$refs.fileInput.click();
-                window.activeUser.activeEditor = `add${capitalize(this.category)}`;
+                if (!category) return;
+                if (category === "files") {
+                    this.$refs.uploadHint.$refs.fileInput.click();
+                } else if (["sceneObjects", "scenes"].includes(category)) {
+                    window.activeUser.activeEditor = category.substring(0, category.length - 1);
+                    if (category === "sceneObjects") {
+                        window.activeUser.editingModel = ApiClient.store.addModel(new SceneObject.Model());
+                    } else window.activeUser.editingModel = ApiClient.store.addModel(new Scene.Model());
+                } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });
         },
 

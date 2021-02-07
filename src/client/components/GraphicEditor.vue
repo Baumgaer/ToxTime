@@ -67,7 +67,7 @@ export default {
     data() {
         return {
             paper: new paper.PaperScope(),
-            watchedModel: {},
+            watchedModel: window.activeUser.editingModel,
             currentTool: null,
             toolMap: {
                 polyClickArea: PolyClickArea,
@@ -100,10 +100,6 @@ export default {
         }
     },
     mounted() {
-        if (this.model) {
-            this.watchedModel = this.model;
-        } else this.watchedModel = ApiClient.store.addModel(new SceneObject.Model());
-
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
@@ -115,6 +111,7 @@ export default {
             // Cases editor was closed unexpected
             if (this.watchedModel.hasChanges() || !this.watchedModel._id) {
                 const result = await this.watchedModel.save();
+                if (!result) return;
                 if (result instanceof Error) {
                     this.paper.project.clear();
                     return;
@@ -124,7 +121,7 @@ export default {
                 this.paper.project.clear();
             }
         } else {
-            if (this.model || this.watchedModel._id) {
+            if (this.watchedModel._id) {
                 if (this.watchedModel.hasChanges()) {
                     this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
                     this.watchedModel.discard();

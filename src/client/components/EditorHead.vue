@@ -38,6 +38,7 @@ export default {
         onCloseButtonClick() {
             this.closeButtonClicked = true;
             window.activeUser.activeEditor = null;
+            window.activeUser.editingModel = null;
         }
     }
 };
