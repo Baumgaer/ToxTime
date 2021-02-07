@@ -258,7 +258,7 @@ export default {
                 /** @type {InstanceType<import("paper")["Group"]>} */
                 const ownerGroup = await getOwnerGroup(actionObjectMap);
                 const actionObjectOriginalPosition = new this.paper.Point(actionObject.position);
-                group.position = ownerGroup.children[0].position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(actionObjectMap.ownerGroupModel.position)));
+                group.position = ownerGroup.children[0].position.add(actionObjectOriginalPosition.subtract(new this.paper.Point(actionObjectMap.ownerGroupModel.sceneObject.position)));
                 group.locked = true;
                 ownerGroup.insertChild(group.model.layer + 1, group);
             } else if (rotator) group.addChild(rotator);
