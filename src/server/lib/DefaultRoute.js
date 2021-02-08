@@ -184,7 +184,6 @@ export default class DefaultRoute {
      * @memberof DefaultRoute
      */
     isFresh(request, response) {
-        console.log("response last modifyed:", response.getHeader('Last-Modified'));
         return fresh(request.headers, {
             'etag': response.getHeader('ETag'),
             'last-modified': response.getHeader('Last-Modified')

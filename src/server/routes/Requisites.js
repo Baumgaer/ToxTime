@@ -6,6 +6,8 @@ import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
 import CustomError from "~common/lib/CustomError";
+import { isPlainObject } from "lodash";
+import httpErrors from "http-errors";
 
 export default class Requisites extends ApiRoute {
 
@@ -50,6 +52,41 @@ export default class Requisites extends ApiRoute {
             console.error(error);
             return false;
         }
+    }
+
+    /**
+     * removes all clickAreas and actionObjects when they are not in the payload
+     * and updates the requisite itself.
+     *
+     * @param {import("express").Request} request the request
+     * @returns {void}
+     * @memberof Requisites
+     */
+    @Requisites.patch("/:id")
+    async update(request) {
+        if (!isPlainObject(request.body)) return new httpErrors.NotAcceptable();
+
+        const id = request.params.id;
+        const result = await this.claimedExport.Model.findById(id).exec();
+        if (!result) return new httpErrors.NotFound();
+
+        const deletedIteratee = {
+            clickAreas: [],
+            actionObjects: []
+        };
+        const iteratingKeys = ["clickAreas", "actionObjects"];
+        for (const iteratingKey of iteratingKeys) {
+            for (const iteratee of result[iteratingKey]) {
+                const foundIteratee = request.body[iteratingKey].find((requestIteratee) => {
+                    return iteratee._id.toString() === requestIteratee._id || iteratee._id.toString() === requestIteratee;
+                });
+                if (!foundIteratee) deletedIteratee[iteratingKey].push(iteratee);
+            }
+        }
+
+        await Promise.all([this.revertModelCreation(deletedIteratee.actionObjects), this.revertModelCreation(deletedIteratee.clickAreas)]);
+
+        return super.update(request);
     }
 
     /**

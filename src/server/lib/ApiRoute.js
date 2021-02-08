@@ -169,7 +169,11 @@ export default class ApiRoute extends DefaultRoute {
      */
     async revertModelCreation(models) {
         const promises = [];
-        for (const model of models) promises.push(model.delete().exec());
+        for (const model of models) {
+            let promise = model.delete();
+            if (promise.exec) promise = promise.exec();
+            promises.push(promise);
+        }
         return Promise.all(promises);
     }
 
