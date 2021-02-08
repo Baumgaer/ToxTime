@@ -6,11 +6,12 @@ const CommonGameObjectRequisite = RequisiteMixinClass(GameObject.RawClass);
 export default GameObject.RawClass.buildClientExport(class Requisite extends CommonGameObjectRequisite {
 
     isSelected = false;
+    loadingStatus = 0;
 
     getAvatar() {
         return {
             type: "image",
-            name: `/requisites/${this._id}`
+            name: `/requisites/${this._id}/avatar`
         };
     }
 

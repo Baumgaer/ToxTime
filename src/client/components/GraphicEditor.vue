@@ -350,9 +350,29 @@ export default {
 
         async createAvatar() {
             if (!this.watchedModel._id) return;
-            const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
-            await ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
-            this.watchedModel.isCreatingAvatar = false;
+            /** @type {HTMLCanvasElement} */
+            const canvas = this.$refs.canvas;
+            this.watchedModel.loadingStatus = -1;
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const formData = new FormData();
+                formData.append('file', blob, this.watchedModel._id);
+                ApiClient.upload("PUT", `/${this.watchedModel.collection}/${this.watchedModel._id}`, {
+                    formData: formData,
+                    onProgress: (progress) => this.watchedModel.loadingStatus = progress,
+                    onSuccess: () => {
+                        this.watchedModel.loadingStatus = 0;
+                        this.watchedModel.isCreatingAvatar = false;
+                    },
+                    onError: () => {
+                        this.watchedModel.loadingStatus = 0;
+                        this.watchedModel.isCreatingAvatar = false;
+                    }
+                });
+            }, "image/png");
+            // const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
+            // await ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
+            // this.watchedModel.isCreatingAvatar = false;
         }
     }
 };

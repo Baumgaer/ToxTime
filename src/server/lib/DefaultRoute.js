@@ -7,6 +7,7 @@ import CustomError from "~common/lib/CustomError";
 import { getPrototypeNamesRecursive } from "~common/utils";
 import { Error } from "mongoose";
 import fresh from "fresh";
+import { fromBuffer } from "file-type";
 
 export const registeredRoutes = {};
 
@@ -248,10 +249,12 @@ export default class DefaultRoute {
                     console.error(result.message);
                     response.send(result);
                 }
-            } else if (typeof result === "string") {
+            } else if (typeof result === "string" || result instanceof Buffer) {
                 // Normally a string will be returned if we want to send a page
-                // (html or text). It is also possible to send a file here.
+                // (html or text). It is also possible to send a file here,
+                // especially when the result is a buffer.
                 // In this case the content type has to be set manually.
+                if (result instanceof Buffer) response.setHeader("Content-Type", (await fromBuffer(result)).mime);
                 response.send(result);
             } else if (typeof result === "object") {
                 // This is a general response. Normally all responses should be

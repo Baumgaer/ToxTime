@@ -1,7 +1,7 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Requisite from "~server/models/Requisite";
 import { isMongoId } from "~common/utils";
-import { readFileSync, writeFileSync, unlinkSync } from "graceful-fs";
+import { readFileSync, unlinkSync } from "graceful-fs";
 import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
@@ -23,13 +23,23 @@ export default class Requisites extends ApiRoute {
      */
     @Requisites.put("/:id")
     async createAvatar(request) {
-        if (!isMongoId(request.params.id) || typeof request.body.content !== "string") return false;
+        if (!isMongoId(request.params.id) || !request.files || Object.keys(request.files).length === 0 || !isPlainObject(request.files)) return false;
         const exists = await this.claimedExport.Model.findById(request.params.id).countDocuments().exec();
         if (!exists) return false;
 
-        const path = resolve(rootPath, "avatars", `${request.params.id}.svg`);
+        const path = resolve(rootPath, "avatars", `${request.params.id}.png`);
         createDirSync(dirname(path));
-        writeFileSync(path, request.body.content, { encoding: "utf-8" });
+        for (const fileNameField in request.files) {
+            if (Object.hasOwnProperty.call(request.files, fileNameField)) {
+                const file = request.files[fileNameField];
+                try {
+                    await file.mv(path);
+                    return true;
+                } catch (error) {
+                    return error;
+                }
+            }
+        }
         return true;
     }
 
@@ -41,13 +51,12 @@ export default class Requisites extends ApiRoute {
      * @returns {false | string | number>}
      * @memberof Requisites
      */
-    @Requisites.get("/:id", { allowUser: true })
+    @Requisites.get("/:id/avatar", { allowUser: true })
     getAvatar(request, response) {
         if (this.isFresh(request, response)) return 304;
         if (!isMongoId(request.params.id)) return false;
         try {
-            response.setHeader("Content-Type", "image/svg+xml");
-            return readFileSync(resolve(rootPath, "avatars", `${request.params.id}.svg`), { encoding: "utf-8" }).toString();
+            return readFileSync(resolve(rootPath, "avatars", `${request.params.id}.png`));
         } catch (error) {
             console.error(error);
             return false;

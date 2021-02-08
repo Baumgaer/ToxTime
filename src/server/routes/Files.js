@@ -1,8 +1,5 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import File from "~server/models/File";
-//import CustomError from "~common/lib/CustomError";
-// import { v4 as uuid } from "uuid";
-// import { isMongoId } from "validator";
 import httpErrors from "http-errors";
 import path from "path";
 import arp from "app-root-path";
@@ -21,19 +18,14 @@ export default class Files extends ApiRoute {
      * @returns {Promise<{models: [User["Model"]]} | Error>}
      * @memberof Files
      */
-    @Files.get("/:id", { allowUser: true })
-    async getById(request, response) {
+    @Files.get("/:id/avatar", { allowUser: true })
+    async getAvatarById(request, response) {
         if (this.isFresh(request, response)) return 304;
         const result = await super.getById(request);
         if (result instanceof Error) return result;
         const model = result;
         if (!model) return httpErrors.NotFound();
-        return new Promise((resolve, reject) => {
-            response.sendFile(path.resolve(arp.path, "uploads", model.fileName), (error) => {
-                if (error) reject(error);
-                resolve();
-            });
-        });
+        return fs.readFileSync(path.resolve(arp.path, "uploads", model.fileName));
     }
 
     /**

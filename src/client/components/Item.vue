@@ -31,7 +31,7 @@
         <ProgressBar :model="model" class="progressBar" />
         <div class="subObjects">
             <div v-for="(subObject, index) of model.getSubObjects()" :key="index" :class="`subObject ${subObject.isSelected ? 'isSelected' : ''}`">
-                <div class="avatar" v-if="subObject.getAvatar()">
+                <div class="avatar" v-if="subObject.getAvatar().type === 'component'">
                     <component :is="subObject.getAvatar().name"></component>
                 </div>
                 <div class="info">
@@ -55,7 +55,6 @@
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
-import { resolveProxy } from "~common/utils";
 
 export default {
     components: {
@@ -83,7 +82,7 @@ export default {
         },
 
         activeClass() {
-            return resolveProxy(this.model) === resolveProxy(window.activeUser.editingModel) ? "active" : "";
+            return window.activeUser.editingModel && this.model._id === window.activeUser.editingModel._id ? "active" : "";
         }
     },
     methods: {

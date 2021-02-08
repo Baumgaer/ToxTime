@@ -21,7 +21,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
     @CommonClientFile.action("download", { type: "component", name: "file-download-icon" }, (instance) => window.activeUser.isAdmin && instance._id)
     download() {
         const element = document.createElement('a');
-        element.setAttribute('href', `/files/${this._id}`);
+        element.setAttribute('href', `/files/${this._id}/avatar`);
         element.setAttribute('download', this.getName());
         element.style.display = 'none';
         document.body.appendChild(element);
