@@ -77,6 +77,7 @@ export default class Requisites extends ApiRoute {
         const iteratingKeys = ["clickAreas", "actionObjects"];
         for (const iteratingKey of iteratingKeys) {
             for (const iteratee of result[iteratingKey]) {
+                if (!request.body[iteratingKey]) continue;
                 const foundIteratee = request.body[iteratingKey].find((requestIteratee) => {
                     return iteratee._id.toString() === requestIteratee._id || iteratee._id.toString() === requestIteratee;
                 });

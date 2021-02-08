@@ -1,6 +1,6 @@
 import onChange from "on-change";
 import lodash from "lodash";
-import { isProxy } from "~common/utils";
+import { isProxy, resolveProxy } from "~common/utils";
 
 /** @type {Record<string, ReturnType<import("~client/lib/ClientModel")["default"]["buildClientExport"]>>} */
 export const modelMap = { Error };
@@ -141,7 +141,16 @@ export class Store {
         if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
         if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
-        return Object.assign(realModel, modelLike);
+        //return Object.assign(realModel, modelLike);
+        return lodash.mergeWith(realModel, modelLike, (targetValue, srcValue) => {
+            if (lodash.isArray(targetValue)) {
+                for (const model of srcValue) {
+                    const srcValueAlreadyInTarget = targetValue.find((value) => resolveProxy(value) === resolveProxy(model));
+                    if (!srcValueAlreadyInTarget) targetValue.push(model);
+                }
+                return targetValue;
+            } else return srcValue;
+        });
     }
 
     /**
