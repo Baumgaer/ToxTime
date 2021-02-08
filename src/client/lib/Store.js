@@ -179,8 +179,7 @@ export class Store {
             }
 
             if (!(fieldName in modelMap[this.className].Schema.obj)) return;
-            if (!Reflect.hasMetadata("stagedChanges", model)) Reflect.defineMetadata("stagedChanges", {}, model);
-            const stagedChanges = Reflect.getMetadata("stagedChanges", model);
+            const stagedChanges = model.getChanges();
             if (!stagedChanges[fieldName]) stagedChanges[fieldName] = prev;
 
         }, { pathAsArray: true, ignoreUnderscores: true, ignoreSymbols: true, isShallow: false, equals: lodash.isEqual });

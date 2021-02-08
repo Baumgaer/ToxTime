@@ -56,11 +56,14 @@ export default class ClientModel extends BaseModel {
         return this[preferredField] || this.name;
     }
 
-    hasChanges() {
+    getChanges() {
         const that = resolveProxy(this);
         if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
-        const stagedChanges = Reflect.getMetadata("stagedChanges", that);
-        return Boolean(Object.keys(stagedChanges).length);
+        return Reflect.getMetadata("stagedChanges", that);
+    }
+
+    hasChanges() {
+        return Boolean(Object.keys(this.getChanges()).length);
     }
 
     destroy() {
