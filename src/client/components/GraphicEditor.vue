@@ -70,6 +70,8 @@ export default {
             watchedModel: window.activeUser.editingModel,
             currentTool: null,
             isMounted: false,
+            initialBackgroundLoadedPromise: null,
+            initialBackgroundLoadedResolver: null,
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -101,18 +103,16 @@ export default {
         }
     },
     mounted() {
+        this.initialBackgroundLoadedPromise = new Promise((resolve) => this.initialBackgroundLoadedResolver = resolve);
         this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
         this.paper.project.activeLayer.applyMatrix = false;
+        this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
 
         // Add clickAreas
-        for (const clickArea of this.watchedModel.clickAreas) {
-            const path = PolyClickArea.build(this.paper, clickArea.shape, clickArea.position);
-            path.model = clickArea;
-            this.paper.project.activeLayer.insertChild(clickArea.layer + 1, path);
-        }
+        this.setupClickAreas({ sceneObject: this.watchedModel }, this.paper.project.activeLayer);
     },
     async beforeDestroy() {
         if (this.currentTool) this.currentTool.remove();
@@ -189,6 +189,7 @@ export default {
             this.watchedModel.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
+            this.initialBackgroundLoadedResolver();
         },
 
         async onActionObjectBackgroundLoaded(actionObjectMap, index) {
@@ -205,14 +206,7 @@ export default {
 
             const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
 
-            // Add clickAreas
-            for (const clickArea of actionObject.sceneObject.clickAreas) {
-                const path = PolyClickArea.build(this.paper, clickArea.shape);
-                path.model = clickArea;
-                path.position = this.calcPosition(actionObject, group, clickArea.position);
-                path.locked = true;
-                group.insertChild(clickArea.layer + 1, path);
-            }
+            this.setupClickAreas(actionObject, group, true);
 
             // Process sub action objects
             if (actionObjectMap.ownerGroupModel) {
@@ -262,8 +256,7 @@ export default {
                 const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
-
-                group.position = new this.paper.Point(actionObject.position);
+                group.position = this.calcPosition({ sceneObject: this.watchedModel }, this.paper.project.activeLayer, actionObject.position);
             }
 
             group.scale(actionObject.scale);
@@ -307,6 +300,18 @@ export default {
                     }
                 });
             });
+        },
+
+        async setupClickAreas(model, container, locked = false) {
+            await this.initialBackgroundLoadedPromise;
+
+            for (const clickArea of model.sceneObject.clickAreas) {
+                const path = PolyClickArea.build(this.paper, clickArea.shape);
+                path.model = clickArea;
+                path.position = this.calcPosition(model, container, clickArea.position);
+                path.locked = locked;
+                container.insertChild(clickArea.layer + 1, path);
+            }
         },
 
         setTool(toolName) {

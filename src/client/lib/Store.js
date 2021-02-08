@@ -145,7 +145,7 @@ export class Store {
         return lodash.mergeWith(realModel, modelLike, (targetValue, srcValue) => {
             if (lodash.isArray(targetValue)) {
                 for (const model of srcValue) {
-                    const srcValueAlreadyInTarget = targetValue.find((value) => resolveProxy(value) === resolveProxy(model));
+                    const srcValueAlreadyInTarget = targetValue.find((value) => lodash.isEqual(resolveProxy(value), resolveProxy(model)));
                     if (!srcValueAlreadyInTarget) targetValue.push(model);
                 }
                 return targetValue;
