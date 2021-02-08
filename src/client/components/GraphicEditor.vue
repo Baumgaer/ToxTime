@@ -18,14 +18,14 @@
             <img ref="background"
                  style="display: none;"
                  v-if="watchedModel.file"
-                 :src="`/files/${watchedModel.file._dummyId || watchedModel.file._id}`"
+                 :src="`/files/${watchedModel.file._id}/avatar`"
                  @load="onBackgroundLoaded($event)"
             />
             <img v-for="(actionObjectMap, index) of actionObjectsMap"
                  style="display: none;"
                  :ref="`actionObjectBackground${actionObjectMap.actionObject._id}${index}`"
                  :key="`${actionObjectMap.actionObject._id}${index}`"
-                 :src="`/files/${actionObjectMap.actionObject.sceneObject.file._id}`"
+                 :src="`/files/${actionObjectMap.actionObject.sceneObject.file._id}/avatar`"
                  @load="onActionObjectBackgroundLoaded(actionObjectMap, index)"
             />
             <canvas ref="canvas" resize @wheel="onWheel($event)"></canvas>
