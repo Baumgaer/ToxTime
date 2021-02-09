@@ -12,7 +12,7 @@
                      @dragend="onDragEnd($event)"
                      @dragover="onDragOver($event, index)"
                      @dragleave="onDragLeave($event, index)"
-                     @drop="onInternalDrop($event, index)"
+                     @drop.prevent.stop="onInternalDrop($event, index)"
                      :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
@@ -93,6 +93,7 @@ export default {
 
                 let indexAddition = 0;
                 if (elementRect.x + elementRect.width / 2 <= event.clientX) indexAddition = 1;
+                if (index > indexOfDraggedModel) indexAddition = 0;
 
                 element.classList.remove("rightDropTarget");
                 element.classList.remove("leftDropTarget");
@@ -100,7 +101,7 @@ export default {
                 if (indexOfDraggedModel >= 0) {
                     this.model.scenes.splice(indexOfDraggedModel, 1);
                 } else indexOfDraggedModel = index;
-                this.model.scenes.splice(indexOfDraggedModel + indexAddition, 0, model);
+                this.model.scenes.splice(index + indexAddition, 0, model);
             } else this.model.scenes.push(model);
         },
 
