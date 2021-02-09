@@ -67,5 +67,7 @@
     "upload": "Hochladen",
     "addSceneObject": "Szenenobjekt hinzufügen",
     "arrange": "Element in den Vordergrund bringen",
-    "addScene": "Szene hinzufügen"
+    "addScene": "Szene hinzufügen",
+    "addLesson": "Lektion hinzufügen",
+    "goals": "Ziele"
 }

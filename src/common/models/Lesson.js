@@ -22,7 +22,9 @@ export function LessonMixinClass(MixinClass) {
             scenes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }
-                ]
+                ],
+                required: true,
+                default: []
             }
         };
     }

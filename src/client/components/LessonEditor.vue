@@ -1,12 +1,28 @@
 <template>
     <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addLesson" :onSaveButtonClick="onSaveButtonClick.bind(this)"/>
-        <section></section>
+        <section class="editorBody">
+            <h3>{{ $t("scenes") }}</h3>
+            <section class="scenes">
+                <div class="scene" v-for="(scene, index) of model.scenes" :key="index">
+                    <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
+                    <component :is="'close-icon'" class="closeIcon"/>
+                    <div class="name">{{ scene.name }}</div>
+                </div>
+            </section>
+            <h3>{{ $t("recipes") }}</h3>
+            <section></section>
+            <h3>{{ $t("goals") }}</h3>
+            <section></section>
+        </section>
     </div>
 </template>
 
 <script>
 import EditorHead from "~client/components/EditorHead";
+import ApiClient from "~client/lib/ApiClient";
+import Scene from "~client/models/Scene";
+
 export default {
     components: {
         EditorHead
@@ -42,7 +58,18 @@ export default {
         },
 
         onInternalDrop(event) {
-            console.log(event);
+            if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            let eventData = event.dataTransfer.getData("model");
+            if (eventData) eventData = JSON.parse(eventData);
+            if (eventData) {
+                const model = ApiClient.store.getModelById(eventData.collection, eventData._id);
+                if (!model || !(model instanceof Scene.RawClass)) return;
+                this.model.scenes.push(model);
+            }
         }
     }
 };

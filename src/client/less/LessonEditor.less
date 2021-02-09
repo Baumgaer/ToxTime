@@ -2,4 +2,71 @@
 
 .lessonEditor {
     height: 100%;
+
+    .editorBody {
+        height: calc(100% - 50px);
+
+        h3 {
+            font-size: 16px;
+            display: block;
+            padding-left: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-color, @gray);
+        }
+
+        .scenes {
+            padding-left: 5px;
+            .scene {
+                display: inline-block;
+                position: relative;
+                background-image: url("~client/assets/transparentBackgroundIndicator.png");
+                cursor: grab;
+                width: calc(20% - 10px);
+                min-width: 150px;
+                max-width: 250px;
+                margin: 5px;
+
+                &::before {
+                    content: "";
+                    float: left;
+                    margin-top: 100%; /* initial ratio of 1:1*/
+                }
+
+                .scenePicture {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+
+                    background-position: center center;
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                }
+
+                .closeIcon {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    font-size: 20px;
+                    font-weight: bold;
+                    cursor: pointer;
+
+                    &:hover {
+                        color: var(--primary-color, @primaryColor);
+                    }
+                }
+                .name {
+                    position: absolute;
+                    box-sizing: border-box;
+                    font-weight: bold;
+                    padding: 5px;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background-color: var(--white-color, fade(@white, 75));
+                }
+            }
+        }
+    }
 }
