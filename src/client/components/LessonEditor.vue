@@ -63,8 +63,10 @@ export default {
         };
     },
     methods: {
-        onSaveButtonClick() {
-            console.log("SAVE!");
+        async onSaveButtonClick() {
+            const result = await this.model.save();
+            if (!result || result instanceof Error) return;
+            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
 
         /**
