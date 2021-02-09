@@ -90,17 +90,15 @@ export default class ClientModel extends BaseModel {
     }
 
     toObject() {
-        const that = resolveProxy(this);
-        const schema = ClientModel.buildSchema(Object.getPrototypeOf(that).constructor);
+        const schema = ClientModel.buildSchema(Object.getPrototypeOf(this).constructor);
 
-        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
-        let changes = Reflect.getMetadata("stagedChanges", that);
-        if (!Object.keys(changes).length && that._dummyId) changes = schema.obj;
+        let changes = this.getChanges();
+        if (!Object.keys(changes).length && this._dummyId) changes = schema.obj;
 
         const data = {};
         for (const key in changes) {
             if (key in schema.obj) {
-                let value = that[key];
+                let value = this[key];
                 if (value instanceof ClientModel) value = value.toObject();
                 if (value instanceof Array) {
                     const arrayValue = [];
@@ -114,8 +112,8 @@ export default class ClientModel extends BaseModel {
                 data[key] = value;
             }
         }
-        if (that._dummyId) data._dummyId = that._dummyId;
-        return Object.keys(data).length ? Object.assign(data, { _id: that._id }) : that._id;
+        if (this._dummyId) data._dummyId = this._dummyId;
+        return Object.keys(data).length ? Object.assign(data, { _id: this._id }) : this._id;
     }
 
     toJson() {

@@ -185,6 +185,7 @@ export default {
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.scaling = this.paper.project.activeLayer.getScaling();
+            raster.position = this.watchedModel.position;
             raster.sendToBack();
             this.watchedModel.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
@@ -375,9 +376,6 @@ export default {
                     }
                 });
             }, "image/png");
-            // const svg = this.paper.project.exportSVG({ asString: true, bounds: "content" });
-            // await ApiClient.put(`/${this.watchedModel.collection}/${this.watchedModel._id}`, { content: svg });
-            // this.watchedModel.isCreatingAvatar = false;
         }
     }
 };

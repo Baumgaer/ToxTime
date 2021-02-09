@@ -141,16 +141,17 @@ export class Store {
         if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
         if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
-        //return Object.assign(realModel, modelLike);
-        return lodash.mergeWith(realModel, modelLike, (targetValue, srcValue) => {
-            if (lodash.isArray(targetValue)) {
+        lodash.mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue) => {
+            const theTarget = resolveProxy(targetValue);
+            if (lodash.isArray(theTarget)) {
                 for (const model of srcValue) {
-                    const srcValueAlreadyInTarget = targetValue.find((value) => lodash.isEqual(resolveProxy(value), resolveProxy(model)));
-                    if (!srcValueAlreadyInTarget) targetValue.push(model);
+                    const srcValueAlreadyInTarget = theTarget.find((value) => lodash.isEqual(resolveProxy(value), resolveProxy(model)));
+                    if (!srcValueAlreadyInTarget) theTarget.push(model);
                 }
-                return targetValue;
-            } else return srcValue;
+                return theTarget;
+            } else return resolveProxy(srcValue);
         });
+        return realModel;
     }
 
     /**
