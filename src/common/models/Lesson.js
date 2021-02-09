@@ -27,6 +27,10 @@ export function LessonMixinClass(MixinClass) {
                 default: []
             }
         };
+
+        getSubObjects() {
+            return this.scenes;
+        }
     }
     return Lesson;
 }

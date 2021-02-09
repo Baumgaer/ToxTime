@@ -4,8 +4,8 @@ import Requisite from "~client/models/Requisite";
 const CommonSceneRequisite = SceneMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class Scene extends CommonSceneRequisite {
 
-    getAvatar() {
-        if (this._id && !this.isCreatingAvatar) return super.getAvatar();
+    getAvatar(forceIcon) {
+        if (!forceIcon && this._id && !this.isCreatingAvatar) return super.getAvatar();
         return {
             type: "component",
             name: "theater-icon"
