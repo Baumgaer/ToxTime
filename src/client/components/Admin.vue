@@ -64,7 +64,8 @@
         </section>
         <section class="editor">
             <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
-            <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" :model="window.activeUser.editingModel" />
+            <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
+            <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -77,8 +78,11 @@ import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
 import GraphicEditor from "~client/components/GraphicEditor";
+import LessonEditor from "~client/components/LessonEditor";
+
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
+import Lesson from "~client/models/Lesson";
 
 import { capitalize } from "~common/utils";
 import natSort from "natsort";
@@ -89,7 +93,8 @@ export default {
         Item,
         AddUsers,
         UploadHint,
-        GraphicEditor
+        GraphicEditor,
+        LessonEditor
     },
     data() {
         return {
@@ -140,6 +145,9 @@ export default {
                     if (category === "sceneObjects") {
                         window.activeUser.editingModel = ApiClient.store.addModel(new SceneObject.Model());
                     } else window.activeUser.editingModel = ApiClient.store.addModel(new Scene.Model());
+                } else if(category === "lessons") {
+                    window.activeUser.activeEditor = `add${capitalize(category)}`;
+                    window.activeUser.editingModel = ApiClient.store.addModel(new Lesson.Model());
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });
         },

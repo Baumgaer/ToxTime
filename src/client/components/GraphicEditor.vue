@@ -17,8 +17,8 @@
         <div ref="canvasWrapper" class="canvasWrapper" @contextmenu.prevent="setTool(null)">
             <img ref="background"
                  style="display: none;"
-                 v-if="watchedModel.file"
-                 :src="`/files/${watchedModel.file._id}/avatar`"
+                 v-if="model.file"
+                 :src="`/files/${model.file._id}/avatar`"
                  @load="onBackgroundLoaded($event)"
             />
             <img v-for="(actionObjectMap, index) of actionObjectsMap"
@@ -61,13 +61,12 @@ export default {
             type: String,
             required: true,
             default: "scene"
-        },
-        model: Object
+        }
     },
     data() {
         return {
             paper: new paper.PaperScope(),
-            watchedModel: window.activeUser.editingModel,
+            model: window.activeUser.editingModel,
             currentTool: null,
             isMounted: false,
             initialBackgroundLoadedPromise: null,
@@ -82,7 +81,7 @@ export default {
     },
     computed: {
         actionObjectsMap() {
-            if (!this.watchedModel || !this.isMounted) return [];
+            if (!this.model || !this.isMounted) return [];
             const map = [];
 
             const getRecursive = (model, ownerGroupModel) => {
@@ -98,7 +97,7 @@ export default {
                 }
             };
 
-            getRecursive(this.watchedModel);
+            getRecursive(this.model);
             return map;
         }
     },
@@ -112,32 +111,32 @@ export default {
         this.isMounted = true;
 
         // Add clickAreas
-        this.setupClickAreas({ sceneObject: this.watchedModel }, this.paper.project.activeLayer);
+        this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
     },
     async beforeDestroy() {
         if (this.currentTool) this.currentTool.remove();
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
-            if (this.watchedModel.hasChanges() || !this.watchedModel._id) {
-                const result = await this.watchedModel.save();
+            if (this.model.hasChanges() || !this.model._id) {
+                const result = await this.model.save();
                 if (!result) return;
                 if (result instanceof Error) {
                     this.paper.project.clear();
                     return;
                 }
-                this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+                this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
                 this.createAvatar();
                 this.paper.project.clear();
             }
         } else {
-            if (this.watchedModel._id) {
-                if (this.watchedModel.hasChanges()) {
-                    this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
-                    this.watchedModel.discard();
+            if (this.model._id) {
+                if (this.model.hasChanges()) {
+                    this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                    this.model.discard();
                 }
             } else {
-                this.watchedModel.destroy();
-                this.$toasted.info(window.vm.$t("discarded", { name: this.watchedModel.getName() }), { className: "infoToaster" });
+                this.model.destroy();
+                this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
             }
             this.paper.project.clear();
         }
@@ -185,9 +184,9 @@ export default {
             const raster = new this.paper.Raster(this.$refs.background);
             raster.position = this.paper.view.center;
             raster.scaling = this.paper.project.activeLayer.getScaling();
-            raster.position = this.watchedModel.position;
+            raster.position = this.model.position;
             raster.sendToBack();
-            this.watchedModel.position = [raster.position.x, raster.position.y];
+            this.model.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
             this.initialBackgroundLoadedResolver();
@@ -225,10 +224,10 @@ export default {
         },
 
         async onSaveButtonClick() {
-            const result = await this.watchedModel.save();
+            const result = await this.model.save();
             if (result instanceof Error) return;
             this.createAvatar();
-            this.$toasted.success(window.vm.$t("saved", { name: this.watchedModel.getName() }), { className: "successToaster" });
+            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
 
         /**
@@ -257,7 +256,7 @@ export default {
                 const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
-                group.position = this.calcPosition({ sceneObject: this.watchedModel }, this.paper.project.activeLayer, actionObject.position);
+                group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
             }
 
             group.scale(actionObject.scale);
@@ -318,7 +317,7 @@ export default {
         setTool(toolName) {
             if (this.currentTool || typeof toolName === "string") {
                 let toolToSet = null;
-                if (toolName in this.toolMap && toolName !== this.currentTool?.name) toolToSet = new this.toolMap[toolName](this.paper, this.watchedModel);
+                if (toolName in this.toolMap && toolName !== this.currentTool?.name) toolToSet = new this.toolMap[toolName](this.paper, this.model);
                 if (this.currentTool) this.currentTool.remove();
                 this.currentTool = toolToSet;
             } else if (this.selectedItem) {
@@ -334,20 +333,20 @@ export default {
 
         addBackground(model) {
             if (!(model instanceof File.RawClass) || !model.mime.startsWith("image")) return;
-            this.watchedModel.file = model;
+            this.model.file = model;
         },
 
         addActionObject(model) {
             // Has to be an Scene Object which can be passed into an action object
             // Should not be the same model as the current watched model to avoid recursion loop
             // has to be checked with the id because watched model can be an recursive proxy
-            if (!(model instanceof SceneObject.RawClass) || model._id === this.watchedModel._id) return;
+            if (!(model instanceof SceneObject.RawClass) || model._id === this.model._id) return;
             const actionObject = ApiClient.store.addModel(new ActionObject.Model({
                 position: [this.paper.view.center.x, this.paper.view.center.y],
                 sceneObject: model,
                 layer: this.actionObjectsMap.length
             }));
-            this.watchedModel.actionObjects.push(actionObject);
+            this.model.actionObjects.push(actionObject);
 
             const actionObjectsMap = this.actionObjectsMap;
             const lastActionObject = actionObjectsMap[actionObjectsMap.length - 2];
@@ -355,24 +354,24 @@ export default {
         },
 
         async createAvatar() {
-            if (!this.watchedModel._id) return;
+            if (!this.model._id) return;
             /** @type {HTMLCanvasElement} */
             const canvas = this.$refs.canvas;
-            this.watchedModel.loadingStatus = -1;
+            this.model.loadingStatus = -1;
             canvas.toBlob((blob) => {
                 if (!blob) return;
                 const formData = new FormData();
-                formData.append('file', blob, this.watchedModel._id);
-                ApiClient.upload("PUT", `/${this.watchedModel.collection}/${this.watchedModel._id}`, {
+                formData.append('file', blob, this.model._id);
+                ApiClient.upload("PUT", `/${this.model.collection}/${this.model._id}`, {
                     formData: formData,
-                    onProgress: (progress) => this.watchedModel.loadingStatus = progress,
+                    onProgress: (progress) => this.model.loadingStatus = progress,
                     onSuccess: () => {
-                        this.watchedModel.loadingStatus = 0;
-                        this.watchedModel.isCreatingAvatar = false;
+                        this.model.loadingStatus = 0;
+                        this.model.isCreatingAvatar = false;
                     },
                     onError: () => {
-                        this.watchedModel.loadingStatus = 0;
-                        this.watchedModel.isCreatingAvatar = false;
+                        this.model.loadingStatus = 0;
+                        this.model.isCreatingAvatar = false;
                     }
                 });
             }, "image/png");
