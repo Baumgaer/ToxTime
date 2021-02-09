@@ -71,7 +71,7 @@
             }
             .buttons {
                 grid-area: buttons;
-                line-height: 68px;
+                line-height: 50px;
                 text-align: right;
 
                 .collapseButton,
@@ -79,9 +79,10 @@
                     float: right;
                     --button-width: 50px;
                     --hover-color: var(--gray-color, @gray);
-                }
-                &.collapsed {
-                    width: 40px;
+                    &.collapsed {
+                        --button-width: 40px;
+                        width: 40px;
+                    }
                 }
             }
         }
