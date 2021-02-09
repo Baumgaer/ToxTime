@@ -79,28 +79,27 @@ export default {
 
             let eventData = event.dataTransfer.getData("model");
             if (eventData) eventData = JSON.parse(eventData);
-            if (eventData) {
-                const model = ApiClient.store.getModelById(eventData.collection, eventData._id);
-                if (!model || !(model instanceof Scene.RawClass)) return;
+            if (!eventData) return;
 
-                if (typeof index === "number") {
-                    const element = this.$refs[`scene${index}`][0];
-                    const elementRect = element.getBoundingClientRect();
-                    let indexOfDraggedModel = this.model.scenes.indexOf(model);
+            const model = ApiClient.store.getModelById(eventData.collection, eventData._id);
+            if (!model || !(model instanceof Scene.RawClass)) return;
 
-                    let indexAddition = 0;
-                    if (elementRect.x + elementRect.width / 2 <= event.clientX) indexAddition = 1;
+            if (typeof index === "number") {
+                const element = this.$refs[`scene${index}`][0];
+                const elementRect = element.getBoundingClientRect();
+                let indexOfDraggedModel = this.model.scenes.indexOf(model);
 
-                    element.classList.remove("rightDropTarget");
-                    element.classList.remove("leftDropTarget");
+                let indexAddition = 0;
+                if (elementRect.x + elementRect.width / 2 <= event.clientX) indexAddition = 1;
 
-                    if (indexOfDraggedModel >= 0) {
-                        this.model.scenes.splice(indexOfDraggedModel, 1);
-                    } else indexOfDraggedModel = index;
-                    this.model.scenes.splice(indexOfDraggedModel + indexAddition, 0, model);
-                } else this.model.scenes.push(model);
+                element.classList.remove("rightDropTarget");
+                element.classList.remove("leftDropTarget");
 
-            }
+                if (indexOfDraggedModel >= 0) {
+                    this.model.scenes.splice(indexOfDraggedModel, 1);
+                } else indexOfDraggedModel = index;
+                this.model.scenes.splice(indexOfDraggedModel + indexAddition, 0, model);
+            } else this.model.scenes.push(model);
         },
 
         onSceneRemoveClick(scene) {
