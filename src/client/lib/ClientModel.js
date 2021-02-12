@@ -107,6 +107,11 @@ export default class ClientModel extends BaseModel {
         Reflect.defineMetadata("backupStore", {}, that);
     }
 
+    /**
+     * Same as deleteBackup() but recursive
+     *
+     * @memberof ClientModel
+     */
     deleteBackupDeep() {
         lodash.eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
@@ -128,6 +133,13 @@ export default class ClientModel extends BaseModel {
         return this.isNew() || Boolean(this.getChangedKeys().length);
     }
 
+    /**
+     * Same as hasChanges() but recursive. Stops recursion if there is some
+     * change detected.
+     *
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
     hasChangesDeep() {
         let result = false;
         lodash.eachDeep(this, (value, key, parentValue, context) => {
@@ -274,6 +286,17 @@ export default class ClientModel extends BaseModel {
         return requestObject;
     }
 
+    /**
+     * Converts all changes into an object which can be handled by the server
+     * and sends this object to the server. If the server responds with a success
+     * status, all backups will be removed to finalize the changes.
+     *
+     * Returns the final object respecting the server response or an error if a
+     * none success response status was received.
+     *
+     * @returns {Record<string, any> | Error}
+     * @memberof ClientModel
+     */
     async save() {
         if (!this.hasChanges()) return;
         const data = this.toRequestObject();
