@@ -141,6 +141,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     hasChangesDeep() {
+        if (this.hasChanges()) return true;
         let result = false;
         lodash.eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular || result) return false;
@@ -187,7 +188,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     getChangesDeep() {
-        const recursiveChanges = {};
+        const recursiveChanges = Object.assign({}, this.getChanges());
         lodash.eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
