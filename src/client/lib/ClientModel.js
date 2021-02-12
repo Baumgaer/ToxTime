@@ -298,7 +298,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     async save() {
-        if (!this.hasChanges()) return;
+        if (!this.hasChangesDeep()) return;
         const data = this.toRequestObject();
 
         let method;
