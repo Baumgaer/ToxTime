@@ -162,8 +162,8 @@ export class Store {
                     const srcValueAlreadyInTarget = theTarget.find((value) => lodash.isEqual(resolveProxy(value), resolveProxy(model)));
                     if (!srcValueAlreadyInTarget) theTarget.push(model);
                 }
-                return theTarget;
-            } else return resolveProxy(srcValue);
+                return targetValue;
+            } else return srcValue;
         });
         return realModel;
     }

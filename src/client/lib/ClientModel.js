@@ -177,7 +177,7 @@ export default class ClientModel extends BaseModel {
     getChanges() {
         const changedKeys = this.getChangedKeys();
         const changes = {};
-        for (const key of changedKeys) changes[key] = resolveProxy(this[key]);
+        for (const key of changedKeys) changes[key] = lodash.clone(resolveProxy(this[key]));
         return changes;
     }
 
@@ -188,7 +188,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     getChangesDeep() {
-        const recursiveChanges = Object.assign({}, this.getChanges());
+        const recursiveChanges = this.getChanges();
         lodash.eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
