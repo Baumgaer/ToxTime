@@ -11,10 +11,13 @@ export const modelMap = { Error };
  */
 export class Store {
 
+    /** @type {Store} */
     static instance = null;
 
+    /** @type {Record<string, Record<string, import("~client/lib/ClientModel")>>} */
     collections = {};
 
+    /** @type {import("on-change").Options} */
     observerOptions = {
         pathAsArray: true,
         ignoreUnderscores: true,
@@ -34,7 +37,7 @@ export class Store {
     }
 
     /**
-     *
+     * Creates an instance of the store if not yet created and returns it.
      *
      * @static
      * @returns {Store}
@@ -75,7 +78,8 @@ export class Store {
     }
 
     /**
-     *
+     * Checks if the model like object is already stored as a model in the
+     * corresponding collection.
      *
      * @param {ModelLike} modelLike
      * @returns {boolean}
@@ -86,7 +90,7 @@ export class Store {
     }
 
     /**
-     *
+     * Checks if a model like data object could be a real model
      *
      * @param {ModelLike} modelLike
      * @returns {boolean}
@@ -126,7 +130,9 @@ export class Store {
     }
 
     /**
-     *
+     * Updates the model with modelLike data. If modelLike has an id and a
+     * dummyModel is stored in collection, this dummy model will be replaced
+     * with a real model. Does not update values when they are unchanged.
      *
      * @param {ModelLike} modelLike
      * @returns {Model}
@@ -163,7 +169,8 @@ export class Store {
     }
 
     /**
-     *
+     * Removes a model from the collections by its collection and id.
+     * Also all components will be informed.
      *
      * @param {ModelLike} modelLike
      * @returns {void}
@@ -175,6 +182,19 @@ export class Store {
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }
 
+    /**
+     * Handles the changes inside a model or inside an array of a model.
+     * When a value is changed its previous value will be stored in the backup
+     * store of the model
+     *
+     * @param {Model} model
+     * @param {string[]} path
+     * @param {any} value
+     * @param {any} prev
+     * @param {string} name
+     * @returns {void}
+     * @memberof Store
+     */
     _backupChanges(model, path, value, prev, name) {
         if ((value === undefined && prev === undefined && name === undefined) || !model.staging) return;
 
@@ -185,13 +205,23 @@ export class Store {
 
         // Previous values are not wrapped into a proxy, so we need to store a
         // proxy in the backup store to have observation on discarded values
-        if (name === "arrayWatch") prev = this.createArrayChangeObserver(model, path[0], prev);
+        if (name === "arrayWatch") prev = this._createArrayChangeObserver(model, path[0], prev);
 
         // Backup changes
         model.updateBackup(path, prev);
     }
 
-    createArrayChangeObserver(model, key, array) {
+    /**
+     * Wraps arrays of models in a proxy to handle changes inside this arrays
+     *
+     * @template T
+     * @param {Model} model
+     * @param {string} key
+     * @param {T extends Array} array
+     * @returns {T}
+     * @memberof Store
+     */
+    _createArrayChangeObserver(model, key, array) {
         const schemaObject = modelMap[model.className].Schema.obj;
 
         // Clone options and if the array is not an array with references, watch deep
@@ -203,6 +233,16 @@ export class Store {
         }, arrayOptions);
     }
 
+    /**
+     * Wraps a given model into a proxy which later will handle change detection.
+     * If there are arrays as values, this arrays will be watched deep when they
+     * are not reference arrays. Otherwise those arrays will be watched shallow.
+     *
+     * @template T
+     * @param {T extends Model} model
+     * @returns {T}
+     * @memberof Store
+     */
     _installChangeObserver(model) {
         const schemaObject = modelMap[model.className].Schema.obj;
         const schemaObjectKeys = Object.keys(schemaObject);
@@ -219,7 +259,7 @@ export class Store {
         // Watch changes of arrays
         for (const schemaObjectKey of schemaObjectKeys) {
             if (!lodash.isArray(schemaObject[schemaObjectKey].type)) continue;
-            model[schemaObjectKey] = this.createArrayChangeObserver(model, schemaObjectKey, model[schemaObjectKey]);
+            model[schemaObjectKey] = this._createArrayChangeObserver(model, schemaObjectKey, model[schemaObjectKey]);
         }
 
         model.staging = true;
