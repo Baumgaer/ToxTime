@@ -5,9 +5,6 @@ import ApiClient from "~client/lib/ApiClient";
 const CommonGameObjectRequisite = RequisiteMixinClass(GameObject.RawClass);
 export default GameObject.RawClass.buildClientExport(class Requisite extends CommonGameObjectRequisite {
 
-    isSelected = false;
-    loadingStatus = 0;
-
     getAvatar() {
         return {
             type: "image",

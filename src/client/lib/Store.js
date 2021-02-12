@@ -15,6 +15,14 @@ export class Store {
 
     collections = {};
 
+    observerOptions = {
+        pathAsArray: true,
+        ignoreUnderscores: true,
+        ignoreSymbols: true,
+        isShallow: true,
+        equals: lodash.isEqual
+    };
+
     constructor() {
         if (!Store.usedInstanceGetter) throw new Error("This is a singleton, use Store.getInstance()!");
         const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
@@ -167,22 +175,54 @@ export class Store {
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }
 
+    _backupChanges(model, path, value, prev, name) {
+        if ((value === undefined && prev === undefined && name === undefined) || !model.staging) return;
+
+        // Notify all vue components about a change
+        const id = model._dummyId || model._id;
+        const vueObserver = this.getModelById(model.collection, id).__ob__;
+        if (this.hasModel(model) && vueObserver) vueObserver.dep.notify();
+
+        // Previous values are not wrapped into a proxy, so we need to store a
+        // proxy in the backup store to have observation on discarded values
+        if (name === "arrayWatch") prev = this.createArrayChangeObserver(model, path[0], prev);
+
+        // Backup changes
+        model.updateBackup(path, prev);
+    }
+
+    createArrayChangeObserver(model, key, array) {
+        const schemaObject = modelMap[model.className].Schema.obj;
+
+        // Clone options and if the array is not an array with references, watch deep
+        const arrayOptions = Object.assign({}, this.observerOptions);
+        if (!schemaObject[key].type[0].ref) arrayOptions.isShallow = false;
+
+        return onChange(array, (path, value, prev) => {
+            this._backupChanges(model, [key].concat(path), value, prev, "arrayWatch");
+        }, arrayOptions);
+    }
+
     _installChangeObserver(model) {
-        const that = this;
-        return onChange(model, function (path, value, prev, name) {
-            if ((value === undefined && prev === undefined && name === undefined) || !this.staging) return;
-            const fieldName = path[0];
+        const schemaObject = modelMap[model.className].Schema.obj;
+        const schemaObjectKeys = Object.keys(schemaObject);
+        const modelKeys = Object.keys(model);
+        const ignoreKeys = lodash.difference(modelKeys, schemaObjectKeys);
+        const options = Object.assign({}, this.observerOptions, { ignoreKeys });
+        model.staging = false;
 
-            // Notify all vue components about a change
-            const id = model._dummyId || model._id;
-            if (that.hasModel(model) && that.getModelById(model.collection, id).__ob__) {
-                that.getModelById(model.collection, id).__ob__.dep.notify();
-            }
+        // Install main observer first to be able to get previous values of arrays when they are changed
+        const mainObserver = onChange(model, (path, value, prev, name) => {
+            this._backupChanges(model, path, value, prev, name);
+        }, options);
 
-            if (!(fieldName in modelMap[this.className].Schema.obj)) return;
-            const stagedChanges = model.getChanges();
-            if (!stagedChanges[fieldName]) stagedChanges[fieldName] = prev;
+        // Watch changes of arrays
+        for (const schemaObjectKey of schemaObjectKeys) {
+            if (!lodash.isArray(schemaObject[schemaObjectKey].type)) continue;
+            model[schemaObjectKey] = this.createArrayChangeObserver(model, schemaObjectKey, model[schemaObjectKey]);
+        }
 
-        }, { pathAsArray: true, ignoreUnderscores: true, ignoreSymbols: true, isShallow: false, equals: lodash.isEqual });
+        model.staging = true;
+        return mainObserver;
     }
 }

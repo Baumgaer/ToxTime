@@ -1,8 +1,11 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
-import { resolveProxy } from "~common/utils";
+import { modelMap } from "~client/lib/Store";
+import { resolveProxy, isValue } from "~common/utils";
 import { v4 as uuid } from "uuid";
-import { isObjectLike, cloneDeep } from "lodash";
+import lodash, { isObjectLike, cloneDeep, isFunction, get, set } from "lodash";
+import deepdash from "deepdash";
+deepdash(lodash);
 
 export default class ClientModel extends BaseModel {
 
@@ -33,6 +36,7 @@ export default class ClientModel extends BaseModel {
                         const element = schema.paths[pathObject];
                         if (element.options.default !== undefined) {
                             let defaultValue = element.options.default;
+                            if (isFunction(defaultValue)) defaultValue = defaultValue();
                             if (isObjectLike(defaultValue)) defaultValue = cloneDeep(defaultValue);
                             this[pathObject] = defaultValue;
                         }
@@ -41,10 +45,7 @@ export default class ClientModel extends BaseModel {
 
                 // Assign given values
                 Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
-                if (!params._id) {
-                    this._dummyId = uuid();
-                    Reflect.defineMetadata("stagedChanges", params, this);
-                }
+                if (!params._id) this._dummyId = uuid();
                 this.staging = true;
 
             }
@@ -56,83 +57,234 @@ export default class ClientModel extends BaseModel {
         return this[preferredField] || this.name;
     }
 
-    getChanges() {
-        const that = resolveProxy(this);
-        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
-        return Reflect.getMetadata("stagedChanges", that);
+    /**
+     * Returns true if the model was created but not yet saved and false else
+     *
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
+    isNew() {
+        return Boolean(this._dummyId && !this._id);
     }
 
+    /**
+     * Collects all data which was set before the last call of save()
+     *
+     * @returns {Record<string, any>}
+     * @memberof ClientModel
+     */
+    getBackup() {
+        const that = resolveProxy(this);
+        if (!Reflect.hasMetadata("backupStore", that)) Reflect.defineMetadata("backupStore", {}, that);
+        return Reflect.getMetadata("backupStore", that);
+    }
+
+    /**
+     * Sets a new value for key if key does not already exist in backup.
+     * It is only possible to backup keys which are defined in the schema of
+     * the model.
+     *
+     * @param {string[]} path
+     * @param {any} value
+     * @memberof ClientModel
+     */
+    updateBackup(path, value) {
+        const backup = this.getBackup();
+        const schemaObject = modelMap[this.className].Schema.obj;
+        if (get(this, path) !== undefined && path[0] in schemaObject && !(path[0] in backup)) {
+            set(backup, path, value);
+        }
+    }
+
+    /**
+     * Removes all key value pairs in the backup store. This implicitly changes
+     * the change state of the model to false.
+     *
+     * @memberof ClientModel
+     */
+    deleteBackup() {
+        const that = resolveProxy(this);
+        Reflect.defineMetadata("backupStore", {}, that);
+    }
+
+    deleteBackupDeep() {
+        lodash.eachDeep(this, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
+                mayModel.deleteBackup();
+            }
+        }, { checkCircular: true, pathFormat: "array" });
+        this.deleteBackup();
+    }
+
+    /**
+     * Returns true if the model has keys in its backup store and false else
+     *
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
     hasChanges() {
-        return Boolean(Object.keys(this.getChanges()).length);
+        return this.isNew() || Boolean(this.getChangedKeys().length);
     }
 
-    destroy() {
-        const that = resolveProxy(this);
-        ApiClient.store.removeModel(that);
-        for (const key in that) {
-            if (Object.hasOwnProperty.call(that, key)) {
-                const element = resolveProxy(that[key]);
-                if (element instanceof ClientModel && !element._id) element.destroy();
-                if (element instanceof Array) {
-                    for (const subElement of element) {
-                        if (subElement instanceof ClientModel && !subElement._id) subElement.destroy();
-                    }
+    hasChangesDeep() {
+        let result = false;
+        lodash.eachDeep(this, (value, key, parentValue, context) => {
+            if (context.isCircular || result) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
+                if (mayModel.hasChanges()) {
+                    result = true;
+                    context.break();
                 }
             }
-        }
+        }, { checkCircular: true, pathFormat: "array" });
+        return result;
     }
 
+    /**
+     * Returns all keys which are set in the backup store because keys defined
+     * in backup store implicitly indicate changes of that keys.
+     *
+     * @returns {string[]}
+     * @memberof ClientModel
+     */
+    getChangedKeys() {
+        if (this.isNew()) return Object.keys(modelMap[this.className].Schema.obj);
+        return Object.keys(this.getBackup());
+    }
+
+    /**
+     * looks into the backup store for changed keys and returns their current value
+     *
+     * @returns {Record<string, any>}
+     * @memberof ClientModel
+     */
+    getChanges() {
+        const changedKeys = this.getChangedKeys();
+        const changes = {};
+        for (const key of changedKeys) changes[key] = resolveProxy(this[key]);
+        return changes;
+    }
+
+    /**
+     * Same as getChanges but recursive
+     *
+     * @returns {Record<string, any>}
+     * @memberof ClientModel
+     */
+    getChangesDeep() {
+        const recursiveChanges = {};
+        lodash.eachDeep(this, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
+                if (mayModel.hasChanges()) set(recursiveChanges, context.path, mayModel.getChanges());
+            }
+        }, { checkCircular: true, pathFormat: "array" });
+        return recursiveChanges;
+    }
+
+    /**
+     * Reverts all changes and removes the backup of the model. If the model
+     * itself is new, it will be removed from store.
+     *
+     * @memberof ClientModel
+     */
     discard() {
-        const that = resolveProxy(this);
-        if (!Reflect.hasMetadata("stagedChanges", that)) Reflect.defineMetadata("stagedChanges", {}, that);
-        let changes = Reflect.getMetadata("stagedChanges", that);
-        if (Object.keys(changes).length) Reflect.defineMetadata("stagedChanges", {}, that);
+        const backup = this.getBackup();
+        Object.assign(this, backup);
+        this.deleteBackup();
+        if (this.isNew()) ApiClient.store.removeModel(this);
     }
 
-    toObject() {
-        const schema = ClientModel.buildSchema(Object.getPrototypeOf(this).constructor);
-
-        let changes = this.getChanges();
-        if (!Object.keys(changes).length && this._dummyId) changes = schema.obj;
-
-        const data = {};
-        for (const key in changes) {
-            if (key in schema.obj) {
-                let value = this[key];
-                if (value instanceof ClientModel) value = value.toObject();
-                if (value instanceof Array) {
-                    const arrayValue = [];
-                    for (const entry of resolveProxy(value)) {
-                        if (entry instanceof ClientModel) {
-                            arrayValue.push(entry.toObject());
-                        } else arrayValue.push(entry);
-                    }
-                    value = arrayValue;
-                }
-                data[key] = value;
+    /**
+     * Same as discard but recursive. Models which are not new will not be
+     * removed from store.
+     *
+     * @memberof ClientModel
+     */
+    discardDeep() {
+        if (!this.hasChangesDeep()) return;
+        lodash.eachDeep(this, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
+                if (mayModel.hasChangesDeep()) {
+                    mayModel.discard();
+                } else return false;
             }
-        }
-        if (this._dummyId) data._dummyId = this._dummyId;
-        return Object.keys(data).length ? Object.assign(data, { _id: this._id }) : this._id;
+        }, { checkCircular: true, pathFormat: "array" });
+        this.discard();
     }
 
-    toJson() {
-        return JSON.stringify(this.toObject());
+    /**
+     * Removes all models recursive which are still new including the current model
+     *
+     * @memberof ClientModel
+     */
+    destroy() {
+        lodash.eachDeep(this, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel && mayModel.isNew()) {
+                ApiClient.store.removeModel(mayModel);
+            }
+        }, { checkCircular: true, pathFormat: "array" });
+        ApiClient.store.removeModel(this);
+    }
+
+    /**
+     * Transforms all changes recursive to an object which can be processed by the server.
+     * Changes which have a model as value will be transformed to the id of the model,
+     * if the model is not new. Otherwise the whole model will be sent to the server.
+     *
+     * @returns {Record<string, any>}
+     * @memberof ClientModel
+     */
+    toRequestObject() {
+        const changes = this.getChangesDeep();
+        const requestObject = {};
+        lodash.eachDeep(changes, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
+                if (!mayModel.hasChanges()) {
+                    lodash.set(requestObject, context.path, mayModel._id);
+                    return false;
+                } else {
+                    lodash.set(requestObject, context.path, value);
+                    const pathToExtend = [].concat(context.path);
+                    if (mayModel.isNew()) {
+                        pathToExtend.push("_dummyId");
+                        lodash.set(requestObject, pathToExtend, mayModel._dummyId);
+                    } else {
+                        pathToExtend.push("_id");
+                        lodash.set(requestObject, pathToExtend, mayModel._id);
+                    }
+                }
+            }
+        }, { checkCircular: true, pathFormat: "array" });
+
+        if (this.isNew()) {
+            requestObject._dummyId = this._dummyId;
+        } else requestObject._id = this._id;
+
+        return requestObject;
     }
 
     async save() {
         if (!this.hasChanges()) return;
-
-        const that = resolveProxy(this);
-        const data = that.toObject();
+        const data = this.toRequestObject();
 
         let method;
-        if (that._id) {
+        if (this._id) {
             method = ApiClient.patch.bind(ApiClient);
         } else method = ApiClient.post.bind(ApiClient);
 
-        const result = await method(`/${this.collection}${that._id ? "/" + that._id : ''}`, data);
-        if (!(result instanceof Error)) Reflect.defineMetadata("stagedChanges", {}, that);
+        const result = await method(`/${this.collection}${this._id ? "/" + this._id : ''}`, data);
+        if (!(result instanceof Error)) this.deleteBackupDeep();
         return result;
     }
 }

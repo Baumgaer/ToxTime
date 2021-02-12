@@ -115,9 +115,10 @@ export default {
     },
     async beforeDestroy() {
         if (this.currentTool) this.currentTool.remove();
+        const hasChanges = this.model.hasChangesDeep();
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
-            if (this.model.hasChanges() || !this.model._id) {
+            if (hasChanges || this.model.isNew()) {
                 const result = await this.model.save();
                 if (!result) return;
                 if (result instanceof Error) {
@@ -129,10 +130,10 @@ export default {
                 this.paper.project.clear();
             }
         } else {
-            if (this.model._id) {
-                if (this.model.hasChanges()) {
+            if (!this.model.isNew()) {
+                if (hasChanges) {
                     this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-                    this.model.discard();
+                    this.model.discardDeep();
                 }
             } else {
                 this.model.destroy();
