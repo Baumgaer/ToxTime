@@ -4,10 +4,7 @@ import Router from "~client/lib/Router";
 import i18n from "~client/lib/i18n";
 import App from '~client/App.vue';
 
-import HelloWorld from "~client/components/HelloWorld.vue";
-
-Vue.config.productionTip = false;
-Vue.prototype.window = window;
+import Public from "~client/components/Public.vue";
 
 Router.extendRoutes([{
     name: "public",
@@ -15,7 +12,7 @@ Router.extendRoutes([{
         title: i18n.tc("helloWorld")
     },
     path: "/public",
-    component: HelloWorld
+    component: Public
 }]);
 
 const router = Router.init();

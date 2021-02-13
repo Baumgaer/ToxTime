@@ -28,7 +28,7 @@
                 <Button ref="settings" name="settings" :active="this.category === 'settings'" @click="onNavButtonClick('settings')" >
                     <cog-icon />
                 </Button>
-                <Button ref="settings" name="logout" @click="onLogoutButtonClick()" >
+                <Button ref="logout" name="logout" @click="onLogoutButtonClick()" >
                     <logout-icon />
                 </Button>
             </div>
