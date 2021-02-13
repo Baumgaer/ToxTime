@@ -269,13 +269,12 @@ export default class ClientModel extends BaseModel {
                 } else {
                     lodash.set(requestObject, context.path, value);
                     const pathToExtend = [].concat(context.path);
-                    if (mayModel.isNew()) {
-                        pathToExtend.push("_dummyId");
-                        lodash.set(requestObject, pathToExtend, mayModel._dummyId);
-                    } else {
-                        pathToExtend.push("_id");
-                        lodash.set(requestObject, pathToExtend, mayModel._id);
-                    }
+
+                    let idProperty = "_id";
+                    if (mayModel.isNew()) idProperty = "_dummyId";
+                    pathToExtend.push(idProperty);
+
+                    lodash.set(requestObject, pathToExtend, mayModel[idProperty]);
                 }
             }
         }, { checkCircular: true, pathFormat: "array" });
