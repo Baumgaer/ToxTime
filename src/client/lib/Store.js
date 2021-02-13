@@ -222,6 +222,7 @@ export class Store {
      * @memberof Store
      */
     _createArrayChangeObserver(model, key, array) {
+        if (!lodash.isArray(array)) return array;
         const schemaObject = modelMap[model.className].Schema.obj;
 
         // Clone options and if the array is not an array with references, watch deep

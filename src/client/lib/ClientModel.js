@@ -13,6 +13,13 @@ export default class ClientModel extends BaseModel {
 
     static collection = "clientModels";
 
+    /** @type {import("mongoose").SchemaDefinition} */
+    static schema = {
+        creator: {
+            default: () => window.activeUser
+        }
+    };
+
     staging = false;
 
     /**
@@ -37,7 +44,9 @@ export default class ClientModel extends BaseModel {
                         if (element.options.default !== undefined) {
                             let defaultValue = element.options.default;
                             if (isFunction(defaultValue)) defaultValue = defaultValue();
-                            if (isObjectLike(defaultValue)) defaultValue = cloneDeep(defaultValue);
+                            if (isObjectLike(defaultValue) && !(defaultValue instanceof ClientModel)) {
+                                defaultValue = cloneDeep(defaultValue);
+                            }
                             this[pathObject] = defaultValue;
                         }
                     }
