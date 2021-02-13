@@ -2,9 +2,8 @@ import fs from "graceful-fs";
 import arp from "app-root-path";
 import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
-import lodash from "lodash";
 import CustomError from "~common/lib/CustomError";
-import { getPrototypeNamesRecursive } from "~common/utils";
+import { getPrototypeNamesRecursive, merge } from "~common/utils";
 import { Error } from "mongoose";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
@@ -165,13 +164,13 @@ export default class DefaultRoute {
     static _registerRoute(target, handlerName, options, method, path, middlewares) {
         const handler = target[handlerName];
         if (!registeredRoutes[target.constructor.name]) registeredRoutes[target.constructor.name] = {};
-        lodash.merge(registeredRoutes[target.constructor.name], { [path]: { [method.toLowerCase()]: { handler, options, middlewares } } });
+        merge(registeredRoutes[target.constructor.name], { [path]: { [method.toLowerCase()]: { handler, options, middlewares } } });
     }
 
     get routes() {
         const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in registeredRoutes);
         const routes = {};
-        for (const prototypeName of prototypeNames) lodash.merge(routes, registeredRoutes[prototypeName]);
+        for (const prototypeName of prototypeNames) merge(routes, registeredRoutes[prototypeName]);
         return routes;
     }
 

@@ -1,6 +1,6 @@
 import httpErrors from "http-errors";
 import { stripHtml } from "string-strip-html";
-import { isObjectLike, isArray, isPlainObject } from "lodash";
+import { isObjectLike, isArray, isPlainObject } from "~common/utils";
 import { Store } from "~client/lib/Store";
 
 import CustomError from "~common/lib/CustomError";

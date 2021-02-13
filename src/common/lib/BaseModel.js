@@ -1,6 +1,5 @@
-import { merge } from "lodash";
 import { Schema } from "mongoose";
-import { dataTransformer, getPrototypeNamesRecursive } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive, merge } from "~common/utils";
 
 const globalActions = {};
 global.globalActions = globalActions;

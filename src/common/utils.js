@@ -1,6 +1,13 @@
-import { isUndefined, isNull } from "lodash";
+import lodash, { isUndefined, isNull } from "lodash";
 import { isMongoId as validatorIsMongoId } from "validator";
 import onChange from "on-change";
+
+import deepdash from "deepdash";
+deepdash(lodash);
+
+export const eachDeep = lodash.eachDeep;
+
+export * from "lodash";
 
 /**
  * Removes multiple slashes from a path part and converts the result to a

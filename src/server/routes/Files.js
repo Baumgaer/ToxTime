@@ -3,7 +3,7 @@ import File from "~server/models/File";
 import httpErrors from "http-errors";
 import path from "path";
 import arp from "app-root-path";
-import lodash from "lodash";
+import { isPlainObject } from "~common/utils";
 import fs from "graceful-fs";
 
 export default class Files extends ApiRoute {
@@ -37,7 +37,7 @@ export default class Files extends ApiRoute {
      */
     @Files.post("/")
     async create(request) {
-        if (!request.files || Object.keys(request.files).length === 0 || !lodash.isPlainObject(request.files)) return httpErrors.BadRequest();
+        if (!request.files || Object.keys(request.files).length === 0 || !isPlainObject(request.files)) return httpErrors.BadRequest();
 
         for (const fileNameField in request.files) {
             if (Object.hasOwnProperty.call(request.files, fileNameField)) {

@@ -1,6 +1,5 @@
 import onChange from "on-change";
-import lodash from "lodash";
-import { isProxy, resolveProxy } from "~common/utils";
+import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference } from "~common/utils";
 
 /** @type {Record<string, ReturnType<import("~client/lib/ClientModel")["default"]["buildClientExport"]>>} */
 export const modelMap = { Error };
@@ -23,7 +22,7 @@ export class Store {
         ignoreUnderscores: true,
         ignoreSymbols: true,
         isShallow: true,
-        equals: lodash.isEqual
+        equals: isEqual
     };
 
     constructor() {
@@ -155,11 +154,11 @@ export class Store {
         if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
         if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
-        lodash.mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue) => {
+        mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue) => {
             const theTarget = resolveProxy(targetValue);
-            if (lodash.isArray(theTarget)) {
+            if (isArray(theTarget)) {
                 for (const model of srcValue) {
-                    const srcValueAlreadyInTarget = theTarget.find((value) => lodash.isEqual(resolveProxy(value), resolveProxy(model)));
+                    const srcValueAlreadyInTarget = theTarget.find((value) => isEqual(resolveProxy(value), resolveProxy(model)));
                     if (!srcValueAlreadyInTarget) theTarget.push(model);
                 }
                 return targetValue;
@@ -222,7 +221,7 @@ export class Store {
      * @memberof Store
      */
     _createArrayChangeObserver(model, key, array) {
-        if (!lodash.isArray(array)) return array;
+        if (!isArray(array)) return array;
         const schemaObject = modelMap[model.className].Schema.obj;
 
         // Clone options and if the array is not an array with references, watch deep
@@ -248,7 +247,7 @@ export class Store {
         const schemaObject = modelMap[model.className].Schema.obj;
         const schemaObjectKeys = Object.keys(schemaObject);
         const modelKeys = Object.keys(model);
-        const ignoreKeys = lodash.difference(modelKeys, schemaObjectKeys);
+        const ignoreKeys = difference(modelKeys, schemaObjectKeys);
         const options = Object.assign({}, this.observerOptions, { ignoreKeys });
         model.staging = false;
 
@@ -259,7 +258,7 @@ export class Store {
 
         // Watch changes of arrays
         for (const schemaObjectKey of schemaObjectKeys) {
-            if (!lodash.isArray(schemaObject[schemaObjectKey].type)) continue;
+            if (!isArray(schemaObject[schemaObjectKey].type)) continue;
             model[schemaObjectKey] = this._createArrayChangeObserver(model, schemaObjectKey, model[schemaObjectKey]);
         }
 

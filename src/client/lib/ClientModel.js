@@ -1,11 +1,8 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
 import { modelMap } from "~client/lib/Store";
-import { resolveProxy, isValue } from "~common/utils";
+import { resolveProxy, isValue, isObjectLike, clone, cloneDeep, isFunction, get, set, eachDeep } from "~common/utils";
 import { v4 as uuid } from "uuid";
-import lodash, { isObjectLike, cloneDeep, isFunction, get, set } from "lodash";
-import deepdash from "deepdash";
-deepdash(lodash);
 
 export default class ClientModel extends BaseModel {
 
@@ -122,7 +119,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     deleteBackupDeep() {
-        lodash.eachDeep(this, (value, key, parentValue, context) => {
+        eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
@@ -152,7 +149,7 @@ export default class ClientModel extends BaseModel {
     hasChangesDeep() {
         if (this.hasChanges()) return true;
         let result = false;
-        lodash.eachDeep(this, (value, key, parentValue, context) => {
+        eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular || result) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
@@ -186,7 +183,7 @@ export default class ClientModel extends BaseModel {
     getChanges() {
         const changedKeys = this.getChangedKeys();
         const changes = {};
-        for (const key of changedKeys) changes[key] = lodash.clone(resolveProxy(this[key]));
+        for (const key of changedKeys) changes[key] = clone(resolveProxy(this[key]));
         return changes;
     }
 
@@ -198,7 +195,7 @@ export default class ClientModel extends BaseModel {
      */
     getChangesDeep() {
         const recursiveChanges = this.getChanges();
-        lodash.eachDeep(this, (value, key, parentValue, context) => {
+        eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
@@ -229,7 +226,7 @@ export default class ClientModel extends BaseModel {
      */
     discardDeep() {
         if (!this.hasChangesDeep()) return;
-        lodash.eachDeep(this, (value, key, parentValue, context) => {
+        eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
@@ -247,7 +244,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     destroy() {
-        lodash.eachDeep(this, (value, key, parentValue, context) => {
+        eachDeep(this, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel && mayModel.isNew()) {
@@ -267,23 +264,23 @@ export default class ClientModel extends BaseModel {
      */
     toRequestObject() {
         const changes = this.getChangesDeep();
-        const requestObject = lodash.cloneDeep(this.getChanges());
-        lodash.eachDeep(changes, (value, key, parentValue, context) => {
+        const requestObject = cloneDeep(this.getChanges());
+        eachDeep(changes, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
                 if (!mayModel.hasChanges()) {
-                    lodash.set(requestObject, context.path, mayModel._id);
+                    set(requestObject, context.path, mayModel._id);
                     return false;
                 } else {
-                    lodash.set(requestObject, context.path, value);
+                    set(requestObject, context.path, value);
                     const pathToExtend = [].concat(context.path);
 
                     let idProperty = "_id";
                     if (mayModel.isNew()) idProperty = "_dummyId";
                     pathToExtend.push(idProperty);
 
-                    lodash.set(requestObject, pathToExtend, mayModel[idProperty]);
+                    set(requestObject, pathToExtend, mayModel[idProperty]);
                 }
             }
         }, { checkCircular: true, pathFormat: "array" });

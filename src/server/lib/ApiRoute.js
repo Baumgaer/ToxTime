@@ -1,9 +1,8 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import CustomError from "~common/lib/CustomError";
-import { isMongoId } from "~common/utils";
+import { isMongoId, isArray, merge, isPlainObject } from "~common/utils";
 
 import httpErrors from "http-errors";
-import { isArray, merge, isPlainObject } from "lodash";
 
 export default class ApiRoute extends DefaultRoute {
 
