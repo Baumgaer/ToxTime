@@ -258,7 +258,7 @@ export default class ClientModel extends BaseModel {
      */
     toRequestObject() {
         const changes = this.getChangesDeep();
-        const requestObject = {};
+        const requestObject = lodash.cloneDeep(this.getChanges());
         lodash.eachDeep(changes, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
             const mayModel = get(this, context.path);
