@@ -1,7 +1,7 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
 import { modelMap } from "~client/lib/Store";
-import { resolveProxy, isValue, isObjectLike, clone, cloneDeep, isFunction, get, set, eachDeep } from "~common/utils";
+import { resolveProxy, isObjectLike, clone, cloneDeep, isFunction, get, set } from "~common/utils";
 import { v4 as uuid } from "uuid";
 
 export default class ClientModel extends BaseModel {
@@ -119,13 +119,9 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     deleteBackupDeep() {
-        eachDeep(this, (value, key, parentValue, context) => {
-            if (context.isCircular) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
-                mayModel.deleteBackup();
-            }
-        }, { checkCircular: true, pathFormat: "array" });
+        this.iterateModels((model) => {
+            model.deleteBackup();
+        });
         this.deleteBackup();
     }
 
@@ -149,16 +145,13 @@ export default class ClientModel extends BaseModel {
     hasChangesDeep() {
         if (this.hasChanges()) return true;
         let result = false;
-        eachDeep(this, (value, key, parentValue, context) => {
-            if (context.isCircular || result) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
-                if (mayModel.hasChanges()) {
-                    result = true;
-                    context.break();
-                }
+        this.iterateModels((model, key, parentValue, context) => {
+            if (result) return false;
+            if (model.hasChanges()) {
+                result = true;
+                context.break();
             }
-        }, { checkCircular: true, pathFormat: "array" });
+        });
         return result;
     }
 
@@ -195,13 +188,9 @@ export default class ClientModel extends BaseModel {
      */
     getChangesDeep() {
         const recursiveChanges = this.getChanges();
-        eachDeep(this, (value, key, parentValue, context) => {
-            if (context.isCircular) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
-                if (mayModel.hasChanges()) set(recursiveChanges, context.path, mayModel.getChanges());
-            }
-        }, { checkCircular: true, pathFormat: "array" });
+        this.iterateModels((model, key, parentValue, context) => {
+            if (model.hasChanges()) set(recursiveChanges, context.path, model.getChanges());
+        });
         return recursiveChanges;
     }
 
@@ -226,15 +215,10 @@ export default class ClientModel extends BaseModel {
      */
     discardDeep() {
         if (!this.hasChangesDeep()) return;
-        eachDeep(this, (value, key, parentValue, context) => {
-            if (context.isCircular) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
-                if (mayModel.hasChangesDeep()) {
-                    mayModel.discard();
-                } else return false;
-            }
-        }, { checkCircular: true, pathFormat: "array" });
+        this.iterateModels((model) => {
+            if (!model.hasChangesDeep()) return false;
+            model.discard();
+        });
         this.discard();
     }
 
@@ -244,13 +228,9 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     destroy() {
-        eachDeep(this, (value, key, parentValue, context) => {
-            if (context.isCircular) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel && mayModel.isNew()) {
-                ApiClient.store.removeModel(mayModel);
-            }
-        }, { checkCircular: true, pathFormat: "array" });
+        this.iterateModels((model) => {
+            ApiClient.store.removeModel(model);
+        });
         ApiClient.store.removeModel(this);
     }
 
@@ -265,25 +245,22 @@ export default class ClientModel extends BaseModel {
     toRequestObject() {
         const changes = this.getChangesDeep();
         const requestObject = cloneDeep(this.getChanges());
-        eachDeep(changes, (value, key, parentValue, context) => {
-            if (context.isCircular) return false;
-            const mayModel = get(this, context.path);
-            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof ClientModel) {
-                if (!mayModel.hasChanges()) {
-                    set(requestObject, context.path, mayModel._id);
-                    return false;
-                } else {
-                    set(requestObject, context.path, value);
-                    const pathToExtend = [].concat(context.path);
-
-                    let idProperty = "_id";
-                    if (mayModel.isNew()) idProperty = "_dummyId";
-                    pathToExtend.push(idProperty);
-
-                    set(requestObject, pathToExtend, mayModel[idProperty]);
-                }
+        this.iterateModels(changes, (model, key, parentValue, context) => {
+            if (!model.hasChanges()) {
+                set(requestObject, context.path, model._id);
+                return false;
             }
-        }, { checkCircular: true, pathFormat: "array" });
+
+            const value = get(changes, context.path);
+            set(requestObject, context.path, value);
+            const pathToExtend = [].concat(context.path);
+
+            let idProperty = "_id";
+            if (model.isNew()) idProperty = "_dummyId";
+            pathToExtend.push(idProperty);
+
+            set(requestObject, pathToExtend, model[idProperty]);
+        });
 
         if (this.isNew()) {
             requestObject._dummyId = this._dummyId;

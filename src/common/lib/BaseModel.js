@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { dataTransformer, getPrototypeNamesRecursive, merge } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction } from "~common/utils";
 
 const globalActions = {};
 global.globalActions = globalActions;
@@ -41,42 +41,6 @@ export default class BaseModel {
             default: Date
         }
     };
-
-    getName(preferredField) {
-        return this[preferredField] || "";
-    }
-
-    getAvatar() {
-        return null;
-    }
-
-    getSubObjects() {
-        return [];
-    }
-
-    /**
-     * Collects and caches all registered actions while assigning the context and returns them
-     *
-     * @readonly
-     * @memberof BaseModel
-     */
-    get actions() {
-        if (this._cachedActions) return this._cachedActions;
-        const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in globalActions);
-        const actions = {};
-        for (const prototypeName of prototypeNames) merge(actions, globalActions[prototypeName]);
-
-        for (const actionName in actions) {
-            if (Object.hasOwnProperty.call(actions, actionName)) {
-                const actionArgs = actions[actionName];
-                actionArgs.name = actionName;
-                Object.defineProperty(actionArgs, "condition", { get: () => actionArgs.conditionFunc ? actionArgs.conditionFunc(this) : true });
-                Object.defineProperty(actionArgs, "func", { value: (...args) => actionArgs._handler.call(this, ...args) });
-            }
-        }
-        this._cachedActions = actions;
-        return actions;
-    }
 
     /**
      * Registers a new action on the model
@@ -124,6 +88,58 @@ export default class BaseModel {
         });
         schema.loadClass(RawClass);
         return schema;
+    }
+
+    /**
+     * Collects and caches all registered actions while assigning the context and returns them
+     *
+     * @readonly
+     * @memberof BaseModel
+     */
+    get actions() {
+        if (this._cachedActions) return this._cachedActions;
+        const prototypeNames = getPrototypeNamesRecursive(this).reverse().filter((name) => name in globalActions);
+        const actions = {};
+        for (const prototypeName of prototypeNames) merge(actions, globalActions[prototypeName]);
+
+        for (const actionName in actions) {
+            if (Object.hasOwnProperty.call(actions, actionName)) {
+                const actionArgs = actions[actionName];
+                actionArgs.name = actionName;
+                Object.defineProperty(actionArgs, "condition", { get: () => actionArgs.conditionFunc ? actionArgs.conditionFunc(this) : true });
+                Object.defineProperty(actionArgs, "func", { value: (...args) => actionArgs._handler.call(this, ...args) });
+            }
+        }
+        this._cachedActions = actions;
+        return actions;
+    }
+
+    getName(preferredField) {
+        return this[preferredField] || "";
+    }
+
+    getAvatar() {
+        return null;
+    }
+
+    getSubObjects() {
+        return [];
+    }
+
+    iterateModels(model, modelCallback, options = {}) {
+        if (!isFunction(modelCallback)) {
+            options = modelCallback || options;
+            modelCallback = model;
+        }
+        let iterate = this;
+        if (!isFunction(model)) iterate = model;
+        eachDeep(iterate, (value, key, parentValue, context) => {
+            if (context.isCircular) return false;
+            const mayModel = get(this, context.path);
+            if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof BaseModel) {
+                return modelCallback(mayModel, key, parentValue, context);
+            }
+        }, Object.assign(options, { checkCircular: true, pathFormat: "array" }));
     }
 
 }
