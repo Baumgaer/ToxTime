@@ -1,6 +1,6 @@
 <template>
     <div class="userEditor">
-        <EditorHead ref="editorHead" name="editUser" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
+        <EditorHead ref="editorHead" name="settings" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section class="editorBody">
             <h3>{{ $t('general') }}</h3>
             <section class="general">
