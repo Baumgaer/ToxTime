@@ -1,0 +1,53 @@
+@import (less) "variables.less";
+
+.userEditor {
+    height: 100%;
+
+    .editorBody {
+        height: calc(100% - 50px);
+
+        h3 {
+            font-size: 16px;
+            display: block;
+            padding-left: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-color, @gray);
+        }
+
+        section {
+            > div {
+                display: inline-block;
+                vertical-align: top;
+                box-sizing: border-box;
+                width: 50%;
+
+                input {
+                    display: block;
+                    width: calc(100% - 20px);
+                    height: 25px;
+                    padding: 5px;
+                    border-radius: 3px;
+                    border: 1px solid gray;
+                    user-select: none;
+                    outline: none;
+                    margin-top: 4px;
+                    &:focus {
+                        border: 1px solid @primaryColor;
+                    }
+                }
+            }
+
+            .left {
+                line-height: 45px;
+                text-align: right;
+                padding-right: 10px;
+                border-right: 3px solid var(--info-color, @infoColor);
+            }
+
+            .right {
+                padding-left: 10px;
+                min-height: 45px;
+            }
+        }
+    }
+}

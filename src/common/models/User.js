@@ -34,8 +34,14 @@ export function UserMixinClass(MixinClass) {
             name: {
                 required: false
             },
-            firstName: String,
-            lastName: String,
+            firstName: {
+                type: String,
+                default: ""
+            },
+            lastName: {
+                type: String,
+                default: ""
+            },
             locale: {
                 type: String,
                 required: true,

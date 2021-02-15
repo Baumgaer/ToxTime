@@ -66,6 +66,7 @@
             <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
             <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
             <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
+            <UserEditor v-if="window.activeUser.activeEditor === 'editUser'" />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -79,6 +80,7 @@ import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
 import GraphicEditor from "~client/components/GraphicEditor";
 import LessonEditor from "~client/components/LessonEditor";
+import UserEditor from "~client/components/UserEditor";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
@@ -94,7 +96,8 @@ export default {
         AddUsers,
         UploadHint,
         GraphicEditor,
-        LessonEditor
+        LessonEditor,
+        UserEditor
     },
     data() {
         return {

@@ -2,12 +2,12 @@ import ApiRoute from "~server/lib/ApiRoute";
 import User from "~server/models/User";
 import { isMongoId } from "~common/utils";
 import EmailTransporter from "~server/lib/EmailTransporter";
-import CustomError from "~common/lib/CustomError";
-import { isEmail } from "validator";
 import { randomBytes } from "crypto";
 import { v4 as uuid } from "uuid";
 import normalizeURL from "normalize-url";
 import httpErrors from "http-errors";
+import passport from "passport";
+import CustomError from "~common/lib/CustomError";
 
 export default class Users extends ApiRoute {
 
@@ -34,6 +34,37 @@ export default class Users extends ApiRoute {
         } catch (error) {
             return error;
         }
+    }
+
+    /**
+     * Sends the initial file when logged in.
+     *
+     * @param {import("express").Request} request the request
+     * @returns {string}
+     * @memberof ApiRoute
+     */
+    @ApiRoute.patch("/:id", { allowUser: true })
+    async update(request) {
+        if (!isMongoId(request.params.id)) return httpErrors.BadRequest();
+        if (!request.user.isAdmin && request.user._id !== request.params.id) return new httpErrors.Forbidden();
+        if (("isAdmin" in request.body || "isConfirmed" in request.body || "isActive" in request.body) && !request.user.isAdmin) return new httpErrors.Forbidden();
+        delete request.body.hash;
+        delete request.body.salt;
+
+        const updateResult = super.update(request);
+
+        // eslint-disable-next-line no-unreachable
+        if (request.body.oldPassword && (request.body.newPassword || request.body.repeatPassword) && request.params.id === request.user._id) {
+            if (request.body.newPassword !== request.body.repeatPassword) return new CustomError("passwordsNotEqual");
+            const chPasswordResult = await new Promise((resolve) => {
+                request.user.changePassword(request.body.oldPassword, request.body.newPassword, (error) => {
+                    if (error) return resolve(error);
+                    resolve(request.user);
+                });
+            });
+            if (chPasswordResult instanceof Error) return chPasswordResult;
+        }
+        return updateResult;
     }
 
     @Users.patch("/toggleLock/:id")

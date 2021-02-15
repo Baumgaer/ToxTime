@@ -46,6 +46,7 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
 
     @CommonClientUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin || instance === window.activeUser)
     async edit() {
-        // Empty...
+        window.activeUser.activeEditor = "editUser";
+        window.activeUser.editingModel = ApiClient.store.getModelById(this.collection, this._dummyId || this._id);
     }
 });

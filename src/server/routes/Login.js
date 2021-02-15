@@ -208,7 +208,7 @@ export default class Login extends DefaultRoute {
                 request.logIn(user, (error) => {
                     if (error) {
                         console.error(error);
-                        return response.send({ success: false, error });
+                        return response.send(error);
                     }
                     const theUser = Object.assign({}, user.toObject());
                     delete theUser.hash;

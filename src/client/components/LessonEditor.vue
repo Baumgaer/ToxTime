@@ -1,6 +1,6 @@
 <template>
     <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
-        <EditorHead ref="editorHead" name="addLesson" :onSaveButtonClick="onSaveButtonClick.bind(this)"/>
+        <EditorHead ref="editorHead" name="addLesson" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section class="editorBody">
             <h3>{{ $t("scenes") }}</h3>
             <section class="scenes">
