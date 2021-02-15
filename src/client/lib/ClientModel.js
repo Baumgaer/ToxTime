@@ -189,7 +189,9 @@ export default class ClientModel extends BaseModel {
     getChangesDeep() {
         const recursiveChanges = this.getChanges();
         this.iterateModels((model, key, parentValue, context) => {
-            if (model.hasChanges()) set(recursiveChanges, context.path, model.getChanges());
+            let isSchemaProperty = true;
+            if (parentValue instanceof ClientModel) isSchemaProperty = key in modelMap[parentValue.className].Schema.obj;
+            if (isSchemaProperty && model.hasChanges()) set(recursiveChanges, context.path, model.getChanges());
         });
         return recursiveChanges;
     }
