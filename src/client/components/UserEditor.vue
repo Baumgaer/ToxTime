@@ -49,6 +49,11 @@ export default {
         EditorHead,
         ToggleSwitch
     },
+    data() {
+        return {
+            savedForDestroy: null
+        };
+    },
     computed: {
         model() {
             // The proxy of active user will be revoked when active user is assigned to itself
@@ -56,24 +61,27 @@ export default {
             return window.activeUser.editingModel;
         }
     },
+    mounted() {
+        this.savedForDestroy = this.model;
+    },
     async beforeDestroy() {
-        const hasChanges = this.model.hasChangesDeep();
+        const hasChanges = this.savedForDestroy.hasChangesDeep();
         if (!this.$refs.editorHead.closeButtonClicked) {
             // Cases editor was closed unexpected
-            if (hasChanges || this.model.isNew()) {
-                const result = await this.model.save();
+            if (hasChanges || this.savedForDestroy.isNew()) {
+                const result = await this.savedForDestroy.save();
                 if (!result || result instanceof Error) return;
-                this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+                this.$toasted.success(window.vm.$t("saved", { name: this.savedForDestroy.getName() }), { className: "successToaster" });
             }
         } else {
-            if (!this.model.isNew()) {
+            if (!this.savedForDestroy.isNew()) {
                 if (hasChanges) {
-                    this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-                    this.model.discardDeep();
+                    this.$toasted.info(window.vm.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
+                    this.savedForDestroy.discardDeep();
                 }
             } else {
-                this.model.destroy();
-                this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                this.savedForDestroy.destroy();
+                this.$toasted.info(window.vm.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
             }
         }
     },
