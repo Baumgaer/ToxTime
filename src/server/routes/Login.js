@@ -172,7 +172,7 @@ export default class Login extends DefaultRoute {
     static async reset(request, isConfirmed = true, additionalUserManipulations) {
         const password = request.body.password;
         const repeatPassword = request.body.repeatPassword;
-        if (!passport) return new CustomError("passwordNotFilled", "The password was not filled", { field: "password" });
+        if (!password) return new CustomError("passwordNotFilled", "The password was not filled", { field: "password" });
         if (!repeatPassword) return new CustomError("passwordNotFilled", "The password repeat was not filled", { field: "repeatPassword" });
         if (password !== repeatPassword) return new CustomError("passwordsNotEqual", "Password and password repeat are not equal", { field: "repeatPassword" });
         const user = await Login.checkPasswordResetToken(request, isConfirmed);

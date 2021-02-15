@@ -6,6 +6,8 @@
     "errorWhileSendingEmail": "Error while sending e-mail",
     "emailOrPasswordIncorrect": "E-mail or password incorrect",
     "password": "Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
     "repeatPassword": "Repeat password",
     "resetPassword": "Reset password",
     "forgotPassword": "Forgot password",
@@ -69,5 +71,11 @@
     "arrange": "Bring element to front",
     "addScene": "Add scene",
     "addLesson": "Add lesson",
-    "goals": "Goals"
+    "goals": "Goals",
+    "german": "German",
+    "english": "English",
+    "locale": "Language",
+    "currentGameSession": "Current Lesson",
+    "solvedGameSessions": "Solved Lessons",
+    "general": "Allgemein"
 }

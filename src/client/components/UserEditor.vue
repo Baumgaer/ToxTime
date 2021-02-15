@@ -8,10 +8,25 @@
                 <div class="left">{{ $t('nickname') }}</div><div class="right"><input type="text" name="name" v-model="model.name" /></div>
                 <div class="left">{{ $t('firstName') }}</div><div class="right"><input type="text" name="firstName" v-model="model.firstName" /></div>
                 <div class="left">{{ $t('lastName') }}</div><div class="right"><input type="text" name="lastName" v-model="model.lastName" /></div>
-                <div class="left">{{ $t('locale') }}</div><div class="right"></div>
-                <div class="left">{{ $t('isAdmin') }}</div><div class="right"><ToggleSwitch name="isAdmin" :checked="model.isAdmin" /></div>
-                <div class="left">{{ $t('isConfirmed') }}</div><div class="right"><ToggleSwitch name="isConfirmed" :checked="model.isConfirmed" /></div>
-                <div class="left">{{ $t('isActive') }}</div><div class="right"><ToggleSwitch name="isActive" :checked="model.isActive" /></div>
+                <div class="left">{{ $t('locale') }}</div>
+                <div class="right">
+                    <select name="locale" v-model="model.locale">
+                        <option value="de-de">{{ $t('german') }}</option>
+                        <option value="en-us">{{ $t('english') }}</option>
+                    </select>
+                </div>
+                <div class="left">{{ $t('isAdmin') }}</div>
+                <div class="right">
+                    <ToggleSwitch ref="isAdmin" name="isAdmin" :checked="model.isAdmin" @change="onToggleSwitched('isAdmin')" />
+                </div>
+                <div class="left">{{ $t('isConfirmed') }}</div>
+                <div class="right">
+                    <ToggleSwitch ref="isConfirmed" name="isConfirmed" :checked="model.isConfirmed" @change="onToggleSwitched('isConfirmed')" />
+                </div>
+                <div class="left">{{ $t('isActive') }}</div>
+                <div class="right">
+                    <ToggleSwitch ref="isActive" name="isActive" :checked="model.isActive" @change="onToggleSwitched('isActive')" />
+                </div>
                 <div class="left">{{ $t('currentGameSession') }}</div><div class="right"></div>
                 <div class="left">{{ $t('solvedGameSessions') }}</div><div class="right"></div>
             </section>
@@ -41,9 +56,34 @@ export default {
             return window.activeUser.editingModel;
         }
     },
+    async beforeDestroy() {
+        const hasChanges = this.model.hasChangesDeep();
+        if (!this.$refs.editorHead.closeButtonClicked) {
+            // Cases editor was closed unexpected
+            if (hasChanges || this.model.isNew()) {
+                const result = await this.model.save();
+                if (!result || result instanceof Error) return;
+                this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+            }
+        } else {
+            if (!this.model.isNew()) {
+                if (hasChanges) {
+                    this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                    this.model.discardDeep();
+                }
+            } else {
+                this.model.destroy();
+                this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+            }
+        }
+    },
     methods: {
-        onSaveButtonClick() {
-            console.log("test");
+        async onSaveButtonClick() {
+            this.model.save();
+        },
+
+        onToggleSwitched(name) {
+            this.model[name] = this.$refs[name].$refs.input.checked;
         }
     }
 };

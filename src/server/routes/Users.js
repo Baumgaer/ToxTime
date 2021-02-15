@@ -6,7 +6,6 @@ import { randomBytes } from "crypto";
 import { v4 as uuid } from "uuid";
 import normalizeURL from "normalize-url";
 import httpErrors from "http-errors";
-import passport from "passport";
 import CustomError from "~common/lib/CustomError";
 
 export default class Users extends ApiRoute {
@@ -55,14 +54,19 @@ export default class Users extends ApiRoute {
 
         // eslint-disable-next-line no-unreachable
         if (request.body.oldPassword && (request.body.newPassword || request.body.repeatPassword) && request.params.id === request.user._id) {
-            if (request.body.newPassword !== request.body.repeatPassword) return new CustomError("passwordsNotEqual");
+            const password = request.body.newPassword;
+            const repeatPassword = request.body.repeatPassword;
+            if (!password) return new CustomError("passwordNotFilled", "The password was not filled", { field: "newPassword" });
+            if (!repeatPassword) return new CustomError("passwordNotFilled", "The password repeat was not filled", { field: "repeatPassword" });
+            if (password !== repeatPassword) return new CustomError("passwordsNotEqual", "Password and password repeat are not equal", { field: "repeatPassword" });
+
             const chPasswordResult = await new Promise((resolve) => {
                 request.user.changePassword(request.body.oldPassword, request.body.newPassword, (error) => {
                     if (error) return resolve(error);
                     resolve(request.user);
                 });
             });
-            if (chPasswordResult instanceof Error) return chPasswordResult;
+            if (chPasswordResult instanceof Error) return new CustomError("passwordIncorrect", "Password incorrect", { field: "oldPassword" });
         }
         return updateResult;
     }

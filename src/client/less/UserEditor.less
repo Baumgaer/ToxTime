@@ -21,6 +21,7 @@
                 box-sizing: border-box;
                 width: 50%;
 
+                .select,
                 input {
                     display: block;
                     width: calc(100% - 20px);
@@ -34,6 +35,19 @@
                     &:focus {
                         border: 1px solid @primaryColor;
                     }
+                }
+
+                select {
+                    .select;
+                    width: calc(100% - 8px);
+                    height: auto;
+                    margin-top: 7px;
+                }
+
+                .switch {
+                    --width: 100px;
+                    --height: 30px;
+                    margin-top: 10px;
                 }
             }
 
