@@ -157,6 +157,7 @@ export default {
         },
 
         onLanguageChange() {
+            if (this.model !== window.activeUser) return;
             i18n.locale = this.$refs.locale.value;
         }
     }
