@@ -50,22 +50,25 @@ export default class Users extends ApiRoute {
         delete request.body.hash;
         delete request.body.salt;
 
-        const updateResult = super.update(request);
+        const updateResult = await super.update(request);
 
         // eslint-disable-next-line no-unreachable
-        if (request.body.oldPassword && (request.body.newPassword || request.body.repeatPassword) && request.params.id === request.user._id) {
+        if (request.body.oldPassword && (request.body.newPassword || request.body.repeatPassword) && request.params.id === request.user._id.toString()) {
+            console.log("general allowed");
             const password = request.body.newPassword;
             const repeatPassword = request.body.repeatPassword;
             if (!password) return new CustomError("passwordNotFilled", "The password was not filled", { field: "newPassword" });
             if (!repeatPassword) return new CustomError("passwordNotFilled", "The password repeat was not filled", { field: "repeatPassword" });
             if (password !== repeatPassword) return new CustomError("passwordsNotEqual", "Password and password repeat are not equal", { field: "repeatPassword" });
 
+            console.log("all tests passed");
             const chPasswordResult = await new Promise((resolve) => {
                 request.user.changePassword(request.body.oldPassword, request.body.newPassword, (error) => {
                     if (error) return resolve(error);
                     resolve(request.user);
                 });
             });
+            console.log(chPasswordResult);
             if (chPasswordResult instanceof Error) return new CustomError("passwordIncorrect", "Password incorrect", { field: "oldPassword" });
         }
         return updateResult;

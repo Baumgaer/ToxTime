@@ -5,6 +5,7 @@
     "emailIncorrect": "E-mail incorrect",
     "errorWhileSendingEmail": "Error while sending e-mail",
     "emailOrPasswordIncorrect": "E-mail or password incorrect",
+    "passwordIncorrect": "Wrong password entered",
     "password": "Password",
     "oldPassword": "Old Password",
     "newPassword": "New Password",
@@ -77,5 +78,5 @@
     "locale": "Language",
     "currentGameSession": "Current Lesson",
     "solvedGameSessions": "Solved Lessons",
-    "general": "Allgemein"
+    "general": "General"
 }

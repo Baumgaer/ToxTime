@@ -5,6 +5,7 @@
     "emailIncorrect": "E-Mail inkorrekt",
     "errorWhileSendingEmail": "Fehler beim Senden der E-Mail",
     "emailOrPasswordIncorrect": "E-Mail oder passwort inkorrekt",
+    "passwordIncorrect": "Falsches Passwort eingegeben",
     "password": "Passwort",
     "oldPassword": "Altes Passwort",
     "newPassword": "Neues Passwort",
