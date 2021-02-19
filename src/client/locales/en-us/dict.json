@@ -78,5 +78,6 @@
     "locale": "Language",
     "currentGameSession": "Current Lesson",
     "solvedGameSessions": "Solved Lessons",
-    "general": "General"
+    "general": "General",
+    "search": "search..."
 }

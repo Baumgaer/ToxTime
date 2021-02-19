@@ -47,7 +47,7 @@
                 </div>
             </header>
             <section class="search">
-                <input v-show="!itemsCollapsed" v-model="search" type="text" name="search" autocomplete="disable" :placeholder="'suchen...'" />
+                <input v-show="!itemsCollapsed" v-model="search" type="text" name="search" autocomplete="disable" :placeholder="$t('search')" />
             </section>
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
                 <div v-if="items.length">
