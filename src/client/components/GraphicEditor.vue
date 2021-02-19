@@ -49,6 +49,7 @@ import Move from "~client/lib/Move";
 import Select from "~client/lib/Select";
 import Arrange from "~client/lib/Arrange";
 import paper from "paper";
+import { difference } from "~common/utils";
 
 export default {
     components: {
@@ -71,6 +72,7 @@ export default {
             isMounted: false,
             initialBackgroundLoadedPromise: null,
             initialBackgroundLoadedResolver: null,
+            oldActionObjectMap: [],
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -92,13 +94,56 @@ export default {
                         if (prev) prev.resolve = resolve;
                     });
                     if (!map[map.length - 1]) promise = null;
-                    map.push({ actionObject, ownerGroupModel, promise });
+                    map.push({ actionObject, ownerGroupModel, promise, next: function() {
+                        if (this.resolved) return;
+                        this.resolved = true;
+                        if (this.resolve) this.resolve();
+                    } });
                     getRecursive(actionObject.sceneObject, actionObject);
                 }
             };
 
             getRecursive(this.model);
+
+            // We need to check if the length has really changed because the list
+            // is new rendered every time a sub element has been changed
+            if (map.length === this.oldActionObjectMap.length) return this.oldActionObjectMap;
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.oldActionObjectMap = map;
             return map;
+        }
+    },
+    watch: {
+        actionObjectsMap(newValue, prevValue) {
+            if (newValue.length === prevValue.length) return;
+
+            // Because the list is newly created, the already resolved promises
+            // are no longer resolved. So we need to check if the promise was
+            // already resolved before and resolve it again to avoid blocking
+            // rendering after inserting a new item
+            for (let index = 0; index < newValue.length; index++) {
+                const newElement = newValue[index];
+                const prevElement = prevValue[index];
+                if (prevElement && prevElement.resolved) newElement.next();
+            }
+
+            // We need to map the action objects because the action object map
+            // is new created. So a comparison on the map doesn't make sense.
+            const newValueMapped = newValue.map((mapItem) => mapItem.actionObject);
+            const prevValueMapped = prevValue.map((mapItem) => mapItem.actionObject);
+            const deletedActionObjects = difference(prevValueMapped, newValueMapped);
+
+            if (!deletedActionObjects.length) return;
+
+            const paperItems = this.paper.project.activeLayer.getItems({
+                recursive: true,
+                match: (item) => {
+                    if (deletedActionObjects.includes(item.model)) return true;
+                    return false;
+                }
+            });
+
+            for (const paperItem of paperItems) paperItem.remove();
         }
     },
     mounted() {
@@ -195,15 +240,22 @@ export default {
 
         async onActionObjectBackgroundLoaded(actionObjectMap, index) {
 
+            console.log(index);
+
             // If not the first one (which does not have an awaiting promise),
             // wait until the previous actionObject has fulfilled
             if (actionObjectMap.promise) await actionObjectMap.promise;
+
+            console.log("sorted way...", index);
 
             const actionObject = actionObjectMap.actionObject;
 
             // Prevent vue from inserting a model each time it gets an id update
             const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === actionObject });
-            if (alreadyInserted) return;
+            if (alreadyInserted) {
+                actionObjectMap.next();
+                return;
+            }
 
             const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
 
@@ -220,8 +272,9 @@ export default {
 
             // Refresh view to be sure that the group is visible
             this.paper.view.draw();
+
             // Poke next actionObject
-            if (actionObjectMap.resolve) actionObjectMap.resolve();
+            actionObjectMap.next();
         },
 
         async onSaveButtonClick() {
@@ -342,16 +395,25 @@ export default {
             // Should not be the same model as the current watched model to avoid recursion loop
             // has to be checked with the id because watched model can be an recursive proxy
             if (!(model instanceof SceneObject.RawClass) || model._id === this.model._id) return;
+
+            const actionObjectAmountBefore = this.actionObjectsMap.length;
             const actionObject = ApiClient.store.addModel(new ActionObject.Model({
                 position: [this.paper.view.center.x, this.paper.view.center.y],
                 sceneObject: model,
                 layer: this.actionObjectsMap.length
             }));
             this.model.actionObjects.push(actionObject);
+            const actionObjectAmountAfter = this.actionObjectsMap.length;
 
+            // To be able to find the last action object in the map, we need to
+            // know how many objects were added by the current actionObject and
+            // subtract that amount from the length.
+            const actionObjectAmountDifference = actionObjectAmountAfter - actionObjectAmountBefore;
+
+            // resolve the last known promise
             const actionObjectsMap = this.actionObjectsMap;
-            const lastActionObject = actionObjectsMap[actionObjectsMap.length - 2];
-            if ((actionObjectsMap.length - 2) >= 0 && lastActionObject && lastActionObject.resolve) lastActionObject.resolve();
+            const lastActionObject = actionObjectsMap[actionObjectsMap.length - actionObjectAmountDifference - 1];
+            if ((actionObjectsMap.length - 2) >= 0 && lastActionObject) lastActionObject.next();
         },
 
         async createAvatar() {
