@@ -87,8 +87,28 @@
             }
         }
 
+        .search {
+            margin-top: 1px;
+            input {
+                display: block;
+                height: 25px;
+                padding: 5px;
+                width: calc(100% - 10px);
+                border: none;
+                user-select: none;
+                outline: none;
+                background-color: @gray;
+                color: @white;
+
+                &::placeholder {
+                    color: @light;
+                    opacity: 0.75;
+                }
+            }
+        }
+
         .list {
-            height: calc(100% - 50px);
+            height: calc(100% - 86px);
             overflow-y: auto;
 
             &::-webkit-scrollbar {

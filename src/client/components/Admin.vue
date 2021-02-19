@@ -41,12 +41,15 @@
                         <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
                         <arrow-collapse-left-icon v-else />
                     </Button>
-                    <Button class="addButton" v-show="!itemsCollapsed && category !== 'settings'" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
+                    <Button class="addButton" v-show="!itemsCollapsed" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
                         <plus-icon />
                     </Button>
                 </div>
             </header>
-            <section ref="itemList" class="list" v-show="!itemsCollapsed && category !== 'settings'">
+            <section class="search">
+                <input v-show="!itemsCollapsed" v-model="search" type="text" name="search" autocomplete="disable" :placeholder="'suchen...'" />
+            </section>
+            <section ref="itemList" class="list" v-show="!itemsCollapsed">
                 <div v-if="items.length">
                     <Item v-for="item in items"
                           :key="item._dummyId || item._id"
@@ -88,6 +91,7 @@ import Lesson from "~client/models/Lesson";
 
 import { capitalize } from "~common/utils";
 import natSort from "natsort";
+import levenshtein from "fast-levenshtein";
 
 export default {
     components: {
@@ -104,12 +108,49 @@ export default {
             store: {},
             filesStore: {},
             category: "users",
-            itemsCollapsed: false
+            itemsCollapsed: false,
+            search: ""
         };
     },
     computed: {
         items() {
-            return Object.values(this.store).sort((a, b) => {
+            const levenshteinValues = {};
+            return Object.values(this.store).filter((item) => {
+                if (!this.search) return true;
+
+                /** @type {string} */
+                const name = item.getName().toLowerCase();
+                const distance = levenshtein.get(name, this.search) / name.length;
+                const exactSearch = name.search(this.search);
+
+                let bonus = 0;
+                if (exactSearch >= 0) bonus = 1 - exactSearch / name.length;
+                levenshteinValues[name] = { distance, bonus };
+
+                return true;
+            }).filter((item) => {
+                if (!this.search) return true;
+                const name = item.getName().toLowerCase();
+                const minDistance = Math.min(...Object.values(levenshteinValues).map((value) => value.distance));
+                const distance = levenshteinValues[name].distance;
+                const bonus = levenshteinValues[name].bonus;
+                return distance - bonus <= minDistance;
+            }).sort((a, b) => {
+                if (this.search) {
+                    const aName = a.getName().toLowerCase();
+                    const bName = b.getName().toLowerCase();
+
+                    const aDistance = levenshteinValues[aName].distance;
+                    const aBonus = levenshteinValues[aName].bonus;
+                    const aLevVal = aDistance - aBonus;
+
+                    const bDistance = levenshteinValues[bName].distance;
+                    const bBonus = levenshteinValues[bName].bonus;
+                    const bLevVal = bDistance - bBonus;
+
+                    return aLevVal - bLevVal;
+                }
+
                 if (b === window.activeUser) return 1;
                 return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || b.isActive - a.isActive || natSort()(a.getName(), b.getName());
             });
