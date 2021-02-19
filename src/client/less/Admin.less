@@ -43,6 +43,7 @@
 
         header {
             grid-area: top;
+            height: 50px;
         }
     }
 
@@ -77,8 +78,8 @@
                 .collapseButton,
                 .addButton {
                     float: right;
-                    --button-width: 50px;
-                    --hover-color: var(--gray-color, @gray);
+                    --button-width: 49px;
+                    //--hover-color: var(--primary-color, @primaryColor);
                     &.collapsed {
                         --button-width: 40px;
                         width: 40px;
@@ -97,8 +98,9 @@
                 border: none;
                 user-select: none;
                 outline: none;
-                background-color: @gray;
+                background-color: transparent;
                 color: @white;
+                border-bottom: 1px solid @gray;
 
                 &::placeholder {
                     color: @light;

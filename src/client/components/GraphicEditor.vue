@@ -239,17 +239,11 @@ export default {
         },
 
         async onActionObjectBackgroundLoaded(actionObjectMap, index) {
-
-            console.log(index);
-
             // If not the first one (which does not have an awaiting promise),
             // wait until the previous actionObject has fulfilled
             if (actionObjectMap.promise) await actionObjectMap.promise;
 
-            console.log("sorted way...", index);
-
             const actionObject = actionObjectMap.actionObject;
-
             // Prevent vue from inserting a model each time it gets an id update
             const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === actionObject });
             if (alreadyInserted) {
@@ -258,7 +252,6 @@ export default {
             }
 
             const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
-
             this.setupClickAreas(actionObject, group, true);
 
             // Process sub action objects
