@@ -1,7 +1,7 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
 import { modelMap } from "~client/lib/Store";
-import { resolveProxy, isObjectLike, clone, cloneDeep, isFunction, get, set } from "~common/utils";
+import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set } from "~common/utils";
 import { v4 as uuid } from "uuid";
 
 export default class ClientModel extends BaseModel {
@@ -71,6 +71,49 @@ export default class ClientModel extends BaseModel {
      */
     isNew() {
         return Boolean(this._dummyId && !this._id);
+    }
+
+    /**
+     * Checks if the given path is a reference in a schema
+     *
+     * @param {string[]} path
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
+    static isSchemaReference(path) {
+        const clonedPath = path.slice();
+
+        let property = clonedPath.shift();
+        const mayNumber = !isNaN(parseInt(property, 10));
+        if (mayNumber) property = clonedPath.shift();
+        if (!property) return false;
+
+        // If the next one is a number, we are inside an array and we don't
+        // have a number as property name
+        if (!isNaN(clonedPath[0])) clonedPath.shift();
+
+        const theModelMap = modelMap;
+        const schemaObject = theModelMap[this.className].Schema.obj;
+        if (isArray(schemaObject[property]?.type)) {
+            if (!schemaObject[property].type[0].ref) {
+                return false;
+            } else if (clonedPath.length) return theModelMap[schemaObject[property].type[0].ref].RawClass.isSchemaReference(clonedPath);
+        } else if (!schemaObject[property]?.ref) {
+            return false;
+        } else if (clonedPath.length) return theModelMap[schemaObject[property].ref].RawClass.isSchemaReference(clonedPath);
+
+        return true;
+    }
+
+    /**
+     * Same as ClientModel.isSchemaReference but on instance
+     *
+     * @param {string[]} path
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
+    isSchemaReference(path) {
+        return Object.getPrototypeOf(this.constructor).isSchemaReference(path);
     }
 
     /**
@@ -263,6 +306,17 @@ export default class ClientModel extends BaseModel {
 
             set(requestObject, pathToExtend, model[idProperty]);
         });
+
+        // Fill arrays
+        eachDeep(requestObject, (model, key, parentValue, context) => {
+            const requestObjectArray = get(requestObject, context.path);
+            if (isArray(parentValue) || !isArray(requestObjectArray) || !this.isSchemaReference(context.path)) return;
+            const referenceArray = get(this, context.path);
+            for (let index = 0; index < referenceArray.length; index++) {
+                const element = referenceArray[index];
+                if (!requestObjectArray[index]) requestObjectArray[index] = element._id;
+            }
+        }, { pathFormat: "array" });
 
         if (this.isNew()) {
             requestObject._dummyId = this._dummyId;

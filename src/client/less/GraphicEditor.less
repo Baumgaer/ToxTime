@@ -1,22 +1,4 @@
-@import (less) "variables.less";
-
 .graphicEditor {
     background-image: url("~client/assets/transparentBackgroundIndicator.png");
     height: 100%;
-
-    .canvasWrapper {
-        width: 100%;
-        height: calc(100% - 50px);
-        overflow: hidden;
-        position: relative;
-
-        canvas {
-            background-color: transparent;
-
-            &[resize] {
-                width: 100%;
-                height: 100%;
-            }
-        }
-    }
 }
