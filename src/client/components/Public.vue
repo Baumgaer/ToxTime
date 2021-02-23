@@ -13,6 +13,7 @@
         </nav>
         <main class="main">
             <UserEditor v-if="window.activeUser.activeEditor === 'editUser' && category === 'settings'" />
+            <LessonList />
         </main>
     </section>
 </template>
@@ -20,18 +21,23 @@
 <script>
 import Button from "~client/components/Button";
 import UserEditor from "~client/components/UserEditor";
+import LessonList from "~client/components/LessonsList";
 import ApiClient from "~client/lib/ApiClient";
 
 export default {
     components: {
         Button,
-        UserEditor
+        UserEditor,
+        LessonList
     },
     data() {
         return {
             store: {},
             category: "lessons"
         };
+    },
+    mounted() {
+        this.onNavButtonClick("lessons");
     },
     methods: {
         async onNavButtonClick(name) {

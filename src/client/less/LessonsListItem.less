@@ -1,0 +1,54 @@
+.lessonsListItem {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-areas: "avatar text";
+
+    .avatar {
+        grid-area: avatar;
+        height: 150px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .text {
+        grid-area: text;
+        margin-left: 3px;
+
+        .scenes {
+            padding-left: 5px;
+            .scene {
+                display: inline-block;
+                position: relative;
+                box-sizing: border-box;
+                background-image: url("~client/assets/transparentBackgroundIndicator.png");
+                width: calc(20% - 10px);
+                min-width: 150px;
+                max-width: 250px;
+                margin: 5px;
+
+                &::before {
+                    content: "";
+                    float: left;
+                    margin-top: 100%; /* initial ratio of 1:1*/
+                }
+
+                .scenePicture {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+
+                    background-position: center center;
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                }
+            }
+        }
+
+        .description {
+            margin: 3px 0;
+        }
+    }
+}
