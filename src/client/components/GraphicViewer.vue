@@ -134,6 +134,7 @@ export default {
         async onActionObjectBackgroundLoaded(actionObjectMap, index) {
             // If not the first one (which does not have an awaiting promise),
             // wait until the previous actionObject has fulfilled
+            await this.initialBackgroundLoadedPromise;
             if (actionObjectMap.promise) await actionObjectMap.promise;
 
             const actionObject = actionObjectMap.actionObject;
