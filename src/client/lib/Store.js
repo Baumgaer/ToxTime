@@ -109,7 +109,7 @@ export class Store {
      */
     addModel(modelLike) {
         const collectionName = modelLike.collection;
-        const id = modelLike._dummyId || modelLike._id;
+        const id = modelLike._id || modelLike._dummyId;
         let model = modelLike;
         if (!this.hasModel(model)) {
             if (modelMap[modelLike.className] !== Error) {
@@ -176,7 +176,7 @@ export class Store {
      * @memberof Store
      */
     removeModel(modelLike) {
-        delete this.collection(modelLike.collection)[modelLike._dummyId || modelLike._id];
+        delete this.collection(modelLike.collection)[modelLike._id || modelLike._dummyId];
         const collectionName = modelLike.collection;
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }

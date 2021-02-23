@@ -27,6 +27,13 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         ApiClient.store.removeModel(this);
     }
 
+    @CommonClientLesson.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)
+    copy() {
+        ApiClient.post(`/${this.collection}/copy/${this._id}`, {
+            name: `${window.vm.$t("copyOf")} ${this.getName()}`
+        });
+    }
+
     @CommonClientLesson.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
     edit() {
         window.activeUser.activeEditor = "addLessons";

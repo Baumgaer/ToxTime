@@ -33,6 +33,13 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         }
     }
 
+    @CommonGameObjectRequisite.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)
+    copy() {
+        ApiClient.post(`/${this.collection}/copy/${this._id}`, {
+            name: `${window.vm.$t("copyOf")} ${this.getName()}`
+        });
+    }
+
     async save() {
         this.isCreatingAvatar = true;
         const result = await super.save();

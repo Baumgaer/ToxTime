@@ -12,7 +12,7 @@ export default class ApiRoute extends DefaultRoute {
     /**
      * collects all users and returns them in a list.
      *
-     * @returns {Promise<{models: User["Model][]} | Error>}
+     * @returns {Promise<import("~server/lib/ServerModel").default[] | Error>}
      * @memberof Register
      */
     @ApiRoute.get("/")
@@ -30,7 +30,7 @@ export default class ApiRoute extends DefaultRoute {
      * collects one user by its id if found
      *
      * @param {import("express").Request} request the request
-     * @returns {Promise<{models: [User["Model"]]} | Error>}
+     * @returns {Promise<import("~server/lib/ServerModel").default | Error>}
      * @memberof Register
      */
     @ApiRoute.get("/:id")
@@ -54,7 +54,7 @@ export default class ApiRoute extends DefaultRoute {
      * not possible to assign request.user as default in mongoose schema.
      *
      * @param {import("express").Request} request the request
-     * @returns {string}
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
      * @memberof ApiRoute
      */
     @ApiRoute.post("/")
@@ -180,11 +180,12 @@ export default class ApiRoute extends DefaultRoute {
      * Sends the initial file when logged in.
      *
      * @param {import("express").Request} request the request
-     * @returns {string}
+     * @returns {Error | import("~server/lib/ServerModel").default}
      * @memberof ApiRoute
      */
     @ApiRoute.patch("/:id")
     async update(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         if (!isPlainObject(request.body)) return new httpErrors.NotAcceptable();
 
         // Create a response body to reflect untouched properties (e.g. _dummyId)
@@ -211,6 +212,13 @@ export default class ApiRoute extends DefaultRoute {
         }
     }
 
+    /**
+     * Deletes a model by the given id and returns the old result if model was found
+     *
+     * @param {import("express").Request} request
+     * @returns {Error | import("~server/lib/ServerModel").default}
+     * @memberof ApiRoute
+     */
     @ApiRoute.delete("/:id")
     async delete(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");

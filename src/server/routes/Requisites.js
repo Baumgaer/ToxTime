@@ -1,12 +1,13 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Requisite from "~server/models/Requisite";
-import { isMongoId, isPlainObject } from "~common/utils";
-import { readFileSync, unlinkSync } from "graceful-fs";
+import { isMongoId, isPlainObject, merge } from "~common/utils";
+import { readFileSync, unlinkSync, copyFileSync } from "graceful-fs";
 import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
 import CustomError from "~common/lib/CustomError";
 import httpErrors from "http-errors";
+import { v4 as uuid } from "uuid";
 
 export default class Requisites extends ApiRoute {
 
@@ -96,6 +97,42 @@ export default class Requisites extends ApiRoute {
         await Promise.all([this.revertModelCreation(deletedIteratee.actionObjects), this.revertModelCreation(deletedIteratee.clickAreas)]);
 
         return super.update(request);
+    }
+
+    @Requisites.post("/copy/:id")
+    async copy(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+
+        const result = await this.claimedExport.Model.findById(request.params.id).exec();
+        if (!result) return new httpErrors.NotFound();
+        const plainObj = result.toObject();
+        delete plainObj._id;
+        plainObj._dummyId = uuid();
+
+        for (const clickArea of plainObj.clickAreas) {
+            delete clickArea._id;
+            clickArea._dummyId = uuid();
+        }
+
+        for (const actionObject of plainObj.actionObjects) {
+            delete actionObject._id;
+            actionObject._dummyId = uuid();
+            actionObject.sceneObject = actionObject.sceneObject._id;
+        }
+
+        merge(plainObj, request.body || {});
+        request.body = plainObj;
+
+        const copy = await this.create(request);
+        if (copy instanceof Error) return copy;
+
+        try {
+            copyFileSync(resolve(rootPath, "avatars", `${result._id.toString()}.png`), resolve(rootPath, "avatars", `${copy._id.toString()}.png`));
+        } catch (error) {
+            console.error(error);
+        }
+
+        return copy;
     }
 
     /**

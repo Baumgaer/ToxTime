@@ -79,5 +79,7 @@
     "currentGameSession": "Current Lesson",
     "solvedGameSessions": "Solved Lessons",
     "general": "General",
-    "search": "search..."
+    "search": "search...",
+    "copy": "Copy",
+    "copyOf": "Copy of"
 }

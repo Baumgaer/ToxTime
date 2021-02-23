@@ -41,6 +41,7 @@ import HandLeftIcon from "vue-material-design-icons/HandLeft";
 import VectorPolygonIcon from "vue-material-design-icons/VectorPolygon";
 import CursorDefaultClickIcon from "vue-material-design-icons/CursorDefaultClick";
 import ArrangeBringForwardIcon from "vue-material-design-icons/ArrangeBringForward";
+import ContentCopyIcon from "vue-material-design-icons/ContentCopy";
 
 if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
 
@@ -79,3 +80,4 @@ Vue.component('hand-left-icon', HandLeftIcon);
 Vue.component('vector-polygon-icon', VectorPolygonIcon);
 Vue.component('cursor-default-click-icon', CursorDefaultClickIcon);
 Vue.component('arrange-bring-forward-icon', ArrangeBringForwardIcon);
+Vue.component('content-copy-icon', ContentCopyIcon);
