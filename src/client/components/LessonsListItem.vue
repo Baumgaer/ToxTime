@@ -1,8 +1,12 @@
 <template>
     <div class="lessonsListItem">
-        <div class="avatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
+        <div class="avatarWrapper">
+            <div class="avatar">
+                <div class="avatarPicture" :style="`background-image: url(${model.getAvatar().name})`"></div>
+            </div>
+        </div>
         <div class="text">
-            <div class="title">{{ model.getName() }}</div>
+            <h2 class="title">{{ model.getName() }}</h2>
             <div class="scenes">
                 <div v-for="scene in model.scenes" :key="scene._id" class="scene">
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>

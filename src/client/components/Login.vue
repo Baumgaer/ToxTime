@@ -4,7 +4,7 @@
             <div class="welcomeBox">{{ $t("welcome", { to: global.process.environment.APP_NAME }) }}</div>
             <div ref="hintBox" class="fail hintBox"></div>
             <input
-                type="text"
+                type="email"
                 :placeholder="$t('email')"
                 ref="email"
                 class="email"
@@ -13,6 +13,7 @@
             <input
                 type="password"
                 :placeholder="$t('password')"
+                autocomplete="current-password"
                 ref="password"
                 class="password"
                 v-on:keydown="resetField('password')"

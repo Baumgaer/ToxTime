@@ -81,5 +81,6 @@
     "general": "Allgemein",
     "search": "suchen...",
     "copy": "Kopieren",
-    "copyOf": "Kopie von"
+    "copyOf": "Kopie von",
+    "accessRights": "Zugriffsrechte"
 }

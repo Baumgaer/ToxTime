@@ -1,42 +1,46 @@
 <template>
     <div class="userEditor">
-        <EditorHead ref="editorHead" name="settings" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
+        <EditorHead ref="editorHead" name="settings" :onSaveButtonClick="onSaveButtonClick.bind(this)" @closeButtonClick="$emit('closeButtonClick')" />
         <section class="editorBody">
             <h3>{{ $t('general') }}</h3>
             <section class="general">
-                <div class="left">{{ $t('email') }}</div><div class="right"><input type="text" ref="email" name="email" v-model="model.email" @change="onInputChange()" /></div>
-                <div class="left">{{ $t('nickname') }}</div><div class="right"><input type="text" name="name" v-model="model.name" @change="onInputChange()" /></div>
-                <div class="left">{{ $t('firstName') }}</div><div class="right"><input type="text" name="firstName" v-model="model.firstName" @change="onInputChange()" /></div>
-                <div class="left">{{ $t('lastName') }}</div><div class="right"><input type="text" name="lastName" v-model="model.lastName" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('email') }}</div><div class="right"><input type="text" ref="email" autocomplete="email" name="email" v-model="model.email" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('nickname') }}</div><div class="right"><input type="text" autocomplete="nickname" name="name" v-model="model.name" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('firstName') }}</div><div class="right"><input type="text" autocomplete="name" name="firstName" v-model="model.firstName" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('lastName') }}</div><div class="right"><input type="text" autocomplete="family-name" name="lastName" v-model="model.lastName" @change="onInputChange()" /></div>
                 <div class="left">{{ $t('locale') }}</div>
                 <div class="right">
-                    <select ref="locale" name="locale" v-model="model.locale" @change="onLanguageChange()">
+                    <select ref="locale" autocomplete="language" name="locale" v-model="model.locale" @change="onLanguageChange()">
                         <option value="de-de">{{ $t('german') }}</option>
                         <option value="en-us">{{ $t('english') }}</option>
                     </select>
                 </div>
-
-                <div v-if="window.activeUser.isAdmin" class="left">{{ $t('isAdmin') }}</div>
-                <div v-if="window.activeUser.isAdmin" class="right">
+            </section>
+            <h3 v-if="window.activeUser.isAdmin">{{ $t('accessRights') }}</h3>
+            <section v-if="window.activeUser.isAdmin">
+                <div class="left">{{ $t('isAdmin') }}</div>
+                <div class="right">
                     <ToggleSwitch ref="isAdmin" name="isAdmin" :checked="model.isAdmin" @change="onToggleSwitched('isAdmin')" />
                 </div>
-                <div v-if="window.activeUser.isAdmin" class="left">{{ $t('isConfirmed') }}</div>
-                <div v-if="window.activeUser.isAdmin" class="right">
+                <div class="left">{{ $t('isConfirmed') }}</div>
+                <div class="right">
                     <ToggleSwitch ref="isConfirmed" name="isConfirmed" :checked="model.isConfirmed" @change="onToggleSwitched('isConfirmed')" />
                 </div>
-                <div v-if="window.activeUser.isAdmin" class="left">{{ $t('isActive') }}</div>
-                <div v-if="window.activeUser.isAdmin" class="right">
+                <div class="left">{{ $t('isActive') }}</div>
+                <div class="right">
                     <ToggleSwitch ref="isActive" name="isActive" :checked="model.isActive" @change="onToggleSwitched('isActive')" />
                 </div>
-
+            </section>
+            <h3>{{ $t('lessons') }}</h3>
+            <section>
                 <div class="left">{{ $t('currentGameSession') }}</div><div class="right"></div>
                 <div class="left">{{ $t('solvedGameSessions') }}</div><div class="right"></div>
             </section>
             <h3 v-if="model === window.activeUser">{{ $t('password') }}</h3>
             <section v-if="model === window.activeUser" class="password">
-                <div class="left">{{ $t('oldPassword') }}</div><div class="right"><input ref="oldPassword" type="password" name="oldPassword" @change="onInputChange()" /></div>
-                <div class="left">{{ $t('newPassword') }}</div><div class="right"><input ref="newPassword" type="password" name="newPassword" @change="onInputChange()" /></div>
-                <div class="left">{{ $t('repeatPassword') }}</div><div class="right"><input ref="repeatPassword" type="password" name="repeatPassword" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('oldPassword') }}</div><div class="right"><input ref="oldPassword" autocomplete="current-password" type="password" name="oldPassword" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('newPassword') }}</div><div class="right"><input ref="newPassword" autocomplete="new-password" type="password" name="newPassword" @change="onInputChange()" /></div>
+                <div class="left">{{ $t('repeatPassword') }}</div><div class="right"><input ref="repeatPassword" autocomplete="new-password" type="password" name="repeatPassword" @change="onInputChange()" /></div>
             </section>
         </section>
     </div>

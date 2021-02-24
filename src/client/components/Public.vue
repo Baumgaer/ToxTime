@@ -12,8 +12,8 @@
             </Button>
         </nav>
         <main class="main">
-            <UserEditor v-if="window.activeUser.activeEditor === 'editUser' && category === 'settings'" />
-            <LessonList />
+            <UserEditor v-if="window.activeUser.editingModel" v-show="window.activeUser.activeEditor === 'editUser' && this.category === 'settings'" @closeButtonClick="onEditUserCloseButtonClick()" />
+            <LessonList v-show="this.category === 'lessons'" />
         </main>
     </section>
 </template>
@@ -33,7 +33,8 @@ export default {
     data() {
         return {
             store: {},
-            category: "lessons"
+            category: "lessons",
+            lastCategory: ""
         };
     },
     mounted() {
@@ -46,7 +47,12 @@ export default {
             await ApiClient.get(`/${name}`);
         },
 
+        onEditUserCloseButtonClick() {
+            this.onNavButtonClick(this.lastCategory);
+        },
+
         onSettingsButtonClick() {
+            this.lastCategory = this.category;
             this.category = "settings";
             window.activeUser.edit();
         },

@@ -19,7 +19,6 @@
                 display: inline-block;
                 vertical-align: top;
                 box-sizing: border-box;
-                width: 50%;
 
                 .select,
                 input {
@@ -56,6 +55,7 @@
             }
 
             .left {
+                width: 15%;
                 line-height: 45px;
                 text-align: right;
                 padding-right: 10px;
@@ -63,8 +63,37 @@
             }
 
             .right {
+                width: 85%;
                 padding-left: 10px;
                 min-height: 45px;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .userEditor {
+        .editorBody {
+            section {
+                .left {
+                    width: 20%;
+                }
+                .right {
+                    width: 80%;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .userEditor {
+        .editorBody {
+            section {
+                .left,
+                .right {
+                    width: 50%;
+                }
             }
         }
     }

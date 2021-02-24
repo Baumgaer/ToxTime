@@ -39,6 +39,7 @@ export default {
             this.closeButtonClicked = true;
             window.activeUser.activeEditor = null;
             window.activeUser.editingModel = null;
+            this.$emit("closeButtonClick");
         }
     }
 };

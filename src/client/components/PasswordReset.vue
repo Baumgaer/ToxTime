@@ -3,7 +3,7 @@
         <div class="welcomeBox">{{ $t("resetPassword") }}</div>
         <form v-on:submit="doReset($event)" v-if="!$route.params.token">
             <div ref="hintBox" class="fail hintBox"></div>
-            <input type="text" name="email" ref="email" class="email" :placeholder="$t('email')" v-on:keydown="resetField('email')" />
+            <input type="email" name="email" ref="email" class="email" :placeholder="$t('email')" v-on:keydown="resetField('email')" />
             <div class="buttons">
                 <button type="submit" class="resetButton">
                     {{ $t("resetPassword") }}
@@ -17,8 +17,8 @@
             <div class="welcomeBox">{{ $t("resetPassword") }}</div>
             <div ref="hintBox" class="fail hintBox"></div>
             <section>
-                <input type="password" name="password" class="password" ref="password" :placeholder="$t('password')" v-on:keydown="resetField('password')" />
-                <input type="password" name="repeatPassword" class="password" ref="repeatPassword" :placeholder="$t('repeatPassword')" v-on:keydown="resetField('repeatPassword')" />
+                <input type="password" autocomplete="new-password" name="password" class="password" ref="password" :placeholder="$t('password')" v-on:keydown="resetField('password')" />
+                <input type="password" autocomplete="new-password" name="repeatPassword" class="password" ref="repeatPassword" :placeholder="$t('repeatPassword')" v-on:keydown="resetField('repeatPassword')" />
                 <div class="buttons">
                     <button type="submit" class="setPasswordButton">
                         {{ $t("setPassword") }}
