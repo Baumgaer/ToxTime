@@ -20,6 +20,13 @@
                     <div class="name">{{ scene.name }}</div>
                 </div>
             </section>
+            <h3>{{ $t("description") }}</h3>
+            <section><textarea-autosize
+                class="description"
+                :placeholder="$t('description')"
+                v-model="model.description"
+                :min-height="100"
+            /></section>
             <h3>{{ $t("recipes") }}</h3>
             <section></section>
             <h3>{{ $t("goals") }}</h3>

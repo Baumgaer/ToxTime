@@ -82,5 +82,8 @@
     "search": "suchen...",
     "copy": "Kopieren",
     "copyOf": "Kopie von",
-    "accessRights": "Zugriffsrechte"
+    "accessRights": "Zugriffsrechte",
+    "description": "Beschreibung",
+    "difficulty": "Schwierigkeitsgrad",
+    "play": "Abspielen"
 }

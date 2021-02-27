@@ -4,6 +4,9 @@
             <div class="avatar">
                 <div class="avatarPicture" :style="`background-image: url(${model.getAvatar().name})`"></div>
             </div>
+            <Button :name="model.actions.play.name" @click="model.actions.play.func()">
+                <component :is="model.actions.play.symbol.name" />
+            </Button>
         </div>
         <div class="text">
             <h2 class="title">{{ model.getName() }}</h2>
@@ -12,19 +15,30 @@
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
                 </div>
             </div>
-            <div class="description">{{ model.description }}</div>
-            <div class="difficulty">{{ model.difficulty }}</div>
+            <h3>{{ $t('description') }}</h3>
+            <div class="description" v-html="description">{{ description }}</div>
+            <div class="difficulty"><span class="label">{{ $t('difficulty') }}:</span> {{ model.difficulty }}</div>
         </div>
     </div>
 </template>
 
 <script>
 import Lesson from "~client/models/Lesson";
+import Button from "~client/components/Button";
+
 export default {
+    components: {
+        Button
+    },
     props: {
         model: {
             type: Lesson.RawClass,
             required: true
+        }
+    },
+    computed: {
+        description() {
+            return this.model.description.replace(/\n/g, "<br />");
         }
     }
 };

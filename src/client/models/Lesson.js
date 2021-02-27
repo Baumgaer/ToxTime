@@ -40,4 +40,9 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         window.activeUser.editingModel = this;
     }
 
+    @CommonClientLesson.action("play", { type: "component", name: "play-icon" }, () => true)
+    play() {
+        console.log("Play button clicked");
+    }
+
 });

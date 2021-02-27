@@ -82,5 +82,8 @@
     "search": "search...",
     "copy": "Copy",
     "copyOf": "Copy of",
-    "accessRights": "Access Rights"
+    "accessRights": "Access Rights",
+    "description": "Description",
+    "difficulty": "Difficulty",
+    "play": "Play"
 }

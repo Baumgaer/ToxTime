@@ -9,7 +9,6 @@
 export default {
     props: {
         name: String,
-        icon: Object,
         active: Boolean,
         showLoadingSpinner: Boolean,
         showLabel: {

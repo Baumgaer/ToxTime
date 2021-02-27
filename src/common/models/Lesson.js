@@ -19,6 +19,10 @@ export function LessonMixinClass(MixinClass) {
             name: {
                 default: `Lesson`
             },
+            description: {
+                type: String,
+                default: ""
+            },
             scenes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }

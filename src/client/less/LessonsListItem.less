@@ -36,6 +36,15 @@
                 background-repeat: no-repeat;
             }
         }
+
+        .button {
+            --button-height: 30px;
+
+            &:hover {
+                background-color: @primaryColor;
+                color: @white;
+            }
+        }
     }
 
     .text {
@@ -52,6 +61,15 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             border-bottom: 1px solid @gray;
+        }
+
+        h3 {
+            margin: 5px 0;
+            border-bottom: 1px solid @gray;
+        }
+
+        .label {
+            font-weight: bold;
         }
 
         .scenes {
