@@ -52,10 +52,12 @@ export function UserMixinClass(MixinClass) {
                 required: true,
                 default: false
             },
-            currentGameSession: Schema.Types.ObjectId,
+            currentGameSessions: {
+                type: [{ type: Schema.Types.ObjectId, ref: "GameSession" }],
+                default: []
+            },
             solvedGameSessions: {
-                type: [{ type: Schema.Types.ObjectId }],
-                required: true,
+                type: [{ type: Schema.Types.ObjectId, ref: "GameSession" }],
                 default: []
             },
             isConfirmed: {
