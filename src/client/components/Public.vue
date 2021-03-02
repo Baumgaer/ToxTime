@@ -1,6 +1,6 @@
 <template>
     <section class="public">
-        <nav class="navigation" ref="navigation">
+        <nav class="navigation" ref="navigation" v-show="model.activeEditor !== 'playGame'">
             <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" @click="onNavButtonClick('lessons')">
                 <school-icon />
             </Button>
@@ -11,9 +11,18 @@
                 <logout-icon />
             </Button>
         </nav>
-        <main class="main">
-            <UserEditor v-if="window.activeUser.editingModel" v-show="window.activeUser.activeEditor === 'editUser' && this.category === 'settings'" @closeButtonClick="onEditUserCloseButtonClick()" />
-            <LessonList v-show="this.category === 'lessons'" />
+        <main class="main" :style="model.activeEditor === 'playGame' ? 'grid-area: nav / main' : '' ">
+            <UserEditor
+                v-if="model.editingModel && ['User', 'SystemUser'].includes(model.editingModel.className)"
+                v-show="model.activeEditor === 'editUser' && this.category === 'settings'"
+                @closeButtonClick="onEditUserCloseButtonClick()"
+            />
+            <Player
+                v-if="model.editingModel && model.editingModel.className === 'GameSession'"
+                v-show="model.activeEditor === 'playGame'"
+                :model="model.editingModel"
+            />
+            <LessonList v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'" />
         </main>
     </section>
 </template>
@@ -22,17 +31,20 @@
 import Button from "~client/components/Button";
 import UserEditor from "~client/components/UserEditor";
 import LessonList from "~client/components/LessonsList";
+import Player from "~client/components/Player";
 import ApiClient from "~client/lib/ApiClient";
 
 export default {
     components: {
         Button,
         UserEditor,
-        LessonList
+        LessonList,
+        Player
     },
     data() {
         return {
             store: {},
+            model: window.activeUser,
             category: "lessons",
             lastCategory: ""
         };

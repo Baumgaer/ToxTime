@@ -291,7 +291,7 @@ export default class ClientModel extends BaseModel {
         const changes = this.getChangesDeep();
         const requestObject = cloneDeep(this.getChanges());
         this.iterateModels(changes, (model, key, parentValue, context) => {
-            if (!model.hasChanges()) {
+            if (!model.hasChanges() || resolveProxy(model) === resolveProxy(this)) {
                 set(requestObject, context.path, model._id);
                 return false;
             }
@@ -312,11 +312,12 @@ export default class ClientModel extends BaseModel {
             const requestObjectArray = get(requestObject, context.path);
             if (isArray(parentValue) || !isArray(requestObjectArray) || !this.isSchemaReference(context.path)) return;
             const referenceArray = get(this, context.path);
+            if (!referenceArray) return;
             for (let index = 0; index < referenceArray.length; index++) {
                 const element = referenceArray[index];
                 if (!requestObjectArray[index]) requestObjectArray[index] = element._id;
             }
-        }, { pathFormat: "array" });
+        }, { pathFormat: "array", checkCircular: true });
 
         if (this.isNew()) {
             requestObject._dummyId = this._dummyId;

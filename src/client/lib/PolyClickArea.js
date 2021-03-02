@@ -16,16 +16,19 @@ export default class PolyClickArea extends Tool {
      * @param {import("paper")} paper
      * @param {number[]} pathPoints
      * @param {number[]} [position]
+     * @param {boolean} [showStroke]
      * @returns {InstanceType<import("paper")["Path"]>}
      * @memberof PolyClickArea
      */
-    static build(paper, pathPoints, position) {
+    static build(paper, pathPoints, position, showStroke = true) {
         const path = new paper.Path(pathPoints);
         path.closed = true;
-        path.strokeColor = "red";
-        path.strokeWidth = 3;
+        if (showStroke) {
+            path.strokeColor = "red";
+            path.strokeWidth = 3;
+        }
         path.fillColor = "white";
-        path.fillColor.alpha = 0.1;
+        path.fillColor.alpha = 0.01;
         if (position) path.position = new paper.Point(...position);
         return path;
     }

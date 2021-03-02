@@ -27,8 +27,7 @@ export default class BaseModel {
         creator: {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
-            autopopulate: true
+            required: true
         },
         creationDate: {
             type: Date,

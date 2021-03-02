@@ -29,6 +29,14 @@ export default {
         model: {
             type: GameObject.RawClass,
             required: true
+        },
+        showClickAreas: {
+            type: Boolean,
+            default: true
+        },
+        adjustToBorder: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -37,6 +45,7 @@ export default {
             isMounted: false,
             initialBackgroundLoadedPromise: null,
             initialBackgroundLoadedResolver: null,
+            lastAdjustmentWidth: window.innerWidth,
             oldActionObjectMap: []
         };
     },
@@ -107,7 +116,6 @@ export default {
     },
     mounted() {
         this.initialBackgroundLoadedPromise = new Promise((resolve) => this.initialBackgroundLoadedResolver = resolve);
-        this.paper.install(this);
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
         this.paper.project.activeLayer.applyMatrix = false;
@@ -116,6 +124,7 @@ export default {
 
         // Add clickAreas
         this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
+        if (this.adjustToBorder) this.paper.view.onResize = this.adjustViewToBorder.bind(this);
     },
     methods: {
         onBackgroundLoaded() {
@@ -128,6 +137,7 @@ export default {
             this.model.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
+            this.adjustViewToBorder();
             this.initialBackgroundLoadedResolver();
         },
 
@@ -162,6 +172,21 @@ export default {
 
             // Poke next actionObject
             actionObjectMap.next();
+        },
+
+        async adjustViewToBorder(args) {
+            if (!this.adjustToBorder) return;
+            await this.initialBackgroundLoadedPromise;
+            const paper = this.paper;
+            const background = this.paper.view.background;
+
+            if (args) {
+                paper.view.scale(1 + (args.delta.width / window.innerWidth));
+                paper.view.translate(paper.view.center.subtract(paper.view.background.position));
+            } else {
+                paper.view.scale(paper.view.viewSize.width / background.size.width);
+                background.position = paper.view.center;
+            }
         },
 
         /**
@@ -240,9 +265,9 @@ export default {
             await this.initialBackgroundLoadedPromise;
 
             for (const clickArea of model.sceneObject.clickAreas) {
-                const path = PolyClickArea.build(this.paper, clickArea.shape);
-                path.model = clickArea;
+                const path = PolyClickArea.build(this.paper, clickArea.shape, null, this.showClickAreas);
                 path.position = this.calcPosition(model, container, clickArea.position);
+                path.model = clickArea;
                 path.locked = locked;
                 container.insertChild(clickArea.layer + 1, path);
             }

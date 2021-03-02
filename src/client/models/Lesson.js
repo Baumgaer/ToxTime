@@ -1,5 +1,6 @@
 import { LessonMixinClass } from "~common/models/Lesson";
 import ClientModel from "~client/lib/ClientModel";
+import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -42,7 +43,14 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
 
     @CommonClientLesson.action("play", { type: "component", name: "play-icon" }, () => true)
     play() {
-        console.log("Play button clicked");
+        const session = ApiClient.store.addModel(new GameSession.Model({
+            lesson: this,
+            currentScene: this.scenes[0]
+        }));
+        window.activeUser.editingModel = session;
+        window.activeUser.activeEditor = "playGame";
+        window.activeUser.currentGameSessions.push(session);
+        window.activeUser.save();
     }
 
 });

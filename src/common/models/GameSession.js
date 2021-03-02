@@ -30,30 +30,26 @@ export function GameSessionMixinClass(MixinClass) {
                 autopopulate: true
             },
             grabbing: {
-                type: [{
-                    type: Schema.Types.ObjectId,
-                    ref: "Item",
-                    autopopulate: true
-                }],
+                type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
                 default: []
             },
             inventory: {
-                type: [{
-                    type: Schema.Types.ObjectId,
-                    ref: "Item",
-                    autopopulate: true
-                }],
+                type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
                 default: []
             },
             knowledgeBase: {
-                type: [{
-                    type: Schema.Types.ObjectId,
-                    ref: "Knowledge",
-                    autopopulate: true
-                }],
+                type: [{ type: String }],
+                default: []
+            },
+            protocol: {
+                type: [{ type: Schema.Types.Mixed }],
                 default: []
             }
         };
+
+        getAvatar() {
+            return this.lesson.getAvatar();
+        }
 
     }
     return GameSession;
