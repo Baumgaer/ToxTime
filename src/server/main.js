@@ -202,11 +202,16 @@ export default class WebServer {
         }));
 
         const isSecure = process.environment.APP_SECURE;
+        const domain = new URL(normalizeURL(process.environment.APP_DOMAIN, {
+            forceHttps: isSecure,
+            forceHttp: !isSecure
+        })).hostname;
+
         this.app.use(expressSession({
             secret: this.sessionSecret,
             cookie: {
                 httpOnly: true,
-                domain: new URL(normalizeURL(process.environment.APP_DOMAIN, { forceHttps: isSecure, forceHttp: !isSecure })).hostname, // protocol dues not mapper
+                domain: domain === "localhost" || process.env.NODE_ENV === "development" ? null : domain,
                 secure: isSecure,
                 maxAge: ms(process.environment.SESSION_MAX_AGE)
             },
