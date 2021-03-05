@@ -45,7 +45,10 @@ import ArrangeBringForwardIcon from "vue-material-design-icons/ArrangeBringForwa
 import ContentCopyIcon from "vue-material-design-icons/ContentCopy";
 import PlayIcon from "vue-material-design-icons/Play";
 
-if (Object.keys(window.userInformation).length) window.activeUser = ApiClient.store.addModel(window.userInformation);
+if (Object.keys(window.userInformation).length) {
+    ApiClient.handleModels(window.userInformation);
+    window.activeUser = ApiClient.store.getModelById(window.userInformation.collection, window.userInformation._id);
+}
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;

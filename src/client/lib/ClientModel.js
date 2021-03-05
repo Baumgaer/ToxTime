@@ -283,15 +283,18 @@ export default class ClientModel extends BaseModel {
      * Transforms all changes recursive to an object which can be processed by the server.
      * Changes which have a model as value will be transformed to the id of the model,
      * if the model is not new. Otherwise the whole model will be sent to the server.
+     * If a modelFilter is given, all models which match the condition will
+     * stored as "unchanged", means that all changes are ignored.
      *
+     * @param { (model: ClientModel) => boolean } [modelFilter]
      * @returns {Record<string, any>}
      * @memberof ClientModel
      */
-    toRequestObject() {
+    toRequestObject(modelFilter) {
         const changes = this.getChangesDeep();
         const requestObject = cloneDeep(this.getChanges());
         this.iterateModels(changes, (model, key, parentValue, context) => {
-            if (!model.hasChanges() || resolveProxy(model) === resolveProxy(this)) {
+            if (!model.hasChanges() || resolveProxy(model) === resolveProxy(this) || (modelFilter && modelFilter(model))) {
                 set(requestObject, context.path, model._id);
                 return false;
             }
