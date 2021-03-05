@@ -6,18 +6,36 @@
             <section class="scenes">
                 <div class="scene"
                      v-for="(scene, index) of model.scenes"
-                     :key="index"
+                     :key="scene._id"
                      draggable
-                     @dragstart="onDragStart($event, scene)"
-                     @dragend="onDragEnd($event)"
-                     @dragover="onDragOver($event, index)"
-                     @dragleave="onDragLeave($event, index)"
+                     @dragstart="onDragStart($event, scene, 'scene')"
+                     @dragend="onDragEnd($event, 'scene')"
+                     @dragover="onDragOver($event, index, 'scene')"
+                     @dragleave="onDragLeave($event, index, 'scene')"
                      @drop.prevent.stop="onInternalDrop($event, index)"
                      :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
                     <component :is="'close-icon'" class="closeIcon" @click="onSceneRemoveClick(scene)"/>
                     <div class="name">{{ scene.name }}</div>
+                </div>
+            </section>
+            <h3>{{ $t("inventory") }}</h3>
+            <section class="inventory">
+                <div class="inventoryItem"
+                     v-for="(item, index) of model.inventory"
+                     :key="item._id"
+                     draggable
+                     @dragstart="onDragStart($event, item, 'item')"
+                     @dragend="onDragEnd($event, 'item')"
+                     @dragover="onDragOver($event, index, 'item')"
+                     @dragleave="onDragLeave($event, index, 'item')"
+                     @drop.prevent.stop="onInternalDrop($event, index)"
+                     :ref="`item${index}`"
+                >
+                    <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
+                    <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
+                    <div class="name">{{ item.name }}</div>
                 </div>
             </section>
             <h3>{{ $t("description") }}</h3>
@@ -39,6 +57,7 @@
 import EditorHead from "~client/components/EditorHead";
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
+import SceneObject from "~client/models/SceneObject";
 
 export default {
     components: {
@@ -92,12 +111,15 @@ export default {
             if (!eventData) return;
 
             const model = ApiClient.store.getModelById(eventData.collection, eventData._id);
-            if (!model || !(model instanceof Scene.RawClass)) return;
+            if (!model || !(model instanceof Scene.RawClass) && !(model instanceof SceneObject.RawClass)) return;
+
+            const field = model instanceof Scene.RawClass ? "scenes" : "inventory";
+            const type = model instanceof Scene.RawClass ? "scene" : "item";
 
             if (typeof index === "number") {
-                const element = this.$refs[`scene${index}`][0];
+                const element = this.$refs[`${type}${index}`][0];
                 const elementRect = element.getBoundingClientRect();
-                let indexOfDraggedModel = this.model.scenes.indexOf(model);
+                let indexOfDraggedModel = this.model[field].indexOf(model);
 
                 let indexAddition = 0;
                 if (elementRect.x + elementRect.width / 2 <= event.clientX) indexAddition = 1;
@@ -107,16 +129,22 @@ export default {
                 element.classList.remove("leftDropTarget");
 
                 if (indexOfDraggedModel >= 0) {
-                    this.model.scenes.splice(indexOfDraggedModel, 1);
+                    this.model[field].splice(indexOfDraggedModel, 1);
                 } else indexOfDraggedModel = index;
-                this.model.scenes.splice(index + indexAddition, 0, model);
-            } else this.model.scenes.push(model);
+                this.model[field].splice(index + indexAddition, 0, model);
+            } else this.model[field].push(model);
         },
 
         onSceneRemoveClick(scene) {
             const index = this.model.scenes.indexOf(scene);
             if (index < 0) return;
             this.model.scenes.splice(index, 1);
+        },
+
+        onItemRemoveClick(item) {
+            const index = this.model.inventory.indexOf(item);
+            if (index < 0) return;
+            this.model.inventory.splice(index, 1);
         },
 
         /**
@@ -135,13 +163,14 @@ export default {
         /**
          * @param {DragEvent} event
          * @param {number} index
+         * @param {"scene" | "item"} type
          */
-        onDragOver(event, index) {
+        onDragOver(event, index, type) {
             event.preventDefault();
             event.stopPropagation();
 
             /** @type {HTMLElement} */
-            const element = this.$refs[`scene${index}`][0];
+            const element = this.$refs[`${type}${index}`][0];
             const elementRect = element.getBoundingClientRect();
 
             if (elementRect.x + elementRect.width / 2 > event.clientX) {
@@ -153,12 +182,12 @@ export default {
             }
         },
 
-        onDragLeave(event, index) {
+        onDragLeave(event, index, type) {
             event.preventDefault();
             event.stopPropagation();
 
             /** @type {HTMLElement} */
-            const element = this.$refs[`scene${index}`][0];
+            const element = this.$refs[`${type}${index}`][0];
             element.classList.remove("rightDropTarget");
             element.classList.remove("leftDropTarget");
         }

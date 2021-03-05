@@ -23,6 +23,13 @@ export function LessonMixinClass(MixinClass) {
                 type: String,
                 default: ""
             },
+            inventory: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }
+                ],
+                required: true,
+                default: []
+            },
             scenes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }

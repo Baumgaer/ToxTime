@@ -85,5 +85,6 @@
     "accessRights": "Zugriffsrechte",
     "description": "Beschreibung",
     "difficulty": "Schwierigkeitsgrad",
-    "play": "Spielen"
+    "play": "Spielen",
+    "inventory": "Inventar"
 }

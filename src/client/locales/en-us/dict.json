@@ -85,5 +85,6 @@
     "accessRights": "Access Rights",
     "description": "Description",
     "difficulty": "Difficulty",
-    "play": "Play"
+    "play": "Play",
+    "inventory": "Inventory"
 }
