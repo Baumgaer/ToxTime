@@ -1,5 +1,5 @@
 <template>
-    <div class="player">
+    <div class="player" @contextmenu.prevent.stop="clearHand">
         <EditorHead :name="model.lesson.name" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section v-for="scene in model.lesson.scenes" :key="scene._id">
             <GraphicViewer
@@ -87,7 +87,7 @@ export default {
         },
         onInventorySlotClick(item) {
             if (!item.amount) return;
-            console.log(item);
+            this.grabFromInventory(item);
         },
         onSceneButtonClick(event) {
             this.$refs.sceneSwitcherPopup.showMenu(event, this.$refs.sceneSwitcherButton.$el);
@@ -98,38 +98,51 @@ export default {
         onSaveButtonClick() {
             console.log("SAVED");
         },
-        nextEmptyInventorySlot() {
-            for (let index = 0; index < this.model.inventory.length; index++) {
-                const item = this.model.inventory[index];
+        nextEmptyInventorySlot(name = "inventory") {
+            for (let index = 0; index < this.model[name].length; index++) {
+                const item = this.model[name][index];
                 if (!item.amount) return index;
             }
             return -1;
         },
-        nextCorrespondingStack(obj) {
-            for (const item of this.model.inventory) {
+        nextCorrespondingStack(obj, name = "inventory") {
+            for (const item of this.model[name]) {
                 if (item.object === obj) return item;
             }
             return null;
         },
-        addToInventory(obj) {
+        addToInventory(obj, name = "inventory") {
             if (!obj) {
-                this.model.inventory.push(ApiClient.store.addModel(new Item.Model({ amount: 0 })));
+                this.model[name].push(ApiClient.store.addModel(new Item.Model({ amount: 0 })));
                 return;
             }
-            const nextEmptySlot = this.nextEmptyInventorySlot();
-            const nextStack = this.nextCorrespondingStack(obj);
+            const nextEmptySlot = this.nextEmptyInventorySlot(name);
+            const nextStack = this.nextCorrespondingStack(obj, name);
 
             if (nextStack) {
                 nextStack.amount++;
             } else if (nextEmptySlot >= 0) {
-                const item = this.model.inventory[nextEmptySlot];
+                const item = this.model[name][nextEmptySlot];
                 item.object = obj;
                 item.amount++;
             } else {
                 const item = ApiClient.store.addModel(new Item.Model());
                 item.object = obj;
-                this.model.inventory.push(item);
+                this.model[name].push(item);
             }
+        },
+        grabFromInventory(item) {
+            item.amount--;
+            this.addToInventory(item.object, "grabbing");
+            if (!item.amount) item.object = null;
+        },
+        clearHand() {
+            for (const item of this.model.grabbing) {
+                for (let index = 0; index < item.amount; index++) {
+                    this.addToInventory(item.object);
+                }
+            }
+            this.model.grabbing.splice(0, this.model.grabbing.length);
         }
     }
 };

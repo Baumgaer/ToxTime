@@ -45,6 +45,12 @@ export function ItemMixinClass(MixinClass) {
         }
 
         set object(value) {
+            if (!value) {
+                this.sceneObject = null;
+                this.actionObject = null;
+                return;
+            }
+
             if (value.className === "SceneObject") {
                 this.sceneObject = value;
                 if (this.actionObject) this.actionObject = null;
