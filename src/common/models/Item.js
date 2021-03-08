@@ -44,6 +44,18 @@ export function ItemMixinClass(MixinClass) {
             return this.actionObject || this.sceneObject;
         }
 
+        set object(value) {
+            if (value.className === "SceneObject") {
+                this.sceneObject = value;
+                if (this.actionObject) this.actionObject = null;
+            }
+
+            if (value.className === "ActionObject") {
+                this.actionObject = value;
+                if (this.sceneObject) this.sceneObject = null;
+            }
+        }
+
     }
     return Item;
 }
