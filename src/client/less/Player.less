@@ -17,4 +17,23 @@
         --hover-color: @primaryColor;
         color: @white;
     }
+
+    .grabbing {
+        transform: unset;
+        overflow: auto;
+        height: max-content;
+        max-width: 200px;
+        border: none;
+
+        &::v-deep .slot {
+            --slot-height: 20px;
+
+            .amount {
+                height: 10px;
+                width: 10px;
+                font-size: 8px;
+                line-height: 10px;
+            }
+        }
+    }
 }

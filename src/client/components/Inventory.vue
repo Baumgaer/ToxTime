@@ -1,6 +1,6 @@
 <template>
-    <section class="inventory" ref="inventory" @wheel="onScroll($event)">
-        <div v-for="(item, index) in model.inventory"
+    <section class="inventory" @wheel="onScroll($event)">
+        <div v-for="(item, index) in model[field]"
              :key="index"
              class="slot"
              :style="`background-image: url('${item.getAvatar().name}')`"
@@ -22,31 +22,46 @@ export default {
         model: {
             type: GameSession.RawClass,
             required: true
+        },
+        field: {
+            type: String,
+            default: "inventory"
+        },
+        minimumSlots: {
+            type: Number,
+            default: 10
+        }
+    },
+    mounted() {
+        if (this.model[this.field].length < 10) {
+            for (let index = this.model[this.field].length; index < this.minimumSlots; index++) {
+                this.add(null);
+            }
         }
     },
     methods: {
         onScroll(event) {
-            this.$refs.inventory.scrollLeft -= (event.wheelDelta);
+            this.$el.scrollLeft -= (event.wheelDelta);
             event.preventDefault();
         },
         onSlotClick(item) {
             if (!item.amount) return;
             this.grab(item);
         },
-        nextEmptyInventorySlot(name = "inventory") {
+        nextEmptyInventorySlot(name = this.field) {
             for (let index = 0; index < this.model[name].length; index++) {
                 const item = this.model[name][index];
                 if (!item.amount) return index;
             }
             return -1;
         },
-        nextCorrespondingStack(obj, name = "inventory") {
+        nextCorrespondingStack(obj, name = this.field) {
             for (const item of this.model[name]) {
                 if (item.object === obj) return item;
             }
             return null;
         },
-        add(obj, name = "inventory") {
+        add(obj, name = this.field) {
             if (!obj) {
                 this.model[name].push(ApiClient.store.addModel(new Item.Model({ amount: 0 })));
                 return;

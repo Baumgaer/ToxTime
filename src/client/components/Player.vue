@@ -1,5 +1,5 @@
 <template>
-    <div class="player" @contextmenu.prevent.stop="$refs.inventory.clearHand">
+    <div class="player" @contextmenu.prevent.stop="$refs.inventory.clearHand" @mousemove.prevent.stop="adjustGrabbingPosition($event)">
         <EditorHead :name="model.lesson.name" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section v-for="scene in model.lesson.scenes" :key="scene._id">
             <GraphicViewer
@@ -14,6 +14,7 @@
         </Button>
         <section class="protocol"></section>
         <Inventory :model="model" ref="inventory" />
+        <Inventory :model="model" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing" />
         <VueSimpleContextMenu
             :ref="'sceneSwitcherPopup'"
             :elementId="'sceneSwitcherPopup'"
@@ -63,12 +64,6 @@ export default {
             if (alreadyInInventory) continue;
             this.$refs.inventory.add(itemSubObject);
         }
-
-        if (this.model.inventory.length < 10) {
-            for (let index = this.model.inventory.length; index < 10; index++) {
-                this.$refs.inventory.add(null);
-            }
-        }
     },
     methods: {
         onSceneButtonClick(event) {
@@ -79,6 +74,10 @@ export default {
         },
         onSaveButtonClick() {
             console.log("SAVED");
+        },
+        adjustGrabbingPosition(event) {
+            this.$refs.grabbing.$el.style.top = (event.pageY + 15) + "px";
+            this.$refs.grabbing.$el.style.left = (event.pageX + 15) + "px";
         }
     }
 };
