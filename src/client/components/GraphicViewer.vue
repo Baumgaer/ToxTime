@@ -37,6 +37,11 @@ export default {
         adjustToBorder: {
             type: Boolean,
             default: false
+        },
+        clickFunction: {
+            type: Function,
+            required: false,
+            default: () => false
         }
     },
     data() {
@@ -122,6 +127,8 @@ export default {
         this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
 
+        this.paper.project.activeLayer.onClick = (event) => this.clickFunction(event, this.paper.project.activeLayer, null);
+
         // Add clickAreas
         this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
         if (this.adjustToBorder) this.paper.view.onResize = this.adjustViewToBorder.bind(this);
@@ -156,7 +163,8 @@ export default {
             }
 
             const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
-            this.setupClickAreas(actionObject, group, true);
+            this.setupClickAreas(actionObject, group, this.showClickAreas);
+            group.onClick = (event) => this.clickFunction(event, group, actionObject);
 
             // Process sub action objects
             if (actionObjectMap.ownerGroupModel) {
@@ -269,6 +277,7 @@ export default {
                 path.position = this.calcPosition(model, container, clickArea.position);
                 path.model = clickArea;
                 path.locked = locked;
+                path.onClick = (event) => this.clickFunction(event, path, clickArea);
                 container.insertChild(clickArea.layer + 1, path);
             }
         }

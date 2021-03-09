@@ -6,6 +6,7 @@
                 :model="scene"
                 :showClickAreas="false"
                 :adjustToBorder="true"
+                :clickFunction="onSceneClick"
                 v-if="model.currentScene === scene"
             />
         </section>
@@ -33,6 +34,7 @@ import GameSession from "~client/models/GameSession";
 import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
 import VueSimpleContextMenu from 'vue-simple-context-menu';
 import Inventory from "~client/components/Inventory";
+import { Layer } from "paper";
 
 export default {
     components: {
@@ -75,9 +77,40 @@ export default {
         onSaveButtonClick() {
             console.log("SAVED");
         },
+        onSceneClick(event, item, model) {
+            // Event bubbled to the whole scene, so the player clicked into the void
+            // or tried to make combos which are maybe nonsense
+            if (item instanceof Layer) return this.addPunishPoint();
+
+            // Stop propagating when it was not a left click
+            if (event.event.button) return false;
+
+            // Do not proceed when no model is given because it could be that
+            // there is a none model including element which is inside model
+            // including element
+            if (!model || this.itemIsInvisible(item)) return;
+            const recipe = this.searchRecipe(model);
+
+            if (recipe) {
+                recipe.exec();
+                // Stop propagation if a recipe was found which means return false
+                return false;
+            }
+        },
+        itemIsInvisible(item) {
+            if (!item) return false;
+            if (!item.opacity) return true;
+            return this.itemIsInvisible(item.parent);
+        },
         adjustGrabbingPosition(event) {
             this.$refs.grabbing.$el.style.top = (event.pageY + 15) + "px";
             this.$refs.grabbing.$el.style.left = (event.pageX + 15) + "px";
+        },
+        searchRecipe(model) {
+            console.log("searching for Recipe with model:", model);
+        },
+        addPunishPoint() {
+            console.log("PUNISHED");
         }
     }
 };
