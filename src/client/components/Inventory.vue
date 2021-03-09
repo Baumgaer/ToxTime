@@ -89,6 +89,7 @@ export default {
                 if (this.model[name].length - 1 >= this.minimumSlots) {
                     const index = this.model[name].indexOf(nextStack);
                     this.model[name].splice(index, 1);
+                    ApiClient.store.removeModel(nextStack);
                 } else nextStack.object = null;
             }
         },
@@ -101,6 +102,7 @@ export default {
                 for (let index = 0; index < item.amount; index++) {
                     this.add(item.object, "inventory");
                 }
+                ApiClient.store.removeModel(item);
             }
             this.model.grabbing.splice(0, this.model.grabbing.length);
         }
