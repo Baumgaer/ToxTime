@@ -59,13 +59,8 @@ export default {
     },
     mounted() {
         this.model.currentScene = this.model.lesson.scenes[0];
-
-        for (const itemSubObject of this.model.lesson.inventory) {
-            const model = this.model;
-            const alreadyInInventory = model.inventory.find((item) => item?.object?._id === itemSubObject._id);
-            if (alreadyInInventory) continue;
-            this.$refs.inventory.add(itemSubObject);
-        }
+        const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
+        if (!inventoryIsFilled) this.initializeInventory();
     },
     methods: {
         onSceneButtonClick(event) {
@@ -78,12 +73,12 @@ export default {
             console.log("SAVED");
         },
         onSceneClick(event, item, model) {
+            // Stop propagating when it was not a left click
+            if (event.event.button > 0) return false;
+
             // Event bubbled to the whole scene, so the player clicked into the void
             // or tried to make combos which are maybe nonsense
             if (item instanceof Layer) return this.addPunishPoint();
-
-            // Stop propagating when it was not a left click
-            if (event.event.button) return false;
 
             // Do not proceed when no model is given because it could be that
             // there is a none model including element which is inside model
@@ -95,6 +90,11 @@ export default {
                 recipe.exec();
                 // Stop propagation if a recipe was found which means return false
                 return false;
+            }
+        },
+        initializeInventory() {
+            for (const itemSubObject of this.model.lesson.inventory) {
+                this.$refs.inventory.add(itemSubObject);
             }
         },
         itemIsInvisible(item) {
