@@ -81,15 +81,25 @@ export default {
                 this.model[name].push(item);
             }
         },
-        grab(item) {
-            item.amount--;
-            this.add(item.object, "grabbing");
-            if (!item.amount) item.object = null;
+        remove(obj, name = this.field) {
+            const nextStack = this.nextCorrespondingStack(obj, name);
+            if (!nextStack) return;
+            nextStack.amount--;
+            if (!nextStack.amount) {
+                if (this.model[name].length - 1 >= this.minimumSlots) {
+                    const index = this.model[name].indexOf(nextStack);
+                    this.model[name].splice(index, 1);
+                } else nextStack.object = null;
+            }
         },
-        clearHand() {
+        grab(item) {
+            this.add(item.object, "grabbing");
+            this.remove(item.object, "inventory");
+        },
+        putBack() {
             for (const item of this.model.grabbing) {
                 for (let index = 0; index < item.amount; index++) {
-                    this.add(item.object);
+                    this.add(item.object, "inventory");
                 }
             }
             this.model.grabbing.splice(0, this.model.grabbing.length);

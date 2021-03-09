@@ -1,5 +1,5 @@
 <template>
-    <div class="player" @contextmenu.prevent.stop="$refs.inventory.clearHand" @mousemove.prevent.stop="adjustGrabbingPosition($event)">
+    <div class="player" @contextmenu.prevent.stop="$refs.inventory.putBack" @mousemove.prevent.stop="adjustGrabbingPosition($event)">
         <EditorHead :name="model.lesson.name" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section v-for="scene in model.lesson.scenes" :key="scene._id">
             <GraphicViewer
