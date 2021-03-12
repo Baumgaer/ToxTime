@@ -7,6 +7,9 @@
             <Button :name="model.actions.play.name" @click="model.actions.play.func()">
                 <component :is="model.actions.play.symbol.name" />
             </Button>
+            <Button v-if="isRemovable" :name="'delete'" @click="window.activeUser.deleteGameSessionByLesson(model)">
+                <component :is="'delete-icon'" />
+            </Button>
         </div>
         <div class="text">
             <h2 class="title">{{ model.getName() }}</h2>
@@ -34,6 +37,10 @@ export default {
         model: {
             type: Lesson.RawClass,
             required: true
+        },
+        isRemovable: {
+            type: Boolean,
+            default: true
         }
     },
     computed: {

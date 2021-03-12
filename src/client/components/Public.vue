@@ -22,7 +22,14 @@
                 v-show="model.activeEditor === 'playGame'"
                 :model="model.editingModel"
             />
-            <LessonList v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'" />
+            <section v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'">
+                <h2>{{ $t('activeLessons') }}</h2>
+                <LessonList :lessons="activeLessons" />
+                <h2>{{ $t('remainingLessons') }}</h2>
+                <LessonList :lessons="remainingLessons" :itemsAreRemovable="false" />
+                <h2>{{ $t('solvedLessons') }}</h2>
+                <LessonList :lessons="solvedLessons" />
+            </section>
         </main>
     </section>
 </template>
@@ -46,8 +53,29 @@ export default {
             store: {},
             model: window.activeUser,
             category: "lessons",
-            lastCategory: ""
+            lastCategory: "",
+            lessonsStore: ApiClient.store.collection("lessons")
         };
+    },
+    computed: {
+        lessons() {
+            return Object.values(this.lessonsStore);
+        },
+        remainingLessons() {
+            return this.lessons.filter((lesson) => {
+                return !this.activeLessons.includes(lesson) && !this.solvedLessons.includes(lesson);
+            });
+        },
+        activeLessons() {
+            return this.lessons.filter((lesson) => {
+                return window.activeUser.currentGameSessions.find((gameSession) => gameSession.lesson === lesson);
+            });
+        },
+        solvedLessons() {
+            return this.lessons.filter((lesson) => {
+                return window.activeUser.solvedGameSessions.find((gameSession) => gameSession.lesson === lesson);
+            });
+        }
     },
     mounted() {
         this.onNavButtonClick("lessons");

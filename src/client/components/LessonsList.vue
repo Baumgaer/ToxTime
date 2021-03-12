@@ -1,21 +1,25 @@
 <template>
     <div class="lessonsList">
-        <LessonsListItem v-for="lesson in lessons" :key="lesson._id" :model="lesson" />
+        <LessonsListItem v-for="lesson in lessons" :key="lesson._id" :model="lesson" :isRemovable="itemsAreRemovable" />
     </div>
 </template>
 
 <script>
 import LessonsListItem from "~client/components/LessonsListItem";
-import ApiClient from "~client/lib/ApiClient";
 
 export default {
     components: {
         LessonsListItem
     },
-    data() {
-        return {
-            lessons: ApiClient.store.collection("lessons")
-        };
+    props: {
+        lessons: {
+            type: Array,
+            default: () => []
+        },
+        itemsAreRemovable: {
+            type: Boolean,
+            default: true
+        }
     }
 };
 </script>

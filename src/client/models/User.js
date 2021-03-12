@@ -49,4 +49,13 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         window.activeUser.activeEditor = "editUser";
         window.activeUser.editingModel = ApiClient.store.getModelById(this.collection, this._dummyId || this._id);
     }
+
+    deleteGameSessionByLesson(lesson) {
+        const filter = (gameSession) => gameSession.lesson === lesson;
+
+        for (const category of ["currentGameSessions", "solvedGameSessions"]) {
+            const gameSession = this[category].find(filter);
+            if (gameSession) return gameSession.delete();
+        }
+    }
 });
