@@ -29,13 +29,15 @@ export function RequisiteMixinClass(MixinClass) {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }
                 ],
-                default: []
+                default: [],
+                normalizeItems: true
             },
             actionObjects: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }
                 ],
-                default: []
+                default: [],
+                normalizeItems: true
             }
         };
 

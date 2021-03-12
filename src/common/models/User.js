@@ -54,11 +54,13 @@ export function UserMixinClass(MixinClass) {
             },
             currentGameSessions: {
                 type: [{ type: Schema.Types.ObjectId, ref: "GameSession", autopopulate: true }],
-                default: []
+                default: [],
+                normalizeItems: true
             },
             solvedGameSessions: {
                 type: [{ type: Schema.Types.ObjectId, ref: "GameSession", autopopulate: true }],
-                default: []
+                default: [],
+                normalizeItems: true
             },
             isConfirmed: {
                 type: Boolean,

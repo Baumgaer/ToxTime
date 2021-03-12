@@ -90,7 +90,7 @@ export default class ApiRoute extends DefaultRoute {
      * and the error is returned.
      *
      * @param {import("express").Request} request
-     * @returns {import("express").Request["body"] | Error}
+     * @returns {Promise<import("express").Request["body"] | Error>}
      * @memberof ApiRoute
      */
     async ProcessChildModels(request) {
@@ -132,6 +132,7 @@ export default class ApiRoute extends DefaultRoute {
             }
 
             if (isArray(schemaObj[key].type) && schemaObj[key].type[0].ref in modelApiMapping && isArray(myRequestBody[key])) {
+                if (schemaObj[key].normalizeItems) await this.normalizeItems(request, key);
                 for (const [index, childModel] of Object.entries(myRequestBody[key])) {
                     if (isMongoId(childModel)) continue;
                     request.body = childModel;
@@ -180,7 +181,7 @@ export default class ApiRoute extends DefaultRoute {
      * Sends the initial file when logged in.
      *
      * @param {import("express").Request} request the request
-     * @returns {Error | import("~server/lib/ServerModel").default}
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
      * @memberof ApiRoute
      */
     @ApiRoute.patch("/:id")
@@ -213,18 +214,65 @@ export default class ApiRoute extends DefaultRoute {
     }
 
     /**
+     * Removes items which are missing in the given array or deletes all items
+     * when the owner of the array is deleted.
+     *
+     * @param {import("express").Request} request
+     * @param {string} field
+     * @param {"missing" | "all"} [mode="missing"]
+     * @param {false | InstanceType<ReturnType<typeof import("~server/lib/ServerModel")["default"]["buildServerExport"]>["Model"]>}
+     * @memberof ApiRoute
+     */
+    async normalizeItems(request, field, mode = "missing", useAsOld = false) {
+        const iterable = request.body[field];
+        const schemaObj = this.claimedExport.Schema.obj;
+        const modelApiMapping = this.webServer.modelApiMapping;
+
+        if (mode !== "all" && (!iterable || !isArray(iterable))) return;
+        const oldModel = useAsOld || await this.claimedExport.Model.findById(request.params.id).exec();
+        if (!oldModel) return;
+
+        const filter = (model, idOrModelLike) => {
+            if (!idOrModelLike) return false;
+            const id = model._id.toString();
+            return isMongoId(idOrModelLike) && idOrModelLike === id || idOrModelLike._id === id;
+        };
+
+        for (let index = 0; index < oldModel[field].length; index++) {
+            const model = oldModel[field][index];
+
+            let foundModel = false;
+            if (mode === "missing") foundModel = Boolean(iterable.find((idOrModelLike) => filter(model, idOrModelLike)));
+
+            if (!foundModel) {
+                request.params.id = model._id.toString();
+                await modelApiMapping[schemaObj[field].type[0].ref].delete(request);
+            }
+        }
+
+        request.body[field] = request.body[field].filter((item) => Boolean(item));
+    }
+
+    /**
      * Deletes a model by the given id and returns the old result if model was found
      *
      * @param {import("express").Request} request
-     * @returns {Error | import("~server/lib/ServerModel").default}
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
      * @memberof ApiRoute
      */
     @ApiRoute.delete("/:id")
     async delete(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        const schemaObj = this.claimedExport.Schema.obj;
+
         try {
             const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
             if (!result) return new httpErrors.NotFound();
+            for (const key in schemaObj) {
+                if (schemaObj[key].normalizeItems) {
+                    await this.normalizeItems(request, key, "all", result);
+                }
+            }
             return result;
         } catch (error) {
             return error;
