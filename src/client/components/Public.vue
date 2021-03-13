@@ -22,7 +22,7 @@
                 v-show="model.activeEditor === 'playGame'"
                 :model="model.editingModel"
             />
-            <section v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'">
+            <section v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'" class="lessons">
                 <h3>{{ $t('currentGameSessions') }}</h3>
                 <LessonList :lessons="activeLessons" />
                 <h3>{{ $t('remainingLessons') }}</h3>
