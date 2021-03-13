@@ -77,7 +77,7 @@
     "german": "Deutsch",
     "english": "Englisch",
     "locale": "Sprache",
-    "currentGameSession": "Aktuelle Lektion",
+    "currentGameSessions": "Aktuelle Lektionen",
     "solvedGameSessions": "Gelöste Lektionen",
     "remainingLessons": "Ausstehende Lektionen",
     "noLessonsYet": "Bisher keine Lektionen",

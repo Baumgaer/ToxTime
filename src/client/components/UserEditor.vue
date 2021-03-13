@@ -33,8 +33,18 @@
             </section>
             <h3>{{ $t('lessons') }}</h3>
             <section>
-                <div class="left">{{ $t('currentGameSession') }}</div><div class="right"></div>
-                <div class="left">{{ $t('solvedGameSessions') }}</div><div class="right"></div>
+                <div class="left">{{ $t('currentGameSessions') }}</div><div class="right">
+                    <div class="gameSessionLabel" v-for="session in model.currentGameSessions" :key="session._id">
+                        <span>{{ session.getName() }}</span>
+                        <span class="x" @click="onSessionRemove(session, 'currentGameSessions')">X</span>
+                    </div>
+                </div>
+                <div class="left">{{ $t('solvedGameSessions') }}</div><div class="right">
+                    <div class="gameSessionLabel" v-for="session in model.solvedGameSessions" :key="session._id">
+                        <span>{{ session.getName() }}</span>
+                        <span class="x" @click="onSessionRemove(session, 'solvedGameSessions')">X</span>
+                    </div>
+                </div>
             </section>
             <h3 v-if="model === window.activeUser">{{ $t('password') }}</h3>
             <section v-if="model === window.activeUser" class="password">
@@ -112,6 +122,11 @@ export default {
             if (this.model.hasChanges()) this.onSettingsChange();
             if (this.changePassword()) this.onPasswordChange();
 
+        },
+
+        onSessionRemove(session, category) {
+            const index = this.model[category].indexOf(session);
+            this.model[category].splice(index, 1);
         },
 
         async onPasswordChange() {
