@@ -55,7 +55,12 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
 
         for (const category of ["currentGameSessions", "solvedGameSessions"]) {
             const gameSession = this[category].find(filter);
-            if (gameSession) return gameSession.delete();
+            if (gameSession) {
+                this[category].splice(this[category].indexOf(gameSession), 1);
+                ApiClient.store.removeModel(gameSession);
+            }
         }
+
+        this.save();
     }
 });

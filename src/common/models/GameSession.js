@@ -31,11 +31,13 @@ export function GameSessionMixinClass(MixinClass) {
             },
             grabbing: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
-                default: []
+                default: [],
+                normalizeItems: true
             },
             inventory: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
-                default: []
+                default: [],
+                normalizeItems: true
             },
             knowledgeBase: {
                 type: [{ type: String }],
