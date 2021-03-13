@@ -58,9 +58,14 @@ export default {
         };
     },
     mounted() {
-        this.model.currentScene = this.model.lesson.scenes[0];
+        if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
         const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
         if (!inventoryIsFilled) this.initializeInventory();
+        this.onSaveButtonClick();
+    },
+    async beforeDestroy() {
+        await this.onSaveButtonClick();
+        clearTimeout(this.saveTimeout);
     },
     methods: {
         onSceneButtonClick(event) {
@@ -69,8 +74,13 @@ export default {
         onSceneSelect(event) {
             this.model.currentScene = event.option.scene;
         },
-        onSaveButtonClick() {
-            console.log("SAVED");
+        async onSaveButtonClick() {
+            if (this.saveTimeout) clearTimeout(this.saveTimeout);
+            const result = await this.model.save();
+            if (result instanceof Error) {
+                this.$toasted.error(window.vm.$t("errorWhileSaving", { name: this.model.getName() }), { className: "errorToaster" });
+            } else if (result) this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+            this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onSceneClick(event, item, model) {
             // Stop propagating when it was not a left click

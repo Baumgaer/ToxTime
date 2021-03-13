@@ -60,6 +60,7 @@
     "usersAdded": "Users added",
     "discarded": "Changes to {name} discarded",
     "saved": "Changes to {name} saved",
+    "errorWhileSaving": "Error while saving {name}",
     "download": "Download",
     "collapse": "Collapse",
     "select": "Manipulation tool",

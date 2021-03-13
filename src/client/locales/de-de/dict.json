@@ -60,6 +60,7 @@
     "usersAdded": "Benutzer hinzugefügt",
     "discarded": "Änderungen an {name} verworfen",
     "saved": "Änderungen an {name} gespeichert",
+    "errorWhileSaving": "Fehler beim Speichern von {name}",
     "download": "Herunterladen",
     "collapse": "Einklappen",
     "select": "Manipulationswerkzeug",

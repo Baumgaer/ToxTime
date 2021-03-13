@@ -42,15 +42,23 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
     }
 
     @CommonClientLesson.action("play", { type: "component", name: "play-icon" }, () => true)
-    play() {
-        const session = ApiClient.store.addModel(new GameSession.Model({
-            lesson: this,
-            currentScene: this.scenes[0]
-        }));
+    async play() {
+        let session = window.activeUser.getGameSessionByLesson(this);
+
+        if (!session) {
+            session = ApiClient.store.addModel(new GameSession.Model({ lesson: this, currentScene: this.scenes[0] }));
+            window.activeUser.currentGameSessions.push(session);
+        } else {
+            const indexInSolved = window.activeUser.solvedGameSessions.indexOf(session);
+            if (indexInSolved >= 0) {
+                window.activeUser.solvedGameSessions.splice(indexInSolved, 1);
+                window.activeUser.currentGameSessions.push(session);
+            }
+        }
+
+        await window.activeUser.save();
         window.activeUser.editingModel = session;
         window.activeUser.activeEditor = "playGame";
-        window.activeUser.currentGameSessions.push(session);
-        window.activeUser.save();
     }
 
 });

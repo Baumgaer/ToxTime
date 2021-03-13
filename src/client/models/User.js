@@ -1,6 +1,7 @@
 import { UserMixinClass } from "~common/models/User";
 import ApiClient from "~client/lib/ApiClient";
 import ClientModel from "~client/lib/ClientModel";
+import { resolveProxy } from "~common/utils";
 
 const CommonClientUser = UserMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class User extends CommonClientUser {
@@ -50,8 +51,19 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         window.activeUser.editingModel = ApiClient.store.getModelById(this.collection, this._dummyId || this._id);
     }
 
+    getGameSessionByLesson(lesson) {
+        const filter = (gameSession) => resolveProxy(gameSession.lesson) === resolveProxy(lesson);
+
+        for (const category of ["currentGameSessions", "solvedGameSessions"]) {
+            const gameSession = this[category].find(filter);
+            if (gameSession) return gameSession;
+        }
+
+        return null;
+    }
+
     deleteGameSessionByLesson(lesson) {
-        const filter = (gameSession) => gameSession.lesson === lesson;
+        const filter = (gameSession) => resolveProxy(gameSession.lesson) === resolveProxy(lesson);
 
         for (const category of ["currentGameSessions", "solvedGameSessions"]) {
             const gameSession = this[category].find(filter);

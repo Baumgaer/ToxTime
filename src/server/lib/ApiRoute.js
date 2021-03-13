@@ -1,6 +1,6 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import CustomError from "~common/lib/CustomError";
-import { isMongoId, isArray, merge, isPlainObject } from "~common/utils";
+import { isMongoId, isArray, merge, isPlainObject, isValue } from "~common/utils";
 
 import httpErrors from "http-errors";
 
@@ -109,7 +109,7 @@ export default class ApiRoute extends DefaultRoute {
         for (const key in schemaObj) {
             if (!(key in myRequestBody)) continue;
 
-            if (schemaObj[key].ref in modelApiMapping && !isMongoId(myRequestBody[key])) {
+            if (schemaObj[key].ref in modelApiMapping && isValue(myRequestBody[key]) && !isMongoId(myRequestBody[key])) {
                 request.body = myRequestBody[key];
                 let method = "create";
                 if (request.body._id) {
