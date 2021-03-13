@@ -1,9 +1,16 @@
+import { Forbidden } from "http-errors";
 import ApiRoute from "~server/lib/ApiRoute";
 import GameSession from "~server/models/GameSession";
 
 export default class GameSessions extends ApiRoute {
 
     claimedExport = GameSession;
+
+    isAllowed(request) {
+        const id = request.params.id;
+        const filter = (session) => session._id.toString() === id || session === id;
+        return Boolean(request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter));
+    }
 
     /**
      * Uses the default create function. This is just for overwriting permissions
@@ -14,6 +21,8 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.post("/", { allowUser: true })
     async create(request) {
+        const filter = (session) => session.lesson._id.toString() === request.body.lesson || session.lesson === request.body.lesson;
+        if (!request.body.lesson || request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter)) return new Forbidden();
         return await super.create(request);
     }
 
@@ -26,6 +35,7 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.patch("/:id", { allowUser: true })
     async update(request) {
+        if (!this.isAllowed(request)) return new Forbidden();
         return await super.update(request);
     }
 
@@ -38,6 +48,7 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.delete("/:id", { allowUser: true })
     async delete(request) {
+        if (!this.isAllowed(request)) return new Forbidden();
         return await super.delete(request);
     }
 
