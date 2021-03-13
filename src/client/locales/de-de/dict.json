@@ -78,6 +78,8 @@
     "locale": "Sprache",
     "currentGameSession": "Aktuelle Lektion",
     "solvedGameSessions": "Gelöste Lektionen",
+    "remainingLessons": "Ausstehende Lektionen",
+    "noLessonsYet": "Bisher keine Lektionen",
     "general": "Allgemein",
     "search": "suchen...",
     "copy": "Kopieren",

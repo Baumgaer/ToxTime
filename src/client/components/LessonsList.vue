@@ -1,7 +1,8 @@
 <template>
-    <div class="lessonsList">
+    <div class="lessonsList" v-if="lessons.length">
         <LessonsListItem v-for="lesson in lessons" :key="lesson._id" :model="lesson" :isRemovable="itemsAreRemovable" />
     </div>
+    <div class="lessonsList" style="text-align: center; display: block" v-else>{{ $t('noLessonsYet') }}</div>
 </template>
 
 <script>

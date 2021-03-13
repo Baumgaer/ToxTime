@@ -23,11 +23,11 @@
                 :model="model.editingModel"
             />
             <section v-show="this.category === 'lessons' && model.activeEditor !== 'playGame'">
-                <h2>{{ $t('activeLessons') }}</h2>
+                <h3>{{ $t('currentGameSession') }}</h3>
                 <LessonList :lessons="activeLessons" />
-                <h2>{{ $t('remainingLessons') }}</h2>
+                <h3>{{ $t('remainingLessons') }}</h3>
                 <LessonList :lessons="remainingLessons" :itemsAreRemovable="false" />
-                <h2>{{ $t('solvedLessons') }}</h2>
+                <h3>{{ $t('solvedGameSessions') }}</h3>
                 <LessonList :lessons="solvedLessons" />
             </section>
         </main>
