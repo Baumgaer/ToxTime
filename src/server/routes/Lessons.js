@@ -62,9 +62,11 @@ export default class Lessons extends ApiRoute {
         const result = await super.delete(request);
         if (result instanceof Error) return result;
 
-        await User.Model.updateMany({ $or: sessionQuery }, { $pullAll: { currentGameSessions: gameSessions, solvedGameSessions: gameSessions } }).exec();
-        await GameSession.Model.deleteMany({ _id: { $in: sessionIds } });
-        await Item.Model.deleteMany({ _id: { $in: itemIds } });
+        await Promise.all([
+            await User.Model.updateMany({ $or: sessionQuery }, { $pullAll: { currentGameSessions: gameSessions, solvedGameSessions: gameSessions } }).exec(),
+            await GameSession.Model.deleteMany({ _id: { $in: sessionIds } }),
+            await Item.Model.deleteMany({ _id: { $in: itemIds } })
+        ]);
 
         return result;
     }
