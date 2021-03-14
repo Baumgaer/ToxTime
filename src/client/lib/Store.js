@@ -199,7 +199,7 @@ export class Store {
 
         // Notify all vue components about a change
         const id = model._dummyId || model._id;
-        const vueObserver = this.getModelById(model.collection, id).__ob__;
+        const vueObserver = this.getModelById(model.collection, id)?.__ob__;
         if (this.hasModel(model) && vueObserver) vueObserver.dep.notify();
 
         // Previous values are not wrapped into a proxy, so we need to store a

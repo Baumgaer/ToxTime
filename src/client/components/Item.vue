@@ -31,10 +31,10 @@
         <ProgressBar :model="model" class="progressBar" />
         <div class="subObjects">
             <div v-for="(subObject, index) of model.getSubObjects()" :key="index" :class="`subObject ${subObject.isSelected ? 'isSelected' : ''}`">
-                <div class="avatar" v-if="subObject.getAvatar(true).type === 'component'">
+                <div class="avatar" v-if="subObject.getAvatar && subObject.getAvatar(true).type === 'component'">
                     <component :is="subObject.getAvatar(true).name"></component>
                 </div>
-                <div class="info">
+                <div class="info" v-if="subObject.getName">
                     <div class="name">
                         <input
                             type="text" name="name"
