@@ -8,7 +8,7 @@ export default class GameSessions extends ApiRoute {
 
     isAllowed(request) {
         const id = request.params.id;
-        const filter = (session) => session._id.toString() === id || session === id;
+        const filter = (session) => session?._id.toString() === id || session === id;
         return Boolean(request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter));
     }
 
@@ -21,7 +21,9 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.post("/", { allowUser: true })
     async create(request) {
-        const filter = (session) => session.lesson._id.toString() === request.body.lesson || session.lesson === request.body.lesson;
+        const filter = (session) => {
+            return session?.lesson?._id.toString() === request.body.lesson || session?.lesson === request.body.lesson;
+        };
         if (!request.body.lesson || request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter)) return new Forbidden();
         return await super.create(request);
     }

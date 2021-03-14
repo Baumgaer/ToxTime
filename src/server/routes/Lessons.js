@@ -7,6 +7,9 @@ import CustomError from "~common/lib/CustomError";
 import { copyFileSync } from "graceful-fs";
 import { resolve } from "path";
 import { path as rootPath } from "app-root-path";
+import GameSession from "~server/models/GameSession";
+import User from "~server/models/User";
+import Item from "~server/models/Item";
 
 export default class Lessons extends ApiRoute {
 
@@ -37,6 +40,33 @@ export default class Lessons extends ApiRoute {
         }
 
         return copy;
+    }
+
+    @Lessons.delete("/:id")
+    async delete(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+
+        const lesson = await Lesson.Model.findById(request.params.id).exec();
+        if (!lesson) return new httpErrors.NotFound();
+
+        const gameSessions = await GameSession.Model.find({ lesson }).exec();
+
+        const sessionIds = [];
+        const itemIds = [];
+        const sessionQuery = gameSessions.map(session => {
+            sessionIds.push(session._id);
+            itemIds.push(...session.inventory.map(item => item._id), ...session.grabbing.map(item => item._id));
+            return { $or: [{ currentGameSessions: session }, { solvedGameSessions: session }] };
+        });
+
+        const result = await super.delete(request);
+        if (result instanceof Error) return result;
+
+        await User.Model.updateMany({ $or: sessionQuery }, { $pullAll: { currentGameSessions: gameSessions, solvedGameSessions: gameSessions } }).exec();
+        await GameSession.Model.deleteMany({ _id: { $in: sessionIds } });
+        await Item.Model.deleteMany({ _id: { $in: itemIds } });
+
+        return result;
     }
 
 }

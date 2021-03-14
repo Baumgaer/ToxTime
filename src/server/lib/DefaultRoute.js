@@ -3,7 +3,7 @@ import arp from "app-root-path";
 import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
 import CustomError from "~common/lib/CustomError";
-import { getPrototypeNamesRecursive, merge, isPlainObject, isValue } from "~common/utils";
+import { getPrototypeNamesRecursive, merge, isPlainObject, isValue, isArray } from "~common/utils";
 import { Error } from "mongoose";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
@@ -255,7 +255,7 @@ export default class DefaultRoute {
                 // In this case the content type has to be set manually.
                 if (result instanceof Buffer) response.setHeader("Content-Type", (await fromBuffer(result)).mime);
                 response.send(result);
-            } else if (isPlainObject(result)) {
+            } else if (typeof result === "object") {
                 // This is a general response. Normally all responses should be
                 // a JSON since this is a rest service.
                 response.json(result);
