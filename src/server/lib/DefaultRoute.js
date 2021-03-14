@@ -3,7 +3,7 @@ import arp from "app-root-path";
 import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
 import CustomError from "~common/lib/CustomError";
-import { getPrototypeNamesRecursive, merge } from "~common/utils";
+import { getPrototypeNamesRecursive, merge, isPlainObject, isValue } from "~common/utils";
 import { Error } from "mongoose";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
@@ -225,7 +225,7 @@ export default class DefaultRoute {
             const result = await routeObject.handler.call(this, request, response, next);
             if (response.headersSent) return;
 
-            if (result === null || result === undefined) {
+            if (!isValue(result)) {
                 // Nothing was returned, so we assume, that the content is empty
                 // if no other status code was set
                 const code = response.statusCode;
@@ -255,14 +255,14 @@ export default class DefaultRoute {
                 // In this case the content type has to be set manually.
                 if (result instanceof Buffer) response.setHeader("Content-Type", (await fromBuffer(result)).mime);
                 response.send(result);
-            } else if (typeof result === "object") {
+            } else if (isPlainObject(result)) {
                 // This is a general response. Normally all responses should be
                 // a JSON since this is a rest service.
                 response.json(result);
             } else if (typeof result === "number") {
                 // A number means we just want to have a certain response code with no content
                 response.sendStatus(result);
-            } else if (result !== null && result !== undefined) {
+            } else if (isValue(result)) {
                 // A return value which is not allowed is returned. This has to
                 // be printed with full trace because it's just wrong...
                 next(httpErrors.InternalServerError(`Unacceptable result: ${JSON.stringify(result)}`));

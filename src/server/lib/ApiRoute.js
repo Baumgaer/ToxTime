@@ -250,7 +250,7 @@ export default class ApiRoute extends DefaultRoute {
             }
         }
 
-        request.body[field] = request.body[field].filter((item) => Boolean(item));
+        request.body[field] = request.body?.[field]?.filter?.((item) => Boolean(item));
     }
 
     /**
