@@ -15,6 +15,7 @@ export default class Arrange extends Tool {
      */
     onToolMouseDown(event) {
         if (event.event.button !== 0) return;
+        if (event.item === this.paper.view.background) return;
         if (this.itemToBringForward) {
             const oldIndex = this.itemToBringForward.index;
             this.itemToBringForward.insertAbove(event.item);
