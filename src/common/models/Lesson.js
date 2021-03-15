@@ -40,7 +40,7 @@ export function LessonMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            return this.scenes;
+            return [...this.scenes, ...this.inventory];
         }
     }
     return Lesson;
