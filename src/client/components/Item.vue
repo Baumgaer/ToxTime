@@ -21,6 +21,7 @@
                     v-if="nameEditDBField"
                     type="text" name="name"
                     ref="nameInput"
+                    autocomplete="off"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
                     @change="onNameChange($event, model)"
                     @mousedown="onMouseDown($event)"

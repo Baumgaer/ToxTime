@@ -70,6 +70,12 @@
             <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
             <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
             <UserEditor v-if="window.activeUser.activeEditor === 'editUser'" />
+            <Player
+                v-if="window.activeUser.editingModel && window.activeUser.editingModel.className === 'GameSession'"
+                v-show="window.activeUser.activeEditor === 'playGame'"
+                :model="window.activeUser.editingModel"
+                :preventAutosave="true"
+            />
         </section>
         <UploadHint ref="uploadHint" />
     </main>
@@ -84,6 +90,7 @@ import UploadHint from "~client/components/UploadHint";
 import GraphicEditor from "~client/components/GraphicEditor";
 import LessonEditor from "~client/components/LessonEditor";
 import UserEditor from "~client/components/UserEditor";
+import Player from "~client/components/Player";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
@@ -101,7 +108,8 @@ export default {
         UploadHint,
         GraphicEditor,
         LessonEditor,
-        UserEditor
+        UserEditor,
+        Player
     },
     data() {
         return {
