@@ -44,6 +44,8 @@ import CursorDefaultClickIcon from "vue-material-design-icons/CursorDefaultClick
 import ArrangeBringForwardIcon from "vue-material-design-icons/ArrangeBringForward";
 import ContentCopyIcon from "vue-material-design-icons/ContentCopy";
 import PlayIcon from "vue-material-design-icons/Play";
+import MenuRightIcon from "vue-material-design-icons/MenuRight";
+import MenuDownIcon from "vue-material-design-icons/MenuDown";
 
 if (Object.keys(window.userInformation).length) {
     ApiClient.handleModels(window.userInformation);
@@ -87,3 +89,5 @@ Vue.component('cursor-default-click-icon', CursorDefaultClickIcon);
 Vue.component('arrange-bring-forward-icon', ArrangeBringForwardIcon);
 Vue.component('content-copy-icon', ContentCopyIcon);
 Vue.component('play-icon', PlayIcon);
+Vue.component('menu-right-icon', MenuRightIcon);
+Vue.component('menu-down-icon', MenuDownIcon);

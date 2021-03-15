@@ -4,6 +4,7 @@
     @height: 50px;
     @halfHeight: 25px;
     @transitionConfig: ease-in-out 0.3s;
+    @collapseSize: 15px;
 
     display: grid;
     border-bottom: 1px solid var(--gray-color, @gray);
@@ -17,12 +18,33 @@
     transition: opacity @transitionConfig, background-color @transitionConfig;
     cursor: pointer;
 
+    &.withChildren {
+        grid-template-columns: @collapseSize @height 1fr;
+        grid-template-areas: "collapse avatar info" "collapse avatar info";
+
+        .expandCollapseButton {
+            display: flex;
+        }
+
+        .subObjects {
+            grid-column: auto / span 3;
+
+            .item {
+                grid-template-columns: @collapseSize @halfHeight 1fr;
+                grid-template-areas: "collapse avatar info" "collapse avatar info";
+            }
+        }
+    }
+
     &:hover {
         background-color: var(--gray-color, @gray);
         opacity: 1 !important;
 
         .subObjects {
             .item {
+                &:not(.active) {
+                    background-color: transparent;
+                }
                 .subObjects {
                     border-left: 1px dotted @dark;
                 }
@@ -34,7 +56,7 @@
         background-color: var(--primary-color, @primaryColor);
 
         &:hover {
-            background-color: var(--info-color, @infoColor);
+            background-color: var(--info-color, @infoColor) !important;
         }
 
         .subObjects {
@@ -53,6 +75,24 @@
             input {
                 color: var(--black-color, @black) !important;
             }
+        }
+    }
+
+    .expandCollapseButton {
+        display: none;
+        grid-area: collapse;
+        font-size: 24px;
+        line-height: 24px;
+        text-align: center;
+        z-index: 2;
+
+        svg {
+            bottom: 2px;
+            left: -5px;
+        }
+
+        &:hover {
+            color: @black;
         }
     }
 
@@ -141,6 +181,12 @@
     .subObjects {
         grid-column: auto / span 2;
         padding-left: 10px;
+        max-height: 0px;
+        transition: max-height 0.5s ease-in-out;
+
+        &.opened {
+            max-height: 5000px;
+        }
 
         .item {
             grid-template-columns: @halfHeight 1fr;

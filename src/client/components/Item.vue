@@ -1,5 +1,13 @@
 <template>
-    <section :class="`item ${activeClass} ${model.isSelected ? 'isSelected' : ''}`" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
+    <section
+        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects ? ' withChildren' : ''}`"
+        draggable
+        @dragstart="onDragStart($event)"
+        @dragend="onDragEnd($event)"
+        ref="itemRoot"
+    >
+        <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" />
+        <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" />
         <div class="avatar" v-if="hasAvatar" :title="model.getAvatar().title">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name" :title="model.getAvatar().title"></component>
@@ -29,7 +37,7 @@
             </div>
         </div>
         <ProgressBar :model="model" class="progressBar" />
-        <div class="subObjects">
+        <div :class="`subObjects${opened ? ' opened' : ''}`">
             <item-component
                 v-for="(subObject, index) of model.getSubObjects()"
                 :key="index"
@@ -61,7 +69,16 @@ export default {
         overlayIcons: String,
         compactMode: Boolean
     },
+    data() {
+        return {
+            opened: true
+        };
+    },
     computed: {
+        hasSubObjects() {
+            return Boolean(this.model.getSubObjects().length);
+        },
+
         hasAvatar() {
             return Boolean(this.model.getAvatar());
         },
@@ -78,6 +95,10 @@ export default {
         }
     },
     methods: {
+        onExpandCollapseButtonClick() {
+            this.opened = !this.opened;
+        },
+
         onMouseDown(event) {
             event.stopPropagation();
             this.$refs.itemRoot.setAttribute("draggable", "false");
