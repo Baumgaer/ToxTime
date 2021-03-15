@@ -35,6 +35,8 @@ import SceneObject from "~client/models/SceneObject";
 import File from "~client/models/File";
 import ActionObject from "~client/models/ActionObject";
 
+import { svgToPng } from "~common/utils";
+
 export default {
     components: {
         Button,
@@ -194,10 +196,13 @@ export default {
 
         async createAvatar() {
             if (!this.model._id) return;
-            /** @type {HTMLCanvasElement} */
-            const canvas = this.$refs.graphicViewer.$refs.canvas;
             this.model.loadingStatus = -1;
-            canvas.toBlob((blob) => {
+
+            try {
+                const blob = await svgToPng(this.$refs.graphicViewer.paper.project.exportSVG({
+                    asString: true,
+                    bounds: "content"
+                }));
                 if (!blob) return;
                 const formData = new FormData();
                 formData.append('file', blob, this.model._id);
@@ -213,7 +218,9 @@ export default {
                         this.model.isCreatingAvatar = false;
                     }
                 });
-            }, "image/png");
+            } catch (error) {
+                this.$toasted.error("unknownError", { className: "errorToaster" });
+            }
         }
     }
 };

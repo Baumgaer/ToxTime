@@ -1,6 +1,7 @@
 import lodash, { isUndefined, isNull } from "lodash";
 import { isMongoId as validatorIsMongoId } from "validator";
 import onChange from "on-change";
+import imageCompression from "browser-image-compression";
 
 import deepdash from "deepdash";
 deepdash(lodash);
@@ -226,4 +227,33 @@ export function isPrimitiveWrapper(value) {
 export function isMongoId(value) {
     if (typeof value !== "string") return false;
     return validatorIsMongoId(value);
+}
+
+/**
+ * converts an svg string to base64 png using the domUrl
+ * @param {string} svgText the svgtext
+ * @return {Promise} a promise to the bas64 png image
+ */
+export function svgToPng(svgText) {
+    // convert an svg text to png using the browser
+    return new Promise((resolve, reject) => {
+        try {
+            // it needs a namespace
+            if (!svgText.match(/xmlns="/mi)) svgText = svgText.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+
+            // make a blob from the svg, convert it to a url and assign this url to an image
+            const svg = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+
+            imageCompression(svg, {
+                fileType: "image/png",
+                maxWidthOrHeight: 500,
+                maxSizeMB: 2,
+                initialQuality: 0.5
+            }).then((file) => {
+                resolve(file);
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
 }

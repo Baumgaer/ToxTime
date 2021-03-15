@@ -167,6 +167,7 @@ export default class WebServer {
             }
 
             imgSrc.push("data:");
+            scriptSrc.push("blob:");
 
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {
