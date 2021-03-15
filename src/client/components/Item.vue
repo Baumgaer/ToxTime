@@ -70,6 +70,7 @@ export default {
         compactMode: Boolean
     },
     data() {
+        this.isItem = true;
         return {
             opened: true
         };
@@ -102,11 +103,21 @@ export default {
         onMouseDown(event) {
             event.stopPropagation();
             this.$refs.itemRoot.setAttribute("draggable", "false");
+            let parent = this.$parent;
+            while (parent?.isItem) {
+                parent.$refs.itemRoot.setAttribute("draggable", "false");
+                parent = parent.$parent;
+            }
         },
 
         onMouseUp(event) {
             event.stopPropagation();
             this.$refs.itemRoot.setAttribute("draggable", "true");
+            let parent = this.$parent;
+            while (parent?.isItem) {
+                parent.$refs.itemRoot.setAttribute("draggable", "true");
+                parent = parent.$parent;
+            }
         },
 
         /**
