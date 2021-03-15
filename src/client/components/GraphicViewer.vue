@@ -121,6 +121,7 @@ export default {
     },
     mounted() {
         this.initialBackgroundLoadedPromise = new Promise((resolve) => this.initialBackgroundLoadedResolver = resolve);
+        if (!this.model.file) this.initialBackgroundLoadedResolver();
         this.paper.setup(this.$refs.canvas);
         this.paper.settings.handleSize = 10;
         this.paper.project.activeLayer.applyMatrix = false;
