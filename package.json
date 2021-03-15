@@ -64,7 +64,7 @@
         "prompts": "^2.4.0",
         "reflect-metadata": "^0.1.13",
         "source-map-support": "^0.5.19",
-        "string-strip-html": "^8.2.4",
+        "string-strip-html": "^8.2.5",
         "ursa-optional": "^0.10.2",
         "uuid": "^8.3.2",
         "validator": "^13.5.2",
