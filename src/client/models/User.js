@@ -12,6 +12,14 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
     /** @type {ClientModel | null} */
     editingModel = null;
 
+    getAvatar() {
+        return {
+            type: "component",
+            name: "account-icon",
+            title: window.vm.$t("user")
+        };
+    }
+
     @CommonClientUser.action("delete", { type: "component", name: "delete-icon" }, (instance) => instance !== window.activeUser)
     async delete() {
         const result = await ApiClient.delete(`/users/${this._id}`);

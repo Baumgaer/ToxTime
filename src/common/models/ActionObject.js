@@ -35,6 +35,10 @@ export function ActionObjectMixinClass(MixinClass) {
                 autopopulate: true
             }
         };
+
+        getSubObjects() {
+            return [this.sceneObject];
+        }
     }
     return ActionObject;
 }

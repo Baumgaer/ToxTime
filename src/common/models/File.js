@@ -37,12 +37,6 @@ export function FileMixinClass(MixinClass) {
         getName(preferredField) {
             return `${this[preferredField] || this.name}`;
         }
-
-        getAvatar() {
-            if (this.mime && this.mime.startsWith("image")) {
-                return { type: "image", name: `/files/${this._id}/avatar` };
-            } else return { type: "component", name: "file-document-icon" };
-        }
     }
     return File;
 }

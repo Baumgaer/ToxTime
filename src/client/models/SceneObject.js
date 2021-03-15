@@ -5,11 +5,12 @@ const CommonSceneObjectRequisite = SceneObjectMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class SceneObject extends CommonSceneObjectRequisite {
 
     getAvatar(forceIcon) {
-        if (!forceIcon && this._id && !this.isCreatingAvatar) return super.getAvatar();
-        return {
+        const value = { title: window.vm.$t('sceneObject') };
+        if (!forceIcon && this._id && !this.isCreatingAvatar) return Object.assign(super.getAvatar(), value);
+        return Object.assign({
             type: "component",
             name: "ufo-icon"
-        };
+        }, value);
     }
 
     @CommonSceneObjectRequisite.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)

@@ -1,8 +1,8 @@
 <template>
-    <section :class="`item ${activeClass}`" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
-        <div class="avatar" v-if="hasAvatar">
+    <section :class="`item ${activeClass} ${model.isSelected ? 'isSelected' : ''}`" draggable @dragstart="onDragStart($event)" @dragend="onDragEnd($event)" ref="itemRoot">
+        <div class="avatar" v-if="hasAvatar" :title="model.getAvatar().title">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
-            <component v-else :is="model.getAvatar().name"></component>
+            <component v-else :is="model.getAvatar().name" :title="model.getAvatar().title"></component>
             <div class="overlayIcons" v-if="overlayIcons">
                 <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
             </div>
@@ -20,7 +20,7 @@
                 />
                 <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
             </div>
-            <div class="actions">
+            <div class="actions" v-if="!compactMode">
                 <div v-for="action of model.actions" :key="`${model._id || model._dummyId}${action.name}`" class="action">
                     <Button  v-if="action.symbol.type === 'component' && action.condition" class="action" :name="action.name" :showLabel="false" @click="action.func()">
                         <component :is="action.symbol.name"></component>
@@ -30,23 +30,13 @@
         </div>
         <ProgressBar :model="model" class="progressBar" />
         <div class="subObjects">
-            <div v-for="(subObject, index) of model.getSubObjects()" :key="index" :class="`subObject ${subObject.isSelected ? 'isSelected' : ''}`">
-                <div class="avatar" v-if="subObject.getAvatar && subObject.getAvatar(true).type === 'component'">
-                    <component :is="subObject.getAvatar(true).name"></component>
-                </div>
-                <div class="info" v-if="subObject.getName">
-                    <div class="name">
-                        <input
-                            type="text" name="name"
-                            ref="nameInput"
-                            :value="subObject.getName() ? subObject.getName() : $t('unnamed')"
-                            @change="onNameChange($event, subObject)"
-                            @mousedown="onMouseDown($event)"
-                            @mouseup="onMouseUp($event)"
-                        />
-                    </div>
-                </div>
-            </div>
+            <item-component
+                v-for="(subObject, index) of model.getSubObjects()"
+                :key="index"
+                :model="subObject"
+                :nameEditDBField="['User', 'SystemUser'].includes(subObject.className) ? 'email' : 'name'"
+                :compactMode="true"
+            />
         </div>
     </section>
 </template>
@@ -57,6 +47,7 @@ import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
 
 export default {
+    name: "item-component",
     components: {
         Button,
         ProgressBar
@@ -67,7 +58,8 @@ export default {
             required: true
         },
         nameEditDBField: String,
-        overlayIcons: String
+        overlayIcons: String,
+        compactMode: Boolean
     },
     computed: {
         hasAvatar() {

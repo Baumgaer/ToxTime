@@ -77,13 +77,6 @@ export function UserMixinClass(MixinClass) {
         getName(preferredField) {
             return `${this[preferredField] || this.email}`;
         }
-
-        getAvatar() {
-            return {
-                type: "component",
-                name: "account-icon"
-            };
-        }
     }
     return User;
 }

@@ -7,7 +7,8 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
     getAvatar() {
         return {
             type: "component",
-            name: "ufo-icon"
+            name: "ufo-icon",
+            title: window.vm.$t('actionObject')
         };
     }
 

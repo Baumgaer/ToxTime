@@ -20,6 +20,14 @@
     &:hover {
         background-color: var(--gray-color, @gray);
         opacity: 1 !important;
+
+        .subObjects {
+            .item {
+                .subObjects {
+                    border-left: 1px dotted @dark;
+                }
+            }
+        }
     }
 
     &.active {
@@ -27,6 +35,24 @@
 
         &:hover {
             background-color: var(--info-color, @infoColor);
+        }
+
+        .subObjects {
+            .item {
+                &:hover {
+                    background-color: var(--info-color, @infoColor)
+                }
+            }
+        }
+    }
+
+    &.isSelected {
+        color: var(--black-color, @black) !important;
+
+        .name {
+            input {
+                color: var(--black-color, @black) !important;
+            }
         }
     }
 
@@ -114,44 +140,36 @@
 
     .subObjects {
         grid-column: auto / span 2;
+        padding-left: 10px;
 
-        .subObject {
-            width: 100%;
-            height: @halfHeight;
-            border-top: 1px dashed var(--gray-color, @gray);
-
-            &.isSelected {
-                color: var(--black-color, @black) !important;
-
-                .name {
-                    input {
-                        color: var(--black-color, @black) !important;
-                    }
-                }
-            }
+        .item {
+            grid-template-columns: @halfHeight 1fr;
+            grid-template-rows: @halfHeight;
+            grid-template-areas: "avatar info" "avatar info";
+            border: none;
 
             .avatar {
-                .avatar;
-                display: inline-block;
-                vertical-align: middle;
-                height: @halfHeight;
-                width: @height;
-                text-align: center;
                 line-height: @halfHeight;
                 font-size: 12px;
+
+                > div.overlayIcons {
+                    font-size: 8px;
+                    width: calc(@halfHeight - 10px);
+                }
+
+                > div {
+                    margin: 3px;
+                }
             }
 
             .info {
-                .info;
-                display: inline-block;
-                vertical-align: middle;
-                width: calc(100% - @height);
-
-                .name {
-                    input {
-                        font-weight: normal;
-                    }
+                input {
+                    font-weight: normal;
                 }
+            }
+
+            .subObjects {
+                border-left: 1px dotted @gray;
             }
         }
     }

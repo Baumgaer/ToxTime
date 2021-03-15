@@ -7,7 +7,8 @@ export default GameObject.RawClass.buildClientExport(class ClickArea extends Com
     getAvatar() {
         return {
             type: "component",
-            name: "cursor-default-click-icon"
+            name: "cursor-default-click-icon",
+            title: window.vm.$t('clickArea')
         };
     }
 

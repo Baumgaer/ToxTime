@@ -10,6 +10,13 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
     loadingStatus = 0;
     formData = new FormData();
 
+    getAvatar() {
+        const value = { title: window.vm.$t("file") };
+        if (this.mime && this.mime.startsWith("image")) {
+            return Object.assign(value, { type: "image", name: `/files/${this._id}/avatar` });
+        } else return Object.assign(value, { type: "component", name: "file-document-icon" });
+    }
+
     @CommonClientFile.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
     async delete() {
         if (this._xhr) return this._xhr.abort();

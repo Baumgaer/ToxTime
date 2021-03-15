@@ -7,11 +7,12 @@ const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
 
     getAvatar() {
-        if (this._id && this.scenes[0]) return this.scenes[0].getAvatar();
-        return {
+        const value = { title: window.vm.$t("lesson") };
+        if (this._id && this.scenes[0]) return Object.assign(this.scenes[0].getAvatar(), value);
+        return Object.assign({
             type: "component",
             name: "school-icon"
-        };
+        }, value);
     }
 
     @CommonClientLesson.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
