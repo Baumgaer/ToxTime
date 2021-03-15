@@ -9,9 +9,6 @@
     display: grid;
     border-bottom: 1px solid var(--gray-color, @gray);
 
-    content-visibility: auto;
-    contain-intrinsic-size: 345px 52px;
-
     grid-template-columns: @height 1fr;
     grid-template-rows: @height;
     grid-template-areas: "avatar info" "avatar info";
@@ -182,6 +179,7 @@
         grid-column: auto / span 2;
         padding-left: 10px;
         max-height: 0px;
+        overflow: hidden;
         transition: max-height 0.5s ease-in-out;
 
         &.opened {
