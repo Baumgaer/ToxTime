@@ -6,8 +6,8 @@
         @dragend="onDragEnd($event)"
         ref="itemRoot"
     >
-        <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" />
-        <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" />
+        <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
+        <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <div class="avatar" v-if="hasAvatar" :title="model.getAvatar().title">
             <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
             <component v-else :is="model.getAvatar().name" :title="model.getAvatar().title"></component>
