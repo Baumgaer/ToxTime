@@ -46,6 +46,7 @@ import ContentCopyIcon from "vue-material-design-icons/ContentCopy";
 import PlayIcon from "vue-material-design-icons/Play";
 import MenuRightIcon from "vue-material-design-icons/MenuRight";
 import MenuDownIcon from "vue-material-design-icons/MenuDown";
+import MovieOpenIcon from "vue-material-design-icons/MovieOpen";
 
 if (Object.keys(window.userInformation).length) {
     ApiClient.handleModels(window.userInformation);
@@ -91,3 +92,4 @@ Vue.component('content-copy-icon', ContentCopyIcon);
 Vue.component('play-icon', PlayIcon);
 Vue.component('menu-right-icon', MenuRightIcon);
 Vue.component('menu-down-icon', MenuDownIcon);
+Vue.component('movie-open-icon', MovieOpenIcon);
