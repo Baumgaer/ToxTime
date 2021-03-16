@@ -134,7 +134,7 @@ export default {
                 interactive: true,
                 plugins: [sticky, animateFill],
                 zIndex: 10,
-                delay: [1000, 250],
+                delay: [1000, 0],
                 onShow: this.onShow.bind(this),
                 showOnCreate: this.autoCreate,
                 onHide: this.onHide.bind(this),
