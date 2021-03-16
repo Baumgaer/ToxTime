@@ -4,6 +4,7 @@
         draggable
         @dragstart="onDragStart($event)"
         @dragend="onDragEnd($event)"
+        @mouseenter="onMouseEnter"
         ref="itemRoot"
     >
         <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
@@ -47,6 +48,13 @@
                 :compactMode="true"
             />
         </div>
+        <Tooltip v-if="tooltipCreated"
+                 :model="model"
+                 :nameEditDBField="nameEditDBField"
+                 :overlayIcons="overlayIcons"
+                 :autoCreate="true"
+                 ref="tooltip"
+        />
     </section>
 </template>
 
@@ -54,12 +62,14 @@
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
+import Tooltip from "~client/components/tooltip";
 
 export default {
     name: "item-component",
     components: {
         Button,
-        ProgressBar
+        ProgressBar,
+        Tooltip
     },
     props: {
         model: {
@@ -73,7 +83,8 @@ export default {
     data() {
         this.isItem = true;
         return {
-            opened: true
+            opened: true,
+            tooltipCreated: false
         };
     },
     computed: {
@@ -97,6 +108,10 @@ export default {
         }
     },
     methods: {
+        onMouseEnter() {
+            this.tooltipCreated = true;
+        },
+
         onExpandCollapseButtonClick() {
             this.opened = !this.opened;
         },

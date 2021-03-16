@@ -1,0 +1,121 @@
+@import (less) "variables.less";
+.tooltip {
+
+    @height: 150px;
+
+    display: none;
+    grid-template-columns: @height 1fr 25px;
+    grid-template-rows: 25px calc(@height - 25px) minmax(min-content, max-content) minmax(min-content, max-content);
+    grid-template-areas: "avatar name closeButton"
+                         "avatar info info"
+                         "menu info info"
+                         "labels labels labels";
+
+    .closeButton {
+        grid-area: closeButton;
+
+        line-height: 25px;
+        text-align: center;
+        font-size: 16px;
+        transition: background-color 0.5s ease-in-out;
+        cursor: pointer;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: @infoColor;
+        }
+
+        &.active {
+            background-color: @infoColor;
+        }
+    }
+
+    .avatar {
+        grid-area: avatar;
+        text-align: center;
+        line-height: @height;
+        font-size: @height;
+
+        svg {
+            bottom: 0;
+        }
+
+        > div.overlayIcons {
+            position: absolute;
+            top: calc((@height / 2) - 10px);
+            text-align: right;
+            font-size: calc(@height / 3);
+            color: @warningColor;
+            width: calc(@height - 10px);
+
+            > span {
+                margin: 2px;
+            }
+        }
+
+        > div {
+            height: @height;
+            width: @height;
+            background-size: contain;
+            background-position: top center;
+            background-repeat: no-repeat;
+        }
+    }
+
+    .name {
+        grid-area: name;
+        margin-left: 10px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        input {
+            width: calc(100% - 10px);
+            background-color: transparent;
+            border: none;
+            color: var(--white-color, @white);
+            font-weight: bold;
+            font-size: 16px;
+
+            &:hover {
+                background-color: var(--white-color, fade(@white, 30%));
+            }
+
+            &:focus {
+                user-select: none;
+                outline: none;
+                background-color: var(--white-color, @white);
+                color: var(--black-color, @black);
+            }
+        }
+    }
+
+    .info {
+        grid-area: info;
+        margin-left: 10px;
+
+        display: grid;
+        grid-template-columns: minmax(min-content, max-content) 1fr;
+        grid-template-rows: repeat(3, minmax(min-content, max-content));
+
+        > div {
+            margin: 5px 0;
+        }
+        .left {
+            margin-right: 10px;
+            text-align: right;
+            font-weight: bold;
+
+            &::after {
+                content: ":";
+                font-weight: bold;
+            }
+        }
+
+    }
+
+    .labels {
+        grid-area: labels;
+    }
+}

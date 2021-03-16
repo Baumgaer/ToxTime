@@ -24,4 +24,26 @@ body {
     .success {
         border: 2px solid var(--success-color, @successColor);
     }
+
+    [data-tippy-root] {
+        max-width: 500px;
+
+        .tippy-box {
+            max-width: none !important;
+
+            .tooltip {
+                display: grid;
+            }
+
+            .tippy-backdrop {
+                width: 200%;
+                background-color: @primaryColor;
+
+                &[data-state=hidden]{
+                    transform: scale(1) translate(-50%,-50%);
+                    opacity: 1;
+                }
+            }
+        }
+    }
 }
