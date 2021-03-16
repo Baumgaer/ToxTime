@@ -138,7 +138,8 @@ export default {
                 onShow: this.onShow.bind(this),
                 showOnCreate: this.autoCreate,
                 onHide: this.onHide.bind(this),
-                hideOnClick: false
+                hideOnClick: false,
+                trigger: "mouseenter mouseover focus"
             });
         },
 

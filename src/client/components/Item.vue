@@ -5,6 +5,7 @@
         @dragstart="onDragStart($event)"
         @dragend="onDragEnd($event)"
         @mouseenter="onMouseEnter"
+        @mouseover.stop
         ref="itemRoot"
     >
         <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
