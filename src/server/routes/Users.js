@@ -79,7 +79,7 @@ export default class Users extends ApiRoute {
             if (!result) return httpErrors.NotFound();
             result.isActive = !result.isActive;
             await result.save();
-            return { models: [result] };
+            return result;
         } catch (error) {
             return error;
         }

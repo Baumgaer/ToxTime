@@ -15,7 +15,7 @@ export default class Files extends ApiRoute {
      *
      * @param {import("express").Request} request the request
      * @param {import("express").Response} response the response
-     * @returns {Promise<{models: [User["Model"]]} | Error>}
+     * @returns {Promise<{User["Model"]} | Error>}
      * @memberof Files
      */
     @Files.get("/:id/avatar", { allowUser: true })

@@ -37,8 +37,8 @@ export function ActionObjectMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            return [this.sceneObject];
-            //return this.sceneObject.getSubObjects();
+            //return [this.sceneObject];
+            return this.sceneObject.getSubObjects();
         }
     }
     return ActionObject;
