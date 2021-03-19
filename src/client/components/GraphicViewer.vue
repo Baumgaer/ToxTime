@@ -191,11 +191,8 @@ export default {
 
             if (args) {
                 paper.view.scale(1 + (args.delta.width / window.innerWidth));
-                paper.view.translate(paper.view.center.subtract(paper.view.background.position));
-            } else {
-                paper.view.scale(paper.view.viewSize.width / background.size.width);
-                background.position = paper.view.center;
-            }
+            } else paper.view.scale(paper.view.viewSize.width / background.size.width);
+            paper.view.translate(paper.view.center.subtract(paper.view.background.position));
         },
 
         /**
