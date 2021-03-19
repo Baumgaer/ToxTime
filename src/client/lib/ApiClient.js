@@ -112,12 +112,12 @@ export default class ApiClient {
         }
 
         if (response.status === 404) {
-            window.vm.$toasted.error(window.vm.$t("notFound"), { className: "errorToaster" });
+            window.$toasted.error(window.$t("notFound"), { className: "errorToaster" });
         } else if (!error.name && error.message) {
-            window.vm.$toasted.error(error.message, { className: "errorToaster" });
+            window.$toasted.error(error.message, { className: "errorToaster" });
         } else if (!error.name && !error.message) {
-            window.vm.$toasted.error("unknownError", { className: "errorToaster" });
-        } else window.vm.$toasted.error(window.vm.$t(error.name), { className: "errorToaster" });
+            window.$toasted.error("unknownError", { className: "errorToaster" });
+        } else window.$toasted.error(window.$t(error.name), { className: "errorToaster" });
 
         return error;
     }

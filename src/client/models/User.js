@@ -16,7 +16,7 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         return {
             type: "component",
             name: "account-icon",
-            title: window.vm.$t("user")
+            title: window.$t("user")
         };
     }
 

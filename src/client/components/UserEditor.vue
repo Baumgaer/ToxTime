@@ -90,17 +90,17 @@ export default {
             if (hasChanges || this.savedForDestroy.isNew()) {
                 const result = await this.savedForDestroy.save();
                 if (!result || result instanceof Error) return;
-                this.$toasted.success(window.vm.$t("saved", { name: this.savedForDestroy.getName() }), { className: "successToaster" });
+                this.$toasted.success(this.$t("saved", { name: this.savedForDestroy.getName() }), { className: "successToaster" });
             }
         } else {
             if (!this.savedForDestroy.isNew()) {
                 if (hasChanges) {
-                    this.$toasted.info(window.vm.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
+                    this.$toasted.info(this.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
                     this.savedForDestroy.discardDeep();
                 }
             } else {
                 this.savedForDestroy.destroy();
-                this.$toasted.info(window.vm.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
+                this.$toasted.info(this.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
             }
         }
     },
@@ -133,7 +133,7 @@ export default {
             // Check if new password was filled
             if (!this.$refs.newPassword.value) {
                 this.$refs.newPassword.classList.add("fail");
-                this.$toasted.error(window.vm.$t("passwordNotFilled"), { className: "errorToaster" });
+                this.$toasted.error(this.$t("passwordNotFilled"), { className: "errorToaster" });
                 return;
             }
 
@@ -141,7 +141,7 @@ export default {
             if (this.$refs.newPassword.value !== this.$refs.repeatPassword.value) {
                 this.$refs.newPassword.classList.add("fail");
                 this.$refs.repeatPassword.classList.add("fail");
-                this.$toasted.error(window.vm.$t("passwordsNotEqual"), { className: "errorToaster" });
+                this.$toasted.error(this.$t("passwordsNotEqual"), { className: "errorToaster" });
                 return;
             }
 
@@ -154,21 +154,21 @@ export default {
 
             if (passwordResult instanceof Error) {
                 if (passwordResult.field) this.$refs[passwordResult.field].classList.add("fail");
-                this.$toasted.error(window.vm.$t(passwordResult.name), { className: "errorToaster" });
+                this.$toasted.error(this.$t(passwordResult.name), { className: "errorToaster" });
                 return;
             }
 
-            this.$toasted.success(window.vm.$t("saved", { name: i18n.t('password') }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: i18n.t('password') }), { className: "successToaster" });
         },
 
         async onSettingsChange() {
             const changeResult = await this.model.save();
             if (changeResult instanceof Error) {
                 if (changeResult.field) this.$refs[changeResult.field].classList.add("fail");
-                this.$toasted.error(window.vm.$t(changeResult.name), { className: "errorToaster" });
+                this.$toasted.error(this.$t(changeResult.name), { className: "errorToaster" });
                 return;
             }
-            this.$toasted.success(window.vm.$t("saved", { name: i18n.t('settings') }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: i18n.t('settings') }), { className: "successToaster" });
         },
 
         onToggleSwitched(name) {

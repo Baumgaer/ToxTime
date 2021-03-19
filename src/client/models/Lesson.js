@@ -7,7 +7,7 @@ const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
 
     getAvatar() {
-        const value = { title: window.vm.$t("lesson") };
+        const value = { title: window.$t("lesson") };
         if (this._id && this.scenes[0]) return Object.assign(this.scenes[0].getAvatar(), value);
         return Object.assign({
             type: "component",
@@ -32,7 +32,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
     @CommonClientLesson.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)
     copy() {
         ApiClient.post(`/${this.collection}/copy/${this._id}`, {
-            name: `${window.vm.$t("copyOf")} ${this.getName()}`
+            name: `${window.$t("copyOf")} ${this.getName()}`
         });
     }
 

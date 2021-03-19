@@ -5,7 +5,7 @@ const CommonSceneObjectRequisite = SceneObjectMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class SceneObject extends CommonSceneObjectRequisite {
 
     getAvatar(forceIcon) {
-        const value = { title: window.vm.$t('sceneObject') };
+        const value = { title: window.$t('sceneObject') };
         if (!forceIcon && this._id && !this.isCreatingAvatar) return Object.assign(super.getAvatar(), value);
         return Object.assign({
             type: "component",

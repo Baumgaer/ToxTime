@@ -8,7 +8,10 @@
 import "vue-material-design-icons/styles.css";
 
 export default {
-    name: "App"
+    name: "App",
+    beforeCreate() {
+        window.$t = this.$t.bind(this);
+    }
 };
 </script>
 

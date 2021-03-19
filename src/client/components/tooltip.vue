@@ -114,7 +114,7 @@ export default {
             model[this.nameEditDBField] = event.target.value;
             const result = await model.save();
             if (result instanceof Error) return;
-            this.$toasted.success(window.vm.$t("saved", { name: model.getName() }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: model.getName() }), { className: "successToaster" });
         },
 
         onHide() {

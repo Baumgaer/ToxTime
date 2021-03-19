@@ -8,7 +8,7 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
         return {
             type: "component",
             name: "movie-open-icon",
-            title: window.vm.$t('actionObject')
+            title: window.$t('actionObject')
         };
     }
 

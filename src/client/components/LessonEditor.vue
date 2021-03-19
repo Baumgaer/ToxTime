@@ -70,17 +70,17 @@ export default {
             if (hasChanges || this.model.isNew()) {
                 const result = await this.model.save();
                 if (!result || result instanceof Error) return;
-                this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+                this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
             }
         } else {
             if (!this.model.isNew()) {
                 if (hasChanges) {
-                    this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                    this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
                     this.model.discardDeep();
                 }
             } else {
                 this.model.destroy();
-                this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
             }
         }
     },
@@ -93,7 +93,7 @@ export default {
         async onSaveButtonClick() {
             const result = await this.model.save();
             if (!result || result instanceof Error) return;
-            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
 
         /**

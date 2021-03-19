@@ -82,8 +82,8 @@ export default {
             if (this.saveTimeout) clearTimeout(this.saveTimeout);
             const result = await this.model.save();
             if (result instanceof Error) {
-                this.$toasted.error(window.vm.$t("errorWhileSaving", { name: this.model.getName() }), { className: "errorToaster" });
-            } else if (result) this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+                this.$toasted.error(this.$t("errorWhileSaving", { name: this.model.getName() }), { className: "errorToaster" });
+            } else if (result) this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onSceneClick(event, item, model) {

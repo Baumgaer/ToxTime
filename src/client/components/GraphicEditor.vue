@@ -77,19 +77,19 @@ export default {
                     paper.project.clear();
                     return;
                 }
-                this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+                this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
                 this.createAvatar();
                 paper.project.clear();
             }
         } else {
             if (!this.model.isNew()) {
                 if (hasChanges) {
-                    this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                    this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
                     this.model.discardDeep();
                 }
             } else {
                 this.model.destroy();
-                this.$toasted.info(window.vm.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
+                this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
             }
             paper.project.clear();
         }
@@ -138,7 +138,7 @@ export default {
             const result = await this.model.save();
             if (result instanceof Error) return;
             this.createAvatar();
-            this.$toasted.success(window.vm.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
 
         setTool(toolName) {
