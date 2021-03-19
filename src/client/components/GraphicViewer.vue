@@ -20,7 +20,7 @@
 <script>
 import GameObject from "~client/models/GameObject";
 import PolyClickArea from "~client/lib/PolyClickArea";
-import { difference } from "~common/utils";
+import { difference, capitalize } from "~common/utils";
 
 import paper from "paper";
 
@@ -188,10 +188,17 @@ export default {
             await this.initialBackgroundLoadedPromise;
             const paper = this.paper;
             const background = this.paper.view.background;
+            const surroundingElement = this.$parent.$parent.$el;
+
+            const diffHeight = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetHeight - background.size.height));
+            const diffWidth = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetWidth - background.size.width));
+
+            let direction = "width";
+            if (diffHeight < diffWidth) direction = "height";
 
             if (args) {
-                paper.view.scale(1 + (args.delta.width / window.innerWidth));
-            } else paper.view.scale(paper.view.viewSize.width / background.size.width);
+                paper.view.scale(1 + (args.delta[direction] / surroundingElement[`offset${capitalize(direction)}`]));
+            } else paper.view.scale(paper.view.viewSize[direction] / background.size[direction]);
             paper.view.translate(paper.view.center.subtract(paper.view.background.position));
         },
 
