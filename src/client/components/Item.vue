@@ -63,7 +63,7 @@
 import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
-import Tooltip from "~client/components/tooltip";
+import Tooltip from "~client/components/Tooltip";
 
 export default {
     name: "item-component",
