@@ -1,6 +1,6 @@
 <template>
     <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
-        <EditorHead ref="editorHead" name="addLesson" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
+        <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section class="editorBody">
             <h3>{{ $t("scenes") }}</h3>
             <section class="scenes">
@@ -62,27 +62,6 @@ import SceneObject from "~client/models/SceneObject";
 export default {
     components: {
         EditorHead
-    },
-    async beforeDestroy() {
-        const hasChanges = this.model.hasChangesDeep();
-        if (!this.$refs.editorHead.closeButtonClicked) {
-            // Cases editor was closed unexpected
-            if (hasChanges || this.model.isNew()) {
-                const result = await this.model.save();
-                if (!result || result instanceof Error) return;
-                this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
-            }
-        } else {
-            if (!this.model.isNew()) {
-                if (hasChanges) {
-                    this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-                    this.model.discardDeep();
-                }
-            } else {
-                this.model.destroy();
-                this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-            }
-        }
     },
     data() {
         return {

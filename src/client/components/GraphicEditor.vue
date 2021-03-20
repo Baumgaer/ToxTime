@@ -1,6 +1,13 @@
 <template>
     <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
-        <EditorHead ref="editorHead" :name="`add${type.charAt(0).toUpperCase() + type.slice(1)}`" :onSaveButtonClick="onSaveButtonClick.bind(this)" >
+        <EditorHead
+            ref="editorHead"
+            :model="model"
+            :name="`add${type.charAt(0).toUpperCase() + type.slice(1)}`"
+            :onSaveButtonClick="onSaveButtonClick.bind(this)"
+            @discarded="onDiscard"
+            @saved="onSave"
+        >
             <Button name="move" :showLabel="false" :active="currentTool && currentTool.name === 'move'" @click="setTool('move')">
                 <hand-left-icon />
             </Button>
@@ -63,37 +70,6 @@ export default {
             }
         };
     },
-    async beforeDestroy() {
-        const paper = this.$refs.graphicViewer.paper;
-
-        if (this.currentTool) this.currentTool.remove();
-        const hasChanges = this.model.hasChangesDeep();
-        if (!this.$refs.editorHead.closeButtonClicked) {
-            // Cases editor was closed unexpected
-            if (hasChanges || this.model.isNew()) {
-                const result = await this.model.save();
-                if (!result) return;
-                if (result instanceof Error) {
-                    paper.project.clear();
-                    return;
-                }
-                this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
-                this.createAvatar();
-                paper.project.clear();
-            }
-        } else {
-            if (!this.model.isNew()) {
-                if (hasChanges) {
-                    this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-                    this.model.discardDeep();
-                }
-            } else {
-                this.model.destroy();
-                this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
-            }
-            paper.project.clear();
-        }
-    },
     methods: {
         /**
          * @param {DragEvent} event
@@ -139,6 +115,17 @@ export default {
             if (result instanceof Error) return;
             this.createAvatar();
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+        },
+
+        async onSave() {
+            const paper = this.$refs.graphicViewer.paper;
+            await this.createAvatar();
+            paper.project.clear();
+        },
+
+        onDiscard() {
+            const paper = this.$refs.graphicViewer.paper;
+            paper.project.clear();
         },
 
         setTool(toolName) {

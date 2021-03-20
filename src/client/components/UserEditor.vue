@@ -1,6 +1,6 @@
 <template>
     <div class="userEditor">
-        <EditorHead ref="editorHead" name="settings" :onSaveButtonClick="onSaveButtonClick.bind(this)" @closeButtonClick="$emit('closeButtonClick')" />
+        <EditorHead ref="editorHead" name="settings" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" @closeButtonClick="$emit('closeButtonClick')" />
         <section class="editorBody">
             <h3>{{ $t('general') }}</h3>
             <section class="general">
@@ -82,27 +82,6 @@ export default {
     },
     mounted() {
         this.savedForDestroy = this.model;
-    },
-    async beforeDestroy() {
-        const hasChanges = this.savedForDestroy.hasChangesDeep();
-        if (!this.$refs.editorHead.closeButtonClicked) {
-            // Cases editor was closed unexpected
-            if (hasChanges || this.savedForDestroy.isNew()) {
-                const result = await this.savedForDestroy.save();
-                if (!result || result instanceof Error) return;
-                this.$toasted.success(this.$t("saved", { name: this.savedForDestroy.getName() }), { className: "successToaster" });
-            }
-        } else {
-            if (!this.savedForDestroy.isNew()) {
-                if (hasChanges) {
-                    this.$toasted.info(this.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
-                    this.savedForDestroy.discardDeep();
-                }
-            } else {
-                this.savedForDestroy.destroy();
-                this.$toasted.info(this.$t("discarded", { name: this.savedForDestroy.getName() }), { className: "infoToaster" });
-            }
-        }
     },
     methods: {
         changePassword() {
