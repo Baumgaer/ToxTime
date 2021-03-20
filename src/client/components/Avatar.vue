@@ -1,9 +1,14 @@
 <template>
-    <div class="avatar" v-if="hasAvatar" :title="model.getAvatar().title">
-        <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
-        <component v-else :is="model.getAvatar().name" :title="model.getAvatar().title"></component>
-        <div class="overlayIcons" v-if="overlayIcons">
-            <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
+    <div class="avatar" v-on="$listeners">
+        <div class="ratio" v-if="hasAvatar" :title="avatar.title" ref="ratio">
+            <div v-if="hasImageAvatar" class="picture" :style="`background-image: url(${avatar.name});${fitImage ? 'background-size: contain;' : ''}`"></div>
+            <component v-else :is="avatar.name" class="picture" :title="avatar.title"></component>
+            <div class="overlayIcons" v-if="overlayIcons">
+                <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
+            </div>
+        </div>
+        <div class="slot">
+            <slot></slot>
         </div>
     </div>
 </template>
@@ -17,11 +22,31 @@ export default {
             type: ClientModel,
             required: true
         },
-        overlayIcons: String
+        overlayIcons: String,
+        fitImage: {
+            type: Boolean,
+            default: false
+        },
+        ratio: {
+            type: String,
+            default: "auto",
+            validator(value) {
+                if (value === "auto") return true;
+                if (value.match(/:/g).length === 1) {
+                    const ratioValues = value.split(":");
+                    if (ratioValues.length === 2 && ratioValues[0]) return true;
+                }
+                return false;
+            }
+        }
     },
     computed: {
+        avatar() {
+            return this.model.getAvatar();
+        },
+
         hasAvatar() {
-            return Boolean(this.model.getAvatar());
+            return Boolean(this.avatar);
         },
 
         hasImageAvatar() {
@@ -29,6 +54,36 @@ export default {
             if (!avatarData) return false;
             if (avatarData.type === "image") return true;
             return false;
+        }
+    },
+    mounted() {
+        this.determineRatioType();
+        this.setFontSize();
+    },
+    methods: {
+        determineRatioType() {
+            if (this.ratio !== "auto") {
+                this.setGivenRatio();
+            } else this.setAutoRatio();
+        },
+
+        setGivenRatio() {
+            const [left, right] = this.ratio.split(":");
+            this.$refs.ratio.style.setProperty("padding-top", `${(parseInt(right) / parseInt(left)) * 100}%`);
+        },
+
+        setAutoRatio() {
+            if (!this.hasAvatar || !this.hasImageAvatar) return;
+            const image = new Image();
+            const that = this;
+            image.onload = function() {
+                that.$refs.ratio.style.setProperty("padding-top", `${(parseInt(this.height) / parseInt(this.width)) * 100}%`);
+            };
+            image.src = this.avatar.name;
+        },
+
+        setFontSize() {
+            if (this.$el.offsetWidth) this.$el.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
         }
     }
 };

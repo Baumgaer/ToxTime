@@ -59,7 +59,7 @@
         .subObjects {
             .item {
                 &:hover {
-                    background-color: var(--info-color, @infoColor)
+                    background-color: var(--info-color, @infoColor);
                 }
             }
         }
@@ -110,31 +110,6 @@
 
     .avatar {
         grid-area: avatar;
-        text-align: center;
-        line-height: @height;
-        font-size: 24px;
-
-        > div.overlayIcons {
-            position: absolute;
-            bottom: 0;
-            text-align: right;
-            font-size: 16px;
-            color: var(--primary-color, @warningColor);
-            width: calc(@height - 10px);
-
-            > span {
-                margin: 2px;
-            }
-        }
-
-        > div {
-            height: 75%;
-            width: 75%;
-            margin: 6px;
-            background-size: contain;
-            background-position: center center;
-            background-repeat: no-repeat;
-        }
     }
 
     .info {
@@ -200,20 +175,6 @@
             grid-template-rows: @halfHeight;
             grid-template-areas: "avatar info" "avatar info";
             border: none;
-
-            .avatar {
-                line-height: @halfHeight;
-                font-size: 12px;
-
-                > div.overlayIcons {
-                    font-size: 8px;
-                    width: calc(@halfHeight - 10px);
-                }
-
-                > div {
-                    margin: 3px;
-                }
-            }
 
             .info {
                 input {

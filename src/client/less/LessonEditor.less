@@ -25,26 +25,17 @@
             user-select: none;
         }
 
-        .scenes,
-        .inventory {
+        .itemList {
             padding-left: 5px;
-            .scene,
-            .inventoryItem {
+
+            .avatar {
                 display: inline-block;
                 position: relative;
-                box-sizing: border-box;
                 background-image: url("~client/assets/transparentBackgroundIndicator.png");
                 cursor: grab;
                 width: calc(20% - 10px);
                 min-width: 150px;
                 max-width: 250px;
-                margin: 5px;
-
-                &::before {
-                    content: "";
-                    float: left;
-                    margin-top: 100%; /* initial ratio of 1:1*/
-                }
 
                 &.leftDropTarget {
                     border-left: 2px solid var(--primary-color, @primaryColor);
@@ -52,19 +43,6 @@
 
                 &.rightDropTarget {
                     border-right: 2px solid var(--primary-color, @primaryColor);
-                }
-
-                .scenePicture,
-                .itemPicture {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    right: 0;
-
-                    background-position: center center;
-                    background-size: cover;
-                    background-repeat: no-repeat;
                 }
 
                 .closeIcon {

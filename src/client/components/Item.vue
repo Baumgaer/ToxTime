@@ -10,13 +10,7 @@
     >
         <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
-        <div class="avatar" v-if="hasAvatar" :title="model.getAvatar().title">
-            <div v-if="hasImageAvatar" :style="`background-image: url(${model.getAvatar().name})`"></div>
-            <component v-else :is="model.getAvatar().name" :title="model.getAvatar().title"></component>
-            <div class="overlayIcons" v-if="overlayIcons">
-                <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
-            </div>
-        </div>
+        <Avatar :model="model" ratio="1:1" :fitImage="true" />
         <div class="info">
             <div class="name">
                 <input
@@ -64,13 +58,15 @@ import Button from "~client/components/Button";
 import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
 import Tooltip from "~client/components/Tooltip";
+import Avatar from "~client/components/Avatar";
 
 export default {
     name: "item-component",
     components: {
         Button,
         ProgressBar,
-        Tooltip
+        Tooltip,
+        Avatar
     },
     props: {
         model: {
@@ -91,17 +87,6 @@ export default {
     computed: {
         hasSubObjects() {
             return Boolean(this.model.getSubObjects().length);
-        },
-
-        hasAvatar() {
-            return Boolean(this.model.getAvatar());
-        },
-
-        hasImageAvatar() {
-            const avatarData = this.model.getAvatar();
-            if (!avatarData) return false;
-            if (avatarData.type === "image") return true;
-            return false;
         },
 
         activeClass() {

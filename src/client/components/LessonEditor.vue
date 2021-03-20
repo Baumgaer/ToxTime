@@ -3,40 +3,45 @@
         <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section class="editorBody">
             <h3>{{ $t("scenes") }}</h3>
-            <section class="scenes">
-                <div class="scene"
-                     v-for="(scene, index) of model.scenes"
-                     :key="scene._id"
-                     draggable
-                     @dragstart="onDragStart($event, scene, 'scene')"
-                     @dragend="onDragEnd($event, 'scene')"
-                     @dragover="onDragOver($event, index, 'scene')"
-                     @dragleave="onDragLeave($event, index, 'scene')"
-                     @drop.prevent.stop="onInternalDrop($event, index)"
-                     :ref="`scene${index}`"
+            <section class="itemList">
+                <Avatar
+                    v-for="(scene, index) of model.scenes"
+                    :key="scene._id"
+                    draggable
+                    :model="scene"
+                    ratio="1:1"
+                    @dragstart="onDragStart($event, scene, 'scene')"
+                    @dragend="onDragEnd($event, 'scene')"
+                    @dragover="onDragOver($event, index, 'scene')"
+                    @dragleave="onDragLeave($event, index, 'scene')"
+                    @drop.prevent.stop="onInternalDrop($event, index)"
+                    :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
                     <component :is="'close-icon'" class="closeIcon" @click="onSceneRemoveClick(scene)"/>
                     <div class="name">{{ scene.name }}</div>
-                </div>
+                </Avatar>
             </section>
             <h3>{{ $t("inventory") }}</h3>
-            <section class="inventory">
-                <div class="inventoryItem"
-                     v-for="(item, index) of model.inventory"
-                     :key="item._id"
-                     draggable
-                     @dragstart="onDragStart($event, item, 'item')"
-                     @dragend="onDragEnd($event, 'item')"
-                     @dragover="onDragOver($event, index, 'item')"
-                     @dragleave="onDragLeave($event, index, 'item')"
-                     @drop.prevent.stop="onInternalDrop($event, index)"
-                     :ref="`item${index}`"
+            <section class="itemList">
+                <Avatar
+                    v-for="(item, index) of model.inventory"
+                    :key="item._id"
+                    draggable
+                    :model="item"
+                    ratio="1:1"
+                    :fitImage="true"
+                    @dragstart="onDragStart($event, item, 'item')"
+                    @dragend="onDragEnd($event, 'item')"
+                    @dragover="onDragOver($event, index, 'item')"
+                    @dragleave="onDragLeave($event, index, 'item')"
+                    @drop.prevent.stop="onInternalDrop($event, index)"
+                    :ref="`item${index}`"
                 >
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
                     <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
                     <div class="name">{{ item.name }}</div>
-                </div>
+                </Avatar>
             </section>
             <h3>{{ $t("description") }}</h3>
             <section><textarea-autosize
@@ -55,13 +60,15 @@
 
 <script>
 import EditorHead from "~client/components/EditorHead";
+import Avatar from "~client/components/Avatar";
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
 import SceneObject from "~client/models/SceneObject";
 
 export default {
     components: {
-        EditorHead
+        EditorHead,
+        Avatar
     },
     data() {
         return {
@@ -96,7 +103,7 @@ export default {
             const type = model instanceof Scene.RawClass ? "scene" : "item";
 
             if (typeof index === "number") {
-                const element = this.$refs[`${type}${index}`][0];
+                const element = this.$refs[`${type}${index}`][0].$el;
                 const elementRect = element.getBoundingClientRect();
                 let indexOfDraggedModel = this.model[field].indexOf(model);
 
@@ -149,7 +156,7 @@ export default {
             event.stopPropagation();
 
             /** @type {HTMLElement} */
-            const element = this.$refs[`${type}${index}`][0];
+            const element = this.$refs[`${type}${index}`][0].$el;
             const elementRect = element.getBoundingClientRect();
 
             if (elementRect.x + elementRect.width / 2 > event.clientX) {
@@ -166,7 +173,7 @@ export default {
             event.stopPropagation();
 
             /** @type {HTMLElement} */
-            const element = this.$refs[`${type}${index}`][0];
+            const element = this.$refs[`${type}${index}`][0].$el;
             element.classList.remove("rightDropTarget");
             element.classList.remove("leftDropTarget");
         }

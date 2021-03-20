@@ -1,9 +1,7 @@
 <template>
     <div class="lessonsListItem">
         <div class="avatarWrapper">
-            <div class="avatar">
-                <div class="avatarPicture" :style="`background-image: url(${model.getAvatar().name})`"></div>
-            </div>
+            <Avatar :model="model" :fitImage="true" />
             <Button :name="model.actions.play.name" @click="model.actions.play.func()">
                 <component :is="model.actions.play.symbol.name" />
             </Button>
@@ -28,10 +26,12 @@
 <script>
 import Lesson from "~client/models/Lesson";
 import Button from "~client/components/Button";
+import Avatar from "~client/components/Avatar";
 
 export default {
     components: {
-        Button
+        Button,
+        Avatar
     },
     props: {
         model: {

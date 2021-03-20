@@ -14,27 +14,7 @@
         grid-area: avatar;
 
         .avatar {
-            display: grid;
-            grid-template-columns: 1fr;
-            position: relative;
-
-            &::before {
-                content: "";
-                float: left;
-                margin-top: 100%; /* initial ratio of 1:1*/
-            }
-
-            .avatarPicture {
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-
-                background-position: center center;
-                background-size: cover;
-                background-repeat: no-repeat;
-            }
+            margin: 0;
         }
 
         .button {
