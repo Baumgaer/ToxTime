@@ -41,10 +41,12 @@ export function GameSessionMixinClass(MixinClass) {
             },
             knowledgeBase: {
                 type: [{ type: String }],
+                required: true,
                 default: []
             },
             protocol: {
                 type: [{ type: Schema.Types.Mixed }],
+                required: true,
                 default: []
             }
         };
