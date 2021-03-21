@@ -1,3 +1,5 @@
+import { Schema } from "mongoose";
+
 /**
  * Creates a new class with the returned class extended by the MixinClass
  *
@@ -25,6 +27,11 @@ export function GameObjectMixinClass(MixinClass) {
                 type: Number,
                 required: true,
                 default: 0
+            },
+            labels: {
+                type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
+                required: true,
+                default: []
             }
         };
     }

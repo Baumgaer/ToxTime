@@ -1,4 +1,4 @@
-// import { Schema } from "mongoose";
+import { Schema } from "mongoose";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -31,6 +31,11 @@ export function FileMixinClass(MixinClass) {
             mime: {
                 type: String,
                 required: true
+            },
+            labels: {
+                type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
+                required: true,
+                default: []
             }
         };
 
