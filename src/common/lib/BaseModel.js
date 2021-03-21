@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction, isArray } from "~common/utils";
 
 const globalActions = {};
 global.globalActions = globalActions;
@@ -100,6 +100,42 @@ export default class BaseModel {
 
     getSchemaObject() {
         return Object.getPrototypeOf(this.constructor).getSchemaObject();
+    }
+
+    static getReferencingModelExports() {
+        const referencingModelExports = [];
+        for (const className in global._modelMap) {
+            if (global._modelMap[className].Model) {
+                const modelExport = global._modelMap[className];
+                eachDeep(modelExport.Schema.obj, (value, key, parentValue, context) => {
+                    if (isObjectLike(value) && value.type === Schema.Types.ObjectId && value.ref === this.className) {
+                        if (!referencingModelExports.includes(modelExport)) referencingModelExports.push(modelExport);
+                        context.break();
+                    }
+                }, { checkCircular: true, pathFormat: "array" });
+            }
+        }
+        return referencingModelExports;
+    }
+
+    getReferencingModelExports() {
+        return Object.getPrototypeOf(this.constructor).getReferencingModelExports();
+    }
+
+    static getReferencePathsOf(className) {
+        const referencePaths = [];
+        eachDeep(global._modelMap[this.className].Schema.obj, (value, key, parentValue, context) => {
+            if (isObjectLike(value) && value.type === Schema.Types.ObjectId && value.ref === className) {
+                if (isArray(parentValue)) {
+                    referencePaths.push(context.path.slice(0, -2));
+                } else referencePaths.push(context.path.slice());
+            }
+        }, { checkCircular: true, pathFormat: "array" });
+        return referencePaths;
+    }
+
+    getReferencePathsOf(className) {
+        return Object.getPrototypeOf(this.constructor).getReferencePathsOf(className);
     }
 
     /**

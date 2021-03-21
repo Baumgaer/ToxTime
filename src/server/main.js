@@ -347,5 +347,13 @@ pmx.action('register:user', { comment: "registers a new user" }, async (paramete
     }
 });
 
+const modelMap = { Error };
+const modelContext = require.context("~server/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
+modelContext.keys().forEach((key) => {
+    const staticModel = modelContext(key).default;
+    modelMap[staticModel.Model.className] = staticModel;
+});
+global._modelMap = modelMap;
+
 const server = new WebServer();
 server.start();

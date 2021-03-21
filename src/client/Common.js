@@ -5,6 +5,14 @@ import "~client/less/common.less";
 import Toasted from 'vue-toasted';
 import TextareaAutosize from "vue-textarea-autosize";
 
+const modelMap = { Error };
+const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
+modelContext.keys().forEach((key) => {
+    const staticModel = modelContext(key).default;
+    modelMap[staticModel.Model.className] = staticModel;
+});
+
+window._modelMap = modelMap;
 window._store = ApiClient.store;
 
 Vue.use(TextareaAutosize);
