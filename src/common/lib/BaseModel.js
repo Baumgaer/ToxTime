@@ -17,8 +17,6 @@ export default class BaseModel {
     /** @type {string} The name of the collection where the model will be stored in */
     static collection = "unknown";
 
-    static schemaObject = {}
-
     /** @type {import("mongoose").SchemaDefinition} Contains a part of the model schema. Do NOT mix. This will be happen automatically*/
     static schema = {
         name: {
@@ -96,7 +94,7 @@ export default class BaseModel {
     }
 
     static getSchemaObject() {
-        return this.schemaObject;
+        return global._modelMap[this.className].Schema.obj;
     }
 
     getSchemaObject() {

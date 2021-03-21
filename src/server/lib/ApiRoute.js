@@ -272,7 +272,7 @@ export default class ApiRoute extends DefaultRoute {
                 if (!schemaObj[key].dependant) continue;
                 await this.normalizeItems(request, key, "all", result);
             }
-            return result;
+            return 200;
         } catch (error) {
             return error;
         }

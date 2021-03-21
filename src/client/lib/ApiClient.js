@@ -41,8 +41,10 @@ export default class ApiClient {
         // Errors can be receives as JSON or text, so we have to pass the whole response
         if (response.status >= 400) return this.handleHttpError(response);
 
-        // Models always comes as JSON, so we can safely get the JSON
-        return this.handleModels(await response.json());
+        if (response.headers.get("Content-Type").includes("application/json")) {
+            return this.handleModels(await response.json());
+        }
+        return {};
     }
 
     static upload(method, target, options = {}, additionalHeaders = {}) {
