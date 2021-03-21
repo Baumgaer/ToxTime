@@ -37,7 +37,7 @@
             <div v-if="model.isActive !== undefined" class="left">{{ $t("isActive") }}</div>
             <div v-if="model.isActive !== undefined" class="right">{{ $t(model.isActive.toString()) }}</div>
 
-            <div v-if="model.mime" class="left">{{ $t("mimetype") }}</div>
+            <div v-if="model.mime" class="left">{{ $t("fileType") }}</div>
             <div v-if="model.mime" class="right">{{ model.mime }}</div>
 
             <div v-if="model.size" class="left">{{ $t("fileSize") }}</div>

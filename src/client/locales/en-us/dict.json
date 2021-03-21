@@ -103,5 +103,7 @@
     "description": "Description",
     "difficulty": "Difficulty",
     "play": "Play",
-    "inventory": "Inventory"
+    "inventory": "Inventory",
+    "fileType": "File type",
+    "fileSize": "File size"
 }

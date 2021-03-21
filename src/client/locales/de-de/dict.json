@@ -103,5 +103,7 @@
     "description": "Beschreibung",
     "difficulty": "Schwierigkeitsgrad",
     "play": "Spielen",
-    "inventory": "Inventar"
+    "inventory": "Inventar",
+    "fileType": "Dateityp",
+    "fileSize": "Dateigröße"
 }
