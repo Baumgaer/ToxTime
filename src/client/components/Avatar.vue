@@ -3,7 +3,7 @@
         <div class="ratio" v-if="hasAvatar" :title="avatar.title" ref="ratio">
             <div v-if="hasImageAvatar" class="picture" :style="`background-image: url(${avatar.name});${fitImage ? 'background-size: contain;' : ''}`"></div>
             <component v-else :is="avatar.name" class="picture" :title="avatar.title"></component>
-            <div class="overlayIcons" v-if="overlayIcons">
+            <div class="overlayIcons" v-if="overlayIcons" ref="overlayIcons">
                 <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
             </div>
         </div>
@@ -68,6 +68,7 @@ export default {
         },
 
         setGivenRatio() {
+            if (!this.hasImageAvatar) return;
             const [left, right] = this.ratio.split(":");
             this.$refs.ratio.style.setProperty("padding-top", `${(parseInt(right) / parseInt(left)) * 100}%`);
         },
@@ -84,6 +85,9 @@ export default {
 
         setFontSize() {
             if (this.$el.offsetWidth) this.$el.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
+            if (this.$refs.overlayIcons) {
+                this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$refs.overlayIcons).fontSize) / 40})`);
+            }
         }
     }
 };

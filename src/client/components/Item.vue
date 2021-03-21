@@ -10,7 +10,7 @@
     >
         <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
-        <Avatar :model="model" ratio="1:1" :fitImage="true" />
+        <Avatar :model="model" ratio="1:1" :fitImage="true" :overlayIcons="overlayIcons" />
         <div class="info">
             <div class="name">
                 <input

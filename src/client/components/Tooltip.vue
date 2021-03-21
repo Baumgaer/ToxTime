@@ -1,6 +1,6 @@
 <template>
     <div class="tooltip">
-        <Avatar :model="model" ratio="16:9" :fitImage="true" />
+        <Avatar :model="model" ratio="16:9" :fitImage="true" :overlayIcons="overlayIcons" />
         <div class="name">
             <input
                 v-if="nameEditDBField"
