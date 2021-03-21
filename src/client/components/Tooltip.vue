@@ -36,6 +36,12 @@
 
             <div v-if="model.isActive !== undefined" class="left">{{ $t("isActive") }}</div>
             <div v-if="model.isActive !== undefined" class="right">{{ $t(model.isActive.toString()) }}</div>
+
+            <div v-if="model.mime" class="left">{{ $t("mimetype") }}</div>
+            <div v-if="model.mime" class="right">{{ model.mime }}</div>
+
+            <div v-if="model.size" class="left">{{ $t("fileSize") }}</div>
+            <div v-if="model.size" class="right">{{ Math.round(((model.size / 100000) + Number.EPSILON) * 100) / 100 }}MB</div>
         </div>
         <div class="labels"></div>
         <div class="closeButton" @click.prevent.stop="onPinButtonClick($event)" ref="pinButton">
