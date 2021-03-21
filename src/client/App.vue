@@ -11,6 +11,7 @@ export default {
     name: "App",
     beforeCreate() {
         window.$t = this.$t.bind(this);
+        window.$toasted = this.$toasted;
     }
 };
 </script>
