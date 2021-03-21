@@ -6,7 +6,7 @@
  * @param {T} MixinClass
  * @returns {Label & T}
  */
-export function ActionObjectMixinClass(MixinClass) {
+export function LabelMixinClass(MixinClass) {
     class Label extends MixinClass {
 
         static className = "Label";
