@@ -132,7 +132,7 @@ export default class ApiRoute extends DefaultRoute {
             }
 
             if (isArray(schemaObj[key].type) && schemaObj[key].type[0].ref in modelApiMapping && isArray(myRequestBody[key])) {
-                if (schemaObj[key].normalizeItems) await this.normalizeItems(request, key);
+                if (schemaObj[key].dependant) await this.normalizeItems(request, key);
                 for (const [index, childModel] of Object.entries(myRequestBody[key])) {
                     if (isMongoId(childModel)) continue;
                     request.body = childModel;
@@ -269,7 +269,7 @@ export default class ApiRoute extends DefaultRoute {
             const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
             if (!result) return new httpErrors.NotFound();
             for (const key in schemaObj) {
-                if (!schemaObj[key].normalizeItems) continue;
+                if (!schemaObj[key].dependant) continue;
                 await this.normalizeItems(request, key, "all", result);
             }
             return result;

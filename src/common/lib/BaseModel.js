@@ -30,6 +30,7 @@ export default class BaseModel {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            sticky: true,
             autopopulate: {
                 select: "-solvedGameSessions -currentGameSessions"
             }

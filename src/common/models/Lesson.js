@@ -27,6 +27,7 @@ export function LessonMixinClass(MixinClass) {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }
                 ],
+                sticky: true,
                 required: true,
                 default: []
             },
@@ -34,6 +35,7 @@ export function LessonMixinClass(MixinClass) {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }
                 ],
+                sticky: true,
                 required: true,
                 default: []
             }

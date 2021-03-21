@@ -34,6 +34,7 @@ export function FileMixinClass(MixinClass) {
             },
             labels: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
+                sticky: true,
                 required: true,
                 default: []
             }

@@ -15,7 +15,8 @@ export function LabelMixinClass(MixinClass) {
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
-                default: `Label`
+                default: `Label`,
+                unique: true
             }
         };
 

@@ -22,7 +22,8 @@ export function GameSessionMixinClass(MixinClass) {
             lesson: {
                 type: Schema.Types.ObjectId,
                 ref: "Lesson",
-                autopopulate: true
+                autopopulate: true,
+                reverseDependant: true
             },
             currentScene: {
                 type: Schema.Types.ObjectId,
@@ -32,12 +33,12 @@ export function GameSessionMixinClass(MixinClass) {
             grabbing: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
                 default: [],
-                normalizeItems: true
+                dependant: true
             },
             inventory: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
                 default: [],
-                normalizeItems: true
+                dependant: true
             },
             knowledgeBase: {
                 type: [{ type: String }],
