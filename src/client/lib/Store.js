@@ -222,7 +222,7 @@ export class Store {
      */
     _createArrayChangeObserver(model, key, array) {
         if (!isArray(array)) return array;
-        const schemaObject = modelMap[model.className].Schema.obj;
+        const schemaObject = model.getSchemaObject();
 
         // Clone options and if the array is not an array with references, watch deep
         const arrayOptions = Object.assign({}, this.observerOptions);
@@ -244,7 +244,7 @@ export class Store {
      * @memberof Store
      */
     _installChangeObserver(model) {
-        const schemaObject = modelMap[model.className].Schema.obj;
+        const schemaObject = model.getSchemaObject();
         const schemaObjectKeys = Object.keys(schemaObject);
         const modelKeys = Object.keys(model);
         const ignoreKeys = difference(modelKeys, schemaObjectKeys);

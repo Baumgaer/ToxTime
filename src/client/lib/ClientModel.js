@@ -30,6 +30,9 @@ export default class ClientModel extends BaseModel {
      */
     static buildClientExport(RawClass) {
         const schema = this.buildSchema(RawClass);
+
+        this.schemaObject = schema.obj;
+
         const modelClass = class ModelClass extends RawClass {
             constructor(params = {}) {
                 super();
@@ -82,6 +85,7 @@ export default class ClientModel extends BaseModel {
      */
     static isSchemaReference(path) {
         const clonedPath = path.slice();
+        const schemaObject = this.getSchemaObject();
 
         let property = clonedPath.shift();
         const mayNumber = !isNaN(parseInt(property, 10));
@@ -93,7 +97,6 @@ export default class ClientModel extends BaseModel {
         if (!isNaN(clonedPath[0])) clonedPath.shift();
 
         const theModelMap = modelMap;
-        const schemaObject = theModelMap[this.className].Schema.obj;
         if (isArray(schemaObject[property]?.type)) {
             if (!schemaObject[property].type[0].ref) {
                 return false;
@@ -139,7 +142,7 @@ export default class ClientModel extends BaseModel {
      */
     updateBackup(path, value) {
         const backup = this.getBackup();
-        const schemaObject = modelMap[this.className].Schema.obj;
+        const schemaObject = this.getSchemaObject();
         if (get(this, path) !== undefined && path[0] in schemaObject && !(path[0] in backup)) {
             set(backup, path, value);
         }
@@ -206,7 +209,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     getChangedKeys() {
-        if (this.isNew()) return Object.keys(modelMap[this.className].Schema.obj);
+        if (this.isNew()) return Object.keys(this.getSchemaObject());
         return Object.keys(this.getBackup());
     }
 
@@ -233,7 +236,7 @@ export default class ClientModel extends BaseModel {
         const recursiveChanges = this.getChanges();
         this.iterateModels((model, key, parentValue, context) => {
             let isSchemaProperty = true;
-            if (parentValue instanceof ClientModel) isSchemaProperty = key in modelMap[parentValue.className].Schema.obj;
+            if (parentValue instanceof ClientModel) isSchemaProperty = key in parentValue.getSchemaObject();
             if (isSchemaProperty && model.hasChanges()) set(recursiveChanges, context.path, model.getChanges());
         });
         return recursiveChanges;
