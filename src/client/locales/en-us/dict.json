@@ -105,5 +105,6 @@
     "play": "Play",
     "inventory": "Inventory",
     "fileType": "File type",
-    "fileSize": "File size"
+    "fileSize": "File size",
+    "trash": "Trash can"
 }

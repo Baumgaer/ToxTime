@@ -105,5 +105,6 @@
     "play": "Spielen",
     "inventory": "Inventar",
     "fileType": "Dateityp",
-    "fileSize": "Dateigröße"
+    "fileSize": "Dateigröße",
+    "trash": "Mülleimer"
 }
