@@ -13,7 +13,7 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         };
     }
 
-    @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
+    @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async delete() {
         if (!this._id) {
             this.destroy();
@@ -37,6 +37,16 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         for (const actionObject of this.actionObjects) {
             ApiClient.store.removeModel(actionObject);
         }
+    }
+
+    @CommonGameObjectRequisite.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
+    async restore() {
+        const result = await ApiClient.delete(`/${this.collection}/restore/${this._id}`);
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
+        if (result instanceof Error) return result;
+        ApiClient.store._trash?.__ob__?.dep.notify();
     }
 
     @CommonGameObjectRequisite.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)

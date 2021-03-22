@@ -106,5 +106,6 @@
     "inventory": "Inventar",
     "fileType": "Dateityp",
     "fileSize": "Dateigröße",
-    "trash": "Mülleimer"
+    "trash": "Mülleimer",
+    "restore": "Wiederherstelen"
 }

@@ -308,4 +308,16 @@ export default class ApiRoute extends DefaultRoute {
             return error;
         }
     }
+
+    /**
+     * Deletes a model by the given id and returns the old result if model was found
+     *
+     * @param {import("express").Request} request
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
+     * @memberof ApiRoute
+     */
+    @ApiRoute.patch("/restore/:id")
+    async restore(request) {
+        console.log(request);
+    }
 }

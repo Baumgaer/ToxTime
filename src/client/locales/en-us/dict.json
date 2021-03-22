@@ -106,5 +106,6 @@
     "inventory": "Inventory",
     "fileType": "File type",
     "fileSize": "File size",
-    "trash": "Trash can"
+    "trash": "Trash can",
+    "restore": "Restore"
 }
