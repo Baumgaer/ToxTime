@@ -268,6 +268,10 @@ export default class ApiRoute extends DefaultRoute {
         try {
             const model = await this.claimedExport.Model.findById(request.params.id).exec();
             if (!model) return new httpErrors.NotFound();
+
+            // Check if model is sticky used by at least one other model
+            // If yes, just mark it as deleted but do not delete it really.
+            // Do the same for all direct dependant models
             const stickyReferencingModels = await model.getStickyReferencingModels();
             if (model.isStickyReferenced() && stickyReferencingModels.length) {
                 const dependantModels = await model.getDependantReferencedModels();
@@ -279,12 +283,20 @@ export default class ApiRoute extends DefaultRoute {
                 await model.save();
                 return model;
             }
+
+            // model is not sticky used by another model. So unmark pseudo
+            // deletion and delete it finally
             model.deleted = false;
             await model.remove();
+
+            // Delete all dependant models
             for (const key in schemaObj) {
                 if (!schemaObj[key].dependant) continue;
                 await this.normalizeItems(request, key, "all", model);
             }
+
+            // If there is at least one model, which is sticky used by this model but deleted
+            // try to delete it finally. It will do it's dependency checks itself
             const stickyReferencedDeletedModels = await model.getStickyReferencedDeletedModels();
             for (const stickyReferencedDeletedModel of stickyReferencedDeletedModels) {
                 request.params.id = stickyReferencedDeletedModel._id.toString();
