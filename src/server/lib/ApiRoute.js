@@ -279,6 +279,7 @@ export default class ApiRoute extends DefaultRoute {
                 await model.save();
                 return model;
             }
+            model.deleted = false;
             await model.remove();
             for (const key in schemaObj) {
                 if (!schemaObj[key].dependant) continue;

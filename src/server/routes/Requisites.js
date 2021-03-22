@@ -117,7 +117,7 @@ export default class Requisites extends ApiRoute {
         if (result.deleted) return result;
 
         try {
-            unlinkSync(resolve(rootPath, "avatars", `${request.params.id}.png`));
+            unlinkSync(resolve(rootPath, "avatars", `${result._id.toString()}.png`));
         } catch (error) {
             // Not interested in stopping progress on failed avatar deletion...
             // It's may be not existent
