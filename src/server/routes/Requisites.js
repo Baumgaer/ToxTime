@@ -110,7 +110,11 @@ export default class Requisites extends ApiRoute {
     @Requisites.delete("/:id")
     async delete(request) {
         const result = await super.delete(request);
+
+        // We do not want to delete the avatar in case of an error or object
+        // was just marked as deleted because it's sticky
         if (result instanceof Error) return result;
+        if (result.deleted) return result;
 
         try {
             unlinkSync(resolve(rootPath, "avatars", `${request.params.id}.png`));
@@ -120,7 +124,7 @@ export default class Requisites extends ApiRoute {
             console.error(error);
         }
 
-        return true;
+        return result;
     }
 
 }

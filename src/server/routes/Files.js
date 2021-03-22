@@ -67,10 +67,14 @@ export default class Files extends ApiRoute {
     @Files.delete("/:id")
     async delete(request) {
         const result = await super.delete(request);
+
+        // We do not want to delete the file in case of an error or object
+        // was just marked as deleted because it's sticky
         if (result instanceof Error) return result;
-        const model = result;
+        if (result.deleted) return result;
+
         try {
-            fs.unlinkSync(path.resolve(arp.path, "uploads", model.fileName));
+            fs.unlinkSync(path.resolve(arp.path, "uploads", result.fileName));
             return result;
         } catch (error) {
             return error;

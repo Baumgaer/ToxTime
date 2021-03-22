@@ -22,7 +22,12 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
             return;
         }
         const result = await ApiClient.delete(`/${this.collection}/${this._id}`);
-        if ((result instanceof Error)) return result;
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
+        if (result instanceof Error) return result;
+        if (result.deleted) return result;
+
         ApiClient.store.removeModel(this);
 
         for (const clickArea of this.clickAreas) {

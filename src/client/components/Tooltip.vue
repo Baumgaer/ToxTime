@@ -14,7 +14,7 @@
         </div>
         <div class="info">
             <div v-if="model.firstName" class="left">{{ $t("firstName") }}</div>
-            <div v-if="model.firstName" class="right">{{ model.firstname }}</div>
+            <div v-if="model.firstName" class="right">{{ model.firstName }}</div>
 
             <div v-if="model.lastName" class="left">{{ $t("lastName") }}</div>
             <div v-if="model.lastName" class="right">{{ model.lastName }}</div>

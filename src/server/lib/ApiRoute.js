@@ -266,14 +266,21 @@ export default class ApiRoute extends DefaultRoute {
         const schemaObj = this.claimedExport.Schema.obj;
 
         try {
-            const result = await this.claimedExport.Model.findByIdAndDelete(request.params.id).exec();
-            if (!result) return new httpErrors.NotFound();
+            const model = await this.claimedExport.Model.findById(request.params.id).exec();
+            if (!model) return new httpErrors.NotFound();
+            if (model.isStickyReferenced()) {
+                model.deleted = true;
+                await model.save();
+                return model;
+            }
+            await model.remove();
             for (const key in schemaObj) {
                 if (!schemaObj[key].dependant) continue;
-                await this.normalizeItems(request, key, "all", result);
+                await this.normalizeItems(request, key, "all", model);
             }
-            return 200;
+            return model;
         } catch (error) {
+            console.error(error);
             return error;
         }
     }

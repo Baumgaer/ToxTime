@@ -16,6 +16,10 @@ export class Store {
     /** @type {Record<string, Record<string, import("~client/lib/ClientModel")>>} */
     collections = {};
 
+    localStorage = {};
+
+    _trash = {};
+
     /** @type {import("on-change").Options} */
     observerOptions = {
         pathAsArray: true,
@@ -32,7 +36,6 @@ export class Store {
             const staticModel = modelContext(key).default;
             modelMap[staticModel.Model.className] = staticModel;
         });
-        this.collection("localStorage");
     }
 
     /**
@@ -57,8 +60,24 @@ export class Store {
      * @memberof Store
      */
     collection(name) {
+        if (name === "trash") return this.trash;
+        if (name === "localStorage") return this.localStorage;
         if (!this.collections[name]) this.collections[name] = {};
         return this.collections[name];
+    }
+
+    get trash() {
+        const collections = Object.values(this.collections);
+        for (const collection of collections) {
+            for (const modelId in collection) {
+                if (Object.hasOwnProperty.call(collection, modelId)) {
+                    const model = collection[modelId];
+                    if (model.deleted) this._trash[modelId] = model;
+                }
+            }
+        }
+        this._trash.__ob__?.dep.notify();
+        return this._trash;
     }
 
     /**

@@ -1,6 +1,7 @@
 import BaseModel, { mongooseBaseModels } from "~common/lib/BaseModel";
 import mongoose from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
+import { get, flatten } from "~common/utils";
 
 export default class ServerModel extends BaseModel {
 
@@ -32,5 +33,20 @@ export default class ServerModel extends BaseModel {
         mongooseBaseModels[RawClass.className] = Model;
         Model.className = RawClass.className;
         return { RawClass, Schema: schema, Model, isServerModel: true };
+    }
+
+    async getStickyReferencingModels() {
+        const referencingModels = [];
+        const referencingModelExports = this.getReferencingModelExports();
+        for (const referencingModelExport of referencingModelExports) {
+            const referencePaths = referencingModelExport.RawClass.getReferencePathsOf(this._getClassName());
+            for (const referencePath of referencePaths) {
+                const pathValue = get(referencingModelExport.Schema.obj, referencePath);
+                if (!pathValue.sticky) continue;
+                referencingModels.push(referencingModelExport.Model.find({ [referencePath.join(".")]: this }).exec());
+            }
+        }
+
+        return flatten((await Promise.all(referencingModels)));
     }
 }

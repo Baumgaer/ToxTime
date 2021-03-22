@@ -15,6 +15,16 @@ export default class Lessons extends ApiRoute {
 
     claimedExport = Lesson;
 
+    @ApiRoute.get("/", { allowUser: true })
+    async getAll() {
+        return super.getAll();
+    }
+
+    @ApiRoute.get("/:id", { allowUser: true })
+    async getById(request) {
+        return super.getById(request);
+    }
+
     @Lessons.post("/copy/:id")
     async copy(request) {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
@@ -60,7 +70,11 @@ export default class Lessons extends ApiRoute {
         });
 
         const result = await super.delete(request);
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
         if (result instanceof Error) return result;
+        if (result.deleted) return result;
 
         const promises = [];
 

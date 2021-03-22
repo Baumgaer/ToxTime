@@ -56,6 +56,7 @@ import MenuRightIcon from "vue-material-design-icons/MenuRight";
 import MenuDownIcon from "vue-material-design-icons/MenuDown";
 import MovieOpenIcon from "vue-material-design-icons/MovieOpen";
 import PinIcon from "vue-material-design-icons/Pin";
+import TrashCanIcon from "vue-material-design-icons/TrashCan";
 
 if (Object.keys(window.userInformation).length) {
     ApiClient.handleModels(window.userInformation);
@@ -103,3 +104,4 @@ Vue.component('menu-right-icon', MenuRightIcon);
 Vue.component('menu-down-icon', MenuDownIcon);
 Vue.component('movie-open-icon', MovieOpenIcon);
 Vue.component('pin-icon', PinIcon);
+Vue.component('trash-can-icon', TrashCanIcon);

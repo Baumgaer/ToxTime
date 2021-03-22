@@ -23,6 +23,9 @@
                 <Button ref="files" name="files" :active="this.category === 'files'" :showLoadingSpinner="filesLoading" @click="onNavButtonClick('files')" >
                     <file-multiple-icon />
                 </Button>
+                <Button ref="trash" name="trash" :active="this.category === 'trash'" @click="onNavButtonClick('trash')" >
+                    <trash-can-icon />
+                </Button>
             </div>
             <div class="bottom">
                 <Button ref="settings" name="settings" :active="this.category === 'settings'" @click="window.activeUser.edit()" >
@@ -41,7 +44,7 @@
                         <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
                         <arrow-collapse-left-icon v-else />
                     </Button>
-                    <Button class="addButton" v-show="!itemsCollapsed" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
+                    <Button class="addButton" v-show="!itemsCollapsed && category !== 'trash'" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
                         <plus-icon />
                     </Button>
                 </div>
@@ -60,7 +63,7 @@
                     />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
-                <Button class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
+                <Button v-show="category !== 'trash'" class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
                     <plus-icon />
                 </Button>
             </section>
@@ -114,6 +117,7 @@ export default {
     data() {
         return {
             store: {},
+            trash: ApiClient.store.trash,
             filesStore: {},
             category: "users",
             itemsCollapsed: false,
@@ -124,6 +128,7 @@ export default {
         items() {
             const levenshteinValues = {};
             return Object.values(this.store).filter((item) => {
+                if (this.category !== "trash" && item.deleted) return false;
                 if (!this.search) return true;
 
                 /** @type {string} */
@@ -177,6 +182,7 @@ export default {
             this.category = name;
             this.store = ApiClient.store.collection(this.category);
             await ApiClient.get(`/${name}`);
+            if (name === "trash") this.store = ApiClient.store.trash;
         },
 
         onCollapseButtonClick() {

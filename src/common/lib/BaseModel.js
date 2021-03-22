@@ -42,6 +42,11 @@ export default class BaseModel {
             type: Date,
             required: true,
             default: Date
+        },
+        deleted: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     };
 
@@ -93,14 +98,34 @@ export default class BaseModel {
         return schema;
     }
 
+    /**
+     * Returns the schema definition by getting it from the precompiled schema
+     *
+     * @static
+     * @returns {import("mongoose").Schema["obj"]}
+     * @memberof BaseModel
+     */
     static getSchemaObject() {
         return global._modelMap[this.className].Schema.obj;
     }
 
+    /**
+     * @see BaseModel.getSchemaObject
+     *
+     * @returns {ReturnType<typeof BaseModel.getSchemaObject>}
+     * @memberof BaseModel
+     */
     getSchemaObject() {
-        return Object.getPrototypeOf(this.constructor).getSchemaObject();
+        return global._modelMap[this._getClassName()].RawClass.getSchemaObject();
     }
 
+    /**
+     * returns all exports of models which do reference this model in any way
+     *
+     * @static
+     * @returns {ModelExport[]}
+     * @memberof BaseModel
+     */
     static getReferencingModelExports() {
         const referencingModelExports = [];
         for (const className in global._modelMap) {
@@ -117,10 +142,24 @@ export default class BaseModel {
         return referencingModelExports;
     }
 
+    /**
+     * @see BaseModel.getReferencingModelExports
+     *
+     * @returns {ReturnType<typeof BaseModel.getReferencingModelExports>}
+     * @memberof BaseModel
+     */
     getReferencingModelExports() {
-        return Object.getPrototypeOf(this.constructor).getReferencingModelExports();
+        return global._modelMap[this._getClassName()].RawClass.getReferencingModelExports();
     }
 
+    /**
+     * Returns all paths of the schema definition where a ref attribute has the value of className
+     *
+     * @static
+     * @param {string} className
+     * @returns {string[][]}
+     * @memberof BaseModel
+     */
     static getReferencePathsOf(className) {
         const referencePaths = [];
         eachDeep(global._modelMap[this.className].Schema.obj, (value, key, parentValue, context) => {
@@ -133,8 +172,64 @@ export default class BaseModel {
         return referencePaths;
     }
 
+    /**
+     * @see BaseModel.getReferencePathsOf
+     *
+     * @param {string} className
+     * @returns {ReturnType<typeof BaseModel.getReferencePathsOf>}
+     * @memberof BaseModel
+     */
     getReferencePathsOf(className) {
-        return Object.getPrototypeOf(this.constructor).getReferencePathsOf(className);
+        return global._modelMap[this._getClassName()].RawClass.getReferencePathsOf(className);
+    }
+
+    /**
+     * Checks if this model has some special modifier in its reference definition
+     *
+     * @param {sticky | dependant | reverseDependant} type
+     * @returns {boolean}
+     * @memberof BaseModel
+     */
+    isSpecialReferenced(type) {
+        const referencingModelExports = this.getReferencingModelExports();
+        for (const referencingModelExport of referencingModelExports) {
+            const referencePaths = referencingModelExport.RawClass.getReferencePathsOf(this._getClassName());
+            for (const referencePath of referencePaths) {
+                const pathValue = get(referencingModelExport.Schema.obj, referencePath);
+                if (pathValue[type]) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Alias for this.isSpecialReferenced("sticky")
+     *
+     * @returns {boolean}
+     * @memberof BaseModel
+     */
+    isStickyReferenced() {
+        return this.isSpecialReferenced("sticky");
+    }
+
+    /**
+     * Alias for this.isSpecialReferenced("dependant")
+     *
+     * @returns {boolean}
+     * @memberof BaseModel
+     */
+    isDependantReferenced() {
+        return this.isSpecialReferenced("dependant");
+    }
+
+    /**
+     * Alias for this.isSpecialReferenced("reverseDependant")
+     *
+     * @returns {boolean}
+     * @memberof BaseModel
+     */
+    isReverseDependantReferenced() {
+        return this.isSpecialReferenced("reverseDependant");
     }
 
     /**
@@ -171,6 +266,10 @@ export default class BaseModel {
 
     getSubObjects() {
         return [];
+    }
+
+    _getClassName() {
+        return this.className || this.toObject().className;
     }
 
     iterateModels(model, modelCallback, options = {}) {
