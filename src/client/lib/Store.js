@@ -1,9 +1,6 @@
 import onChange from "on-change";
 import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference } from "~common/utils";
 
-/** @type {Record<string, ReturnType<import("~client/lib/ClientModel")["default"]["buildClientExport"]>>} */
-export const modelMap = { Error };
-
 /**
  * @typedef {import("~common/lib/BaseModel").default} Model
  * @typedef {Partial<Model>} ModelLike
@@ -31,11 +28,6 @@ export class Store {
 
     constructor() {
         if (!Store.usedInstanceGetter) throw new Error("This is a singleton, use Store.getInstance()!");
-        const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");
-        modelContext.keys().forEach((key) => {
-            const staticModel = modelContext(key).default;
-            modelMap[staticModel.Model.className] = staticModel;
-        });
     }
 
     /**
@@ -131,10 +123,10 @@ export class Store {
         const id = modelLike._id || modelLike._dummyId;
         let model = modelLike;
         if (!this.hasModel(model)) {
-            if (modelMap[modelLike.className] !== Error) {
-                if (!(modelLike instanceof modelMap[modelLike.className].Model)) {
-                    model = this._installChangeObserver(new modelMap[modelLike.className].Model(modelLike));
-                } else if (modelLike instanceof modelMap[modelLike.className].Model && !isProxy(modelLike)) {
+            if (window._modelMap[modelLike.className] !== Error) {
+                if (!(modelLike instanceof window._modelMap[modelLike.className].Model)) {
+                    model = this._installChangeObserver(new window._modelMap[modelLike.className].Model(modelLike));
+                } else if (modelLike instanceof window._modelMap[modelLike.className].Model && !isProxy(modelLike)) {
                     model = this._installChangeObserver(modelLike);
                 }
                 this.collection(collectionName)[id] = model;
@@ -157,7 +149,7 @@ export class Store {
      * @memberof Store
      */
     updateModel(modelLike) {
-        if (modelLike instanceof modelMap[modelLike.className].Model) throw new Error("You should not pass an instance here");
+        if (modelLike instanceof window._modelMap[modelLike.className].Model) throw new Error("You should not pass an instance here");
         const dummyModel = this.getModelById(modelLike.collection, modelLike._dummyId);
         let realModel = this.getModelById(modelLike.collection, modelLike._id);
 

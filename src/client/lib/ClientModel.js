@@ -1,6 +1,5 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
-import { modelMap } from "~client/lib/Store";
 import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set } from "~common/utils";
 import { v4 as uuid } from "uuid";
 
@@ -96,7 +95,7 @@ export default class ClientModel extends BaseModel {
         // have a number as property name
         if (!isNaN(clonedPath[0])) clonedPath.shift();
 
-        const theModelMap = modelMap;
+        const theModelMap = window._modelMap;
         if (isArray(schemaObject[property]?.type)) {
             if (!schemaObject[property].type[0].ref) {
                 return false;
