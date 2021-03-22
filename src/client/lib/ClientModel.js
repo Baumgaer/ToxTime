@@ -76,49 +76,6 @@ export default class ClientModel extends BaseModel {
     }
 
     /**
-     * Checks if the given path is a reference in a schema
-     *
-     * @param {string[]} path
-     * @returns {boolean}
-     * @memberof ClientModel
-     */
-    static isSchemaReference(path) {
-        const clonedPath = path.slice();
-        const schemaObject = this.getSchemaObject();
-
-        let property = clonedPath.shift();
-        const mayNumber = !isNaN(parseInt(property, 10));
-        if (mayNumber) property = clonedPath.shift();
-        if (!property) return false;
-
-        // If the next one is a number, we are inside an array and we don't
-        // have a number as property name
-        if (!isNaN(clonedPath[0])) clonedPath.shift();
-
-        const theModelMap = window._modelMap;
-        if (isArray(schemaObject[property]?.type)) {
-            if (!schemaObject[property].type[0].ref) {
-                return false;
-            } else if (clonedPath.length) return theModelMap[schemaObject[property].type[0].ref].RawClass.isSchemaReference(clonedPath);
-        } else if (!schemaObject[property]?.ref) {
-            return false;
-        } else if (clonedPath.length) return theModelMap[schemaObject[property].ref].RawClass.isSchemaReference(clonedPath);
-
-        return true;
-    }
-
-    /**
-     * Same as ClientModel.isSchemaReference but on instance
-     *
-     * @param {string[]} path
-     * @returns {boolean}
-     * @memberof ClientModel
-     */
-    isSchemaReference(path) {
-        return Object.getPrototypeOf(this.constructor).isSchemaReference(path);
-    }
-
-    /**
      * Collects all data which was set before the last call of save()
      *
      * @returns {Record<string, any>}

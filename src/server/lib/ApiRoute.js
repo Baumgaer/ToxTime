@@ -268,7 +268,13 @@ export default class ApiRoute extends DefaultRoute {
         try {
             const model = await this.claimedExport.Model.findById(request.params.id).exec();
             if (!model) return new httpErrors.NotFound();
-            if (model.isStickyReferenced()) {
+            const stickyReferencingModels = await model.getStickyReferencingModels();
+            if (model.isStickyReferenced() && stickyReferencingModels.length) {
+                const dependantModels = await model.getDependantReferencedModels();
+                for (const dependantModel of dependantModels) {
+                    dependantModel.deleted = true;
+                    await dependantModel.save();
+                }
                 model.deleted = true;
                 await model.save();
                 return model;
@@ -277,6 +283,11 @@ export default class ApiRoute extends DefaultRoute {
             for (const key in schemaObj) {
                 if (!schemaObj[key].dependant) continue;
                 await this.normalizeItems(request, key, "all", model);
+            }
+            const stickyReferencedDeletedModels = await model.getStickyReferencedDeletedModels();
+            for (const stickyReferencedDeletedModel of stickyReferencedDeletedModels) {
+                request.params.id = stickyReferencedDeletedModel._id.toString();
+                await this.webServer.modelApiMapping[stickyReferencedDeletedModel._getClassName()].delete(request);
             }
             return model;
         } catch (error) {

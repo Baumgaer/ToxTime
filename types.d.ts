@@ -9,6 +9,12 @@ declare type ModelExport = {
 }
 
 interface Window {
-    _modelMap: Record<string, ReturnType<import("~client/lib/ClientModel")["default"]["buildClientExport"]>>
+    _modelMap: Record<string, ModelExport>
     _activeUser: InstanceType<import("~client/models/User")["RawClass"]>
+}
+
+namespace NodeJS { // eslint-disable-line
+    interface Global {
+        _modelMap: Record<string, ReturnType<ModelExport>>
+    }
 }

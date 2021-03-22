@@ -28,7 +28,7 @@ export function ItemMixinClass(MixinClass) {
                 type: Schema.Types.ObjectId,
                 ref: "SceneObject",
                 autopopulate: true,
-                sticky: true,
+                reverseDependant: true,
                 required: false,
                 default: null
             },
@@ -36,7 +36,7 @@ export function ItemMixinClass(MixinClass) {
                 type: Schema.Types.ObjectId,
                 ref: "ActionObject",
                 autopopulate: true,
-                sticky: true,
+                reverseDependant: true,
                 required: false,
                 default: null
             }

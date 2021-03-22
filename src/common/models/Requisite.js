@@ -22,6 +22,7 @@ export function RequisiteMixinClass(MixinClass) {
             file: {
                 type: Schema.Types.ObjectId,
                 required: true,
+                sticky: true,
                 ref: "File",
                 autopopulate: true
             },

@@ -1,7 +1,7 @@
 import BaseModel, { mongooseBaseModels } from "~common/lib/BaseModel";
 import mongoose from "mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
-import { get, flatten } from "~common/utils";
+import { get, flatten, compact } from "~common/utils";
 
 export default class ServerModel extends BaseModel {
 
@@ -48,5 +48,49 @@ export default class ServerModel extends BaseModel {
         }
 
         return flatten((await Promise.all(referencingModels)));
+    }
+
+    async getStickyReferencedDeletedModels() {
+        const referenceModelExports = this.getReferenceModelExports();
+        let results = [];
+
+        for (const referenceModelExport of referenceModelExports) {
+            for (const referencePath of this.getReferencePathsOf(referenceModelExport.RawClass.className)) {
+                // If the reference is not sticky, skip it
+                if (!get(this.getSchemaObject(), referencePath)?.sticky) continue;
+                if (!this.populated(referencePath.join("."))) {
+                    results.push(get(await global._modelMap[this._getClassName()].Model
+                        .findById(this._id.toString(), referencePath.join("."))
+                        .populate(referencePath.join(" "))
+                        .exec(), referencePath)
+                    );
+                } else results.push(get(this, referencePath));
+            }
+        }
+
+        results = compact(flatten(results)).filter((result) => result.deleted);
+
+        return results;
+    }
+
+    async getDependantReferencedModels() {
+        const referenceModelExports = this.getReferenceModelExports();
+        const results = [];
+
+        for (const referenceModelExport of referenceModelExports) {
+            for (const referencePath of this.getReferencePathsOf(referenceModelExport.RawClass.className)) {
+                // If the reference is not sticky, skip it
+                if (!get(this.getSchemaObject(), referencePath)?.dependant) continue;
+                if (!this.populated(referencePath.join("."))) {
+                    results.push(get(await global._modelMap[this._getClassName()].Model
+                        .findById(this._id.toString(), referencePath.join("."))
+                        .populate(referencePath.join(" "))
+                        .exec(), referencePath)
+                    );
+                } else results.push(get(this, referencePath));
+            }
+        }
+
+        return flatten(results);
     }
 }

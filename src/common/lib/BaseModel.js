@@ -120,7 +120,8 @@ export default class BaseModel {
     }
 
     /**
-     * returns all exports of models which do reference this model in any way
+     * Returns all exports of models which do reference this model in their
+     * schema definition in any way.
      *
      * @static
      * @returns {ModelExport[]}
@@ -150,6 +151,33 @@ export default class BaseModel {
      */
     getReferencingModelExports() {
         return global._modelMap[this._getClassName()].RawClass.getReferencingModelExports();
+    }
+
+    /**
+     * Returns all Model exports which references in this model schema definition
+     *
+     * @static
+     * @returns {ModelExport[]}
+     * @memberof BaseModel
+     */
+    static getReferenceModelExports() {
+        const referenceModelExports = [];
+        eachDeep(this.getSchemaObject(), (value) => {
+            if (!global._modelMap[value?.ref]) return;
+            if (referenceModelExports.includes(global._modelMap[value?.ref])) return;
+            referenceModelExports.push(global._modelMap[value?.ref]);
+        }, { pathFormat: "array" });
+        return referenceModelExports;
+    }
+
+    /**
+     * @see BaseModel.getReferenceModelExports
+     *
+     * @returns {ReturnType<typeof BaseModel.getReferenceModelExports>}
+     * @memberof BaseModel
+     */
+    getReferenceModelExports() {
+        return global._modelMap[this._getClassName()].RawClass.getReferenceModelExports();
     }
 
     /**
@@ -184,7 +212,54 @@ export default class BaseModel {
     }
 
     /**
-     * Checks if this model has some special modifier in its reference definition
+     * Checks if the given path is a reference in this models schema definition
+     *
+     * @param {string[]} path
+     * @returns {boolean}
+     * @memberof ClientModel
+     */
+    static isSchemaReference(path) {
+        if (!path) return false;
+        const clonedPath = path.slice();
+        const schemaObject = this.getSchemaObject();
+
+        let property = clonedPath.shift();
+        const mayNumber = !isNaN(parseInt(property, 10));
+        if (mayNumber) property = clonedPath.shift();
+        if (!property) return false;
+
+        const schemaProperty = schemaObject[property];
+        const modelMap = global._modelMap;
+
+        // If the next one is a number, we are inside an array and we don't
+        // have a number as property name
+        if (!isNaN(clonedPath[0])) clonedPath.shift();
+
+        if (isArray(schemaProperty?.type)) {
+            if (!schemaProperty.type[0].ref) {
+                return false;
+            } else if (clonedPath.length) return modelMap[schemaProperty.type[0].ref].RawClass.isSchemaReference(clonedPath);
+        } else if (!schemaProperty?.ref) {
+            return false;
+        } else if (clonedPath.length) return modelMap[schemaProperty.ref].RawClass.isSchemaReference(clonedPath);
+
+        return true;
+    }
+
+    /**
+     * @see BaseModel.isSchemaReference
+     *
+     * @param {string[]} path
+     * @returns {ReturnType<typeof BaseModel.isSchemaReference>}
+     * @memberof ClientModel
+     */
+    isSchemaReference(path) {
+        return global._modelMap[this._getClassName()].RawClass.isSchemaReference(path);
+    }
+
+    /**
+     * Checks if this model schema definition is special referenced in some
+     * other schema definitions by the given type.
      *
      * @param {sticky | dependant | reverseDependant} type
      * @returns {boolean}
