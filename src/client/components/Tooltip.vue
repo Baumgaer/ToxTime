@@ -43,18 +43,14 @@
             <div v-if="model.size" class="left">{{ $t("fileSize") }}</div>
             <div v-if="model.size" class="right">{{ Math.round(((model.size / 100000) + Number.EPSILON) * 100) / 100 }}MB</div>
         </div>
-        <div class="labels">
-            <div>
-                <Item v-for="label in model.getLabels()"
-                      :key="label._id"
-                      class="label"
-                      :style="`${!model.labels.includes(label) ? 'opacity: 0.8;' : ''}`"
-                      :compactMode="true"
-                      nameEditDBField="name"
-                      :model="label"
-                ><span class="x">X</span></Item>
-                <Button v-if="model.labels" name="addLabel" :showLabel="false"><plus-icon /></Button>
-            </div>
+        <div class="labels" v-if="model.labels">
+            <span class="label" v-for="label of model.getLabels()" :key="label._id" :style="`${!model.labels.includes(label) ? 'opacity: 0.8;' : ''}`">
+                <item-component :model="label" :compactMode="true" :preventTooltipHiding="true">
+                    <span>X</span>
+                </item-component>
+            </span>
+            <Button v-if="model.labels" name="addLabel" :showLabel="false" ref="addLabelButton" @click="onAddLabelButtonClick"><plus-icon /></Button>
+            <LabelSelector v-if="labelSelectorCreated" ref="labelSelector" :model="model" :attachTo="$refs.addLabelButton.$el" @hide="onLabelSelectorHide" />
         </div>
         <div class="closeButton" @click.prevent.stop="onPinButtonClick($event)" ref="pinButton">
             <pin-icon :title="$t('pin')"/>
@@ -64,9 +60,10 @@
 
 <script>
 import ClientModel from "~client/lib/ClientModel";
-import Avatar from "~client/components/Avatar";
-import Button from "~client/components/Button";
-import Item from "~client/components/Item";
+import Avatar from "~client/components/Avatar.vue";
+import Button from "~client/components/Button.vue";
+import LabelSelector from "~client/components/LabelSelector.vue";
+
 import tippy, { sticky, hideAll, animateFill } from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/translucent.css';
@@ -77,7 +74,7 @@ export default {
     components: {
         Avatar,
         Button,
-        Item
+        LabelSelector
     },
     props: {
         model: {
@@ -86,12 +83,15 @@ export default {
         },
         nameEditDBField: String,
         overlayIcons: String,
-        autoCreate: Boolean
+        autoCreate: Boolean,
+        preventTooltipHiding: Boolean
     },
     data() {
         return {
             tippy: null,
-            pinned: false
+            pinned: false,
+            labelSelectorCreated: false,
+            labelSelectorOpen: false
         };
     },
     beforeDestroy() {
@@ -103,6 +103,7 @@ export default {
     },
     methods: {
         onShow(instance) {
+            if (this.preventTooltipHiding) return;
             hideAll({ exclude: instance, duration: 0 });
         },
 
@@ -111,6 +112,11 @@ export default {
                 this.$refs.pinButton.classList.remove("active");
             } else this.$refs.pinButton.classList.add("active");
             this.toggleActiveState();
+        },
+
+        onAddLabelButtonClick() {
+            this.labelSelectorCreated = true;
+            this.labelSelectorOpen = true;
         },
 
         /**
@@ -126,7 +132,13 @@ export default {
         },
 
         onHide() {
+            if (this.labelSelectorOpen) return false;
+            this.$refs.labelSelector?.hide();
             if (this.pinned) return false;
+        },
+
+        onLabelSelectorHide() {
+            this.labelSelectorOpen = false;
         },
 
         attachTo(element) {
@@ -140,6 +152,7 @@ export default {
                 animateFill: true,
                 sticky: true,
                 interactive: true,
+                interactiveBorder: 20,
                 plugins: [sticky, animateFill],
                 zIndex: 10,
                 delay: [1000, 0],

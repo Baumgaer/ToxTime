@@ -122,19 +122,27 @@
 
         .label {
             display: inline-block;
-            background-color: @dusk;
+            vertical-align: middle;
+            background-color: @dark;
+            margin: 5px;
+
+            border-radius: 50px;
+            overflow: hidden;
 
             &:hover {
-                background-color: @dark;
+                background-color: @dusk;
             }
         }
 
         .button {
             --button-height: 35px;
-            --background-color: @dusk;
-            --hover-color: @dark;
+            --background-color: @dark;
+            --hover-color: @dusk;
             width: 35px;
             border-radius: 35px;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 5px;
         }
     }
 }

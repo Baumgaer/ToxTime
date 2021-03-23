@@ -57,13 +57,13 @@
             </section>
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
                 <div v-if="items.length">
-                    <Item v-for="item in items"
-                          :key="item._dummyId || item._id"
-                          :model="item"
-                          :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
-                          :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
-                          :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
-                          :ref="item._dummyId"
+                    <item-component v-for="item in items"
+                                    :key="item._dummyId || item._id"
+                                    :model="item"
+                                    :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
+                                    :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
+                                    :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
+                                    :ref="item._dummyId"
                     />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
@@ -90,7 +90,6 @@
 
 <script>
 import Button from "~client/components/Button.vue";
-import Item from "~client/components/Item.vue";
 import ApiClient from "~client/lib/ApiClient";
 import AddUsers from "~client/components/AddUsers.vue";
 import UploadHint from "~client/components/UploadHint";
@@ -104,14 +103,11 @@ import Scene from "~client/models/Scene";
 import Lesson from "~client/models/Lesson";
 import Label from "~client/models/Label";
 
-import { capitalize } from "~common/utils";
-import natSort from "natsort";
-import levenshtein from "fast-levenshtein";
+import { capitalize, itemFilterAndSort } from "~common/utils";
 
 export default {
     components: {
         Button,
-        Item,
         AddUsers,
         UploadHint,
         GraphicEditor,
@@ -132,48 +128,12 @@ export default {
     },
     computed: {
         items() {
-            const levenshteinValues = {};
-            return Object.values(this.store).filter((item) => {
+            const items = Object.values(this.store).filter((item) => {
                 if (this.category !== "trash" && item.deleted) return false;
                 if (this.category === "trash" && !item.deleted) return false;
-                if (!this.search) return true;
-
-                /** @type {string} */
-                const name = item.getName().toLowerCase();
-                const distance = levenshtein.get(name, this.search) / name.length;
-                const exactSearch = name.search(this.search);
-
-                let bonus = 0;
-                if (exactSearch >= 0) bonus = 1 - exactSearch / name.length;
-                levenshteinValues[name] = { distance, bonus };
-
                 return true;
-            }).filter((item) => {
-                if (!this.search) return true;
-                const name = item.getName().toLowerCase();
-                const minDistance = Math.min(...Object.values(levenshteinValues).map((value) => value.distance));
-                const distance = levenshteinValues[name].distance;
-                const bonus = levenshteinValues[name].bonus;
-                return distance - bonus <= minDistance;
-            }).sort((a, b) => {
-                if (this.search) {
-                    const aName = a.getName().toLowerCase();
-                    const bName = b.getName().toLowerCase();
-
-                    const aDistance = levenshteinValues[aName].distance;
-                    const aBonus = levenshteinValues[aName].bonus;
-                    const aLevVal = aDistance - aBonus;
-
-                    const bDistance = levenshteinValues[bName].distance;
-                    const bBonus = levenshteinValues[bName].bonus;
-                    const bLevVal = bDistance - bBonus;
-
-                    return aLevVal - bLevVal;
-                }
-
-                if (b === window.activeUser) return 1;
-                return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || b.isActive - a.isActive || natSort()(a.getName(), b.getName());
             });
+            return itemFilterAndSort(items, this.search);
         },
         filesLoading() {
             return Object.values(this.filesStore).some((file) => file.loadingStatus);

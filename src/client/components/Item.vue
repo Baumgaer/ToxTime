@@ -6,6 +6,7 @@
         @dragend="onDragEnd($event)"
         @mouseenter="onMouseEnter"
         @mouseover.stop
+        v-on="$listeners"
         ref="itemRoot"
     >
         <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
@@ -23,7 +24,7 @@
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
                 />
-                <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
+                <strong class="fixedName" v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
             </div>
             <div class="actions" v-if="!compactMode">
                 <div v-for="action of model.actions" :key="`${model._id || model._dummyId}${action.name}`" class="action">
@@ -48,6 +49,7 @@
                  :nameEditDBField="nameEditDBField"
                  :overlayIcons="overlayIcons"
                  :autoCreate="true"
+                 :preventTooltipHiding="preventTooltipHiding"
                  ref="tooltip"
         />
         <slot></slot>
@@ -76,7 +78,8 @@ export default {
         },
         nameEditDBField: String,
         overlayIcons: String,
-        compactMode: Boolean
+        compactMode: Boolean,
+        preventTooltipHiding: Boolean
     },
     data() {
         this.isItem = true;
@@ -87,7 +90,7 @@ export default {
     },
     computed: {
         hasSubObjects() {
-            return Boolean(this.model.getSubObjects().length);
+            return Boolean(this.model?.getSubObjects().length);
         },
 
         activeClass() {

@@ -36,12 +36,17 @@ export function FileMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                autopopulate: true
             }
         };
 
         getName(preferredField) {
             return `${this[preferredField] || this.name}`;
+        }
+
+        getLabels() {
+            return this.labels;
         }
     }
     return File;

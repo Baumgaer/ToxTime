@@ -32,7 +32,8 @@ export function GameObjectMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                autopopulate: true
             }
         };
     }

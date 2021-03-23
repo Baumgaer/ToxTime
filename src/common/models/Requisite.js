@@ -47,7 +47,7 @@ export function RequisiteMixinClass(MixinClass) {
         }
 
         getLabels() {
-            let labels = this.labels;
+            let labels = this.labels.concat(this.file.getLabels());
             for (const subObject of this.getSubObjects()) {
                 labels = labels.concat(subObject.getLabels());
             }

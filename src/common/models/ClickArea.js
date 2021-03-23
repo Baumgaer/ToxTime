@@ -25,6 +25,10 @@ export function ClickAreaMixinClass(MixinClass) {
                 default: []
             }
         };
+
+        getLabels() {
+            return this.labels;
+        }
     }
     return ClickArea;
 }

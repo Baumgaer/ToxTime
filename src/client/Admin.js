@@ -5,6 +5,9 @@ import i18n from "~client/lib/i18n";
 import App from '~client/App.vue';
 
 import Admin from "~client/components/Admin.vue";
+import Item from "~client/components/Item.vue";
+
+Vue.component('item-component', Item);
 
 Router.extendRoutes([{
     name: "admin",
