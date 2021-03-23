@@ -21,8 +21,23 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
     async delete() {
         if (this._xhr) return this._xhr.abort();
         const result = await ApiClient.delete(`/files/${this._id}`);
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
         if (result instanceof Error) return result;
+        if (result.deleted) return result;
+
         ApiClient.store.removeModel(this);
+    }
+
+    @CommonClientFile.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
+    async restore() {
+        const result = await ApiClient.patch(`/files/restore/${this._id}`);
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
+        if (result instanceof Error) return result;
+        ApiClient.store._trash?.__ob__?.dep.notify();
     }
 
     @CommonClientFile.action("download", { type: "component", name: "file-download-icon" }, (instance) => window.activeUser.isAdmin && instance._id)

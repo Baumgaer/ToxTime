@@ -6,6 +6,15 @@ import ApiClient from "~client/lib/ApiClient";
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
 
+    /** @type {import("mongoose").SchemaDefinition} */
+    static schema = {
+        name: {
+            default: () => {
+                return `${window.$t("newFeminin")} ${window.$t('lesson')}`;
+            }
+        }
+    };
+
     getAvatar() {
         const value = { title: window.$t("lesson") };
         if (this._id && this.scenes[0]) return Object.assign(this.scenes[0].getAvatar(), value);

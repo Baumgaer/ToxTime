@@ -109,5 +109,8 @@
     "trash": "Trash can",
     "restore": "Restore",
     "labels": "Labels",
-    "label": "Label"
+    "label": "Label",
+    "newNeutral": "New",
+    "newMaskulin": "New",
+    "newFeminin": "New"
 }

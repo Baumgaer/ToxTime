@@ -109,5 +109,8 @@
     "trash": "Mülleimer",
     "restore": "Wiederherstelen",
     "labels": "Label",
-    "label": "Label"
+    "label": "Label",
+    "newNeutral": "Neues",
+    "newMaskulin": "Neuer",
+    "newFeminin": "Neue"
 }
