@@ -343,6 +343,10 @@ export default class BaseModel {
         return [];
     }
 
+    getLabels() {
+        return [];
+    }
+
     _getClassName() {
         return this.className || this.toObject().className;
     }

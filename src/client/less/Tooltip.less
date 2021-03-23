@@ -1,15 +1,17 @@
 @import (less) "variables.less";
 .tooltip {
-
     @height: 150px;
 
     display: none;
     grid-template-columns: @height 1fr 25px;
-    grid-template-rows: 25px calc(@height - 25px) minmax(min-content, max-content) minmax(min-content, max-content);
-    grid-template-areas: "avatar name closeButton"
-                         "avatar info info"
-                         "menu info info"
-                         "labels labels labels";
+    grid-template-rows:
+        25px calc(@height - 25px) minmax(min-content, max-content)
+        minmax(min-content, max-content);
+    grid-template-areas:
+        "avatar name closeButton"
+        "avatar info info"
+        "menu info info"
+        "labels labels labels";
 
     .closeButton {
         grid-area: closeButton;
@@ -112,10 +114,27 @@
                 font-weight: bold;
             }
         }
-
     }
 
     .labels {
         grid-area: labels;
+        font-size: 24px;
+
+        .label {
+            display: inline-block;
+            background-color: @dusk;
+
+            &:hover {
+                background-color: @dark;
+            }
+        }
+
+        .button {
+            --button-height: 35px;
+            --background-color: @dusk;
+            --hover-color: @dark;
+            width: 35px;
+            border-radius: 35px;
+        }
     }
 }

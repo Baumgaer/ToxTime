@@ -14,6 +14,14 @@ export default ClientModel.buildClientExport(class Label extends CommonClientLab
         }
     };
 
+    getAvatar() {
+        return {
+            type: "component",
+            name: "label-icon",
+            title: window.$t("label")
+        };
+    }
+
     @CommonClientLabel.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async delete() {
         if (!this._id) return this.destroy();

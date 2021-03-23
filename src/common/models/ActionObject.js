@@ -38,8 +38,11 @@ export function ActionObjectMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            //return [this.sceneObject];
             return this.sceneObject.getSubObjects();
+        }
+
+        getLabels() {
+            return this.labels.concat(this.sceneObject.getLabels());
         }
     }
     return ActionObject;

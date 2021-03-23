@@ -45,6 +45,14 @@ export function RequisiteMixinClass(MixinClass) {
         getSubObjects() {
             return this.clickAreas.concat(this.actionObjects);
         }
+
+        getLabels() {
+            let labels = this.labels;
+            for (const subObject of this.getSubObjects()) {
+                labels = labels.concat(subObject.getLabels());
+            }
+            return labels;
+        }
     }
     return Requisite;
 }

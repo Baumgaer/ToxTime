@@ -50,6 +50,7 @@
                  :autoCreate="true"
                  ref="tooltip"
         />
+        <slot></slot>
     </section>
 </template>
 

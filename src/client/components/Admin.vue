@@ -63,6 +63,7 @@
                           :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
                           :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
                           :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
+                          :ref="item._dummyId"
                     />
                 </div>
                 <div v-else class="empty">{{ $t('noContent') }}</div>
@@ -101,6 +102,7 @@ import Player from "~client/components/Player";
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
 import Lesson from "~client/models/Lesson";
+import Label from "~client/models/Label";
 
 import { capitalize } from "~common/utils";
 import natSort from "natsort";
@@ -124,7 +126,8 @@ export default {
             filesStore: {},
             category: "users",
             itemsCollapsed: false,
-            search: ""
+            search: "",
+            focusInputField: null
         };
     },
     computed: {
@@ -210,6 +213,9 @@ export default {
                 } else if(category === "lessons") {
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                     window.activeUser.editingModel = ApiClient.store.addModel(new Lesson.Model());
+                } else if (category === "labels") {
+                    const addedModel = ApiClient.store.addModel(new Label.Model());
+                    addedModel.save();
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });
         },
