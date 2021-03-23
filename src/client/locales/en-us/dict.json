@@ -107,5 +107,7 @@
     "fileType": "File type",
     "fileSize": "File size",
     "trash": "Trash can",
-    "restore": "Restore"
+    "restore": "Restore",
+    "labels": "Labels",
+    "label": "Label"
 }

@@ -58,6 +58,7 @@ import MovieOpenIcon from "vue-material-design-icons/MovieOpen";
 import PinIcon from "vue-material-design-icons/Pin";
 import TrashCanIcon from "vue-material-design-icons/TrashCan";
 import DeleteRestoreIcon from "vue-material-design-icons/DeleteRestore";
+import LabelMultipleIcon from "vue-material-design-icons/LabelMultiple";
 
 if (Object.keys(window.userInformation).length) {
     ApiClient.handleModels(window.userInformation);
@@ -107,3 +108,4 @@ Vue.component('movie-open-icon', MovieOpenIcon);
 Vue.component('pin-icon', PinIcon);
 Vue.component('trash-can-icon', TrashCanIcon);
 Vue.component('delete-restore-icon', DeleteRestoreIcon);
+Vue.component('label-multiple-icon', LabelMultipleIcon);

@@ -23,6 +23,9 @@
                 <Button ref="files" name="files" :active="this.category === 'files'" :showLoadingSpinner="filesLoading" @click="onNavButtonClick('files')" >
                     <file-multiple-icon />
                 </Button>
+                <Button ref="labels" name="labels" :active="this.category === 'labels'" @click="onNavButtonClick('labels')" >
+                    <label-multiple-icon />
+                </Button>
                 <Button ref="trash" name="trash" :active="this.category === 'trash'" @click="onNavButtonClick('trash')" >
                     <trash-can-icon />
                 </Button>

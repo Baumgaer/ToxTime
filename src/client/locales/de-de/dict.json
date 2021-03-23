@@ -107,5 +107,7 @@
     "fileType": "Dateityp",
     "fileSize": "Dateigröße",
     "trash": "Mülleimer",
-    "restore": "Wiederherstelen"
+    "restore": "Wiederherstelen",
+    "labels": "Label",
+    "label": "Label"
 }
