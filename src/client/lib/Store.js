@@ -59,6 +59,9 @@ export class Store {
     }
 
     get trash() {
+        for (const key in this._trash) {
+            if (key !== "__ob__") delete this._trash[key];
+        }
         const collections = Object.values(this.collections);
         for (const collection of collections) {
             for (const modelId in collection) {

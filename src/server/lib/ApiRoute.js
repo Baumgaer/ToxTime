@@ -253,6 +253,15 @@ export default class ApiRoute extends DefaultRoute {
         request.body[field] = request.body?.[field]?.filter?.((item) => Boolean(item));
     }
 
+    async markDependentsOfModelWith(model, callback) {
+        const dependantModels = await model.getDependantReferencedModels();
+        for (const dependantModel of dependantModels) {
+            await this.markDependentsOfModelWith(dependantModel, callback.bind(this));
+            await callback(dependantModel);
+            await dependantModel.save();
+        }
+    }
+
     /**
      * Deletes a model by the given id and returns the old result if model was found
      *
@@ -265,6 +274,21 @@ export default class ApiRoute extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         const schemaObj = this.claimedExport.Schema.obj;
 
+        const helper = {
+            somehowStickyReferenced: async (model) => {
+                return model.isStickyReferenced() && ((await model.getStickyReferencingModels()).length || await helper.someDependentsAreStickyReferenced(model));
+            },
+            someDependentsAreStickyReferenced: async (model) => {
+                const dependantModels = await model.getDependantReferencedModels();
+                for (const dependantModel of dependantModels) {
+                    if (helper.somehowStickyReferenced(dependantModel)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
         try {
             const model = await this.claimedExport.Model.findById(request.params.id).exec();
             if (!model) return new httpErrors.NotFound();
@@ -272,13 +296,8 @@ export default class ApiRoute extends DefaultRoute {
             // Check if model is sticky used by at least one other model
             // If yes, just mark it as deleted but do not delete it really.
             // Do the same for all direct dependant models
-            const stickyReferencingModels = await model.getStickyReferencingModels();
-            if (model.isStickyReferenced() && stickyReferencingModels.length) {
-                const dependantModels = await model.getDependantReferencedModels();
-                for (const dependantModel of dependantModels) {
-                    dependantModel.deleted = true;
-                    await dependantModel.save();
-                }
+            if (await helper.somehowStickyReferenced(model)) {
+                await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = true; });
                 model.deleted = true;
                 await model.save();
                 return model;
@@ -318,6 +337,18 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.patch("/restore/:id")
     async restore(request) {
-        console.log(request);
+        try {
+            const model = await this.claimedExport.Model.findById(request.params.id).exec();
+            if (!model) return new httpErrors.NotFound();
+
+            await this.markDependentsOfModelWith(model, (dependant) => {
+                dependant.deleted = false;
+            });
+            model.deleted = false;
+            await model.save();
+            return model;
+        } catch (error) {
+            return error;
+        }
     }
 }

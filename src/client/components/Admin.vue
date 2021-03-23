@@ -129,6 +129,7 @@ export default {
             const levenshteinValues = {};
             return Object.values(this.store).filter((item) => {
                 if (this.category !== "trash" && item.deleted) return false;
+                if (this.category === "trash" && !item.deleted) return false;
                 if (!this.search) return true;
 
                 /** @type {string} */

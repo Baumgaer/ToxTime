@@ -41,7 +41,7 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
 
     @CommonGameObjectRequisite.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
     async restore() {
-        const result = await ApiClient.delete(`/${this.collection}/restore/${this._id}`);
+        const result = await ApiClient.patch(`/${this.collection}/restore/${this._id}`);
 
         // We do not want to delete sub objects in case of an error or object
         // was just marked as deleted because it's sticky
