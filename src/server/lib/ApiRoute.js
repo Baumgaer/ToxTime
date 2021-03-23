@@ -276,14 +276,12 @@ export default class ApiRoute extends DefaultRoute {
 
         const helper = {
             somehowStickyReferenced: async (model) => {
-                return model.isStickyReferenced() && ((await model.getStickyReferencingModels()).length || await helper.someDependentsAreStickyReferenced(model));
+                return model.isStickyReferenced() && (await model.getStickyReferencingModels()).length || await helper.someDependentsAreStickyReferenced(model);
             },
             someDependentsAreStickyReferenced: async (model) => {
                 const dependantModels = await model.getDependantReferencedModels();
                 for (const dependantModel of dependantModels) {
-                    if (helper.somehowStickyReferenced(dependantModel)) {
-                        return true;
-                    }
+                    if (await helper.somehowStickyReferenced(dependantModel)) return true;
                 }
                 return false;
             }
