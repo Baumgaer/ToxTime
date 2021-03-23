@@ -46,7 +46,7 @@ export default {
     computed: {
         labels() {
             const items = Object.values(this.allLabels).filter((label) => {
-                return !this.model.labels.includes(label);
+                return !this.model.getLabels().includes(label);
             });
             return itemFilterAndSort(items, this.search);
         }
