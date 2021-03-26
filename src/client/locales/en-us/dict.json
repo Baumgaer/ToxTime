@@ -112,5 +112,7 @@
     "label": "Label",
     "newNeutral": "New",
     "newMaskulin": "New",
-    "newFeminin": "New"
+    "newFeminin": "New",
+    "addLabel": "Add Label",
+    "addCertainLabel": "Add Label \"{label}\""
 }
