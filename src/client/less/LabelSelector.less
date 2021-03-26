@@ -1,0 +1,27 @@
+@import (less) "variables";
+
+.labelSelector {
+    .search input {
+        outline: none;
+        user-select: none;
+        background-color: lighten(@dusk, 2%);
+        padding: 7px;
+        border-radius: 4px 4px 0 0;
+        border: none;
+        color: @white;
+
+        &::placeholder {
+            color: @light;
+            opacity: 0.75;
+        }
+
+        &:hover {
+            background-color: @gray;
+        }
+
+        &:focus {
+            background-color: @white;
+            color: @black;
+        }
+    }
+}

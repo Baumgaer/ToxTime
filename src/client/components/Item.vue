@@ -52,7 +52,9 @@
                  :preventTooltipHiding="preventTooltipHiding"
                  ref="tooltip"
         />
-        <slot></slot>
+        <div class="slotted">
+            <slot></slot>
+        </div>
     </section>
 </template>
 

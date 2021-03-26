@@ -46,7 +46,7 @@
         <div class="labels" v-if="model.labels">
             <span class="label" v-for="label of model.getLabels()" :key="label._id" :style="`${!model.labels.includes(label) ? 'opacity: 0.8;' : ''}`">
                 <item-component :model="label" :compactMode="true" :preventTooltipHiding="true">
-                    <span>X</span>
+                    <span v-if="model.labels.includes(label)" @click="onLabelDeleteButtonClick(label)">X</span>
                 </item-component>
             </span>
             <Button v-if="model.labels" name="addLabel" :showLabel="false" ref="addLabelButton" @click="onAddLabelButtonClick"><plus-icon /></Button>
@@ -117,6 +117,13 @@ export default {
         onAddLabelButtonClick() {
             this.labelSelectorCreated = true;
             this.labelSelectorOpen = true;
+        },
+
+        onLabelDeleteButtonClick(label) {
+            const index = this.model.labels.indexOf(label);
+            if (index < 0) return;
+            this.model.labels.splice(index, 1);
+            this.model.save();
         },
 
         /**

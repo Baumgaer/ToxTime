@@ -118,19 +118,49 @@
 
     .labels {
         grid-area: labels;
-        font-size: 24px;
 
         .label {
             display: inline-block;
+            position: relative;
             vertical-align: middle;
             background-color: @dark;
             margin: 5px;
+            height: 25px;
 
             border-radius: 50px;
             overflow: hidden;
 
             &:hover {
                 background-color: @dusk;
+            }
+
+            &::v-deep {
+                .item {
+                    grid-template-columns: 25px 1fr;
+
+                    .info {
+                        margin-right: 30px;
+                    }
+
+                    .tooltip {
+                        font-size: initial;
+                    }
+                }
+
+                .slotted > span {
+                    position: absolute;
+                    top: 50%;
+                    right: 5px;
+                    transform: translate(0, -50%);
+                    border-radius: 50px;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+
+                    &:hover {
+                        background-color: @dark;
+                    }
+                }
             }
         }
 

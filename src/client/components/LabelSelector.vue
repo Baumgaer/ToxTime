@@ -96,4 +96,4 @@ export default {
 };
 </script>
 
-<!-- <style lang="less" scoped src="~client/less/LabelSelector.less"></style> -->
+<style lang="less" scoped src="~client/less/LabelSelector.less"></style>
