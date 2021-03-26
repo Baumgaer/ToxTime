@@ -1,7 +1,7 @@
 <template>
-    <div :class="`${active ? 'button active' : 'button'} ${showLoadingSpinner ? 'buttonLoading' : ''}`" :title="$t(this.name)" v-on:click="$emit('click', $event)">
+    <div :class="`${active ? 'button active' : 'button'} ${showLoadingSpinner ? 'buttonLoading' : ''}`" :title="transName" v-on:click="$emit('click', $event)">
         <div class="icon"><slot></slot></div>
-        <div v-show="showLabel" class="label">{{ $t(this.name) }}</div>
+        <div v-show="showLabel" class="label">{{ transName }}</div>
     </div>
 </template>
 
@@ -9,11 +9,17 @@
 export default {
     props: {
         name: String,
+        nameIsTranslated: Boolean,
         active: Boolean,
         showLoadingSpinner: Boolean,
         showLabel: {
             type: Boolean,
             default: true
+        }
+    },
+    computed: {
+        transName() {
+            return this.nameIsTranslated ? this.name : this.$t(this.name);
         }
     }
 };

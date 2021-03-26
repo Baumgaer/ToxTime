@@ -1,6 +1,6 @@
 <template>
     <header>
-        <h2>{{ $t(name) }}</h2>
+        <h2>{{ nameIsTranslated ? this.name : $t(name) }}</h2>
         <div class="buttons">
             <Button class="close" name="close" :showLabel="false" @click="onCloseButtonClick" >
                 <close-icon />
@@ -29,6 +29,7 @@ export default {
             type: String,
             required: true
         },
+        nameIsTranslated: Boolean,
         onSaveButtonClick:{
             type: Function,
             required: true

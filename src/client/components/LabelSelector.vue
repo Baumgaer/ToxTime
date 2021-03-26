@@ -5,7 +5,7 @@
         </div>
         <div class="labels">
             <item-component v-for="label in labels" :key="label._id" :model="label" :preventTooltipHiding="true" draggable="false" :compactMode="true" @click="onItemClick(label)"></item-component>
-            <Button v-if="search" :name="$t('addCertainLabel', {label: search})" @click="onAddLabelButtonClick"><label-icon /></Button>
+            <Button v-if="search" :name="$t('addCertainLabel', {label: search})" :nameIsTranslated="true" @click="onAddLabelButtonClick"><label-icon /></Button>
         </div>
     </div>
 </template>
