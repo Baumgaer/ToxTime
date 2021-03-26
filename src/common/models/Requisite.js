@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { uniq } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -47,10 +48,7 @@ export function RequisiteMixinClass(MixinClass) {
         }
 
         getLabels() {
-            let labels = this.labels.concat(this.file.getLabels());
-            for (const subObject of this.getSubObjects()) {
-                labels = labels.concat(subObject.getLabels());
-            }
+            let labels = uniq(this.labels.concat(this.file.getLabels()));
             return labels;
         }
     }

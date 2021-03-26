@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { uniq } from "~common/utils";
 /**
  * Creates a new class with the returned class extended by the MixinClass
  *
@@ -42,7 +43,7 @@ export function ActionObjectMixinClass(MixinClass) {
         }
 
         getLabels() {
-            return this.labels.concat(this.sceneObject.getLabels());
+            return uniq(this.labels.concat(this.sceneObject.getLabels()));
         }
     }
     return ActionObject;
