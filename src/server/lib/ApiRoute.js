@@ -199,16 +199,32 @@ export default class ApiRoute extends DefaultRoute {
 
         try {
             const id = request.params.id;
+            const modelApiMapping = this.webServer.modelApiMapping;
             const myRequestBody = await this.ProcessChildModels(request);
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(request.body, { lastModified: new Date() });
             delete myRequestBody._id;
+
             let model = await this.claimedExport.Model.findByIdAndUpdate(id, myRequestBody).exec();
             if (!model) return new httpErrors.NotFound();
+
+            // Delete all sticky referenced but deleted models which have lost
+            // their last reference by editing this model
+            const stickyReferencedDeletedModels = await model.getStickyReferencedDeletedModels();
+            for (const stickyReferencedDeletedModel of stickyReferencedDeletedModels) {
+                const stickyReferencingModels = await stickyReferencedDeletedModel.getStickyReferencingModels();
+                if (!stickyReferencingModels.length || stickyReferencingModels.length === 1 && stickyReferencingModels[0] === model) {
+                    request.params.id = stickyReferencedDeletedModel._id.toString();
+                    await modelApiMapping[stickyReferencedDeletedModel._getClassName()].delete(request);
+                }
+            }
+
+            // Get new updated version of the model
             model = await this.claimedExport.Model.findById(id).exec();
             const modelObject = merge(responseBody, model.toObject());
             return modelObject;
         } catch (error) {
+            console.error(error);
             return error;
         }
     }
@@ -262,6 +278,18 @@ export default class ApiRoute extends DefaultRoute {
         }
     }
 
+    async somehowStickyReferenced(model) {
+        return model.isStickyReferenced() && (await model.getStickyReferencingModels()).length || await this.someDependentsAreStickyReferenced(model);
+    }
+
+    async someDependentsAreStickyReferenced(model) {
+        const dependantModels = await model.getDependantReferencedModels();
+        for (const dependantModel of dependantModels) {
+            if (await this.somehowStickyReferenced(dependantModel)) return true;
+        }
+        return false;
+    }
+
     /**
      * Deletes a model by the given id and returns the old result if model was found
      *
@@ -274,19 +302,6 @@ export default class ApiRoute extends DefaultRoute {
         if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
         const schemaObj = this.claimedExport.Schema.obj;
 
-        const helper = {
-            somehowStickyReferenced: async (model) => {
-                return model.isStickyReferenced() && (await model.getStickyReferencingModels()).length || await helper.someDependentsAreStickyReferenced(model);
-            },
-            someDependentsAreStickyReferenced: async (model) => {
-                const dependantModels = await model.getDependantReferencedModels();
-                for (const dependantModel of dependantModels) {
-                    if (await helper.somehowStickyReferenced(dependantModel)) return true;
-                }
-                return false;
-            }
-        };
-
         try {
             const model = await this.claimedExport.Model.findById(request.params.id).exec();
             if (!model) return new httpErrors.NotFound();
@@ -294,7 +309,7 @@ export default class ApiRoute extends DefaultRoute {
             // Check if model is sticky used by at least one other model
             // If yes, just mark it as deleted but do not delete it really.
             // Do the same for all direct dependant models
-            if (await helper.somehowStickyReferenced(model)) {
+            if (await this.somehowStickyReferenced(model)) {
                 await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = true; });
                 model.deleted = true;
                 await model.save();
