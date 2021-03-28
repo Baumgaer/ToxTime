@@ -18,6 +18,10 @@ window._store = ApiClient.store;
 Vue.use(TextareaAutosize);
 Vue.use(Toasted, { duration: 5000 });
 
+Vue.config.productionTip = false;
+Vue.prototype.window = window;
+Vue.prototype.global = window;
+
 
 // Import Icons
 import AccountIcon from "vue-material-design-icons/Account";
@@ -60,15 +64,6 @@ import TrashCanIcon from "vue-material-design-icons/TrashCan";
 import DeleteRestoreIcon from "vue-material-design-icons/DeleteRestore";
 import LabelMultipleIcon from "vue-material-design-icons/LabelMultiple";
 import LabelIcon from "vue-material-design-icons/Label";
-
-if (Object.keys(window.userInformation).length) {
-    ApiClient.handleModels(window.userInformation);
-    window.activeUser = ApiClient.store.getModelById(window.userInformation.collection, window.userInformation._id);
-}
-
-Vue.config.productionTip = false;
-Vue.prototype.window = window;
-Vue.prototype.global = window;
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
