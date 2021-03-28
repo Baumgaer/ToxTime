@@ -133,6 +133,8 @@ export default {
          */
         onDragStart(event) {
             event.stopPropagation();
+            this.$refs.tooltip?.tippy?.clearDelayTimeouts?.();
+            this.$refs.tooltip?.tippy?.hide?.();
             ApiClient.store.collection("localStorage").isInternalDnD = true;
             event.dataTransfer.setData("model", JSON.stringify({collection: this.model.collection, _id: this.model._id}));
         },
