@@ -296,7 +296,7 @@ export default class ClientModel extends BaseModel {
      * Returns the final object respecting the server response or an error if a
      * none success response status was received.
      *
-     * @returns {Record<string, any> | Error}
+     * @returns {Promise<Record<string, any> | Error>}
      * @memberof ClientModel
      */
     async save() {
