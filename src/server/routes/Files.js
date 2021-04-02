@@ -25,6 +25,7 @@ export default class Files extends ApiRoute {
         if (result instanceof Error) return result;
         const model = result;
         if (!model) return httpErrors.NotFound();
+        if (model.fileName.endsWith(".svg")) response.setHeader("Content-Type", "image/svg+xml");
         return fs.readFileSync(path.resolve(arp.path, "uploads", model.fileName));
     }
 

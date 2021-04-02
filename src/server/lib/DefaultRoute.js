@@ -3,7 +3,7 @@ import arp from "app-root-path";
 import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
 import CustomError from "~common/lib/CustomError";
-import { getPrototypeNamesRecursive, merge, isPlainObject, isValue, isArray } from "~common/utils";
+import { getPrototypeNamesRecursive, merge, isValue } from "~common/utils";
 import { Error } from "mongoose";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
@@ -253,7 +253,10 @@ export default class DefaultRoute {
                 // (html or text). It is also possible to send a file here,
                 // especially when the result is a buffer.
                 // In this case the content type has to be set manually.
-                if (result instanceof Buffer) response.setHeader("Content-Type", (await fromBuffer(result)).mime);
+                if (result instanceof Buffer && !response.getHeader("Content-Type")) {
+                    const type = await fromBuffer(result);
+                    response.setHeader("Content-Type", type.mime);
+                }
                 response.send(result);
             } else if (typeof result === "object") {
                 // This is a general response. Normally all responses should be
