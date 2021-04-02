@@ -149,7 +149,9 @@ export default {
 
         addBackground(model) {
             if (!(model instanceof File.RawClass) || !model.mime.startsWith("image")) return;
+            const view = this.$refs.graphicViewer.paper.view;
             this.model.file = model;
+            if (!this.model.position) this.model.position = [view.center.x, view.center.y];
         },
 
         addActionObject(model) {

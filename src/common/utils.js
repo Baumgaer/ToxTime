@@ -234,9 +234,9 @@ export function isMongoId(value) {
 /**
  * converts an svg string to base64 png using the domUrl
  * @param {string} svgText the svgtext
- * @return {Promise} a promise to the bas64 png image
+ * @return {Promise<File>} a promise to the bas64 png image
  */
-export function svgToPng(svgText) {
+export function svgToPng(svgText, options = {}) {
     // convert an svg text to png using the browser
     return new Promise((resolve, reject) => {
         try {
@@ -246,12 +246,12 @@ export function svgToPng(svgText) {
             // make a blob from the svg, convert it to a url and assign this url to an image
             const svg = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
 
-            imageCompression(svg, {
+            imageCompression(svg, Object.assign({
                 fileType: "image/png",
                 maxWidthOrHeight: 500,
                 maxSizeMB: 2,
                 initialQuality: 0.5
-            }).then((file) => {
+            }, options)).then((file) => {
                 resolve(file);
             });
         } catch (err) {

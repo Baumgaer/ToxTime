@@ -138,11 +138,21 @@ export default {
         onBackgroundLoaded() {
             if (this.paper.view.background) this.paper.view.background.remove();
             const raster = new this.paper.Raster(this.$refs.background);
-            raster.position = this.paper.view.center;
+
+            raster.position = this.model.position ? new this.paper.Point(...this.model.position) : this.paper.view.center;
             raster.scaling = this.paper.project.activeLayer.getScaling();
-            raster.position = this.model.position;
+
+            // add fixed size to have a "fixed fixpoint" for action objects and
+            // click areas. If this is not done and the background is a svg,
+            // the background scales on window resize while all other objects
+            // are on a fixed position
+            const oldWidth = this.$refs.background.naturalWidth;
+            const oldHeight = this.$refs.background.naturalHeight;
+            const newWidth = 3840;
+            const newHeight = parseInt(oldHeight) * newWidth / parseInt(oldWidth);
+            raster.size = new this.paper.Size(newWidth, newHeight);
+
             raster.sendToBack();
-            this.model.position = [raster.position.x, raster.position.y];
             this.paper.view.background = raster;
             this.paper.view.draw();
             this.adjustViewToBorder();
