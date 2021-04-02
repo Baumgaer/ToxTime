@@ -21,6 +21,7 @@
                     autocomplete="off"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
                     @change="onNameChange($event, model)"
+                    @keyup="onNameKeyUp($event)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
                 />
@@ -143,6 +144,14 @@ export default {
             ApiClient.store.collection("localStorage").isInternalDnD = false;
         },
 
+        onNameKeyUp(event) {
+            if (event.key === "Escape") {
+                this.$refs.nameInput.value = this.model.getName();
+                this.$refs.nameInput.blur();
+            }
+            if (event.key === "Enter") this.$refs.nameInput.blur();
+        },
+
         /**
          * @param {Event} event
          * @param {import("~client/lib/ClientModel").default} model
@@ -150,6 +159,7 @@ export default {
         async onNameChange(event, model) {
             if (!this.nameEditDBField) return;
             model[this.nameEditDBField] = event.target.value;
+            this.$refs.nameInput.blur();
             const result = await model.save();
             if (result instanceof Error) return;
             this.$toasted.success(this.$t("saved", { name: model.getName() }), { className: "successToaster" });
