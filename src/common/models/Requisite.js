@@ -48,8 +48,9 @@ export function RequisiteMixinClass(MixinClass) {
         }
 
         getLabels() {
-            let labels = uniq(this.labels.concat(this.file.getLabels()));
-            return labels;
+            let labels = this.labels;
+            if (this.file) labels = labels.concat(this.file.getLabels());
+            return uniq(labels);
         }
     }
     return Requisite;
