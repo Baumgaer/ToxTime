@@ -20,7 +20,7 @@
                     ref="nameInput"
                     autocomplete="off"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
-                    @change="onNameChange($event, model)"
+                    @change="onNameChange($event)"
                     @keyup="onNameKeyUp($event)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
@@ -66,6 +66,8 @@ import ApiClient from "~client/lib/ApiClient";
 import Tooltip from "~client/components/Tooltip";
 import Avatar from "~client/components/Avatar";
 
+import ClientModel from "~client/lib/ClientModel";
+
 export default {
     name: "item-component",
     components: {
@@ -76,7 +78,7 @@ export default {
     },
     props: {
         model: {
-            type: Object,
+            type: ClientModel,
             required: true
         },
         nameEditDBField: String,
@@ -154,15 +156,28 @@ export default {
 
         /**
          * @param {Event} event
-         * @param {import("~client/lib/ClientModel").default} model
          */
-        async onNameChange(event, model) {
+        async onNameChange(event) {
             if (!this.nameEditDBField) return;
-            model[this.nameEditDBField] = event.target.value;
+            this.model[this.nameEditDBField] = event.target.value;
             this.$refs.nameInput.blur();
-            const result = await model.save();
+
+            // Determine top most model to have recursive save.
+            // Important to have more consistency when creating new objects
+            // and renaming sub objects while current creating object is not
+            // stored
+            let modelToSave = this.model;
+            let parent = this.$parent;
+            while (parent && parent.isItem) {
+                if (parent.model.getSubObjects().includes(this.model)) {
+                    modelToSave = parent.model;
+                    parent = parent.$parent;
+                } else break;
+            }
+
+            const result = await modelToSave.save();
             if (result instanceof Error) return;
-            this.$toasted.success(this.$t("saved", { name: model.getName() }), { className: "successToaster" });
+            this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         }
     }
 };
