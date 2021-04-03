@@ -307,6 +307,16 @@ export default class BaseModel {
         return this.isSpecialReferenced("reverseDependant");
     }
 
+    includesDeletedModel() {
+        let result = false;
+        this.iterateModels((model, key, parentValue, context) => {
+            if (!model.deleted) return;
+            result = true;
+            context.break();
+        });
+        return result;
+    }
+
     /**
      * Collects and caches all registered actions while assigning the context and returns them
      *

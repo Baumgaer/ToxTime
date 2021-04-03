@@ -1,6 +1,6 @@
 <template>
     <section
-        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects ? ' withChildren' : ''}`"
+        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects ? ' withChildren' : ''}${model.deleted ? ' deleted' : ''}`"
         draggable
         @dragstart="onDragStart($event)"
         @dragend="onDragEnd($event)"

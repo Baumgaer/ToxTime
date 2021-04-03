@@ -39,6 +39,7 @@ export function ActionObjectMixinClass(MixinClass) {
         };
 
         getSubObjects() {
+            if (this.sceneObject?.deleted) return [this.sceneObject];
             return this.sceneObject.getSubObjects();
         }
 

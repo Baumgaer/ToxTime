@@ -33,6 +33,18 @@
         }
     }
 
+    &.deleted {
+        .info {
+            .name {
+                color: @warningColor;
+
+                input {
+                    color: @warningColor;
+                }
+            }
+        }
+    }
+
     &:hover {
         background-color: var(--gray-color, @gray);
         opacity: 1 !important;
