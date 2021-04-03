@@ -20,3 +20,19 @@
 .infoToaster {
     background: var(--info-color, @infoColor) !important;
 }
+
+.swal-modal {
+    font-family: Avenir, Helvetica, Arial, sans-serif !important;
+
+    .swal-footer {
+        .swal-button-container {
+            .confirm {
+                background-color: @successColor;
+            }
+
+            .reject {
+                background-color: @failColor;
+            }
+        }
+    }
+}

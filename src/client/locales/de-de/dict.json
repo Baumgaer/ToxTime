@@ -114,5 +114,7 @@
     "newMaskulin": "Neuer",
     "newFeminin": "Neue",
     "addLabel": "Laben hinzufügen",
-    "addCertainLabel": "Label \"{label}\" hinzufügen"
+    "addCertainLabel": "Label \"{label}\" hinzufügen",
+    "closeItTitle": "Ungespeicherte Änderungen",
+    "closeItQuestion": "\"{name}\" hat nicht gespeicherte Änderungen. Sollen diese wirklich verworfen werden?"
 }

@@ -114,5 +114,7 @@
     "newMaskulin": "New",
     "newFeminin": "New",
     "addLabel": "Add Label",
-    "addCertainLabel": "Add Label \"{label}\""
+    "addCertainLabel": "Add Label \"{label}\"",
+    "closeItTitle": "Unsaved changes",
+    "closeItQuestion": "\"{name}\" has unsaved changes. Do you really want to discard them?"
 }

@@ -16,6 +16,7 @@
 <script>
 import Button from "~client/components/Button";
 import ClientModel from "~client/lib/ClientModel";
+import sweetAlert from "sweetalert";
 
 export default {
     components: {
@@ -66,7 +67,29 @@ export default {
         }
     },
     methods: {
-        onCloseButtonClick() {
+        async onCloseButtonClick() {
+            if (this.model.hasChangesDeep()) {
+                const answer = await sweetAlert({
+                    title: this.$t("closeItTitle"),
+                    text: this.$t("closeItQuestion", {
+                        name: this.model.getName()
+                    }),
+                    className: "alert",
+                    buttons: {
+                        yes: {
+                            text: this.$t("true"),
+                            className: "confirm",
+                            value: true
+                        },
+                        no: {
+                            text: this.$t("false"),
+                            className: "reject",
+                            value: false
+                        }
+                    }
+                });
+                if (!answer) return;
+            }
             this.closeButtonClicked = true;
             this.$emit("closeButtonClick");
             window.activeUser.activeEditor = null;
