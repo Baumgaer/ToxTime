@@ -13,7 +13,7 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
         };
     }
 
-    @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
+    @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
     async delete() {
         if (!this._id) {
             this.destroy();

@@ -61,11 +61,11 @@ export default class BaseModel {
      * @returns
      * @memberof BaseModel
      */
-    static action(name, symbol, conditionFunc) {
+    static action(name, symbol, conditionFunc, needsConfirmation) {
         return (target, methodName) => {
             const _handler = target[methodName];
             if (!globalActions[target.constructor.name]) globalActions[target.constructor.name] = {};
-            merge(globalActions[target.constructor.name], { [name]: { symbol, _handler, conditionFunc } });
+            merge(globalActions[target.constructor.name], { [name]: { symbol, _handler, conditionFunc, needsConfirmation } });
         };
     }
 

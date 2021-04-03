@@ -29,7 +29,12 @@
             </div>
             <div class="actions" v-if="!compactMode">
                 <div v-for="action of model.actions" :key="`${model._id || model._dummyId}${action.name}`" class="action">
-                    <Button  v-if="action.symbol.type === 'component' && action.condition" class="action" :name="action.name" :showLabel="false" @click="action.func()">
+                    <Button v-if="action.symbol.type === 'component' && action.condition"
+                            class="action"
+                            :name="action.name"
+                            :showLabel="false"
+                            @click="action.needsConfirmation ? confirm(action) : action.func()"
+                    >
                         <component :is="action.symbol.name"></component>
                     </Button>
                 </div>
@@ -65,6 +70,7 @@ import ProgressBar from "~client/components/ProgressBar";
 import ApiClient from "~client/lib/ApiClient";
 import Tooltip from "~client/components/Tooltip";
 import Avatar from "~client/components/Avatar";
+import sweetAlert from "sweetalert";
 
 import ClientModel from "~client/lib/ClientModel";
 
@@ -152,6 +158,31 @@ export default {
                 this.$refs.nameInput.blur();
             }
             if (event.key === "Enter") this.$refs.nameInput.blur();
+        },
+
+        async confirm(action) {
+            const answer = await sweetAlert({
+                title: this.$t("confirmTitle", { type: this.$t(action.name) }),
+                text: this.$t("confirmQuestion", {
+                    name: this.model.getName(),
+                    type: this.$t(action.name).toLowerCase()
+                }),
+                className: "alert",
+                buttons: {
+                    yes: {
+                        text: this.$t("true"),
+                        className: "confirm",
+                        value: true
+                    },
+                    no: {
+                        text: this.$t("false"),
+                        className: "reject",
+                        value: false
+                    }
+                }
+            });
+            if (!answer) return;
+            action.func();
         },
 
         /**

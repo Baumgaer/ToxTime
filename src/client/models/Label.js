@@ -22,7 +22,7 @@ export default ClientModel.buildClientExport(class Label extends CommonClientLab
         };
     }
 
-    @CommonClientLabel.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
+    @CommonClientLabel.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
     async delete() {
         if (!this._id) return this.destroy();
         const result = await ApiClient.delete(`/labels/${this._id}`);
