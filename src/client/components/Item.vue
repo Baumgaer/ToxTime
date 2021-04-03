@@ -167,13 +167,7 @@ export default {
             // and renaming sub objects while current creating object is not
             // stored
             let modelToSave = this.model;
-            let parent = this.$parent;
-            while (parent && parent.isItem) {
-                if (parent.model.getSubObjects().includes(this.model)) {
-                    modelToSave = parent.model;
-                    parent = parent.$parent;
-                } else break;
-            }
+            if (this.$parent?.isItem && this.$parent.model?.hasChanges()) modelToSave = this.$parent.model;
 
             const result = await modelToSave.save();
             if (result instanceof Error) return;
