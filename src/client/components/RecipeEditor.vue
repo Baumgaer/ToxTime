@@ -9,13 +9,20 @@
 import EditorHead from "~client/components/EditorHead";
 import paper from "paper";
 
+import Recipe from "~client/models/Recipe";
+
 export default {
     components: {
         EditorHead
     },
+    props: {
+        model: {
+            type: Recipe.RawClass,
+            required: true
+        }
+    },
     data() {
         return {
-            model: window.activeUser.editingModel,
             paper: new paper.PaperScope()
         };
     },
