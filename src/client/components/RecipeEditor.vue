@@ -1,14 +1,13 @@
 <template>
-    <div class="recipeEditor">
+    <div class="recipeEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addRecipe" :model="model" />
-        <div class="input"></div>
-        <div class="transition"></div>
-        <div class="output"></div>
+        <canvas ref="canvas" resize></canvas>
     </div>
 </template>
 
 <script>
 import EditorHead from "~client/components/EditorHead";
+import paper from "paper";
 
 export default {
     components: {
@@ -16,34 +15,21 @@ export default {
     },
     data() {
         return {
-            model: window.activeUser.editingModel
+            model: window.activeUser.editingModel,
+            paper: new paper.PaperScope()
         };
     },
+    mounted() {
+        this.paper.setup(this.$refs.canvas);
+        this.paper.activate();
+        this.paper.settings.handleSize = 10;
+        this.paper.project.activeLayer.applyMatrix = false;
+        this.paper.project.currentStyle.strokeScaling = false;
+    },
     methods: {
-        onInputDrop() {
-            console.log("InputDrop");
-        },
-
-        onOutputDrop() {
-            console.log("OutputDrop");
-        },
-
-        /**
-         * @see https://stackoverflow.com/questions/14560302/html-line-drawing-without-canvas-just-js
-         */
-        lineDraw(ax,ay,bx,by) {
-            if(ay>by) {
-                bx=ax+bx;
-                ax=bx-ax;
-                bx=bx-ax;
-                by=ay+by;
-                ay=by-ay;
-                by=by-ay;
-            }
-            let calc=Math.atan((ay-by)/(bx-ax));
-            calc=calc*180/Math.PI;
-            let length=Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
-            document.body.innerHTML += "<div id='line' style='height:" + length + "px;width:1px;background-color:black;position:absolute;top:" + (ay) + "px;left:" + (ax) + "px;transform:rotate(" + calc + "deg);-ms-transform:rotate(" + calc + "deg);transform-origin:0% 0%;-moz-transform:rotate(" + calc + "deg);-moz-transform-origin:0% 0%;-webkit-transform:rotate(" + calc  + "deg);-webkit-transform-origin:0% 0%;-o-transform:rotate(" + calc + "deg);-o-transform-origin:0% 0%;'></div>";
+        onInternalDrop(event) {
+            this.paper.activate();
+            console.log(event);
         }
     }
 };

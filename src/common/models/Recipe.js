@@ -23,28 +23,26 @@ export function RecipeMixinClass(MixinClass) {
                 type: String,
                 default: ""
             },
-            labels: {
-                type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
-                default: [],
+            input: {
+                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
                 required: true,
-                sticky: true
-            },
-            sceneObjects: {
-                type: [{ type: Schema.Types.ObjectId, ref: "SceneObject" }],
                 default: [],
-                required: true,
-                sticky: true
+                dependant: true
             },
-            actionObjects: {
-                type: [{ type: Schema.Types.ObjectId, ref: "ActionObject" }],
+            transitionSettings: {
+                type: {
+                    delay: Number,
+                    ingredientsExact: Boolean,
+                    quantityExact: Boolean
+                },
+                required: true,
+                default: {}
+            },
+            output: {
+                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
+                required: true,
                 default: [],
-                required: true,
-                sticky: true
-            },
-            clickArea: {
-                type: Schema.Types.ObjectId,
-                ref: "ClickArea",
-                sticky: true
+                dependant: true
             }
         };
 

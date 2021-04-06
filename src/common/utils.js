@@ -88,6 +88,17 @@ export function capitalize(string) {
 }
 
 /**
+ * Uncapitalizes the first character of the given string
+ *
+ * @export
+ * @param {string} string
+ * @returns {string}
+ */
+export function unCapitalize(string) {
+    return string.charAt(0).toLowerCase() + string.slice(1);
+}
+
+/**
  * Converts a csv string into an array of objects
  *
  * @export
