@@ -123,6 +123,7 @@ export default {
         this.initialBackgroundLoadedPromise = new Promise((resolve) => this.initialBackgroundLoadedResolver = resolve);
         if (!this.model.file) this.initialBackgroundLoadedResolver();
         this.paper.setup(this.$refs.canvas);
+        this.paper.activate();
         this.paper.settings.handleSize = 10;
         this.paper.project.activeLayer.applyMatrix = false;
         this.paper.project.currentStyle.strokeScaling = false;
@@ -136,6 +137,7 @@ export default {
     },
     methods: {
         onBackgroundLoaded() {
+            this.paper.activate();
             if (this.paper.view.background) this.paper.view.background.remove();
             const raster = new this.paper.Raster(this.$refs.background);
 
@@ -164,6 +166,7 @@ export default {
             // wait until the previous actionObject has fulfilled
             await this.initialBackgroundLoadedPromise;
             if (actionObjectMap.promise) await actionObjectMap.promise;
+            this.paper.activate();
 
             const actionObject = actionObjectMap.actionObject;
             // Prevent vue from inserting a model each time it gets an id update
@@ -181,6 +184,7 @@ export default {
             if (actionObjectMap.ownerGroupModel) {
                 /** @type {InstanceType<import("paper")["Group"]>} */
                 const ownerGroup = await this.getOwnerGroup(actionObjectMap);
+                this.paper.activate();
                 group.position = this.calcPosition(actionObjectMap.ownerGroupModel, ownerGroup, actionObject.position);
                 group.locked = true;
                 ownerGroup.insertChild(group.model.layer + 1, group);
@@ -196,6 +200,7 @@ export default {
         async adjustViewToBorder(args) {
             if (!this.adjustToBorder) return;
             await this.initialBackgroundLoadedPromise;
+            this.paper.activate();
             const paper = this.paper;
             const background = this.paper.view.background;
             const surroundingElement = this.$parent.$parent.$el;
@@ -286,7 +291,7 @@ export default {
 
         async setupClickAreas(model, container, locked = false) {
             await this.initialBackgroundLoadedPromise;
-
+            this.paper.activate();
             for (const clickArea of model.sceneObject.clickAreas) {
                 const path = PolyClickArea.build(this.paper, clickArea.shape, null, this.showClickAreas);
                 path.position = this.calcPosition(model, container, clickArea.position);
