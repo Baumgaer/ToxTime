@@ -70,6 +70,11 @@ export default {
             }
         };
     },
+    async mounted() {
+        await this.$refs.graphicViewer.initialBackgroundLoadedPromise;
+        await Promise.all(this.$refs.graphicViewer.actionObjectsMap.map((item) => item.promise));
+        this.$refs.graphicViewer.adjustViewToBorder(null, true);
+    },
     methods: {
         /**
          * @param {DragEvent} event

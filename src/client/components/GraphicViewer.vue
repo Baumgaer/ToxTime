@@ -188,7 +188,6 @@ export default {
         },
 
         async adjustViewToBorder(args, force) {
-            console.log(force);
             if (!force && !this.adjustToBorder) return;
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
