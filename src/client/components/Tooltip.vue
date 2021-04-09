@@ -13,6 +13,9 @@
             <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
         </div>
         <div class="info">
+            <div v-if="model.deleted" class="left">{{ $t("deleted") }}</div>
+            <div v-if="model.deleted" class="right">{{ $t(model.deleted.toString()) }}</div>
+
             <div v-if="model.firstName" class="left">{{ $t("firstName") }}</div>
             <div v-if="model.firstName" class="right">{{ model.firstName }}</div>
 
