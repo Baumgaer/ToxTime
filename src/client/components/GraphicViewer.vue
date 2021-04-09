@@ -252,7 +252,7 @@ export default {
 
             let rotator = null;
             if (!actionObjectMap.ownerGroupModel) {
-                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 150);
+                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 1500);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
                 group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
