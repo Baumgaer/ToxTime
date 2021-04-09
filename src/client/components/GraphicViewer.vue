@@ -48,6 +48,7 @@ export default {
         return {
             paper: new paper.PaperScope(),
             isMounted: false,
+            /** @type { null | Promise<void>} */
             initialBackgroundLoadedPromise: null,
             initialBackgroundLoadedResolver: null,
             lastAdjustmentWidth: window.innerWidth,
