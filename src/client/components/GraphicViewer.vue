@@ -229,12 +229,24 @@ export default {
          */
         buildActionObjectGroup(actionObjectMap, indexOfBackground) {
             const actionObject = actionObjectMap.actionObject;
+
+            const backgroundRef = this.$refs[`actionObjectBackground${actionObject._id}${indexOfBackground}`][0];
+            const raster = new this.paper.Raster(backgroundRef);
+
+            // add fixed size to have a "fixed fixpoint" for action objects and
+            // click areas. If this is not done and the background is a svg,
+            // the background scales on window resize while all other objects
+            // are on a fixed position
+            const oldWidth = backgroundRef.naturalWidth;
+            const oldHeight = backgroundRef.naturalHeight;
+            const newWidth = 3840;
+            const newHeight = parseInt(oldHeight) * newWidth / parseInt(oldWidth);
+            raster.size = new this.paper.Size(newWidth, newHeight);
+
             const group = new this.paper.Group({
                 applyMatrix: false,
                 scaling: this.paper.project.activeLayer.getScaling(),
-                children: [
-                    new this.paper.Raster(this.$refs[`actionObjectBackground${actionObject._id}${indexOfBackground}`][0])
-                ]
+                children: [ raster ]
             });
             group.model = actionObject;
 

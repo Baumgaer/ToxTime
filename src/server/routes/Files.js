@@ -20,13 +20,18 @@ export default class Files extends ApiRoute {
      */
     @Files.get("/:id/avatar", { allowUser: true })
     async getAvatarById(request, response) {
-        if (this.isFresh(request, response)) return 304;
         const result = await super.getById(request);
         if (result instanceof Error) return result;
         const model = result;
         if (!model) return httpErrors.NotFound();
         if (model.fileName.endsWith(".svg")) response.setHeader("Content-Type", "image/svg+xml");
-        return fs.readFileSync(path.resolve(arp.path, "uploads", model.fileName));
+
+        const filePath = path.resolve(arp.path, "uploads", model.fileName);
+        const stats = fs.statSync(filePath);
+        if (!stats.isFile()) return false;
+        response.setHeader("Last-Modified", stats.mtime.toUTCString());
+        if (this.isFresh(request, response)) return 304;
+        return fs.readFileSync(filePath);
     }
 
     /**

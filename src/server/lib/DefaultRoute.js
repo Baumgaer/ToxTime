@@ -185,8 +185,8 @@ export default class DefaultRoute {
      */
     isFresh(request, response) {
         return fresh(request.headers, {
-            'etag': response.getHeader('ETag'),
-            'last-modified': response.getHeader('Last-Modified')
+            'ETag': response.getHeader('ETag'),
+            'Last-Modified': response.getHeader('Last-Modified')
         });
     }
 

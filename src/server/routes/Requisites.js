@@ -1,7 +1,7 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Requisite from "~server/models/Requisite";
 import { isMongoId, isPlainObject, merge } from "~common/utils";
-import { readFileSync, unlinkSync, copyFileSync } from "graceful-fs";
+import { readFileSync, unlinkSync, copyFileSync, statSync } from "graceful-fs";
 import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
@@ -53,10 +53,14 @@ export default class Requisites extends ApiRoute {
      */
     @Requisites.get("/:id/avatar", { allowUser: true })
     getAvatar(request, response) {
-        if (this.isFresh(request, response)) return 304;
         if (!isMongoId(request.params.id)) return false;
         try {
-            return readFileSync(resolve(rootPath, "avatars", `${request.params.id}.png`));
+            const filePath = resolve(rootPath, "avatars", `${request.params.id}.png`);
+            const stats = statSync(filePath);
+            if (!stats.isFile()) return false;
+            response.setHeader("Last-Modified", stats.mtime.toUTCString());
+            if (this.isFresh(request, response)) return 304;
+            return readFileSync(filePath);
         } catch (error) {
             console.error(error);
             return false;
