@@ -52,7 +52,7 @@
         "natsort": "^2.0.2",
         "neat-csv": "^6.0.1",
         "nodemailer": "^6.5.0",
-        "normalize-url": "^5.3.0",
+        "normalize-url": "^6.0.0",
         "nunjucks": "^3.2.3",
         "on-change": "^2.2.3",
         "paper": "^0.12.15",
