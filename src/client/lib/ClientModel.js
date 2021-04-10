@@ -147,7 +147,7 @@ export default class ClientModel extends BaseModel {
     hasChangesDeep() {
         if (this.hasChanges()) return true;
         let result = false;
-        this.iterateModels((model, key, parentValue, context) => {
+        this.iterateModels(resolveProxy(this), (model, key, parentValue, context) => {
             if (result) return false;
             if (model.hasChanges()) {
                 result = true;
@@ -205,8 +205,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     discard() {
-        const backup = this.getBackup();
-        Object.assign(this, backup);
+        Object.assign(resolveProxy(this), this.getBackup());
         this.deleteBackup();
         if (this.isNew()) ApiClient.store.removeModel(this);
     }
@@ -219,7 +218,7 @@ export default class ClientModel extends BaseModel {
      */
     discardDeep() {
         if (!this.hasChangesDeep()) return;
-        this.iterateModels((model) => {
+        this.iterateModels(resolveProxy(this), (model) => {
             if (!model.hasChangesDeep()) return false;
             model.discard();
         });
@@ -253,7 +252,7 @@ export default class ClientModel extends BaseModel {
         const changes = this.getChangesDeep();
         const requestObject = cloneDeep(this.getChanges());
         this.iterateModels(changes, (model, key, parentValue, context) => {
-            if (!model.hasChanges() || resolveProxy(model) === resolveProxy(this) || (modelFilter && modelFilter(model))) {
+            if (!model.hasChanges() || model === this || (modelFilter && modelFilter(model))) {
                 set(requestObject, context.path, model._id);
                 return false;
             }
@@ -279,7 +278,7 @@ export default class ClientModel extends BaseModel {
                 const element = referenceArray[index];
                 if (!requestObjectArray[index]) requestObjectArray[index] = element._id;
             }
-        }, { pathFormat: "array", checkCircular: true });
+        }, { pathFormat: "array" });
 
         if (this.isNew()) {
             requestObject._dummyId = this._dummyId;

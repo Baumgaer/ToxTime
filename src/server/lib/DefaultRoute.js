@@ -4,7 +4,6 @@ import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
 import CustomError from "~common/lib/CustomError";
 import { getPrototypeNamesRecursive, merge, isValue } from "~common/utils";
-import { Error } from "mongoose";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
 
@@ -245,8 +244,8 @@ export default class DefaultRoute {
                     console.error(result);
                     response.status(httpErrors.BadRequest().statusCode).json(result);
                 } else {
-                    console.error(result.message);
-                    response.send(result);
+                    console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl} ${result.message}`);
+                    response.status(result.statusCode).send(result.stack);
                 }
             } else if (typeof result === "string" || result instanceof Buffer) {
                 // Normally a string will be returned if we want to send a page
