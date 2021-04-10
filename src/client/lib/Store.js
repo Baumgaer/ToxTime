@@ -2,7 +2,7 @@ import onChange from "on-change";
 import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference } from "~common/utils";
 
 /**
- * @typedef {import("~common/lib/BaseModel").default} Model
+ * @typedef {import("~client/lib/ClientModel").default} Model
  * @typedef {Partial<Model>} ModelLike
  */
 export class Store {
@@ -168,15 +168,25 @@ export class Store {
         if (!realModel) realModel = dummyModel;
         const collectionName = realModel.collection;
         if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
-        mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue) => {
-            const theTarget = resolveProxy(targetValue);
-            if (isArray(theTarget)) {
+        const changedKeys = realModel.getChangedKeys();
+        mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue, key) => {
+            if (isArray(targetValue)) {
+                let theTarget = resolveProxy(targetValue);
+                if (changedKeys.includes(key)) theTarget = resolveProxy(realModel.getBackup()[key]);
+
                 for (const model of srcValue) {
-                    const srcValueAlreadyInTarget = theTarget.find((value) => isEqual(resolveProxy(value), resolveProxy(model)));
+                    const srcValueAlreadyInTarget = theTarget.find((value) => isEqual(value, model));
                     if (!srcValueAlreadyInTarget) theTarget.push(model);
                 }
+                return targetValue; // This is now the modified value
+            }
+
+            if (changedKeys.includes(key)) {
+                realModel.updateBackup([key], srcValue);
                 return targetValue;
-            } else return srcValue;
+            }
+
+            return srcValue;
         });
         return realModel;
     }
