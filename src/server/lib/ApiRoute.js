@@ -202,7 +202,7 @@ export default class ApiRoute extends DefaultRoute {
             const modelApiMapping = this.webServer.modelApiMapping;
             const myRequestBody = await this.ProcessChildModels(request);
             if (myRequestBody instanceof Error) return myRequestBody;
-            Object.assign(request.body, { lastModified: new Date() });
+            Object.assign(myRequestBody, { lastModifiedDate: new Date() });
             delete myRequestBody._id;
 
             let model = await this.claimedExport.Model.findByIdAndUpdate(id, myRequestBody).exec();

@@ -65,6 +65,10 @@ export default class ClientModel extends BaseModel {
         return this[preferredField] || this.name;
     }
 
+    getModifyHash() {
+        return (new Date(this.lastModifiedDate)).getTime().toString(6);
+    }
+
     /**
      * Returns true if the model was created but not yet saved and false else
      *

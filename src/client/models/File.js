@@ -13,7 +13,7 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
     getAvatar() {
         const value = { title: window.$t("file") };
         if (this.mime && this.mime.startsWith("image")) {
-            return Object.assign(value, { type: "image", name: `/files/${this._id}/avatar` });
+            return Object.assign(value, { type: "image", name: `/files/${this._id}/avatar?v=${this.getModifyHash()}` });
         } else return Object.assign(value, { type: "component", name: "file-document-icon" });
     }
 
