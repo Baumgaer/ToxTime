@@ -103,8 +103,14 @@ export default class ClientModel extends BaseModel {
     updateBackup(path, value) {
         const backup = this.getBackup();
         const schemaObject = this.getSchemaObject();
-        if (get(this, path) !== undefined && path[0] in schemaObject && !(path[0] in backup)) {
-            set(backup, path, value);
+        if (get(this, path) !== undefined && path[0] in schemaObject) {
+            if (!(path[0] in backup)) {
+                set(backup, path, value);
+            } else {
+                const currentVal = resolveProxy(this[path[0]]);
+                const newVal = resolveProxy(value);
+                if (currentVal === newVal) delete backup[path[0]];
+            }
         }
     }
 
