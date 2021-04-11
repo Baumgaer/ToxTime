@@ -1,19 +1,22 @@
 <template>
     <div class="recipeEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
-        <EditorHead ref="editorHead" name="addRecipe" :model="model" />
-        <canvas ref="canvas" resize></canvas>
+        <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
+        <RecipePlaces :model="model" prop="input" />
+        <div class="transition"></div>
+        <RecipePlaces :model="model" prop="output" />
     </div>
 </template>
 
 <script>
 import EditorHead from "~client/components/EditorHead";
-import paper from "paper";
+import RecipePlaces from "~client/components/RecipePlaces";
 
 import Recipe from "~client/models/Recipe";
 
 export default {
     components: {
-        EditorHead
+        EditorHead,
+        RecipePlaces
     },
     props: {
         model: {
@@ -21,23 +24,12 @@ export default {
             required: true
         }
     },
-    data() {
-        return {
-            paper: new paper.PaperScope()
-        };
-    },
-    mounted() {
-        this.paper.setup(this.$refs.canvas);
-        this.paper.activate();
-        this.paper.settings.handleSize = 10;
-        this.paper.project.activeLayer.applyMatrix = false;
-        this.paper.project.currentStyle.strokeScaling = false;
-    },
     methods: {
         onInternalDrop(event) {
-            this.paper.activate();
             console.log(event);
-        }
+        },
+
+        onSaveButtonClick() {}
     }
 };
 </script>

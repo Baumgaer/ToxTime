@@ -77,6 +77,7 @@
             <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
             <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
             <UserEditor v-if="window.activeUser.activeEditor === 'editUser'" />
+            <RecipeEditor v-if="window.activeUser.activeEditor === 'addRecipes'" :model="window.activeUser.editingModel" />
             <Player
                 v-if="window.activeUser.editingModel && window.activeUser.editingModel.className === 'GameSession'"
                 v-show="window.activeUser.activeEditor === 'playGame'"
@@ -97,11 +98,13 @@ import GraphicEditor from "~client/components/GraphicEditor";
 import LessonEditor from "~client/components/LessonEditor";
 import UserEditor from "~client/components/UserEditor";
 import Player from "~client/components/Player";
+import RecipeEditor from "~client/components/RecipeEditor";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
 import Lesson from "~client/models/Lesson";
 import Label from "~client/models/Label";
+import Recipe from "~client/models/Recipe";
 
 import { capitalize, itemFilterAndSort } from "~common/utils";
 
@@ -113,7 +116,8 @@ export default {
         GraphicEditor,
         LessonEditor,
         UserEditor,
-        Player
+        Player,
+        RecipeEditor
     },
     data() {
         return {
@@ -166,16 +170,19 @@ export default {
                 if (category === "files") {
                     this.$refs.uploadHint.$refs.fileInput.click();
                 } else if (["sceneObjects", "scenes"].includes(category)) {
-                    window.activeUser.activeEditor = category.substring(0, category.length - 1);
                     if (category === "sceneObjects") {
                         window.activeUser.editingModel = ApiClient.store.addModel(new SceneObject.Model());
                     } else window.activeUser.editingModel = ApiClient.store.addModel(new Scene.Model());
+                    window.activeUser.activeEditor = category.substring(0, category.length - 1);
                 } else if(category === "lessons") {
-                    window.activeUser.activeEditor = `add${capitalize(category)}`;
                     window.activeUser.editingModel = ApiClient.store.addModel(new Lesson.Model());
+                    window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else if (category === "labels") {
                     const addedModel = ApiClient.store.addModel(new Label.Model());
                     addedModel.save();
+                } else if (category === "recipes") {
+                    window.activeUser.editingModel = ApiClient.store.addModel(new Recipe.Model());
+                    window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });
         },
