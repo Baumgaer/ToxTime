@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="transitionOutputLine"></div>
-            <RecipePlaces :model="model" prop="output" />
+            <RecipePlaces :model="model" prop="output" align="right" />
         </div>
         <textarea-autosize
             class="description"

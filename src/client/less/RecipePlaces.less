@@ -1,6 +1,59 @@
 @import (less) "variables.less";
 
+@size: 3em;
+
 .recipePlaces {
     display: inline-block;
     vertical-align: middle;
+    width: 30%;
+    min-width: calc(@size * 2);
+    position: relative;
+
+    &.rightAligned {
+        .spreader {
+            right: auto;
+            left: 0;
+        }
+        .item {
+            margin-left: auto;
+
+            .amount {
+                left: auto;
+                right: @size;
+            }
+        }
+    }
+
+    .spreader {
+        position: absolute;
+        right: 0;
+        top: calc(@size * 0.5);
+        border-left: 1px solid @black;
+        height: calc(100% - @size);
+    }
+
+    .item {
+        margin-top: 1em;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        .amount {
+            position: absolute;
+            margin-top: calc(@size * (-0.5) - 1px);
+            left: @size;
+            border-top: 1px solid @black;
+            width: calc(100% - @size);
+        }
+    }
+
+    .placeholder {
+        width: @size;
+        height: @size;
+        line-height: @size;
+        background-color: @dark;
+        border-radius: @size;
+        color: @white;
+    }
 }

@@ -1,13 +1,15 @@
 <template>
-    <div class="recipePlaces" @dragenter="onDragEnter($event)">
+    <div :class="`recipePlaces ${align}Aligned`" @dragenter="onDragEnter($event)">
         <div v-for="item in model[prop]" :key="item._id" class="place">
-            <Avatar :model="item.object" :fitImage="true" ratio="1:1">
-                <input type="text" name="amount" v-model="item.amount" />
+            <Avatar class="item" :model="item.object" :fitImage="true" ratio="1:1">
+                <input type="text" name="amount" class="amount" v-model="item.amount" />
             </Avatar>
         </div>
-        <div class="placeholder" ref="placeholder">
+        <div class="item placeholder" ref="placeholder">
             <gamepad-variant-icon />
+            <div class="amount"></div>
         </div>
+        <div class="spreader"></div>
     </div>
 </template>
 
@@ -28,6 +30,10 @@ export default {
         prop: {
             type: String,
             required: true
+        },
+        align: {
+            type: String,
+            default: "left"
         }
     },
     data() {
