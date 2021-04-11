@@ -65,6 +65,7 @@ import DeleteRestoreIcon from "vue-material-design-icons/DeleteRestore";
 import LabelMultipleIcon from "vue-material-design-icons/LabelMultiple";
 import LabelIcon from "vue-material-design-icons/Label";
 import AlertIcon from "vue-material-design-icons/Alert";
+import GamepadVariantIcon from "vue-material-design-icons/GamepadVariant";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -108,3 +109,4 @@ Vue.component('delete-restore-icon', DeleteRestoreIcon);
 Vue.component('label-multiple-icon', LabelMultipleIcon);
 Vue.component('label-icon', LabelIcon);
 Vue.component('alert-icon', AlertIcon);
+Vue.component('gamepad-variant-icon', GamepadVariantIcon);

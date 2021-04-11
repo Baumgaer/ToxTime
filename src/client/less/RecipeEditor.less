@@ -2,4 +2,44 @@
 
 .recipeEditor {
     height: 100%;
+
+    .recipe {
+        text-align: center;
+        white-space: nowrap;
+
+        padding: 10em 3em;
+
+        .recipePlaces {
+            display: inline-block;
+            vertical-align: middle;
+
+            &:first-child {
+                border-right: 1px solid @black;
+            }
+
+            &:last-child {
+                border-left: 1px solid @black;
+            }
+        }
+
+        .transitionInputLine,
+        .transitionOutputLine {
+            display: inline-block;
+            vertical-align: middle;
+            border-bottom: 1px solid @black;
+            width: 5%;
+        }
+
+        .transition {
+            display: inline-block;
+            vertical-align: middle;
+
+            border: 1px solid @black;
+            background-color: @dark;
+        }
+    }
+
+    .description {
+        display: block;
+    }
 }

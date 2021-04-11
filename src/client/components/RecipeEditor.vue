@@ -1,22 +1,47 @@
 <template>
     <div class="recipeEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
-        <RecipePlaces :model="model" prop="input" />
-        <div class="transition"></div>
-        <RecipePlaces :model="model" prop="output" />
+        <div class="recipe">
+            <RecipePlaces :model="model" prop="input" />
+            <div class="transitionInputLine"></div>
+            <div class="transition">
+                <div class="left">{{ $t("delay") }}</div>
+                <div class="right"><input type="number" name="delay" v-model="model.transitionSettings.delay"></div>
+
+                <div class="left">{{ $t("ingredientsExact") }}</div>
+                <div class="right">
+                    <ToggleSwitch ref="ingredientsExact" @change="onToggleSwitched('ingredientsExact')" name="ingredientsExact" :checked="model.transitionSettings.ingredientsExact"/>
+                </div>
+
+                <div class="left">{{ $t("quantityExact") }}</div>
+                <div class="right">
+                    <ToggleSwitch ref="quantityExact" @change="onToggleSwitched('quantityExact')" name="quantityExact" :checked="model.transitionSettings.quantityExact"/>
+                </div>
+            </div>
+            <div class="transitionOutputLine"></div>
+            <RecipePlaces :model="model" prop="output" />
+        </div>
+        <textarea-autosize
+            class="description"
+            :placeholder="$t('description')"
+            v-model="model.description"
+            :min-height="100"
+        />
     </div>
 </template>
 
 <script>
 import EditorHead from "~client/components/EditorHead";
 import RecipePlaces from "~client/components/RecipePlaces";
+import ToggleSwitch from "~client/components/ToggleSwitch";
 
 import Recipe from "~client/models/Recipe";
 
 export default {
     components: {
         EditorHead,
-        RecipePlaces
+        RecipePlaces,
+        ToggleSwitch
     },
     props: {
         model: {
@@ -27,6 +52,10 @@ export default {
     methods: {
         onInternalDrop(event) {
             console.log(event);
+        },
+
+        onToggleSwitched(name) {
+            this.model.transitionSettings[name] = this.$refs[name].$refs.input.checked;
         },
 
         onSaveButtonClick() {}
