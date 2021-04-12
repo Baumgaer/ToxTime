@@ -65,6 +65,8 @@ import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
 import SceneObject from "~client/models/SceneObject";
 
+import { parseEventModelData } from "~client/utils";
+
 export default {
     components: {
         EditorHead,
@@ -92,11 +94,7 @@ export default {
             event.preventDefault();
             event.stopPropagation();
 
-            let eventData = event.dataTransfer.getData("model");
-            if (eventData) eventData = JSON.parse(eventData);
-            if (!eventData) return;
-
-            const model = ApiClient.store.getModelById(eventData.collection, eventData._id);
+            let model = parseEventModelData(event);
             if (!model || !(model instanceof Scene.RawClass) && !(model instanceof SceneObject.RawClass)) return;
 
             const field = model instanceof Scene.RawClass ? "scenes" : "inventory";
@@ -144,6 +142,7 @@ export default {
 
         onDragEnd() {
             ApiClient.store.collection("localStorage").isInternalDnD = false;
+            ApiClient.store.collection("localStorage").internalDnDData = null;
         },
 
         /**

@@ -106,7 +106,8 @@ import Lesson from "~client/models/Lesson";
 import Label from "~client/models/Label";
 import Recipe from "~client/models/Recipe";
 
-import { capitalize, itemFilterAndSort } from "~common/utils";
+import { capitalize } from "~common/utils";
+import { itemFilterAndSort } from "~client/utils";
 
 export default {
     components: {

@@ -17,6 +17,10 @@
         .item {
             margin-left: auto;
 
+            input.amount {
+                left: 0;
+            }
+
             .amount {
                 left: auto;
                 right: @size;
@@ -33,10 +37,50 @@
     }
 
     .item {
+        margin: 0;
         margin-top: 1em;
+        width: @size;
+        height: @size;
+        background-color: @dark;
+        border-radius: @size;
+        font-size: unset !important;
 
         &:first-child {
             margin-top: 0;
+        }
+
+        > span,
+        div {
+            pointer-events: none;
+        }
+
+        &::v-deep .picture {
+            border-radius: @size;
+        }
+
+        input {
+            margin-left: 0;
+            margin-right: 0;
+            margin-bottom: 0;
+            padding: 0;
+            border: none;
+            border-bottom: 1px solid @black;
+            text-align: center;
+            background: transparent;
+            box-sizing: border-box;
+            outline: none;
+            pointer-events: all;
+
+            &:focus {
+                border-bottom: 1px solid @primaryColor;
+            }
+
+            &.amount {
+                border-top: none;
+                margin-top: calc(@size * (-0.5) - 20px);
+                width: calc(100% - @size - 8px);
+                left: calc(@size + 8px);
+            }
         }
 
         .amount {
@@ -49,11 +93,10 @@
     }
 
     .placeholder {
-        width: @size;
-        height: @size;
         line-height: @size;
-        background-color: @dark;
-        border-radius: @size;
         color: @white;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
     }
 }

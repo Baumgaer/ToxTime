@@ -14,7 +14,7 @@
 import ClientModel from "~client/lib/ClientModel";
 import Button from "~client/components/Button.vue";
 import ApiClient from '~client/lib/ApiClient';
-import { itemFilterAndSort } from "~common/utils";
+import { itemFilterAndSort } from "~client/utils";
 
 import Label from "~client/models/Label";
 

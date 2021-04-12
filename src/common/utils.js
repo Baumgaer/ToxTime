@@ -2,8 +2,6 @@ import lodash, { isUndefined, isNull } from "lodash";
 import { isMongoId as validatorIsMongoId } from "validator";
 import onChange from "on-change";
 import imageCompression from "browser-image-compression";
-import natSort from "natsort";
-import levenshtein from "fast-levenshtein";
 
 import deepdash from "deepdash";
 deepdash(lodash);
@@ -268,55 +266,5 @@ export function svgToPng(svgText, options = {}) {
         } catch (err) {
             reject(err);
         }
-    });
-}
-
-/**
- * sorts and filters a given list with given search string
- *
- * @export
- * @param {import("~common/lib/BaseModel").default[]} list
- * @param {string} search
- */
-export function itemFilterAndSort(list, search = "") {
-    const levenshteinValues = {};
-    return list.filter((item) => {
-        if (!search) return true;
-
-        /** @type {string} */
-        const name = item.getName().toLowerCase();
-        const distance = levenshtein.get(name, search) / name.length;
-        const exactSearch = name.search(search);
-
-        let bonus = 0;
-        if (exactSearch >= 0) bonus = 1 - exactSearch / name.length;
-        levenshteinValues[name] = { distance, bonus };
-
-        return true;
-    }).filter((item) => {
-        if (!search) return true;
-        const name = item.getName().toLowerCase();
-        const minDistance = Math.min(...Object.values(levenshteinValues).map((value) => value.distance));
-        const distance = levenshteinValues[name].distance;
-        const bonus = levenshteinValues[name].bonus;
-        return distance - bonus <= minDistance;
-    }).sort((a, b) => {
-        if (search) {
-            const aName = a.getName().toLowerCase();
-            const bName = b.getName().toLowerCase();
-
-            const aDistance = levenshteinValues[aName].distance;
-            const aBonus = levenshteinValues[aName].bonus;
-            const aLevVal = aDistance - aBonus;
-
-            const bDistance = levenshteinValues[bName].distance;
-            const bBonus = levenshteinValues[bName].bonus;
-            const bLevVal = bDistance - bBonus;
-
-            return aLevVal - bLevVal;
-        }
-
-        if (b === window.activeUser) return 1;
-        return b.isAdmin - a.isAdmin || b.isConfirmed - a.isConfirmed || b.isActive - a.isActive || natSort()(a.getName(), b.getName());
     });
 }

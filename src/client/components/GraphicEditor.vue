@@ -43,6 +43,7 @@ import File from "~client/models/File";
 import ActionObject from "~client/models/ActionObject";
 
 import { svgToPng } from "~common/utils";
+import { parseEventModelData } from "~client/utils";
 
 export default {
     components: {
@@ -85,9 +86,8 @@ export default {
             event.preventDefault();
             event.stopPropagation();
 
-            let eventData = event.dataTransfer.getData("model");
-            if (eventData) eventData = JSON.parse(eventData);
-            if (eventData) this.addObject(ApiClient.store.getModelById(eventData.collection, eventData._id));
+            const model = parseEventModelData(event);
+            if (model) this.addObject(model);
         },
 
         /**
