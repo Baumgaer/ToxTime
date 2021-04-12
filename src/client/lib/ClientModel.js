@@ -242,7 +242,7 @@ export default class ClientModel extends BaseModel {
      */
     destroy() {
         this.iterateModels((model) => {
-            ApiClient.store.removeModel(model);
+            if (model.isNew()) ApiClient.store.removeModel(model);
         });
         ApiClient.store.removeModel(this);
     }
