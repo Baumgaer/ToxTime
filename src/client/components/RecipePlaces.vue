@@ -9,6 +9,7 @@
         >
             <Avatar class="item" :model="item.object" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
                 <input type="number" name="amount" class="amount" v-model="item.amount" />
+                <div class="removeButton" @click="removeItem(item)">X</div>
             </Avatar>
         </div>
         <div class="item placeholder"
@@ -153,6 +154,12 @@ export default {
             this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
             if (!(model instanceof GameObject.RawClass) || model instanceof Scene.RawClass) return;
             place.object = model;
+        },
+
+        removeItem(item) {
+            const itemIndex = this.model[this.prop].indexOf(item);
+            if (itemIndex < 0) return;
+            this.model[this.prop].splice(itemIndex, 1);
         }
     }
 };

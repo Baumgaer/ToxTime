@@ -21,6 +21,11 @@
                 left: 0;
             }
 
+            .removeButton {
+                right: calc(@size - 12px);
+                left: unset;
+            }
+
             .amount {
                 left: auto;
                 right: @size;
@@ -60,6 +65,25 @@
 
         &::v-deep .picture {
             border-radius: @size;
+        }
+
+        .removeButton {
+            background-color: @infoColor;
+            color: @white;
+            border-radius: 100%;
+            width: 18px;
+            height: 18px;
+
+            position: absolute;
+            top: -8px;
+            left: calc(@size - 12px);
+
+            pointer-events: all;
+
+            &:hover {
+                background-color: @primaryColor;
+                cursor: pointer;
+            }
         }
 
         input {
