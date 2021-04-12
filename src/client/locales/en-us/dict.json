@@ -119,5 +119,9 @@
     "closeItTitle": "Unsaved changes",
     "closeItQuestion": "\"{name}\" has unsaved changes. Do you really want to discard them?",
     "confirmTitle": "Confirm {type}",
-    "confirmQuestion": "Do you really want to {type} {name}?"
+    "confirmQuestion": "Do you really want to {type} {name}?",
+    "delay": "Delay",
+    "ingredientsExact": "Exact ingredients",
+    "quantityExact": "Exact quantities",
+    "addRecipe": "Add recipe"
 }

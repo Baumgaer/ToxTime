@@ -5,17 +5,23 @@
             <RecipePlaces :model="model" prop="input" />
             <div class="transitionInputLine"></div>
             <div class="transition">
-                <div class="left">{{ $t("delay") }}</div>
-                <div class="right"><input type="number" name="delay" v-model="model.transitionSettings.delay"></div>
-
-                <div class="left">{{ $t("ingredientsExact") }}</div>
-                <div class="right">
-                    <ToggleSwitch ref="ingredientsExact" @change="onToggleSwitched('ingredientsExact')" name="ingredientsExact" :checked="model.transitionSettings.ingredientsExact"/>
+                <div>
+                    <div class="left">{{ $t("delay") }}</div>
+                    <div class="right"><input type="number" name="delay" v-model="model.transitionSettings.delay"></div>
                 </div>
 
-                <div class="left">{{ $t("quantityExact") }}</div>
-                <div class="right">
-                    <ToggleSwitch ref="quantityExact" @change="onToggleSwitched('quantityExact')" name="quantityExact" :checked="model.transitionSettings.quantityExact"/>
+                <div>
+                    <div class="left">{{ $t("ingredientsExact") }}</div>
+                    <div class="right">
+                        <ToggleSwitch ref="ingredientsExact" @change="onToggleSwitched('ingredientsExact')" name="ingredientsExact" :checked="model.transitionSettings.ingredientsExact"/>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="left">{{ $t("quantityExact") }}</div>
+                    <div class="right">
+                        <ToggleSwitch ref="quantityExact" @change="onToggleSwitched('quantityExact')" name="quantityExact" :checked="model.transitionSettings.quantityExact"/>
+                    </div>
                 </div>
             </div>
             <div class="transitionOutputLine"></div>

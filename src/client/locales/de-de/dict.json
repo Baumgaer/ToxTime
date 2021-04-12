@@ -119,5 +119,9 @@
     "closeItTitle": "Ungespeicherte Änderungen",
     "closeItQuestion": "\"{name}\" hat nicht gespeicherte Änderungen. Sollen diese wirklich verworfen werden?",
     "confirmTitle": "{type} bestätigen",
-    "confirmQuestion": "{name} wirklich {type}?"
+    "confirmQuestion": "{name} wirklich {type}?",
+    "delay": "Verzögerung",
+    "ingredientsExact": "Exakte Zutaten",
+    "quantityExact": "Exakte Mengen",
+    "addRecipe": "Rezept hinzufügen"
 }

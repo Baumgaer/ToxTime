@@ -7,7 +7,7 @@
         text-align: center;
         white-space: nowrap;
 
-        padding: 10em 3em;
+        padding: 5em 1em;
 
         .transitionInputLine,
         .transitionOutputLine {
@@ -20,9 +20,48 @@
         .transition {
             display: inline-block;
             vertical-align: middle;
+            text-align: left;
+            color: @white;
 
             border: 1px solid @black;
             background-color: @dark;
+
+            white-space: nowrap;
+            width: 40%;
+
+            > div {
+                display: grid;
+                grid-template-columns: 70% 30%;
+            }
+
+            .left,
+            .right {
+                display: inline-block;
+                vertical-align: top;
+                box-sizing: border-box;
+                padding: 8px 4px;
+            }
+
+            .left {
+                text-align: right;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            .right {
+                text-align: left;
+            }
+
+            input {
+                display: inline;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .switch {
+                --height: 28px;
+                --width: 100%;
+            }
         }
     }
 
