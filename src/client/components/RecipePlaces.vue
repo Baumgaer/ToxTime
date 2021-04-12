@@ -1,14 +1,13 @@
 <template>
     <div :class="`recipePlaces ${align}Aligned`" @dragend="onDragEnd()">
-        <div v-for="item in model[prop]" :key="item._id || item._dummyId" class="item">
-            <Avatar class="item"
-                    :model="item.object"
-                    :fitImage="true"
-                    ratio="1:1"
-                    @dragover="onDragOver($event, item)"
-                    @drop="onDrop($event, item)"
-                    @dragleave="onDragLeave($event, item)"
-            >
+        <div v-for="item in model[prop]"
+             :key="item._id || item._dummyId"
+             class="item"
+             @dragover="onDragOver($event, item)"
+             @drop="onDrop($event, item)"
+             @dragleave="onDragLeave($event, item)"
+        >
+            <Avatar class="item" :model="item.object" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
                 <input type="number" name="amount" class="amount" v-model="item.amount" />
             </Avatar>
         </div>
@@ -29,6 +28,8 @@
 import Avatar from "~client/components/Avatar";
 import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
+import GameObject from "~client/models/GameObject";
+import Scene from "~client/models/Scene";
 
 import ApiClient from "~client/lib/ApiClient";
 
@@ -76,7 +77,7 @@ export default {
 
             if (place === "placeholder") {
                 this.highlightPlaceholder(model);
-            } else this.highlightItem(place, model);
+            } else this.highlightItem(place);
         },
 
         onDragLeave(event, place) {
@@ -125,21 +126,33 @@ export default {
             this.$refs.placeholder.firstElementChild.style.opacity = 1;
         },
 
-        highlightItem(place, model) {
-            console.log(place, model);
+        highlightItem(place) {
+            this.$refs[place._id || place._dummyId][0].$el.classList.add("highlight");
         },
 
         removeItemHighlight(place) {
-            console.log(place);
+            this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
         },
 
         addNewItem(model) {
+            this.$refs.placeholder.style.backgroundImage = "none";
+            this.$refs.placeholder.firstElementChild.style.opacity = 1;
+
+            if (!(model instanceof GameObject.RawClass) || model instanceof Scene.RawClass) return;
+
+            const alreadyAvailable = this.model[this.prop].find((item) => {
+                return item.object === model;
+            });
+
+            if (alreadyAvailable) return;
             const recipeItem = ApiClient.store.addModel(new RecipeItem.Model({ object: model }));
             this.model[this.prop].push(recipeItem);
         },
 
         replaceItem(place, model) {
-            console.log(place, model);
+            this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
+            if (!(model instanceof GameObject.RawClass) || model instanceof Scene.RawClass) return;
+            place.object = model;
         }
     }
 };

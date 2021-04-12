@@ -2,7 +2,7 @@
     <div class="avatar" v-on="$listeners">
         <div class="ratio" v-if="hasAvatar" :title="avatar.title" ref="ratio">
             <div v-if="hasImageAvatar" class="picture" :style="`background-image: url(${avatar.name});${fitImage ? 'background-size: contain;' : ''}`"></div>
-            <component v-else :is="avatar.name" class="picture" :title="avatar.title"></component>
+            <component v-else :is="avatar.name" class="picture" ref="icon" :title="avatar.title"></component>
             <div class="overlayIcons" v-if="overlayIcons" ref="overlayIcons">
                 <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
             </div>
@@ -84,7 +84,7 @@ export default {
         },
 
         setFontSize() {
-            if (this.$el.offsetWidth) this.$el.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
+            if (this.$el.offsetWidth) this.$el.firstElementChild.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
             if (this.$refs.overlayIcons) {
                 this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$refs.overlayIcons).fontSize) / 40})`);
             }

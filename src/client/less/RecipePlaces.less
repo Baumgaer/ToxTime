@@ -43,10 +43,14 @@
         height: @size;
         background-color: @dark;
         border-radius: @size;
-        font-size: unset !important;
+        color: @white;
 
         &:first-child {
             margin-top: 0;
+        }
+
+        &.highlight {
+            background-color: @infoColor;
         }
 
         > span,
@@ -94,7 +98,6 @@
 
     .placeholder {
         line-height: @size;
-        color: @white;
         background-position: center center;
         background-repeat: no-repeat;
         background-size: contain;
