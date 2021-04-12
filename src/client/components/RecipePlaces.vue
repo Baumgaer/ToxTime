@@ -1,6 +1,6 @@
 <template>
     <div :class="`recipePlaces ${align}Aligned`" @dragend="onDragEnd()">
-        <div v-for="item in model[prop]" :key="item._id" class="item">
+        <div v-for="item in model[prop]" :key="item._id || item._dummyId" class="item">
             <Avatar class="item"
                     :model="item.object"
                     :fitImage="true"
