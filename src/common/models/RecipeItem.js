@@ -48,11 +48,19 @@ export function RecipeItemMixinClass(MixinClass) {
                 sticky: true,
                 required: false,
                 default: null
+            },
+            scene: {
+                type: Schema.Types.ObjectId,
+                ref: "Scene",
+                autopopulate: true,
+                sticky: true,
+                required: false,
+                default: null
             }
         };
 
         get object() {
-            return this.actionObject || this.sceneObject || this.label || this.clickArea || this.file;
+            return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.label;
         }
 
         set object(value) {
@@ -63,11 +71,11 @@ export function RecipeItemMixinClass(MixinClass) {
                 if (otherThan !== "ActionObject") this.actionObject = null;
                 if (otherThan !== "ClickArea") this.clickArea = null;
                 if (otherThan !== "File") this.file = null;
+                if (otherThan !== "Scene") this.scene = null;
             };
 
-            if (!value) return setAllOtherToNull();
-            this[unCapitalize(value.className)] = value;
-            setAllOtherToNull(value.className);
+            setAllOtherToNull(value?.className);
+            if (value) this[unCapitalize(value.className)] = value;
         }
 
     }

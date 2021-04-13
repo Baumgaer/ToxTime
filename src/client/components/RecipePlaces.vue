@@ -8,7 +8,7 @@
              @dragleave="onDragLeave($event, item)"
         >
             <Avatar class="item" :model="item" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
-                <input type="number" name="amount" class="amount" v-model="item.amount" :max="`${item.actionObject ? '1' : Infinity}`" min="0" />
+                <input type="number" name="amount" class="amount" v-model="item.amount" :max="`${item.actionObject ? 1 : Infinity}`" :min="`${item.scene ? 1 : 0}`" />
                 <div class="removeButton" @click="removeItem(item)">X</div>
             </Avatar>
         </div>
@@ -126,9 +126,9 @@ export default {
         },
 
         isAllowed(model) {
-            const defaultExceptions = [Label.RawClass, File.RawClass];
-            const isExceptions = defaultExceptions.some((type) => model instanceof type);
-            if (!(model instanceof GameObject.RawClass) && !isExceptions || model instanceof Scene.RawClass) return false;
+            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass];
+            const isAllowed = defaultAllowed.some((type) => model instanceof type);
+            if (!isAllowed) return false;
 
             const isDefinedForbidden = this.forbiddenModels.some((type) => model instanceof type);
             if (isDefinedForbidden) return false;
@@ -174,6 +174,7 @@ export default {
             if (!this.isAllowed(model)) return;
             place.object = model;
             if (model instanceof ActionObject.RawClass) place.amount = Math.min(place.amount, 1);
+            if (model instanceof Scene.RawClass) place.amount = 1;
         },
 
         removeItem(item) {

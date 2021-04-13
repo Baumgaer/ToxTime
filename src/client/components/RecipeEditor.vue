@@ -44,6 +44,7 @@ import ToggleSwitch from "~client/components/ToggleSwitch";
 import Recipe from "~client/models/Recipe";
 import ClickArea from "~client/models/ClickArea";
 import File from "~client/models/File";
+import Scene from "~client/models/Scene";
 
 export default {
     components: {
@@ -60,7 +61,7 @@ export default {
     data() {
         return {
             forbiddenOutputTypes: [ClickArea.RawClass],
-            forbiddenInputTypes: [File.RawClass]
+            forbiddenInputTypes: [File.RawClass, Scene.RawClass]
         };
     },
     methods: {
