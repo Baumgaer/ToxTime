@@ -2,6 +2,7 @@
     <div class="avatar" v-on="$listeners">
         <div class="ratio" v-if="hasAvatar" :title="avatar.title" ref="ratio">
             <div v-if="hasImageAvatar" class="picture" :style="`background-image: url(${avatar.name});${fitImage ? 'background-size: contain;' : ''}`"></div>
+            <div v-else-if="hasTextAvatar" class="picture text" ref="text" :title="avatar.name">{{ avatar.name }} </div>
             <component v-else :is="avatar.name" class="picture" ref="icon" :title="avatar.title"></component>
             <div class="overlayIcons" v-if="computedOverlayIcons" ref="overlayIcons">
                 <component v-for="overlayIcon of computedOverlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
@@ -56,6 +57,13 @@ export default {
             return false;
         },
 
+        hasTextAvatar() {
+            const avatarData = this.model.getAvatar();
+            if (!avatarData) return false;
+            if (avatarData.type === "text") return true;
+            return false;
+        },
+
         computedOverlayIcons() {
             return this.overlayIcons || this.model.getOverlayIcons();
         }
@@ -88,7 +96,10 @@ export default {
         },
 
         setFontSize() {
-            if (this.$el.offsetWidth) this.$el.firstElementChild.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
+            if (this.$el.offsetWidth) {
+                this.$el.firstElementChild.style.setProperty("font-size", `${this.$el.offsetWidth}px`);
+                if (this.hasTextAvatar) this.$refs.text.style.setProperty("line-height", `${this.$el.offsetWidth}px`);
+            }
             if (this.$refs.overlayIcons) {
                 this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$refs.overlayIcons).fontSize) / 40})`);
             }

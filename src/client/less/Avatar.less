@@ -20,7 +20,12 @@
             background-size: cover;
             background-repeat: no-repeat;
 
-            text-align: center;
+            &.text {
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: initial;
+            }
 
             svg {
                 bottom: initial;
