@@ -71,6 +71,7 @@ import ApiClient from "~client/lib/ApiClient";
 import Tooltip from "~client/components/Tooltip";
 import Avatar from "~client/components/Avatar";
 import sweetAlert from "sweetalert";
+import { hideAll } from "tippy.js";
 
 import ClientModel from "~client/lib/ClientModel";
 
@@ -144,6 +145,12 @@ export default {
             event.stopPropagation();
             this.$refs.tooltip?.tippy?.clearDelayTimeouts?.();
             this.$refs.tooltip?.tippy?.hide?.();
+
+            // NOTE: This timeout is important because the tooltips appear with a delay.
+            // It can happen that a tooltip is set to hidden before the animation is triggered.
+            // In this case the tooltip would not be hidden.
+            this.hideAllTimeout = setTimeout(hideAll, 500);
+
             ApiClient.store.collection("localStorage").isInternalDnD = true;
 
             const data = {collection: this.model.collection, _id: this.model._id};
@@ -154,6 +161,7 @@ export default {
         onDragEnd() {
             ApiClient.store.collection("localStorage").isInternalDnD = false;
             ApiClient.store.collection("localStorage").internalDnDData = null;
+            clearTimeout(this.hideAllTimeout);
         },
 
         onNameKeyUp(event) {
