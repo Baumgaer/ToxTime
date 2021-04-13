@@ -190,11 +190,15 @@ export default {
 
         async adjustViewToBorder(args, force) {
             if (!force && !this.adjustToBorder) return;
+
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
+
             const paper = this.paper;
             const background = this.paper.view.background;
             const surroundingElement = this.$parent.$parent.$el;
+
+            if (!background) return;
 
             const diffHeight = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetHeight - background.size.height));
             const diffWidth = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetWidth - background.size.width));

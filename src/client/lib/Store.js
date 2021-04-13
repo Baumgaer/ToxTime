@@ -1,5 +1,5 @@
 import onChange from "on-change";
-import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference } from "~common/utils";
+import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue } from "~common/utils";
 
 /**
  * @typedef {import("~client/lib/ClientModel").default} Model
@@ -174,10 +174,13 @@ export class Store {
                 let theTarget = resolveProxy(targetValue);
                 if (changedKeys.includes(key)) theTarget = resolveProxy(realModel.getBackup()[key]);
 
-                for (const model of srcValue) {
-                    const srcValueAlreadyInTarget = theTarget.find((value) => isEqual(value, model));
-                    if (!srcValueAlreadyInTarget) theTarget.push(model);
+                if (isValue(theTarget)) {
+                    for (const model of srcValue) {
+                        const srcValueAlreadyInTarget = theTarget.find((value) => isEqual(value, model));
+                        if (!srcValueAlreadyInTarget) theTarget.push(model);
+                    }
                 }
+
                 return targetValue; // This is now the modified value
             }
 
