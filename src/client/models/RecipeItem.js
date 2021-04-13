@@ -10,6 +10,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         if (object === this.label) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.sceneObject) return object.getAvatar();
         if (object === this.actionObject) return object.sceneObject.getAvatar();
+        if (object === this.file) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
     }
 
@@ -19,6 +20,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         if (object === this.label) return "label-icon";
         if (object === this.sceneObject) return "ufo-icon";
         if (object === this.actionObject) return "movie-open-icon";
+        if (object === this.file) return "file-document-icon";
         return "cursor-default-click-icon";
     }
 

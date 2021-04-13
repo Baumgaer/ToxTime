@@ -8,7 +8,7 @@
              @dragleave="onDragLeave($event, item)"
         >
             <Avatar class="item" :model="item" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
-                <input type="number" name="amount" class="amount" v-model="item.amount" />
+                <input type="number" name="amount" class="amount" v-model="item.amount" :max="`${item.actionObject ? '1' : Infinity}`" min="0" />
                 <div class="removeButton" @click="removeItem(item)">X</div>
             </Avatar>
         </div>
@@ -18,7 +18,8 @@
              @drop="onDrop($event, 'placeholder')"
              @dragleave="onDragLeave($event, 'placeholder')"
         >
-            <gamepad-variant-icon />
+            <component v-if="placeholderAvatarData && placeholderAvatarData.type === 'component'" :is="placeholderAvatarData.name" />
+            <gamepad-variant-icon v-else />
             <div class="amount"></div>
         </div>
         <div class="spreader"></div>
@@ -32,6 +33,8 @@ import RecipeItem from "~client/models/RecipeItem";
 import GameObject from "~client/models/GameObject";
 import Scene from "~client/models/Scene";
 import Label from "~client/models/Label";
+import ActionObject from "~client/models/ActionObject";
+import File from "~client/models/File";
 
 import ApiClient from "~client/lib/ApiClient";
 
@@ -53,11 +56,15 @@ export default {
         align: {
             type: String,
             default: "left"
+        },
+        forbiddenModels: {
+            type: Array,
+            default: () => []
         }
     },
     data() {
         return {
-            hoveringObject: null
+            placeholderAvatarData: null
         };
     },
     methods: {
@@ -119,17 +126,27 @@ export default {
         },
 
         isAllowed(model) {
-            if (!(model instanceof GameObject.RawClass) && !(model instanceof Label.RawClass) || model instanceof Scene.RawClass) return false;
+            const defaultExceptions = [Label.RawClass, File.RawClass];
+            const isExceptions = defaultExceptions.some((type) => model instanceof type);
+            if (!(model instanceof GameObject.RawClass) && !isExceptions || model instanceof Scene.RawClass) return false;
+
+            const isDefinedForbidden = this.forbiddenModels.some((type) => model instanceof type);
+            if (isDefinedForbidden) return false;
+
             return true;
         },
 
         highlightPlaceholder(model) {
-            this.$refs.placeholder.style.backgroundImage = `url(${model.getAvatar().name})`;
-            this.$refs.placeholder.firstElementChild.style.opacity = 0;
+            const isTextLikeAvatar = ["text", "component"].includes(model.getAvatar().type);
+            if (!isTextLikeAvatar) {
+                this.$refs.placeholder.style.backgroundImage = `url(${model.getAvatar().name})`;
+                this.$refs.placeholder.firstElementChild.style.opacity = 0;
+            } else this.placeholderAvatarData = model.getAvatar();
         },
 
         removePlaceholderHighlight() {
             this.$refs.placeholder.style.backgroundImage = "none";
+            this.placeholderAvatarData = null;
             this.$refs.placeholder.firstElementChild.style.opacity = 1;
         },
 
@@ -142,8 +159,7 @@ export default {
         },
 
         addNewItem(model) {
-            this.$refs.placeholder.style.backgroundImage = "none";
-            this.$refs.placeholder.firstElementChild.style.opacity = 1;
+            this.removePlaceholderHighlight();
 
             if (!this.isAllowed(model)) return;
             const alreadyAvailable = this.model[this.prop].find((item) => item.object === model);
@@ -154,9 +170,10 @@ export default {
         },
 
         replaceItem(place, model) {
-            this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
+            this.removeItemHighlight(place);
             if (!this.isAllowed(model)) return;
             place.object = model;
+            if (model instanceof ActionObject.RawClass) place.amount = Math.min(place.amount, 1);
         },
 
         removeItem(item) {

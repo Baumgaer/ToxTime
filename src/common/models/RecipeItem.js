@@ -40,11 +40,19 @@ export function RecipeItemMixinClass(MixinClass) {
                 sticky: true,
                 required: false,
                 default: null
+            },
+            file: {
+                type: Schema.Types.ObjectId,
+                ref: "File",
+                autopopulate: true,
+                sticky: true,
+                required: false,
+                default: null
             }
         };
 
         get object() {
-            return this.actionObject || this.sceneObject || this.label || this.clickArea;
+            return this.actionObject || this.sceneObject || this.label || this.clickArea || this.file;
         }
 
         set object(value) {
@@ -54,6 +62,7 @@ export function RecipeItemMixinClass(MixinClass) {
                 if (otherThan !== "SceneObject") this.sceneObject = null;
                 if (otherThan !== "ActionObject") this.actionObject = null;
                 if (otherThan !== "ClickArea") this.clickArea = null;
+                if (otherThan !== "File") this.file = null;
             };
 
             if (!value) return setAllOtherToNull();

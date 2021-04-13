@@ -2,7 +2,7 @@
     <div class="recipeEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
         <div class="recipe">
-            <RecipePlaces :model="model" prop="input" />
+            <RecipePlaces :model="model" prop="input" :forbiddenModels="forbiddenInputTypes" />
             <div class="transitionInputLine"></div>
             <div class="transition">
                 <div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="transitionOutputLine"></div>
-            <RecipePlaces :model="model" prop="output" align="right" />
+            <RecipePlaces :model="model" prop="output" align="right" :forbiddenModels="forbiddenOutputTypes" />
         </div>
         <textarea-autosize
             class="description"
@@ -42,6 +42,8 @@ import RecipePlaces from "~client/components/RecipePlaces";
 import ToggleSwitch from "~client/components/ToggleSwitch";
 
 import Recipe from "~client/models/Recipe";
+import ClickArea from "~client/models/ClickArea";
+import File from "~client/models/File";
 
 export default {
     components: {
@@ -54,6 +56,12 @@ export default {
             type: Recipe.RawClass,
             required: true
         }
+    },
+    data() {
+        return {
+            forbiddenOutputTypes: [ClickArea.RawClass],
+            forbiddenInputTypes: [File.RawClass]
+        };
     },
     methods: {
         onInternalDrop(event) {

@@ -30,6 +30,12 @@
                 left: auto;
                 right: @size;
             }
+
+            &::v-deep .overlayIcons {
+                right: auto;
+                left: -5px;
+                bottom: -5px;
+            }
         }
     }
 
@@ -65,6 +71,11 @@
 
         &::v-deep .picture {
             border-radius: @size;
+        }
+
+        &::v-deep .overlayIcons {
+            right: -5px;
+            bottom: -5px;
         }
 
         .removeButton {
