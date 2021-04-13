@@ -17,6 +17,7 @@ export function RecipeMixinClass(MixinClass) {
         /** @type {import("mongoose").SchemaDefinition} */
         static schema = {
             name: {
+                unique: true,
                 default: `Recipe`
             },
             description: {
