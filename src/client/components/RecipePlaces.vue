@@ -8,7 +8,13 @@
              @dragleave="onDragLeave($event, item)"
         >
             <Avatar class="item" :model="item" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
-                <input type="number" name="amount" class="amount" v-model="item.amount" :max="`${item.actionObject ? 1 : Infinity}`" :min="`${item.scene ? 1 : 0}`" />
+                <input type="number"
+                       name="amount"
+                       class="amount"
+                       v-model="item.amount"
+                       :max="`${item.actionObject ? 1 : item.scene ? 1 : Infinity}`"
+                       :min="`${item.scene ? 1 : 0}`"
+                />
                 <div class="removeButton" @click="removeItem(item)">X</div>
             </Avatar>
         </div>

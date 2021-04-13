@@ -1,5 +1,5 @@
 <template>
-    <div class="recipeEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
+    <div class="recipeEditor">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
         <div class="recipe">
             <RecipePlaces :model="model" prop="input" :forbiddenModels="forbiddenInputTypes" />
@@ -65,15 +65,15 @@ export default {
         };
     },
     methods: {
-        onInternalDrop(event) {
-            console.log(event);
-        },
-
         onToggleSwitched(name) {
             this.model.transitionSettings[name] = this.$refs[name].$refs.input.checked;
         },
 
-        onSaveButtonClick() {}
+        async onSaveButtonClick() {
+            const result = await this.model.save();
+            if (!result || result instanceof Error) return;
+            this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+        }
     }
 };
 </script>
