@@ -7,7 +7,7 @@
              @drop="onDrop($event, item)"
              @dragleave="onDragLeave($event, item)"
         >
-            <Avatar class="item" :model="item.object" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
+            <Avatar class="item" :model="item" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
                 <input type="number" name="amount" class="amount" v-model="item.amount" />
                 <div class="removeButton" @click="removeItem(item)">X</div>
             </Avatar>
@@ -31,6 +31,7 @@ import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
 import GameObject from "~client/models/GameObject";
 import Scene from "~client/models/Scene";
+import Label from "~client/models/Label";
 
 import ApiClient from "~client/lib/ApiClient";
 
@@ -117,6 +118,11 @@ export default {
             ApiClient.store.collection("localStorage").internalDnDData = null;
         },
 
+        isAllowed(model) {
+            if (!(model instanceof GameObject.RawClass) && !(model instanceof Label.RawClass) || model instanceof Scene.RawClass) return false;
+            return true;
+        },
+
         highlightPlaceholder(model) {
             this.$refs.placeholder.style.backgroundImage = `url(${model.getAvatar().name})`;
             this.$refs.placeholder.firstElementChild.style.opacity = 0;
@@ -139,20 +145,17 @@ export default {
             this.$refs.placeholder.style.backgroundImage = "none";
             this.$refs.placeholder.firstElementChild.style.opacity = 1;
 
-            if (!(model instanceof GameObject.RawClass) || model instanceof Scene.RawClass) return;
-
-            const alreadyAvailable = this.model[this.prop].find((item) => {
-                return item.object === model;
-            });
-
+            if (!this.isAllowed(model)) return;
+            const alreadyAvailable = this.model[this.prop].find((item) => item.object === model);
             if (alreadyAvailable) return;
+
             const recipeItem = ApiClient.store.addModel(new RecipeItem.Model({ object: model }));
             this.model[this.prop].push(recipeItem);
         },
 
         replaceItem(place, model) {
             this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
-            if (!(model instanceof GameObject.RawClass) || model instanceof Scene.RawClass) return;
+            if (!this.isAllowed(model)) return;
             place.object = model;
         },
 

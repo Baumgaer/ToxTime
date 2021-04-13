@@ -3,8 +3,8 @@
         <div class="ratio" v-if="hasAvatar" :title="avatar.title" ref="ratio">
             <div v-if="hasImageAvatar" class="picture" :style="`background-image: url(${avatar.name});${fitImage ? 'background-size: contain;' : ''}`"></div>
             <component v-else :is="avatar.name" class="picture" ref="icon" :title="avatar.title"></component>
-            <div class="overlayIcons" v-if="overlayIcons" ref="overlayIcons">
-                <component v-for="overlayIcon of overlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
+            <div class="overlayIcons" v-if="computedOverlayIcons" ref="overlayIcons">
+                <component v-for="overlayIcon of computedOverlayIcons.split(' ')" :is="overlayIcon" :key="overlayIcon" class="overlayIcon"></component>
             </div>
         </div>
         <div class="slot">
@@ -54,6 +54,10 @@ export default {
             if (!avatarData) return false;
             if (avatarData.type === "image") return true;
             return false;
+        },
+
+        computedOverlayIcons() {
+            return this.overlayIcons || this.model.getOverlayIcons();
         }
     },
     mounted() {

@@ -65,6 +65,10 @@ export default class ClientModel extends BaseModel {
         return this[preferredField] || this.name;
     }
 
+    getOverlayIcons() {
+        return "";
+    }
+
     getModifyHash() {
         return (new Date(this.lastModifiedDate)).getTime().toString(6);
     }
