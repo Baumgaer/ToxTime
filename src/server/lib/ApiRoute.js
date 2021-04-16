@@ -1,6 +1,7 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import CustomError from "~common/lib/CustomError";
-import { isMongoId, isArray, merge, isPlainObject, isValue } from "~common/utils";
+import { isMongoId, isArray, merge, isPlainObject, isValue, get, set } from "~common/utils";
+import { v4 as uuid } from "uuid";
 
 import httpErrors from "http-errors";
 
@@ -363,5 +364,72 @@ export default class ApiRoute extends DefaultRoute {
         } catch (error) {
             return error;
         }
+    }
+
+    /**
+     * Deletes a model by the given id and returns the old result if model was found
+     *
+     * @param {import("express").Request} request
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
+     * @memberof ApiRoute
+     */
+    @ApiRoute.post("/copy/:id")
+    async copy(request) {
+        /** @type {null | import("~server/lib/ServerModel").default} */
+        const result = await this.claimedExport.Model.findById(request.params.id).exec();
+        if (!result) return new httpErrors.NotFound();
+
+        const plainObj = result.toObject();
+        delete plainObj._id;
+        plainObj._dummyId = uuid();
+
+        const processSticky = (referencePath) => {
+            const references = get(plainObj, referencePath);
+            if (isArray(references)) {
+                set(plainObj, referencePath, references.map((reference) => reference._id));
+            } else if (isPlainObject(references)) set(plainObj, referencePath, references._id);
+        };
+
+        const processReferencesOfDirectReference = (referencePath, concatValue) => {
+            const modelClass = get(result, referencePath.concat(concatValue));
+            if (!modelClass) return;
+            const referencingModelExports = modelClass.getReferencingModelExports();
+
+            for (const referencingModelExport of referencingModelExports) {
+                const referenceReferencePaths = modelClass.getReferencePathsOf(referencingModelExport.RawClass.className);
+                for (const referenceReferencePath of referenceReferencePaths) {
+                    processSticky(referencePath.concat(referenceReferencePath));
+                }
+            }
+        };
+
+        const processDependant = (referencePath) => {
+            const references = get(plainObj, referencePath);
+            if (isArray(references)) {
+                for (const reference of references) {
+                    delete reference._id;
+                    reference._dummyId = uuid();
+                    processReferencesOfDirectReference(referencePath, [0]);
+                }
+            } else if (isPlainObject(references)) {
+                delete references._id;
+                references._dummyId = uuid();
+                processReferencesOfDirectReference(referencePath);
+            }
+        };
+
+        const referenceModelExports = result.getReferenceModelExports();
+        for (const referenceModelExport of referenceModelExports) {
+            const referencePaths = result.getReferencePathsOf(referenceModelExport.RawClass.className);
+            for (const referencePath of referencePaths) {
+                const referenceDeclaration = get(result.getSchemaObject(), referencePath);
+                if (referenceDeclaration.sticky) processSticky(referencePath);
+                if (referenceDeclaration.dependant) processDependant(referencePath);
+            }
+        }
+
+        merge(plainObj, request.body || {});
+        request.body = plainObj;
+        return this.create(request);
     }
 }

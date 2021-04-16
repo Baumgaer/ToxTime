@@ -325,4 +325,37 @@ export default class ClientModel extends BaseModel {
         if (!(result instanceof Error)) this.deleteBackupDeep();
         return result;
     }
+
+    @BaseModel.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
+    async delete() {
+        if (!this._id) {
+            this.destroy();
+            window.activeUser.activeEditor = null;
+            window.activeUser.editingModel = null;
+            return;
+        }
+
+        const result = await ApiClient.delete(`/${this.collection}/${this._id}`);
+        if ((result instanceof Error)) return result;
+        if (result.deleted) return result;
+
+        ApiClient.store.removeModel(this);
+    }
+
+    @BaseModel.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
+    async restore() {
+        const result = await ApiClient.patch(`/${this.collection}/restore/${this._id}`);
+
+        // We do not want to delete sub objects in case of an error or object
+        // was just marked as deleted because it's sticky
+        if (result instanceof Error) return result;
+        ApiClient.store._trash?.__ob__?.dep.notify();
+    }
+
+    @BaseModel.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)
+    copy() {
+        ApiClient.post(`/${this.collection}/copy/${this._id}`, {
+            name: `${window.$t("copyOf")} ${this.getName()}`
+        });
+    }
 }

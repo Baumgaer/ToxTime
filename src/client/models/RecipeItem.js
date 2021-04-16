@@ -28,4 +28,9 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         return "";
     }
 
+    @CommonItemRecipeItem.action("delete", { type: "component", name: "delete-icon" }, () => false)
+    @CommonItemRecipeItem.action("restore", { type: "component", name: "delete-restore-icon" }, () => false)
+    @CommonItemRecipeItem.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
+    fakeAction() { }
+
 });

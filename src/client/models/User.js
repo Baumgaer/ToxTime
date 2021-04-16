@@ -20,11 +20,9 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         };
     }
 
-    @CommonClientUser.action("delete", { type: "component", name: "delete-icon" }, (instance) => instance !== window.activeUser, true)
+    @CommonClientUser.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted && instance !== window.activeUser, true)
     async delete() {
-        const result = await ApiClient.delete(`/users/${this._id}`);
-        if ((result instanceof Error)) return result;
-        ApiClient.store.removeModel(this);
+        return await super.delete();
     }
 
     @CommonClientUser.action("resentConfirm", { type: "component", name: "email-check-icon" }, (instance) => !instance.isConfirmed)
@@ -55,9 +53,12 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
 
     @CommonClientUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin || instance === window.activeUser)
     async edit() {
+        window.activeUser.editingModel = this;
         window.activeUser.activeEditor = "editUser";
-        window.activeUser.editingModel = ApiClient.store.getModelById(this.collection, this._dummyId || this._id);
     }
+
+    @CommonClientUser.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
+    copy() { }
 
     getGameSessionByLesson(lesson) {
         const filter = (gameSession) => resolveProxy(gameSession.lesson) === resolveProxy(lesson);

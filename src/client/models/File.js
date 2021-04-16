@@ -17,28 +17,14 @@ export default ClientModel.buildClientExport(class File extends CommonClientFile
         } else return Object.assign(value, { type: "component", name: "file-document-icon" });
     }
 
-    @CommonClientFile.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
+    @CommonClientFile.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
     async delete() {
         if (this._xhr) return this._xhr.abort();
-        const result = await ApiClient.delete(`/files/${this._id}`);
-
-        // We do not want to delete sub objects in case of an error or object
-        // was just marked as deleted because it's sticky
-        if (result instanceof Error) return result;
-        if (result.deleted) return result;
-
-        ApiClient.store.removeModel(this);
+        return await super.delete();
     }
 
-    @CommonClientFile.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
-    async restore() {
-        const result = await ApiClient.patch(`/files/restore/${this._id}`);
-
-        // We do not want to delete sub objects in case of an error or object
-        // was just marked as deleted because it's sticky
-        if (result instanceof Error) return result;
-        ApiClient.store._trash?.__ob__?.dep.notify();
-    }
+    @CommonClientFile.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
+    fakeAction() { }
 
     @CommonClientFile.action("download", { type: "component", name: "file-download-icon" }, (instance) => window.activeUser.isAdmin && instance._id)
     download() {

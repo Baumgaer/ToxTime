@@ -21,4 +21,9 @@ export default GameObject.RawClass.buildClientExport(class ClickArea extends Com
         };
     }
 
+    @CommonGameObjectClickArea.action("delete", { type: "component", name: "delete-icon" }, () => false)
+    @CommonGameObjectClickArea.action("restore", { type: "component", name: "delete-restore-icon" }, () => false)
+    @CommonGameObjectClickArea.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
+    fakeAction() { }
+
 });

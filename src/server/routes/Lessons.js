@@ -31,16 +31,8 @@ export default class Lessons extends ApiRoute {
 
         const result = await this.claimedExport.Model.findById(request.params.id).exec();
         if (!result) return new httpErrors.NotFound();
-        const plainObj = result.toObject();
-        delete plainObj._id;
-        plainObj._dummyId = uuid();
+        const copy = await super.copy(request);
 
-        plainObj.scenes = plainObj.scenes.map((scene) => scene._id);
-
-        merge(plainObj, request.body || {});
-        request.body = plainObj;
-
-        const copy = await this.create(request);
         if (copy instanceof Error) return copy;
 
         try {

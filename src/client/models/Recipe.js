@@ -22,18 +22,16 @@ export default ClientModel.buildClientExport(class Recipe extends CommonClientRe
         };
     }
 
-    @CommonClientRecipe.action("delete", { type: "component", name: "delete-icon" }, () => window.activeUser.isAdmin)
+    @CommonClientRecipe.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
     async delete() {
-        if (!this._id) {
-            this.destroy();
-            window.activeUser.activeEditor = null;
-            window.activeUser.editingModel = null;
-            return;
-        }
+        const result = await super.delete();
+        if (result) return result;
 
-        const result = await ApiClient.delete(`/recipes/${this._id}`);
-        if ((result instanceof Error)) return result;
-        ApiClient.store.removeModel(this);
+        for (const category of ["input", "output"]) {
+            for (const item of this[category]) {
+                ApiClient.store.removeModel(item);
+            }
+        }
     }
 
     @CommonClientRecipe.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)

@@ -21,4 +21,9 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
         };
     }
 
+    @CommonGameObjectActionObject.action("delete", { type: "component", name: "delete-icon" }, () => false)
+    @CommonGameObjectActionObject.action("restore", { type: "component", name: "delete-restore-icon" }, () => false)
+    @CommonGameObjectActionObject.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
+    fakeAction() { }
+
 });

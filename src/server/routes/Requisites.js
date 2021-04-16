@@ -73,25 +73,8 @@ export default class Requisites extends ApiRoute {
 
         const result = await this.claimedExport.Model.findById(request.params.id).exec();
         if (!result) return new httpErrors.NotFound();
-        const plainObj = result.toObject();
-        delete plainObj._id;
-        plainObj._dummyId = uuid();
 
-        for (const clickArea of plainObj.clickAreas) {
-            delete clickArea._id;
-            clickArea._dummyId = uuid();
-        }
-
-        for (const actionObject of plainObj.actionObjects) {
-            delete actionObject._id;
-            actionObject._dummyId = uuid();
-            actionObject.sceneObject = actionObject.sceneObject._id;
-        }
-
-        merge(plainObj, request.body || {});
-        request.body = plainObj;
-
-        const copy = await this.create(request);
+        const copy = await super.copy(request);
         if (copy instanceof Error) return copy;
 
         try {
