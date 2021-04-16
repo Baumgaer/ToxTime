@@ -31,6 +31,11 @@
                 right: @size;
             }
 
+            .location {
+                left: calc(100% - 0.5em);
+                right: auto;
+            }
+
             &::v-deep .overlayIcons {
                 right: auto;
                 left: -5px;
@@ -52,7 +57,7 @@
         margin-top: 1em;
         width: @size;
         height: @size;
-        background-color: @dark;
+        background-color: @dusk;
         border-radius: @size;
         color: @white;
 
@@ -94,6 +99,20 @@
             &:hover {
                 background-color: @primaryColor;
                 cursor: pointer;
+            }
+        }
+
+        .location {
+            position: absolute;
+            width: max-content;
+            right: calc(100% - 0.5em);
+            margin-top: calc(@size * -0.5);
+
+            &::v-deep .item {
+                height: calc(@size * 0.5);
+                width: max-content;
+                grid-template-columns: calc(@size * 0.5) 1fr;
+                padding-right: 10px;
             }
         }
 

@@ -16,6 +16,10 @@
                        :min="`${item.scene ? 1 : 0}`"
                 />
                 <div class="removeButton" @click="removeItem(item)">X</div>
+                <div class="location">
+                    <Item v-if="item.location !== 'inventory'" :model="item.location" :compactMode="true" />
+                    <Item v-else :model="inventoryModel" :compactMode="true" />
+                </div>
             </Avatar>
         </div>
         <div class="item placeholder"
@@ -25,7 +29,7 @@
              @dragleave="onDragLeave($event, 'placeholder')"
         >
             <component v-if="placeholderAvatarData && placeholderAvatarData.type === 'component'" :is="placeholderAvatarData.name" />
-            <gamepad-variant-icon v-else />
+            <plus-icon v-else />
             <div class="amount"></div>
         </div>
         <div class="spreader"></div>
@@ -34,6 +38,9 @@
 
 <script>
 import Avatar from "~client/components/Avatar";
+import Item from "~client/components/Item";
+
+import Inventory from "~client/models/Inventory";
 import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
 import GameObject from "~client/models/GameObject";
@@ -48,7 +55,8 @@ import { parseEventModelData } from "~client/utils";
 
 export default {
     components: {
-        Avatar
+        Avatar,
+        Item
     },
     props: {
         model: {
@@ -70,7 +78,8 @@ export default {
     },
     data() {
         return {
-            placeholderAvatarData: null
+            placeholderAvatarData: null,
+            inventoryModel: new Inventory.Model()
         };
     },
     methods: {

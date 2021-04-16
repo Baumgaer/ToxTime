@@ -56,6 +56,17 @@ export function RecipeItemMixinClass(MixinClass) {
                 sticky: true,
                 required: false,
                 default: null
+            },
+            locateInInventory: {
+                type: Boolean,
+                default: true
+            },
+            locateInActionObject: {
+                type: Schema.Types.ObjectId,
+                ref: "ActionObject",
+                default: null,
+                autopopulate: true,
+                sticky: true
             }
         };
 
@@ -76,6 +87,21 @@ export function RecipeItemMixinClass(MixinClass) {
 
             setAllOtherToNull(value?.className);
             if (value) this[unCapitalize(value.className)] = value;
+        }
+
+        get location() {
+            if (this.locateInInventory) return "inventory";
+            return this.locateInActionObject;
+        }
+
+        set location(value) {
+            if (!value || value.className !== "ActionObject") {
+                this.locateInInventory = true;
+                this.locateInActionObject = null;
+            } else {
+                this.locateInActionObject = value;
+                this.locateInInventory = false;
+            }
         }
 
     }
