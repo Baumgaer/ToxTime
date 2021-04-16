@@ -28,6 +28,7 @@ export function RecipeMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
                 required: true,
                 default: [],
+                autopopulate: true,
                 dependant: true
             },
             transitionSettings: {
@@ -43,6 +44,7 @@ export function RecipeMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
                 required: true,
                 default: [],
+                autopopulate: true,
                 dependant: true
             }
         };
