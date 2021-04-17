@@ -124,5 +124,6 @@
     "delay": "Verzögerung",
     "ingredientsExact": "Exakte Zutaten",
     "quantityExact": "Exakte Mengen",
-    "addRecipe": "Rezept hinzufügen"
+    "addRecipe": "Rezept hinzufügen",
+    "addCertainItem": "{type} \"{name}\" hinzufügen"
 }

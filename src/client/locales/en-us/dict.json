@@ -124,5 +124,6 @@
     "delay": "Delay",
     "ingredientsExact": "Exact ingredients",
     "quantityExact": "Exact quantities",
-    "addRecipe": "Add recipe"
+    "addRecipe": "Add recipe",
+    "addCertainItem": "Add {type} \"{name}\""
 }

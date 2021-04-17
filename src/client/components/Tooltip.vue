@@ -53,7 +53,7 @@
                 </item-component>
             </span>
             <Button v-if="model.labels" name="addLabel" :showLabel="false" ref="addLabelButton" @click="onAddLabelButtonClick"><plus-icon /></Button>
-            <LabelSelector v-if="labelSelectorCreated" ref="labelSelector" :model="model" :attachTo="$refs.addLabelButton.$el" @hide="onLabelSelectorHide" />
+            <ItemSelector v-if="itemSelectorCreated" ref="itemSelector" :model="model" :attribute="'labels'" :selectionFunction="itemFilter" :attachTo="$refs.addLabelButton.$el" @hide="onItemSelectorHide" />
         </div>
         <div class="closeButton" @click.prevent.stop="onPinButtonClick($event)" ref="pinButton">
             <pin-icon :title="$t('pin')"/>
@@ -65,19 +65,20 @@
 import ClientModel from "~client/lib/ClientModel";
 import Avatar from "~client/components/Avatar.vue";
 import Button from "~client/components/Button.vue";
-import LabelSelector from "~client/components/LabelSelector.vue";
+import ItemSelector from "~client/components/ItemSelector.vue";
 
 import tippy, { sticky, hideAll, animateFill } from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/translucent.css';
 import 'tippy.js/dist/backdrop.css';
 import 'tippy.js/animations/shift-away.css';
+import ApiClient from '~client/lib/ApiClient';
 
 export default {
     components: {
         Avatar,
         Button,
-        LabelSelector
+        ItemSelector
     },
     props: {
         model: {
@@ -93,8 +94,8 @@ export default {
         return {
             tippy: null,
             pinned: false,
-            labelSelectorCreated: false,
-            labelSelectorOpen: false
+            itemSelectorCreated: false,
+            itemSelectorOpen: false
         };
     },
     beforeDestroy() {
@@ -118,8 +119,8 @@ export default {
         },
 
         onAddLabelButtonClick() {
-            this.labelSelectorCreated = true;
-            this.labelSelectorOpen = true;
+            this.itemSelectorCreated = true;
+            this.itemSelectorOpen = true;
         },
 
         onLabelDeleteButtonClick(label) {
@@ -142,13 +143,17 @@ export default {
         },
 
         onHide() {
-            if (this.labelSelectorOpen) return false;
-            this.$refs.labelSelector?.hide();
+            if (this.itemSelectorOpen) return false;
+            this.$refs.itemSelector?.hide();
             if (this.pinned) return false;
         },
 
-        onLabelSelectorHide() {
-            this.labelSelectorOpen = false;
+        onItemSelectorHide() {
+            this.itemSelectorOpen = false;
+        },
+
+        itemFilter() {
+            return Object.values(ApiClient.store.collection("labels"));
         },
 
         attachTo(element) {
