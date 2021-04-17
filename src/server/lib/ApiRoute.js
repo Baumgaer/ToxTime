@@ -375,6 +375,9 @@ export default class ApiRoute extends DefaultRoute {
      */
     @ApiRoute.post("/copy/:id")
     async copy(request) {
+        if (!request.params.id || !isMongoId(request.params.id)) return new CustomError("NotAMongoId");
+        if (request.body && !isPlainObject(request.body)) return new httpErrors.NotAcceptable();
+
         /** @type {null | import("~server/lib/ServerModel").default} */
         const result = await this.claimedExport.Model.findById(request.params.id).exec();
         if (!result) return new httpErrors.NotFound();
