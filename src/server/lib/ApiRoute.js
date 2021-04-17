@@ -386,17 +386,18 @@ export default class ApiRoute extends DefaultRoute {
         const processSticky = (referencePath) => {
             const references = get(plainObj, referencePath);
             if (isArray(references)) {
-                set(plainObj, referencePath, references.map((reference) => reference._id));
-            } else if (isPlainObject(references)) set(plainObj, referencePath, references._id);
+                set(plainObj, referencePath, references.map((reference) => reference._id.toString()));
+            } else if (isPlainObject(references)) set(plainObj, referencePath, references._id.toString());
         };
 
         const processReferencesOfDirectReference = (referencePath, concatValue) => {
-            const modelClass = get(result, referencePath.concat(concatValue));
+            referencePath = referencePath.concat(concatValue);
+            const modelClass = get(result, referencePath);
             if (!modelClass) return;
-            const referencingModelExports = modelClass.getReferencingModelExports();
+            const referenceModelExports = modelClass.getReferenceModelExports();
 
-            for (const referencingModelExport of referencingModelExports) {
-                const referenceReferencePaths = modelClass.getReferencePathsOf(referencingModelExport.RawClass.className);
+            for (const referenceModelExport of referenceModelExports) {
+                const referenceReferencePaths = modelClass.getReferencePathsOf(referenceModelExport.RawClass.className);
                 for (const referenceReferencePath of referenceReferencePaths) {
                     processSticky(referencePath.concat(referenceReferencePath));
                 }
@@ -406,15 +407,16 @@ export default class ApiRoute extends DefaultRoute {
         const processDependant = (referencePath) => {
             const references = get(plainObj, referencePath);
             if (isArray(references)) {
-                for (const reference of references) {
+                for (let i = 0; i < references.length; i++) {
+                    const reference = references[i];
                     delete reference._id;
                     reference._dummyId = uuid();
-                    processReferencesOfDirectReference(referencePath, [0]);
+                    processReferencesOfDirectReference(referencePath, [i]);
                 }
             } else if (isPlainObject(references)) {
                 delete references._id;
                 references._dummyId = uuid();
-                processReferencesOfDirectReference(referencePath);
+                processReferencesOfDirectReference(referencePath, []);
             }
         };
 
@@ -430,6 +432,7 @@ export default class ApiRoute extends DefaultRoute {
 
         merge(plainObj, request.body || {});
         request.body = plainObj;
+        request.params.id = null;
         return this.create(request);
     }
 }
