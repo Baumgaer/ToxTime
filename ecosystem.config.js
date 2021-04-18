@@ -234,7 +234,7 @@ module.exports = {
         name: config.APP_NAME || "PACMaker",
         script: path.resolve(arp.path, "server.js"),
         cwd: path.resolve(arp.path),
-        "node_args": ["--inspect=1992"],
+        "node_args": config.NODE_ENV === "development" ? ["--inspect=1992"] : [],
 
         "log_date_format": "YYYY-MM-DD HH:mm Z",
         "out_file": path.resolve(arp.path, "var", "log", "stdout.log"),
