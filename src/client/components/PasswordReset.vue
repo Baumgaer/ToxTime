@@ -14,7 +14,6 @@
             </div>
         </form>
         <form v-on:submit="setPassword($event)" v-else>
-            <div class="welcomeBox">{{ $t("resetPassword") }}</div>
             <div ref="hintBox" class="fail hintBox"></div>
             <section>
                 <input type="password" autocomplete="new-password" name="password" class="password" ref="password" :placeholder="$t('password')" v-on:keydown="resetField('password')" />
@@ -68,7 +67,7 @@ export default {
                 return;
             }
             const result = await ApiClient.post("/login/reset", { email });
-            if (!result.success) {
+            if (result instanceof Error) {
                 this.hint("error", null, i18n.t("errorWhileSendingEmail"));
             } else this.hint("success", null, i18n.t("passwordResetSuccess", { email }));
         },
@@ -85,7 +84,7 @@ export default {
                 return;
             }
             const result = await ApiClient.post(this.$route.path, {password, repeatPassword });
-            if (!result.success) return this.hint("error", result.error.field, i18n.t(result.error.name));
+            if (result instanceof Error) return this.hint("error", result.error.field, i18n.t(result.error.name));
             this.hint("success", null, i18n.t("passwordSuccessfullySet"));
             setTimeout(() => this.$router.push("/"), 2000);
         }
