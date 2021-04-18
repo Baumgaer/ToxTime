@@ -35,10 +35,11 @@ export default class Tool {
      * @param {import("~client/lib/ClientModel").default} model
      * @memberof Tool
      */
-    constructor(paper, model) {
+    constructor(paper, model, setNewToolFunc) {
         this.paper = paper;
         this.model = model;
         this.tool = new paper.Tool();
+        this.setNewTool = setNewToolFunc;
         for (const key in this.originalEvents) {
             if (Object.hasOwnProperty.call(this.originalEvents, key)) {
                 const eventFunction = paper.view[key];
@@ -116,7 +117,9 @@ export default class Tool {
 
     onToolDoubleClick() { }
 
-    onToolKeyDown() { }
+    onToolKeyDown(event) {
+        if (event.key === "escape" && this.setNewTool) this.setNewTool?.(null);
+    }
 
     onToolKeyUp() { }
 
