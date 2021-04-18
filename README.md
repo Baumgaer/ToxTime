@@ -12,10 +12,26 @@
 2. Install mongoDB and configure a valid user.
    - Skipping user creation for testing is ok.
    - Do not configure a database for this application. It will be created automatically on first start.
-3. Rin `npm run setup`
+3. Run `npm run setup` in a command line tool like CMS, Powershell or Terminal
    - Skip database user and database password if no database user was created
    - A system user will be created at the end of configuration process
 4. Check the `/var/log/error.log` and `/var/log/stdout.log` for errors and success messages
+
+## General commands
+
+- `npm run setup` starts the full installation of the application
+- `npm run config` starts the config wizard of the application
+- `npm run start` starts the server
+- `npm run stop` stops the server
+- `npm run restart` restarts the server
+- `npm run logrotate` rotates the logs in /var/log. Means: The newest will be renamed and the overwritten with an empty log
+- `npm run startup [platform]` creates a autostart script for the platform or it will be auto detected
+- `npm run unstartup [platform]` removes the autostart for the platform or it will be auto detected
+
+### HINT: platform can be one of
+
+[ubuntu | ubuntu14 | ubuntu12 | centos | centos6 | arch | oracle | amazon | macos | darwin | freebsd | systemd | systemv | upstart | launchd | rcd | openrc]
+Not supported on windows!
 
 ## Configuration
 
@@ -33,6 +49,7 @@ APP_TRUST_PROXY: false
 
 if there are any questions about which possibilities are available,
 see the ecosystem.config.js or type `npm run config`
+After changing the config, you have to restart the server with `npm restart`
 
 ## Development
 
