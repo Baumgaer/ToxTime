@@ -39,7 +39,7 @@
         "greenlock": "^4.0.4",
         "greenlock-express": "^4.0.3",
         "greenlock-store-fs": "^3.2.2",
-        "helmet": "^4.4.1",
+        "helmet": "^4.5.0",
         "hpp": "^0.2.3",
         "http-errors": "^1.8.0",
         "i18next": "^20.2.1",
