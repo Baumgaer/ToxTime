@@ -161,20 +161,30 @@ const defaults = {
 
 
     /**
-     * The name which will be displayed as an email sender
+     * The name which will be displayed as an email sender.
+     * NOTE: Some e-mail provider do not allow to set a custom name. If sending
+     * e-mails fails, keep this as an empty string (e.g.: "").
+     *
+     * A hint in the error log could be:
+     * "Error: Mail command failed: 550-Requested action not taken: mailbox unavailable"
      */
     "MAIL_NAME": "PACMaker",
 
     /**
-     * The email address which will be used as an email sender
+     * The email address which will be used as an email sender.
+     * NOTE: Some e-mail provider do not allow custom e-mail address. If sending
+     * e-mails fails, type the correct e-mail address the provider has given you.
+     *
+     * A hint in the error log could be:
+     * "Error: Mail command failed: 550-Requested action not taken: mailbox unavailable"
      */
     "MAIL_ADDRESS": "noreply@pacmaker.com",
 
     /**
-     * The IP address of the mail server. If the host is not given in development
-     * mode, the host of the temporary http://ethereal.email/ account will be used and the
-     * configured host else. While not in development mode,
-     * this has to be a valid host name for example: mail.uni-bonn.de.
+     * The IP address of the mail server (e.g.: smtp.email.com). If the host
+     * is not given in development mode, the host of the temporary
+     * http://ethereal.email/ account will be used and the configured host else.
+     * While NOT in development mode, this has to be a valid host name.
      */
     "MAIL_HOST": "",
 
@@ -190,7 +200,12 @@ const defaults = {
      * this can set to null to let the testaccount decide wether it is true
      * or false. Otherwise the configured value is used. If it is false,
      * the mailer will try STARTTLS and if it does not work, it will use no
-     * encryption.
+     * encryption. If it is set to true and the application is not able to send
+     * e-mails, your e-mail provider possibly dies not support SSL.
+     * In this case set it to false.
+     *
+     * A hint in the error log could be
+     * "Error: 14904:error:1408F10B:SSL routines:ssl3_get_record:wrong version number"
      */
     "MAIL_SSL": true,
 

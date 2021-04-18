@@ -11,7 +11,7 @@ const configFilePath = path.resolve(arp.path, "config.yaml");
 const ecosystemString = fs.readFileSync(path.resolve(arp.path, "ecosystem.config.js")).toString();
 const defaultsRegEx = /const defaults = (.*?);/gis;
 const defaults = defaultsRegEx.exec(ecosystemString)[1];
-const questionsRegEx = /\/\*(?<question>.*?)\*\/\n(?<id>.*?):\s(?<default>.*?),/gis;
+const questionsRegEx = /\/\*(?<question>.*?)\*\/\n(?<id>.*?):\s(?<default>.*?)(,|$)/gis;
 const selectRegex = /@property \{(?<value>.*?)\} (?<title>.*?) (?<description>.*?)\n/gis;
 
 const alreadyConfigured = {};
