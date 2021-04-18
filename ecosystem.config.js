@@ -20,12 +20,16 @@ const defaults = {
     /**
      * A comma separated list of subdomains. Needed for HTTPS. NOTE: "www"
      * is also a subdomain!
+     *
+     * Example:
+     * subdomain.yourdomain.com, basis.uni-bonn.de, ecampus.uni-bonn.de
      */
     "APP_ALT_NAMES": "",
 
     /**
      * Has to be a valid e-Mail address which is used for Let's Encrypt
      * certificates if HTTPS is enabled AND no reverse proxy is used.
+     * It is also used as a contact for users in case of problems.
      */
     "APP_MAINTAINER_MAIL": "name@example.com",
 
@@ -42,13 +46,33 @@ const defaults = {
     "APP_DEFAULT_LANGUAGE": "de-de",
 
     /**
-     * Enables or disables HTTPS.
+     * Enables or disables HTTPS. Needs a valid domain if no revers proxy will
+     * be configured.
      */
     "APP_SECURE": true,
 
     /**
+     * If there is a reverse proxy in front of this application, for example nginx,
+     * this will enable the application to react on requests of this proxy.
+     * If enabled, the app will use the HTTPS server of the reverse proxy
+     * instead of creating an own HTTPS server.
+     *
+     * @type {select}
+     * @property {false} Disable will disable reverse proxy
+     * @property {true} Enable will use the most right entry of header X-Forwarded-* as IP or disable the behavior
+     * @property {"loopback"} Loopback 127.0.0.1/8, ::1/128
+     * @property {"linklocal"} LinkLocal 169.254.0.0/16, fe80::/10
+     * @property {"uniquelocal"} UniqueLocal 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7
+     * @property {1} Number The nth hop from the proxy server should be trusted as a client. Must be set manually in config.yaml
+     * @property {""} Manual any other IP address or list of IP addresses. Must be set manually in config.yaml
+     */
+    "APP_TRUST_PROXY": false,
+
+    /**
      * The IP address on which the application will accept requests.
      * Use 0.0.0.0 to accept requests on all IP addresses.
+     * Use localhost to accept requests only from same machine (recommended for
+     * testing and in combination with reverse proxy).
      */
     "APP_HOST": "localhost",
 
@@ -62,34 +86,21 @@ const defaults = {
      */
     "APP_HTTPS_PORT": 443,
 
-    /**
-     * If there is a reverse proxy in front of this application, for example nginx,
-     * this will enable the application to react on requests of this proxy.
-     *
-     * @type {select}
-     * @property {false} Disable will disable reverse proxy
-     * @property {true} Enable will use the most right entry of header X-Forwarded-* as IP or disable the behavior
-     * @property {"loopback"} Loopback 127.0.0.1/8, ::1/128
-     * @property {"linklocal"} LinkLocal 169.254.0.0/16, fe80::/10
-     * @property {"uniquelocal"} UniqueLocal 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fc00::/7
-     * @property {1} Number The nth hop from the proxy server should be trusted as a client. Must be set manually in config.yaml
-     * @property {""} Manual any other IP address or list of IP addresses. Must be set manually in config.yaml
-     */
-    "APP_TRUST_PROXY": false,
-
 
     /**
      * The secret to secure the session token. Will be randomly generated on
-     * each server restart by default.
+     * each server restart by default (crypto.randomBytes(512).toString()).
+     * Each other value will be static. This has nothing to do with user passwords.
      */
     "SESSION_SECRET": crypto.randomBytes(512).toString(),
 
     /**
      * Maximum timeout of the session in human readable value e.g. 1h for one
-     * hour or 1m for one minute or 2.5 hrs for two and a half day.
-     * Notice the space between 2.5 and hrs.
+     * hour or 1m for one minute or 2.5 days for two and a half day.
+     * Notice the space between 2.5 and day!
      */
     "SESSION_MAX_AGE": "1h",
+
 
     /**
      * The name of the field in the csv which describes the role (e.g. admin or tutor)
@@ -161,14 +172,15 @@ const defaults = {
 
     /**
      * The IP address of the mail server. If the host is not given in development
-     * mode, the host of the temporary ether.mail account will be used and the
-     * configured host else.
+     * mode, the host of the temporary http://ethereal.email/ account will be used and the
+     * configured host else. While not in development mode,
+     * this has to be a valid host name for example: mail.uni-bonn.de.
      */
     "MAIL_HOST": "",
 
     /**
      * The port of the mail server. When the port is 0 in development mode,
-     * the port of the temporary ether.mail account will be used and the
+     * the port of the temporary http://ethereal.email/ account will be used and the
      * configured port else.
      */
     "MAIL_PORT": 465,

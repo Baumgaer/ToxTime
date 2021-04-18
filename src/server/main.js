@@ -164,6 +164,7 @@ export default class WebServer {
                 styleSrc.push(`'nonce-${contentSecurityNonce}'`);
                 styleSrc.push("'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='");
                 styleSrc.push("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
+                styleSrc.push("'sha256-Y5HGV3cmFL1QmdV9FMkQjm7MR7FR+stNxbf9+GKET60='");
             }
 
             imgSrc.push("data:");

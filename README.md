@@ -2,105 +2,37 @@
 
 ## Requirements
 
-- Node.js v12.13.0 or better
-- NPM v6.12.1 or better
-- MongoDB v4.4.2 or better
+- Node.js v12.13.0 or newer ([download here](https://nodejs.org/en/))
+- NPM v6.12.1 or newer (comes with nodejs)
+- MongoDB v4.4.2 or newer ([download here](https://www.mongodb.com/try/download/community))
 
 ## Project setup
 
-1. Install mongoDB (see [MongoDB website](https://www.mongodb.com/try/download/community)) and configure a valid user. Do not configure a database for this application. It will be created automatically on first start.
-2. Configure the application in the "env" section of the config.json in root folder
-3. Install other dependencies with `npm install`
-4. Start the application with `npm start`
+1. Install Node.js
+2. Install mongoDB and configure a valid user.
+   - Skipping user creation for testing is ok.
+   - Do not configure a database for this application. It will be created automatically on first start.
+3. Rin `npm run setup`
+   - Skip database user and database password if no database user was created
+   - A system user will be created at the end of configuration process
+4. Check the `/var/log/error.log` and `/var/log/stdout.log` for errors and success messages
 
 ## Configuration
 
-To configure this application, open the `config.json` file and edit or add values of the "env" section.
+To configure this application, open the `config.yaml` file and edit or add values of the "env" section.
 
 For example:
 
-```json
-{
-  "verbose": false,
-  "restartable": "rs",
-  "env": {
-    "NODE_ENV": "production"
-    // Other configuration
-  }
-}
+```yaml
+APP_HOST: 0.0.0.0
+APP_SECURE: false
+APP_HTTP_PORT: 1337
+APP_HTTPS_PORT: 1338
+APP_TRUST_PROXY: false
 ```
 
-**NODE_ENV:**
-
-Defines the environment in which the application is running.
-
-- Type: string
-- Default: production
-- Possible values: production, development
-
-**DEBUG:**
-
-Enables or disables debug information printed to the logs. This will increase the ammount of output significant.
-
-- Type: boolean
-- Default: false
-
-**APP_HOST:**
-
-The network interface on which the webserver should listen.
-Use 0.0.0.0 to listen to all interfaces, localhost to listen only to the local interface or a specific IP address.
-
-- Type: string
-- Default: localhost
-- Required: No
-
-**APP_PORT:**
-
-The port on which the webserver should listen. Ensure that this port is not used by another application. Otherwise this application will not start.
-
-- Type: number
-- Default: 80
-- Required: No
-
-**DB_HOST:**
-
-The IP address for database communication.
-
-- Type: string
-- Default: localhost
-- Required: No
-
-**DB_PORT:**
-
-The port for database communication.
-
-- Type: number
-- Default: 27017
-- Required: No
-
-**DB_DATABASE_NAME:**
-
-The name of the database where the data should be stored.
-
-- Type: string
-- Required: Yes
-
-**DB_USER:**
-
-The user name for database communication. This user should have database creation rights
-as well as collection creation and modification rights.
-
-- Type: string
-- Default: ""
-- Required: No
-
-**DB_USER_PASSWORD:**
-
-The password for the database user.
-
-- Type: string
-- Default: ""
-- Required: No
+if there are any questions about which possibilities are available,
+see the ecosystem.config.js or type `npm run config`
 
 ## Development
 
@@ -137,4 +69,4 @@ npm start
 ### Customize configuration
 
 - See [Configuration Reference For VUE](https://cli.vuejs.org/config/)
-- See [Configuration Reference For NODEMON](https://github.com/remy/nodemon/blob/master/lib/config/defaults.js)
+- See [Configuration Reference For PM2](https://pm2.keymetrics.io/docs/usage/application-declaration/)
