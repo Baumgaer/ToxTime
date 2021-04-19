@@ -4,7 +4,7 @@
             <input v-model="search" type="text" name="search" autocomplete="disable" :placeholder="$t('search')" />
         </div>
         <div class="items">
-            <item-component v-for="item in items" :key="item._id" :model="item" :preventTooltipHiding="true" draggable="false" :compactMode="true" @click="onItemClick(item)"></item-component>
+            <item-component v-for="item in items" :key="item._dummyId || item._id" :model="item" :preventTooltipHiding="true" draggable="false" :compactMode="true" @click="onItemClick(item)"></item-component>
             <Button v-if="search && showAddButton && staticModelType" :name="$t('addCertainItem', {type: staticModelType.RawClass.className, name: search})" :nameIsTranslated="true" @click="onAddItemButtonClick">
                 <Avatar :model="new staticModelType.RawClass()" ratio="1:1" :fitImage="true" />
             </Button>
@@ -49,6 +49,10 @@ export default {
         attachTo: {
             type: HTMLElement,
             required: true
+        },
+        autoSave: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -60,7 +64,7 @@ export default {
     },
     computed: {
         items() {
-            const items = this.selectionFunction().filter((item) => {
+            const items = this.selectionFunction(this.model, this.attribute).filter((item) => {
                 return !this.model[this.attribute].includes(item);
             });
             return itemFilterAndSort(items, this.search);
@@ -101,7 +105,7 @@ export default {
             if (isArray(attribute)) {
                 attribute.push(item);
             } else this.model[this.attribute] = item;
-            this.model.save();
+            if (this.autoSave) this.model.save();
             this.tippy.hide();
         },
 
@@ -113,7 +117,7 @@ export default {
 
         getModelExportToCreate() {
             let className = null;
-            const allItems = this.selectionFunction();
+            const allItems = this.selectionFunction(this.model, this.attribute);
             for (const item of allItems) {
                 if (!className) {
                     className = item.className;

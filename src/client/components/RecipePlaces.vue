@@ -7,7 +7,7 @@
              @drop="onDrop($event, item)"
              @dragleave="onDragLeave($event, item)"
         >
-            <RecipePlace class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" />
+            <RecipePlace class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" :itemFilter="itemFilter" />
         </div>
         <div class="item placeholder"
              ref="placeholder"
@@ -57,6 +57,10 @@ export default {
         forbiddenModels: {
             type: Array,
             default: () => []
+        },
+        itemFilter: {
+            type: Function,
+            required: true
         }
     },
     data() {
@@ -159,7 +163,7 @@ export default {
         },
 
         replaceItem(place, model) {
-            this.removeItemHighlight(place);
+            this.$refs[`place_${place._id}`][0].removeHighlight();
             if (!this.isAllowed(model)) return;
             place.object = model;
             if (model instanceof ActionObject.RawClass) place.amount = Math.min(place.amount, 1);

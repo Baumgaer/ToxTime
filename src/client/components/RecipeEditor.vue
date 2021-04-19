@@ -2,7 +2,7 @@
     <div class="recipeEditor">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
         <div class="recipe">
-            <RecipePlaces :model="model" prop="input" :forbiddenModels="forbiddenInputTypes" />
+            <RecipePlaces :model="model" prop="input" :forbiddenModels="forbiddenInputTypes" :itemFilter="itemFilter" />
             <div class="transitionInputLine"></div>
             <div class="transition">
                 <div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="transitionOutputLine"></div>
-            <RecipePlaces :model="model" prop="output" align="right" :forbiddenModels="forbiddenOutputTypes" />
+            <RecipePlaces :model="model" prop="output" align="right" :forbiddenModels="forbiddenOutputTypes" :itemFilter="itemFilter" />
         </div>
         <textarea-autosize
             class="description"
@@ -45,6 +45,8 @@ import Recipe from "~client/models/Recipe";
 import ClickArea from "~client/models/ClickArea";
 import File from "~client/models/File";
 import Scene from "~client/models/Scene";
+import Inventory from "~client/models/Inventory";
+import Hand from "~client/models/Hand";
 
 export default {
     components: {
@@ -73,6 +75,14 @@ export default {
             const result = await this.model.save();
             if (!result || result instanceof Error) return;
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+        },
+
+        itemFilter() {
+            return [
+                new Inventory.Model(),
+                new Hand.Model(),
+                new Scene.Model({ name: this.$t("actionObjectFromScene") })
+            ];
         }
     }
 };

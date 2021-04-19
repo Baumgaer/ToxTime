@@ -1,5 +1,4 @@
 import { Schema } from "mongoose";
-import { unCapitalize } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -61,6 +60,10 @@ export function RecipeItemMixinClass(MixinClass) {
                 type: Boolean,
                 default: true
             },
+            locateInHand: {
+                type: Boolean,
+                default: false
+            },
             locateInActionObject: {
                 type: Schema.Types.ObjectId,
                 ref: "ActionObject",
@@ -69,40 +72,6 @@ export function RecipeItemMixinClass(MixinClass) {
                 sticky: true
             }
         };
-
-        get object() {
-            return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.label;
-        }
-
-        set object(value) {
-
-            const setAllOtherToNull = (otherThan) => {
-                if (otherThan !== "Label") this.label = null;
-                if (otherThan !== "SceneObject") this.sceneObject = null;
-                if (otherThan !== "ActionObject") this.actionObject = null;
-                if (otherThan !== "ClickArea") this.clickArea = null;
-                if (otherThan !== "File") this.file = null;
-                if (otherThan !== "Scene") this.scene = null;
-            };
-
-            setAllOtherToNull(value?.className);
-            if (value) this[unCapitalize(value.className)] = value;
-        }
-
-        get location() {
-            if (this.locateInInventory) return "inventory";
-            return this.locateInActionObject;
-        }
-
-        set location(value) {
-            if (!value || value.className !== "ActionObject") {
-                this.locateInInventory = true;
-                this.locateInActionObject = null;
-            } else {
-                this.locateInActionObject = value;
-                this.locateInInventory = false;
-            }
-        }
 
     }
     return RecipeItem;

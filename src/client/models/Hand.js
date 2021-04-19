@@ -1,14 +1,14 @@
 import ClientModel from "~client/lib/ClientModel";
 
-export default ClientModel.buildClientExport(class Inventory extends ClientModel {
+export default ClientModel.buildClientExport(class Hand extends ClientModel {
 
-    static className = "Inventory"
+    static className = "Hand"
 
     /** @type {import("mongoose").SchemaDefinition} */
     static schema = {
         name: {
             default: () => {
-                return window.$t("inventory");
+                return window.$t("hand");
             }
         }
     };
@@ -16,7 +16,7 @@ export default ClientModel.buildClientExport(class Inventory extends ClientModel
     getAvatar() {
         return {
             type: "component",
-            name: "bag-personal-icon",
+            name: "hand-left-icon",
             title: this.name
         };
     }

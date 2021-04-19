@@ -125,5 +125,7 @@
     "ingredientsExact": "Exakte Zutaten",
     "quantityExact": "Exakte Mengen",
     "addRecipe": "Rezept hinzufügen",
-    "addCertainItem": "{type} \"{name}\" hinzufügen"
+    "addCertainItem": "{type} \"{name}\" hinzufügen",
+    "hand": "Hand",
+    "actionObjectFromScene": "Aktionsobjekt aus Szene"
 }

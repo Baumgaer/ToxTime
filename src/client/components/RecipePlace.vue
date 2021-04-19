@@ -9,10 +9,19 @@
         />
         <div class="removeButton" @click="remove">X</div>
         <div class="location" @click="openItemSelector" ref="location">
-            <Item v-if="model.location !== 'inventory'" :model="model.location" :compactMode="true" />
-            <Item v-else :model="inventoryModel" :compactMode="true" />
+            <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" />
+            <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" />
         </div>
-        <ItemSelector v-if="itemSelectorCreated" ref="itemSelector" :model="model" :attribute="'location'" :selectionFunction="itemFilter" :attachTo="$refs.location" />
+        <ItemSelector
+            v-if="itemSelectorCreated"
+            ref="itemSelector"
+            :model="model"
+            :attribute="'location'"
+            :selectionFunction="itemFilter"
+            :showAddButton="false"
+            :attachTo="$refs.location"
+            :autoSave="false"
+        />
     </Avatar>
 </template>
 
@@ -20,6 +29,8 @@
 import ClientModel from "~client/lib/ClientModel";
 import RecipeItem from "~client/models/RecipeItem";
 import Inventory from "~client/models/Inventory";
+import Hand from "~client/models/Hand";
+import Scene from "~client/models/Scene";
 
 import Avatar from "~client/components/Avatar";
 import Item from "~client/components/Item";
@@ -47,12 +58,18 @@ export default {
         align: {
             type: String,
             required: true
+        },
+        itemFilter: {
+            type: Function,
+            required: true
         }
     },
     data() {
         return {
             itemSelectorCreated: false,
-            inventoryModel: new Inventory.Model()
+            inventoryModel: new Inventory.Model(),
+            handModel: new Hand.Model(),
+            chooseModel: new Scene.Model({ name: this.$t("actionObjectFromScene") })
         };
     },
     methods: {
@@ -71,9 +88,7 @@ export default {
         },
 
         openItemSelector() {
-            const locationDom = this.$refs.location;
-            const itemSelector = this.$refs.itemSelector;
-            console.log(locationDom, itemSelector);
+            this.itemSelectorCreated = true;
         }
     }
 };

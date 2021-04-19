@@ -1,5 +1,7 @@
 import { RecipeItemMixinClass } from "~common/models/RecipeItem";
 import Item from "~client/models/Item";
+import { unCapitalize } from "~common/utils";
+import ApiClient from "~client/lib/ApiClient";
 
 const CommonItemRecipeItem = RecipeItemMixinClass(Item.RawClass);
 export default Item.RawClass.buildClientExport(class RecipeItem extends CommonItemRecipeItem {
@@ -26,6 +28,58 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         if (object === this.scene) return "theater-icon";
         if (object === this.file) return "file-document-icon";
         return "";
+    }
+
+    get object() {
+        return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.label;
+    }
+
+    set object(value) {
+        const that = ApiClient.store.getModelById(this.collection, this._dummyId || this._id) || this;
+
+        const setAllOtherToNull = (otherThan) => {
+            if (otherThan !== "Label") that.label = null;
+            if (otherThan !== "SceneObject") that.sceneObject = null;
+            if (otherThan !== "ActionObject") that.actionObject = null;
+            if (otherThan !== "ClickArea") that.clickArea = null;
+            if (otherThan !== "File") that.file = null;
+            if (otherThan !== "Scene") that.scene = null;
+        };
+
+        setAllOtherToNull(value?.className);
+        if (value) that[unCapitalize(value.className)] = value;
+    }
+
+    get location() {
+        if (this.locateInInventory) return "inventory";
+        if (this.locateInHand) return "hand";
+        if (!this.locateInActionObject) return "choose";
+        return this.locateInActionObject;
+    }
+
+    set location(value) {
+        const that = ApiClient.store.getModelById(this.collection, this._dummyId || this._id) || this;
+        if (!value || value.className === "Inventory") {
+            // Locate in inventory
+            that.locateInInventory = true;
+            that.locateInHand = false;
+            that.locateInActionObject = null;
+        } else if (value.className === "Scene") {
+            // Predefined rule to force the user to select an actionObject
+            that.locateInInventory = false;
+            that.locateInHand = false;
+            that.locateInActionObject = null;
+        } else if (value.className === "ActionObject") {
+            // Locate at the position of the given action object
+            that.locateInInventory = false;
+            that.locateInHand = false;
+            that.locateInActionObject = value;
+        } else if (value.className === "Hand") {
+            // Locate in hand
+            that.locateInActionObject = null;
+            that.locateInInventory = false;
+            that.locateInHand = true;
+        }
     }
 
     @CommonItemRecipeItem.action("delete", { type: "component", name: "delete-icon" }, () => false)
