@@ -7,7 +7,7 @@
             <div class="transition">
                 <div>
                     <div class="left">{{ $t("delay") }}</div>
-                    <div class="right"><input type="number" name="delay" v-model="model.transitionSettings.delay"></div>
+                    <div class="right"><input type="number" name="delay" min="0" v-model="model.transitionSettings.delay"></div>
                 </div>
 
                 <div>
