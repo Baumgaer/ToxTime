@@ -14,32 +14,13 @@
             right: auto;
             left: 0;
         }
+
         .item {
             margin-left: auto;
-
-            input.amount {
-                left: 0;
-            }
-
-            .removeButton {
-                right: calc(@size - 12px);
-                left: unset;
-            }
 
             .amount {
                 left: auto;
                 right: @size;
-            }
-
-            .location {
-                left: calc(100% - 0.5em);
-                right: auto;
-            }
-
-            &::v-deep .overlayIcons {
-                right: auto;
-                left: -5px;
-                bottom: -5px;
             }
         }
     }
@@ -53,94 +34,23 @@
     }
 
     .item {
-        margin: 0;
-        margin-top: 1em;
+        margin-top: 3em;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .placeholder {
         width: @size;
         height: @size;
         background-color: @dusk;
         border-radius: @size;
         color: @white;
-
-        &:first-child {
-            margin-top: 0;
-        }
-
-        &.highlight {
-            background-color: @infoColor;
-        }
-
-        > span,
-        div {
-            pointer-events: none;
-        }
-
-        &::v-deep .picture {
-            border-radius: @size;
-        }
-
-        &::v-deep .overlayIcons {
-            right: -5px;
-            bottom: -5px;
-        }
-
-        .removeButton {
-            background-color: @infoColor;
-            color: @white;
-            border-radius: 100%;
-            width: 18px;
-            height: 18px;
-
-            position: absolute;
-            left: calc(@size - 12px);
-            margin-top: -50px;
-
-            pointer-events: all;
-
-            &:hover {
-                background-color: @primaryColor;
-                cursor: pointer;
-            }
-        }
-
-        .location {
-            position: absolute;
-            width: max-content;
-            right: calc(100% - 0.5em);
-            margin-top: calc(@size * -0.5);
-            pointer-events: all;
-
-            &::v-deep .item {
-                height: calc(@size * 0.5);
-                width: max-content;
-                grid-template-columns: calc(@size * 0.5) 1fr;
-                padding-right: 10px;
-            }
-        }
-
-        input {
-            margin-left: 0;
-            margin-right: 0;
-            margin-bottom: 0;
-            padding: 0;
-            border: none;
-            border-bottom: 1px solid @black;
-            text-align: center;
-            background: transparent;
-            box-sizing: border-box;
-            outline: none;
-            pointer-events: all;
-
-            &:focus {
-                border-bottom: 1px solid @primaryColor;
-            }
-
-            &.amount {
-                border-top: none;
-                margin-top: calc(@size * (-0.5) - 20px);
-                width: calc(100% - @size - 8px);
-                left: calc(@size + 8px);
-            }
-        }
+        line-height: @size;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
 
         .amount {
             position: absolute;
@@ -149,12 +59,5 @@
             border-top: 1px solid @black;
             width: calc(100% - @size);
         }
-    }
-
-    .placeholder {
-        line-height: @size;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-size: contain;
     }
 }

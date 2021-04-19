@@ -7,20 +7,7 @@
              @drop="onDrop($event, item)"
              @dragleave="onDragLeave($event, item)"
         >
-            <Avatar class="item" :model="item" :fitImage="true" ratio="1:1" :ref="item._id || item._dummyId">
-                <input type="number"
-                       name="amount"
-                       class="amount"
-                       v-model="item.amount"
-                       :max="`${item.actionObject ? 1 : item.scene ? 1 : Infinity}`"
-                       :min="`${item.scene ? 1 : 0}`"
-                />
-                <div class="removeButton" @click="removeItem(item)">X</div>
-                <div class="location">
-                    <Item v-if="item.location !== 'inventory'" :model="item.location" :compactMode="true" />
-                    <Item v-else :model="inventoryModel" :compactMode="true" />
-                </div>
-            </Avatar>
+            <RecipePlace class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" />
         </div>
         <div class="item placeholder"
              ref="placeholder"
@@ -37,26 +24,22 @@
 </template>
 
 <script>
-import Avatar from "~client/components/Avatar";
-import Item from "~client/components/Item";
+import RecipePlace from "~client/components/RecipePlace";
 
-import Inventory from "~client/models/Inventory";
 import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
-import GameObject from "~client/models/GameObject";
-import Scene from "~client/models/Scene";
-import Label from "~client/models/Label";
 import ActionObject from "~client/models/ActionObject";
+import Scene from "~client/models/Scene";
+import GameObject from "~client/models/GameObject";
+import Label from "~client/models/Label";
 import File from "~client/models/File";
 
 import ApiClient from "~client/lib/ApiClient";
-
 import { parseEventModelData } from "~client/utils";
 
 export default {
     components: {
-        Avatar,
-        Item
+        RecipePlace
     },
     props: {
         model: {
@@ -78,8 +61,7 @@ export default {
     },
     data() {
         return {
-            placeholderAvatarData: null,
-            inventoryModel: new Inventory.Model()
+            placeholderAvatarData: null
         };
     },
     methods: {
@@ -101,7 +83,7 @@ export default {
 
             if (place === "placeholder") {
                 this.highlightPlaceholder(model);
-            } else this.highlightItem(place);
+            } else this.$refs[`place_${place._id}`].highlight();
         },
 
         onDragLeave(event, place) {
@@ -112,7 +94,7 @@ export default {
 
             if (place === "placeholder") {
                 this.removePlaceholderHighlight();
-            } else this.removeItemHighlight(place);
+            } else this.$refs[`place_${place._id}`].removeHighlight();
         },
 
         /**
@@ -140,17 +122,6 @@ export default {
             ApiClient.store.collection("localStorage").internalDnDData = null;
         },
 
-        isAllowed(model) {
-            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass];
-            const isAllowed = defaultAllowed.some((type) => model instanceof type);
-            if (!isAllowed) return false;
-
-            const isDefinedForbidden = this.forbiddenModels.some((type) => model instanceof type);
-            if (isDefinedForbidden) return false;
-
-            return true;
-        },
-
         highlightPlaceholder(model) {
             const isTextLikeAvatar = ["text", "component"].includes(model.getAvatar().type);
             if (!isTextLikeAvatar) {
@@ -165,12 +136,15 @@ export default {
             this.$refs.placeholder.firstElementChild.style.opacity = 1;
         },
 
-        highlightItem(place) {
-            this.$refs[place._id || place._dummyId][0].$el.classList.add("highlight");
-        },
+        isAllowed(model) {
+            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass];
+            const isAllowed = defaultAllowed.some((type) => model instanceof type);
+            if (!isAllowed) return false;
 
-        removeItemHighlight(place) {
-            this.$refs[place._id || place._dummyId][0].$el.classList.remove("highlight");
+            const isDefinedForbidden = this.forbiddenModels.some((type) => model instanceof type);
+            if (isDefinedForbidden) return false;
+
+            return true;
         },
 
         addNewItem(model) {
@@ -190,12 +164,6 @@ export default {
             place.object = model;
             if (model instanceof ActionObject.RawClass) place.amount = Math.min(place.amount, 1);
             if (model instanceof Scene.RawClass) place.amount = 1;
-        },
-
-        removeItem(item) {
-            const itemIndex = this.model[this.prop].indexOf(item);
-            if (itemIndex < 0) return;
-            this.model[this.prop].splice(itemIndex, 1);
         }
     }
 };

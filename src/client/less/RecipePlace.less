@@ -1,0 +1,121 @@
+@import (less) "variables.less";
+
+@size: 3em;
+
+.recipePlace {
+    margin: 0;
+    width: @size;
+    height: @size;
+    background-color: @dusk;
+    border-radius: @size;
+    color: @white;
+
+    &.highlight {
+        background-color: @infoColor;
+    }
+
+    &.rightAligned {
+        margin-left: auto;
+
+        .amount {
+            left: 0 !important;
+        }
+
+        .removeButton {
+            right: 0;
+            left: unset;
+        }
+
+        .location {
+            left: calc(100% - 0.5em);
+            right: auto;
+        }
+
+        &::v-deep .overlayIcons {
+            right: auto;
+            left: -5px;
+        }
+    }
+
+    > span,
+    div {
+        pointer-events: none;
+    }
+
+    &::v-deep .picture {
+        border-radius: @size;
+    }
+
+    &::v-deep .overlayIcons {
+        right: -5px;
+        top: -5px;
+    }
+
+    .removeButton {
+        background-color: @infoColor;
+        color: @white;
+        border-radius: 100%;
+        width: 18px;
+        height: 18px;
+
+        position: absolute;
+        left: -5px;
+        margin-top: -50px;
+
+        pointer-events: all;
+
+        &:hover {
+            background-color: @primaryColor;
+            cursor: pointer;
+        }
+    }
+
+    .location {
+        position: relative;
+        width: @size;
+        pointer-events: all;
+        transform: translateX(-50%);
+
+        &::v-deep .item {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            height: calc(@size * 0.5);
+            width: max-content;
+            grid-template-columns: calc(@size * 0.5) 1fr;
+            padding-right: 10px;
+            background-color: @dusk;
+            border-radius: @size;
+
+            &:hover {
+                background-color: @primaryColor;
+            }
+        }
+    }
+
+    input {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        padding: 0;
+        border: none;
+        border-bottom: 1px solid @black;
+        text-align: center;
+        background: transparent;
+        box-sizing: border-box;
+        outline: none;
+        pointer-events: all;
+
+        &:focus {
+            border-bottom: 1px solid @primaryColor;
+        }
+
+        &.amount {
+            position: absolute;
+            border-top: none;
+            margin-top: calc(@size * (-0.5) - 20px);
+            width: calc(100% - @size - 8px);
+            left: calc(@size + 8px);
+        }
+    }
+}
