@@ -47,7 +47,10 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         };
 
         setAllOtherToNull(value?.className);
-        if (value) that[unCapitalize(value.className)] = value;
+        if (value) {
+            that[unCapitalize(value.className)] = value;
+            if (value.className === "Scene") this.amount = 1;
+        }
     }
 
     get location() {
@@ -69,11 +72,13 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
             that.locateInInventory = false;
             that.locateInHand = false;
             that.locateInActionObject = null;
+            this.amount = Math.min(this.amount, 1);
         } else if (value.className === "ActionObject") {
             // Locate at the position of the given action object
             that.locateInInventory = false;
             that.locateInHand = false;
             that.locateInActionObject = value;
+            this.amount = Math.min(this.amount, 1);
         } else if (value.className === "Hand") {
             // Locate in hand
             that.locateInActionObject = null;

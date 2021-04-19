@@ -4,11 +4,11 @@
                name="amount"
                class="amount"
                v-model="model.amount"
-               :max="`${model.actionObject ? 1 : model.scene ? 1 : Infinity}`"
+               :max="`${locatedInActionObject || model.scene ? 1 : Infinity}`"
                :min="`${model.scene ? 1 : 0}`"
         />
         <div class="removeButton" @click="remove">X</div>
-        <div class="location" @click="openItemSelector" ref="location">
+        <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file">
             <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" :showTooltip="false" />
             <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" />
         </div>
@@ -63,6 +63,16 @@ export default {
         itemFilter: {
             type: Function,
             required: true
+        }
+    },
+    computed: {
+        locatedInActionObject() {
+            return this.model.locateInActionObject || !this.model.locateInActionObject && !this.model.locateInHand && !this.model.locateInInventory;
+        }
+    },
+    watch: {
+        model() {
+            this.itemSelectorCreated = false;
         }
     },
     data() {
