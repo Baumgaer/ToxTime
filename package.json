@@ -36,7 +36,7 @@
         "core-js": "^3.10.1",
         "csv-string": "^4.0.1",
         "csvjs": "0.0.7",
-        "deepdash": "^5.3.5",
+        "deepdash": "^5.3.7",
         "express": "^4.17.1",
         "express-fileupload": "^1.2.1",
         "express-session": "^1.17.1",
