@@ -73,6 +73,10 @@ export function RecipeItemMixinClass(MixinClass) {
             }
         };
 
+        getSubObjects() {
+            return [this.object];
+        }
+
     }
     return RecipeItem;
 }

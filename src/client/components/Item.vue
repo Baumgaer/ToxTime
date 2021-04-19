@@ -88,6 +88,10 @@ export default {
             type: ClientModel,
             required: true
         },
+        showTooltip: {
+            type: Boolean,
+            default: true
+        },
         nameEditDBField: String,
         overlayIcons: String,
         compactMode: Boolean,
@@ -111,6 +115,7 @@ export default {
     },
     methods: {
         onMouseEnter() {
+            if (!this.showTooltip) return;
             this.tooltipCreated = true;
         },
 

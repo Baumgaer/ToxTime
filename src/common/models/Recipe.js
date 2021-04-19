@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { flatten, compact } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -50,9 +51,11 @@ export function RecipeMixinClass(MixinClass) {
         };
 
         get objects() {
-            const objects = [];
-            if (this.clickArea) objects.push(this.clickArea);
-            return objects.concat(this.actionObjects).concat(this.sceneObjects).concat(this.labels);
+            return [...this.input, ...this.output];
+        }
+
+        getSubObjects() {
+            return compact(flatten(this.objects.map((object) => object?.getSubObjects?.())));
         }
 
     }

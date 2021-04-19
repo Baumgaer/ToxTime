@@ -27,8 +27,7 @@
         }
 
         .location {
-            left: calc(100% - 0.5em);
-            right: auto;
+            right: 0;
         }
 
         &::v-deep .overlayIcons {
@@ -73,8 +72,8 @@
     .location {
         position: relative;
         width: @size;
+        height: 25px;
         pointer-events: all;
-        transform: translateX(-50%);
 
         &::v-deep .item {
             position: absolute;
