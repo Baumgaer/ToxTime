@@ -68,6 +68,11 @@ export default {
             return this.overlayIcons || this.model.getOverlayIcons();
         }
     },
+    watch: {
+        model() {
+            setTimeout(this.setFontSize.bind(this));
+        }
+    },
     mounted() {
         this.determineRatioType();
         this.setFontSize();
@@ -101,7 +106,7 @@ export default {
                 if (this.hasTextAvatar) this.$refs.text.style.setProperty("line-height", `${this.$el.offsetWidth}px`);
             }
             if (this.$refs.overlayIcons) {
-                this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$refs.overlayIcons).fontSize) / 40})`);
+                this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$el.firstElementChild).fontSize) / 40})`);
             }
         }
     }
