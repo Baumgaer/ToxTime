@@ -69,13 +69,13 @@ export default {
         }
     },
     watch: {
-        model() {
-            setTimeout(this.setFontSize.bind(this));
+        model(prev, next) {
+            if(prev === next) setTimeout(this.setFontSize.bind(this));
         }
     },
     mounted() {
         this.determineRatioType();
-        this.setFontSize();
+        setTimeout(this.setFontSize.bind(this));
     },
     methods: {
         determineRatioType() {
@@ -106,7 +106,7 @@ export default {
                 if (this.hasTextAvatar) this.$refs.text.style.setProperty("line-height", `${this.$el.offsetWidth}px`);
             }
             if (this.$refs.overlayIcons) {
-                this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${parseInt(getComputedStyle(this.$el.firstElementChild).fontSize) / 40})`);
+                this.$refs.overlayIcons.style.setProperty("font-size", `calc(16px * ${this.$el.offsetWidth / 40})`);
             }
         }
     }
