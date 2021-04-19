@@ -83,7 +83,7 @@ export default {
 
             if (place === "placeholder") {
                 this.highlightPlaceholder(model);
-            } else this.$refs[`place_${place._id}`].highlight();
+            } else this.$refs[`place_${place._id}`][0].highlight();
         },
 
         onDragLeave(event, place) {
@@ -94,7 +94,7 @@ export default {
 
             if (place === "placeholder") {
                 this.removePlaceholderHighlight();
-            } else this.$refs[`place_${place._id}`].removeHighlight();
+            } else this.$refs[`place_${place._id}`][0].removeHighlight();
         },
 
         /**
