@@ -1,5 +1,6 @@
 import onChange from "on-change";
 import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue } from "~common/utils";
+import ClientModel from "~client/lib/ClientModel";
 
 /**
  * @typedef {import("~client/lib/ClientModel").default} Model
@@ -10,11 +11,16 @@ export class Store {
     /** @type {Store} */
     static instance = null;
 
-    /** @type {Record<string, Record<string, import("~client/lib/ClientModel")>>} */
+    /** @type {Record<string, Record<string, Model>>} */
     collections = {};
 
+    /** @type {Record<string, Map<Model, Model[]>>} */
+    indexes = {};
+
+    /** @type {Record<string, any>} */
     localStorage = {};
 
+    /** @type {Record<string, Model>} */
     _trash = {};
 
     /** @type {import("on-change").Options} */
@@ -280,6 +286,7 @@ export class Store {
 
         // Install main observer first to be able to get previous values of arrays when they are changed
         const mainObserver = onChange(model, (path, value, prev, name) => {
+            this._updateIndex(model, value, prev);
             this._backupChanges(model, path, value, prev, name);
         }, options);
 
@@ -291,5 +298,28 @@ export class Store {
 
         model.staging = true;
         return mainObserver;
+    }
+
+    _updateIndex(model, newValue, oldValue) {
+        if (!(newValue instanceof ClientModel) && !(newValue instanceof ClientModel)) return;
+
+        // Build index collection if not available
+        const index = this.indexes[model.collection];
+        if (!index) this.indexes[model.collection] = new Map();
+
+        // Determine object to get associations from
+        let reference = newValue;
+        if (!newValue) reference = oldValue;
+
+        // If this is true it means that the value switched from a falsy value
+        // to another falsy value
+        if (!reference) return;
+
+        // Initialize index collection if not initialized
+        let associatedObjects = this.indexes[model.collection].get(reference);
+        if (!associatedObjects) associatedObjects = this.indexes[model.collection].set(reference, []).get(reference);
+
+        // Add model to index if not available and was not available before
+        if (!oldValue && !associatedObjects.includes(model)) associatedObjects.push(model);
     }
 }

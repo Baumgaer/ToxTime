@@ -2,6 +2,7 @@ import { LessonMixinClass } from "~common/models/Lesson";
 import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
+import GameObject from "~client/models/GameObject";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
@@ -48,6 +49,27 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         await window.activeUser.save();
         window.activeUser.editingModel = session;
         window.activeUser.activeEditor = "playGame";
+    }
+
+    getResources() {
+        const resources = [];
+        for (const model of [...this.scenes, ...this.inventory]) {
+            model.iterateModels((model) => {
+                if (!(model instanceof GameObject.RawClass)) return false;
+                if (resources.includes(model)) return false;
+                resources.push(model);
+            });
+        }
+        for (const sceneObject of this.inventory) {
+            if (resources.includes(sceneObject)) continue;
+            resources.push(sceneObject);
+            sceneObject.iterateModels((model) => {
+                if (!(model instanceof GameObject.RawClass)) return false;
+                if (resources.includes(model)) return false;
+                resources.push(model);
+            });
+        }
+        return resources;
     }
 
 });

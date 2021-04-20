@@ -36,6 +36,14 @@ export default class ClientModel extends BaseModel {
             constructor(params = {}) {
                 super();
 
+                // Assign defined values
+                Object.assign(this, { collection: RawClass.collection, className: RawClass.className });
+                if (!params._id) {
+                    this._dummyId = uuid();
+                } else this._id = params._id;
+
+                const proxy = ApiClient.store.addModel(this);
+
                 // Assign defaults
                 for (const pathObject in schema.paths) {
                     if (Object.hasOwnProperty.call(schema.paths, pathObject)) {
@@ -47,13 +55,24 @@ export default class ClientModel extends BaseModel {
                                 defaultValue = cloneDeep(defaultValue);
                             }
                             this[pathObject] = defaultValue;
+                            if (defaultValue instanceof ClientModel) ApiClient.store._updateIndex(proxy, defaultValue, null);
                         }
                     }
                 }
 
-                // Assign given values
-                Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
-                if (!params._id) this._dummyId = uuid();
+                // Assign params
+                for (const key in params) {
+                    if (Object.hasOwnProperty.call(params, key)) {
+                        const value = params[key];
+                        this[key] = value;
+                        if (value instanceof ClientModel) ApiClient.store._updateIndex(proxy, value, null);
+                        if (isArray(value)) {
+                            for (const element of value) {
+                                if (element instanceof ClientModel) ApiClient.store._updateIndex(proxy, element, null);
+                            }
+                        }
+                    }
+                }
                 this.staging = true;
 
             }
