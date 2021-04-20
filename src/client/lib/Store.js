@@ -254,7 +254,7 @@ export class Store {
      * @memberof Store
      */
     _createArrayChangeObserver(model, key, array) {
-        if (!isArray(array)) return array;
+        if (!isArray(array)) array = [];
         const schemaObject = model.getSchemaObject();
 
         // Clone options and if the array is not an array with references, watch deep
