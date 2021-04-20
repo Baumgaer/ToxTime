@@ -75,7 +75,6 @@ export default class ClientModel extends BaseModel {
                 }
                 this.staging = true;
 
-                return proxy;
             }
         };
         return { RawClass, Schema: schema, Model: modelClass, isClientModel: true };

@@ -14,7 +14,7 @@ export class Store {
     /** @type {Record<string, Record<string, Model>>} */
     collections = {};
 
-    /** @type {Record<string, Map<Model, Map<Model, Model>>>} */
+    /** @type {Record<string, Map<Model, Model[]>>} */
     indexes = {};
 
     /** @type {Record<string, any>} */
@@ -134,7 +134,7 @@ export class Store {
         if (!this.hasModel(model)) {
             if (window._modelMap[modelLike.className] !== Error) {
                 if (!(modelLike instanceof window._modelMap[modelLike.className].Model)) {
-                    model = new window._modelMap[modelLike.className].Model(modelLike);
+                    model = this._installChangeObserver(new window._modelMap[modelLike.className].Model(modelLike));
                 } else if (modelLike instanceof window._modelMap[modelLike.className].Model && !isProxy(modelLike)) {
                     model = this._installChangeObserver(modelLike);
                 }
@@ -317,10 +317,9 @@ export class Store {
 
         // Initialize index collection if not initialized
         let associatedObjects = this.indexes[model.collection].get(reference);
-        if (!associatedObjects) associatedObjects = this.indexes[model.collection].set(reference, new Map()).get(reference);
-        if (!associatedObjects) return;
+        if (!associatedObjects) associatedObjects = this.indexes[model.collection].set(reference, []).get(reference);
 
         // Add model to index if not available and was not available before
-        if (!oldValue && !associatedObjects.has(model)) associatedObjects.set(model, model);
+        if (!oldValue && !associatedObjects.includes(model)) associatedObjects.push(model);
     }
 }

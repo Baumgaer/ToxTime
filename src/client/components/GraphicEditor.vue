@@ -169,11 +169,11 @@ export default {
             let actionObjectsMap = this.$refs.graphicViewer.actionObjectsMap;
 
             const actionObjectAmountBefore = actionObjectsMap.length;
-            const actionObject = new ActionObject.Model({
+            const actionObject = ApiClient.store.addModel(new ActionObject.Model({
                 position: [paper.view.center.x, paper.view.center.y],
                 sceneObject: model,
                 layer: actionObjectsMap.length
-            });
+            }));
             this.model.actionObjects.push(actionObject);
             const actionObjectAmountAfter = actionObjectsMap.length;
 

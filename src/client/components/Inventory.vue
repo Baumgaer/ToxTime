@@ -63,7 +63,7 @@ export default {
         },
         add(obj, name = this.field) {
             if (!obj) {
-                this.model[name].push(new Item.Model({ amount: 0 }));
+                this.model[name].push(ApiClient.store.addModel(new Item.Model({ amount: 0 })));
                 return;
             }
             const nextEmptySlot = this.nextEmptyInventorySlot(name);
@@ -76,7 +76,7 @@ export default {
                 item.object = obj;
                 item.amount++;
             } else {
-                const item = new Item.Model();
+                const item = ApiClient.store.addModel(new Item.Model());
                 item.object = obj;
                 this.model[name].push(item);
             }

@@ -16,6 +16,7 @@
 import ClientModel from "~client/lib/ClientModel";
 import Button from "~client/components/Button.vue";
 import Avatar from "~client/components/Avatar";
+import ApiClient from '~client/lib/ApiClient';
 import { itemFilterAndSort } from "~client/utils";
 import { isArray } from "~common/utils";
 
@@ -114,7 +115,7 @@ export default {
 
         onAddItemButtonClick() {
             if (!this.staticModelType) return;
-            const item = new this.staticModelType.Model({ name: this.search });
+            const item = ApiClient.store.addModel(new this.staticModelType.Model({ name: this.search }));
             this.onItemClick(item);
         },
 

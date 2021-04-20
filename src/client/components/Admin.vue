@@ -172,17 +172,17 @@ export default {
                     this.$refs.uploadHint.$refs.fileInput.click();
                 } else if (["sceneObjects", "scenes"].includes(category)) {
                     if (category === "sceneObjects") {
-                        window.activeUser.editingModel = new SceneObject.Model();
-                    } else window.activeUser.editingModel = new Scene.Model();
+                        window.activeUser.editingModel = ApiClient.store.addModel(new SceneObject.Model());
+                    } else window.activeUser.editingModel = ApiClient.store.addModel(new Scene.Model());
                     window.activeUser.activeEditor = category.substring(0, category.length - 1);
                 } else if(category === "lessons") {
-                    window.activeUser.editingModel = new Lesson.Model();
+                    window.activeUser.editingModel = ApiClient.store.addModel(new Lesson.Model());
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else if (category === "labels") {
-                    const addedModel = new Label.Model();
+                    const addedModel = ApiClient.store.addModel(new Label.Model());
                     addedModel.save();
                 } else if (category === "recipes") {
-                    window.activeUser.editingModel = new Recipe.Model();
+                    window.activeUser.editingModel = ApiClient.store.addModel(new Recipe.Model());
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });

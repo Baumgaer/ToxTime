@@ -1,6 +1,7 @@
 import { LessonMixinClass } from "~common/models/Lesson";
 import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
+import ApiClient from "~client/lib/ApiClient";
 import GameObject from "~client/models/GameObject";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -35,7 +36,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         let session = window.activeUser.getGameSessionByLesson(this);
 
         if (!session) {
-            session = new GameSession.Model({ lesson: this, currentScene: this.scenes[0] });
+            session = ApiClient.store.addModel(new GameSession.Model({ lesson: this, currentScene: this.scenes[0] }));
             window.activeUser.currentGameSessions.push(session);
         } else {
             const indexInSolved = window.activeUser.solvedGameSessions.indexOf(session);
