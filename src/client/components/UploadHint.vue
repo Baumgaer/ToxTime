@@ -82,7 +82,6 @@ export default {
                     name: file.name
                 });
                 fileModel.formData.append("file", file);
-                ApiClient.store.addModel(fileModel);
                 promises.push(fileModel.save());
             }
             const result = (await Promise.all(promises)).filter((model) => Boolean(model));

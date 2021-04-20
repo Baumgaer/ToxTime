@@ -158,7 +158,7 @@ export default {
             const alreadyAvailable = this.model[this.prop].find((item) => item.object === model);
             if (alreadyAvailable) return;
 
-            const recipeItem = ApiClient.store.addModel(new RecipeItem.Model({ object: model }));
+            const recipeItem = new RecipeItem.Model({ object: model });
             this.model[this.prop].push(recipeItem);
         },
 
