@@ -14,7 +14,7 @@ export class Store {
     /** @type {Record<string, Record<string, Model>>} */
     collections = {};
 
-    /** @type {Record<string, Map<Model, Model[]>>} */
+    /** @type {Record<string, Map<Model, Map<Model, Model>>>} */
     indexes = {};
 
     /** @type {Record<string, any>} */
@@ -133,16 +133,28 @@ export class Store {
         let model = modelLike;
         if (!this.hasModel(model)) {
             if (window._modelMap[modelLike.className] !== Error) {
+
                 if (!(modelLike instanceof window._modelMap[modelLike.className].Model)) {
+                    // If there comes a plain object from the ApiClient or something similar,
+                    // create an instance and put it into a proxy
                     model = this._installChangeObserver(new window._modelMap[modelLike.className].Model(modelLike));
                 } else if (modelLike instanceof window._modelMap[modelLike.className].Model && !isProxy(modelLike)) {
+                    // If there is already an instance available but it is not a proxy,
+                    // put it into a proxy
                     model = this._installChangeObserver(modelLike);
                 }
+
+                // Assign the proxy model to the store
                 this.collection(collectionName)[id] = model;
+
+                // Build index
+                for (const key of Object.keys(model)) this._updateIndex(model, model[key], null, [key]);
             } else {
                 model = new Error();
                 Object.assign(model, modelLike);
             }
+
+            // Notify components
             if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
             return model;
         } else return this.updateModel(model);
@@ -176,6 +188,7 @@ export class Store {
         if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
         const changedKeys = realModel.getChangedKeys();
         mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue, key) => {
+            this._updateIndex(realModel, srcValue, targetValue, [key]);
             if (isArray(targetValue)) {
                 let theTarget = resolveProxy(targetValue);
                 if (changedKeys.includes(key)) theTarget = resolveProxy(realModel.getBackup()[key]);
@@ -262,7 +275,9 @@ export class Store {
         if (!schemaObject[key].type[0].ref) arrayOptions.isShallow = false;
 
         return onChange(array, (path, value, prev) => {
-            this._backupChanges(model, [key].concat(path), value, prev, "arrayWatch");
+            const fullPath = [key].concat(path);
+            this._updateIndex(model, value, prev, fullPath);
+            this._backupChanges(model, fullPath, value, prev, "arrayWatch");
         }, arrayOptions);
     }
 
@@ -286,26 +301,48 @@ export class Store {
 
         // Install main observer first to be able to get previous values of arrays when they are changed
         const mainObserver = onChange(model, (path, value, prev, name) => {
-            this._updateIndex(model, value, prev);
+            this._updateIndex(model, value, prev, path);
             this._backupChanges(model, path, value, prev, name);
         }, options);
 
         // Watch changes of arrays
         for (const schemaObjectKey of schemaObjectKeys) {
             if (!isArray(schemaObject[schemaObjectKey].type)) continue;
-            model[schemaObjectKey] = this._createArrayChangeObserver(model, schemaObjectKey, model[schemaObjectKey]);
+            model[schemaObjectKey] = this._createArrayChangeObserver(mainObserver, schemaObjectKey, model[schemaObjectKey]);
         }
 
         model.staging = true;
         return mainObserver;
     }
 
-    _updateIndex(model, newValue, oldValue) {
-        if (!(newValue instanceof ClientModel) && !(newValue instanceof ClientModel)) return;
+    /**
+     * Creates an index which maps objects to their parents.
+     * Example: A file model can be used by several scene or sceneObject models.
+     * File => [Scene, SceneObject]
+     *
+     * @param {Model} model
+     * @param {any} newValue
+     * @param {any} oldValue
+     * @param {string[]} path
+     * @returns {void}
+     * @memberof Store
+     */
+    _updateIndex(model, newValue, oldValue, path) {
+        if (!model.isSchemaReference(path)) return;
+
+        if (isArray(newValue) || isArray(oldValue)) {
+            const addedItems = difference(newValue || [], oldValue);
+            const removedItems = difference(oldValue || [], newValue);
+            for (const addedItem of addedItems) this._updateIndex(model, addedItem, null, path);
+            for (const removedItem of removedItems) this._updateIndex(model, null, removedItem, path);
+            return;
+        }
+
+        if (newValue && !(newValue instanceof ClientModel) && oldValue && !(oldValue instanceof ClientModel)) return;
 
         // Build index collection if not available
-        const index = this.indexes[model.collection];
-        if (!index) this.indexes[model.collection] = new Map();
+        let index = this.indexes[model.collection];
+        if (!index) index = this.indexes[model.collection] = new Map();
 
         // Determine object to get associations from
         let reference = newValue;
@@ -316,10 +353,16 @@ export class Store {
         if (!reference) return;
 
         // Initialize index collection if not initialized
-        let associatedObjects = this.indexes[model.collection].get(reference);
-        if (!associatedObjects) associatedObjects = this.indexes[model.collection].set(reference, []).get(reference);
+        let associatedObjects = index.get(reference);
+        if (!associatedObjects) associatedObjects = index.set(reference, new Map()).get(reference);
 
         // Add model to index if not available and was not available before
-        if (!oldValue && !associatedObjects.includes(model)) associatedObjects.push(model);
+        if (!oldValue && !associatedObjects.has(model)) associatedObjects.set(model, model);
+        if (!newValue && associatedObjects.has(model)) associatedObjects.delete(model);
+        if (newValue && oldValue) {
+            if (associatedObjects.has(oldValue)) associatedObjects.delete(model);
+            associatedObjects.set(model, model);
+        }
+        if (!associatedObjects.size) index.delete(reference);
     }
 }
