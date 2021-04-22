@@ -126,6 +126,5 @@
     "quantityExact": "Exact quantities",
     "addRecipe": "Add recipe",
     "addCertainItem": "Add {type} \"{name}\"",
-    "hand": "Hand",
-    "actionObjectFromScene": "Action object from scene"
+    "hand": "Hand"
 }

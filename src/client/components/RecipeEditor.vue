@@ -81,7 +81,7 @@ export default {
             return [
                 new Inventory.Model(),
                 new Hand.Model(),
-                new Scene.Model({ name: this.$t("actionObjectFromScene") })
+                new Scene.Model({ name: this.$t("scene") })
             ];
         }
     }

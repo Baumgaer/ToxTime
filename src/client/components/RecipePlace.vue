@@ -80,7 +80,7 @@ export default {
             itemSelectorCreated: false,
             inventoryModel: new Inventory.Model(),
             handModel: new Hand.Model(),
-            chooseModel: new Scene.Model({ name: this.$t("actionObjectFromScene") })
+            chooseModel: new Scene.Model({ name: this.$t("scene") })
         };
     },
     methods: {
