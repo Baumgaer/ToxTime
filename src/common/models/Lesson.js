@@ -38,6 +38,14 @@ export function LessonMixinClass(MixinClass) {
                 sticky: true,
                 required: true,
                 default: []
+            },
+            recipes: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }
+                ],
+                sticky: true,
+                required: true,
+                default: []
             }
         };
 
