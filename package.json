@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "setup": "npm install --only=production && pm2 install pm2-logrotate && node ./setup.js",
+        "upgrade": "npm install --only=production && npm run restart",
         "config": "node ./setup.js",
         "start": "pm2 start ecosystem.config.js",
         "stop": "pm2 stop ecosystem.config.js",

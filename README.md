@@ -24,6 +24,7 @@
 All commands are available in the root folder of the application:
 
 - `npm run setup` starts the full installation of the application
+- `npm run upgrade` installs new dependencies of the new copied files of the application
 - `npm run config` starts the config wizard of the application
 - `npm run start` starts the server
 - `npm run stop` stops the server
