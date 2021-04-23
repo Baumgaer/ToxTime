@@ -1,13 +1,12 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Requisite from "~server/models/Requisite";
-import { isMongoId, isPlainObject, merge } from "~common/utils";
+import { isMongoId, isPlainObject } from "~common/utils";
 import { readFileSync, unlinkSync, copyFileSync, statSync } from "graceful-fs";
 import { path as rootPath } from "app-root-path";
 import { resolve, dirname } from "path";
 import { sync as createDirSync } from "mkdirp";
 import CustomError from "~common/lib/CustomError";
 import httpErrors from "http-errors";
-import { v4 as uuid } from "uuid";
 
 export default class Requisites extends ApiRoute {
 

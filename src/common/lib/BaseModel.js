@@ -47,6 +47,11 @@ export default class BaseModel {
             type: Boolean,
             required: true,
             default: false
+        },
+        wasted: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     };
 

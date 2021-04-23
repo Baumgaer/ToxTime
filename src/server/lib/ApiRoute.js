@@ -1,6 +1,6 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import CustomError from "~common/lib/CustomError";
-import { isMongoId, isArray, merge, isPlainObject, isValue, get, set } from "~common/utils";
+import { isMongoId, isArray, merge, isPlainObject, isValue, get, set, eachDeep } from "~common/utils";
 import { v4 as uuid } from "uuid";
 
 import httpErrors from "http-errors";
@@ -133,6 +133,7 @@ export default class ApiRoute extends DefaultRoute {
             }
 
             if (isArray(schemaObj[key].type) && schemaObj[key].type[0].ref in modelApiMapping && isArray(myRequestBody[key])) {
+                request.body = myRequestBody;
                 if (schemaObj[key].dependant) await this.normalizeItems(request, key);
                 for (const [index, childModel] of Object.entries(myRequestBody[key])) {
                     if (isMongoId(childModel)) continue;
@@ -241,12 +242,14 @@ export default class ApiRoute extends DefaultRoute {
      * @memberof ApiRoute
      */
     async normalizeItems(request, field, mode = "missing", useAsOld = false) {
-        const iterable = request.body[field];
+        const id = request.params.id;
+        const myRequestBody = request.body;
+        let iterable = myRequestBody[field];
         const schemaObj = this.claimedExport.Schema.obj;
         const modelApiMapping = this.webServer.modelApiMapping;
 
         if (mode !== "all" && (!iterable || !isArray(iterable))) return;
-        const oldModel = useAsOld || await this.claimedExport.Model.findById(request.params.id).exec();
+        const oldModel = useAsOld || await this.claimedExport.Model.findById(id).exec();
         if (!oldModel) return;
 
         const filter = (model, idOrModelLike) => {
@@ -263,11 +266,13 @@ export default class ApiRoute extends DefaultRoute {
 
             if (!foundModel) {
                 request.params.id = model._id.toString();
-                await modelApiMapping[schemaObj[field].type[0].ref].delete(request);
+                const result = await modelApiMapping[schemaObj[field].type[0].ref].delete(request);
+                if (!result || result instanceof Error || !result.deleted) continue;
+                const resultId = result._id.toString();
+                if (mode === "missing" && !iterable.some((item) => item === resultId || item._id === resultId)) iterable.push(resultId);
             }
         }
-
-        request.body[field] = request.body?.[field]?.filter?.((item) => Boolean(item));
+        if (mode === "missing") myRequestBody[field] = iterable.filter?.((item) => Boolean(item));
     }
 
     async markDependentsOfModelWith(model, callback) {
@@ -319,7 +324,14 @@ export default class ApiRoute extends DefaultRoute {
 
             // model is not sticky used by another model. So unmark pseudo
             // deletion and delete it finally
+            await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = false; dependant.wasted = true; });
             model.deleted = false;
+            model.wasted = true;
+            let returnRequested = false;
+            if (!request.requestedModel) {
+                returnRequested = true;
+                request.requestedModel = JSON.parse(JSON.stringify(model));
+            }
             await model.remove();
 
             // Delete all dependant models
@@ -333,8 +345,22 @@ export default class ApiRoute extends DefaultRoute {
             const stickyReferencedDeletedModels = await model.getStickyReferencedDeletedModels();
             for (const stickyReferencedDeletedModel of stickyReferencedDeletedModels) {
                 request.params.id = stickyReferencedDeletedModel._id.toString();
-                await this.webServer.modelApiMapping[stickyReferencedDeletedModel._getClassName()].delete(request);
+                const result = await this.webServer.modelApiMapping[stickyReferencedDeletedModel._getClassName()].delete(request);
+                if (request.requestedModel) {
+                    let currentModelResult = null;
+                    eachDeep(request.requestedModel, (value, key, parentValue, context) => {
+                        if (value === result._id.toString()) {
+                            currentModelResult = parentValue;
+                            context.break();
+                        }
+                    });
+                    if (currentModelResult) {
+                        currentModelResult.wasted = result.wasted;
+                        currentModelResult.deleted = result.deleted;
+                    }
+                }
             }
+            if (returnRequested) return request.requestedModel;
             return model;
         } catch (error) {
             console.error(error);

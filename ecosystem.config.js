@@ -238,6 +238,7 @@ let shouldWatch = false;
 for (const [index, argv] of process.argv.entries()) {
     if (argv === "--env" && process.argv[index + 1] === "development") {
         shouldWatch = true;
+        config.NODE_ENV = "development";
         break;
     }
 }

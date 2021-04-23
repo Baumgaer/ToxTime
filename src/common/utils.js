@@ -7,6 +7,8 @@ import deepdash from "deepdash";
 deepdash(lodash);
 
 export const eachDeep = lodash.eachDeep;
+export const findPathDeep = lodash.findPathDeep;
+export const findDeep = lodash.findDeep;
 
 export * from "lodash";
 
