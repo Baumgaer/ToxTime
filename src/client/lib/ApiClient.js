@@ -1,4 +1,3 @@
-import httpErrors from "http-errors";
 import { stripHtml } from "string-strip-html";
 import { isObjectLike, isArray, isPlainObject } from "~common/utils";
 import { Store } from "~client/lib/Store";
@@ -68,7 +67,15 @@ export default class ApiClient {
                     status: xhr.status,
                     statusText: xhr.statusText,
                     headers: {
-                        get: xhr.getResponseHeader
+                        get: (name) => {
+                            return new Promise((resolve) => {
+                                const responseInterval = setInterval(() => {
+                                    if (!xhr.HEADERS_RECEIVED) return;
+                                    resolve(xhr.getResponseHeader(name));
+                                    clearInterval(responseInterval);
+                                });
+                            });
+                        }
                     },
                     text: () => xhr.responseText,
                     json: () => JSON.parse(xhr.response)
@@ -104,10 +111,11 @@ export default class ApiClient {
      */
     static async handleHttpError(response) {
         let error = null;
-        if (!response.headers.get("Content-Type").includes("application/json")) {
+        if (!(await response.headers.get("Content-Type")).includes("application/json")) {
             const result = stripHtml(await response.text()).result;
             const matches = result.match(/:(.*?)at/);
-            error = httpErrors(response.status, matches ? matches[1] : result);
+            error = new Error(matches ? matches[1] : result);
+            error.status = response.status;
         } else {
             error = new Error();
             Object.assign(error, await response.json());
