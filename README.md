@@ -12,12 +12,16 @@
 2. Install mongoDB and configure a valid user.
    - Skipping user creation for testing is ok.
    - Do not configure a database for this application. It will be created automatically on first start.
-3. Run `npm run setup` in a command line tool like CMS, Powershell or Terminal
+3. Go to the root folder of the application `cd /path/to/my/project`
+4. Run `npm run setup` in a command line tool like CMS, Powershell or Terminal
    - Skip database user and database password if no database user was created
    - A system user will be created at the end of configuration process
-4. Check the `/var/log/error.log` and `/var/log/stdout.log` for errors and success messages
+5. Check the `/var/log/error.log` and `/var/log/stdout.log` for errors and success messages
+6. The application should be accessible via `<domain>:<port>` or at least via `localhost:80`. See `/var/log/stdout.log` and `/var/log/error.log` for more information.
 
 ## General commands
+
+All commands are available in the root folder of the application:
 
 - `npm run setup` starts the full installation of the application
 - `npm run config` starts the config wizard of the application
