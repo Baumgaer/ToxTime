@@ -114,6 +114,7 @@ export default class Select extends Tool {
         super.onToolKeyDown(event);
         if (event.key !== "delete" || !this.selection) return;
         this.model[this.selection.item.model.collection].splice(this.model[this.selection.item.model.collection].indexOf(this.selection.item.model), 1);
+        this.selection.item.model.isSelected = false;
         this.selection.item.remove();
         this.selection = null;
     }
