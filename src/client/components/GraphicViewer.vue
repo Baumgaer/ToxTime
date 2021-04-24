@@ -244,11 +244,14 @@ export default {
                 const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 1500);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
+                rotator.strokeColor = "white";
+                rotator.opacity = 0.01;
+                rotator.strokeWidth = 3;
                 group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
 
                 bounds = this.paper.Path.Rectangle(raster.bounds.topLeft, raster.bounds.bottomRight);
                 bounds.name = "boundary";
-                bounds.strokeColor = "red";
+                bounds.strokeColor = "white";
                 bounds.opacity = 0.01;
                 bounds.strokeWidth = 3;
             }

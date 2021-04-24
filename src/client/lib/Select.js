@@ -9,7 +9,7 @@ export default class Select extends Tool {
         segments: true,
         stroke: true,
         fill: true,
-        bounds: true,
+        bounds: false,
         tolerance: 15
     };
 
@@ -31,10 +31,11 @@ export default class Select extends Tool {
 
         // Select the group of the hit item if the parent is a group
         if (hitResult?.item.name === "boundary") hitResult.isScale = true;
+        if (hitResult?.item.name === "rotator") hitResult.isRotation = true;
         if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
 
         if (hitResult.item === this.selection?.item) {
-            if (hitResult.isScale) return;
+            if (hitResult.isScale || hitResult.isRotation) return;
             // Modify a clickArea
             if (event.modifiers.shift && hitResult.type == 'segment') {
                 // Remove point from a clickArea
@@ -87,6 +88,7 @@ export default class Select extends Tool {
 
             // Select the group of the hit item if the parent is a group
             if (hitResult.item.name === "boundary") hitResult.isScale = true;
+            if (hitResult.item.name === "rotator") hitResult.isRotation = true;
             if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
             if (hitResult.item !== this.selection.item) return;
 
@@ -95,11 +97,15 @@ export default class Select extends Tool {
             this.currentDrag = hitResult;
         }
 
-        if (this.currentDrag.item instanceof this.paper.Group && this.currentDrag.type === "bounds" || this.currentDrag.isScale) {
+        if (this.currentDrag.item instanceof this.paper.Group && (this.currentDrag.isScale || this.currentDrag.isRotation)) {
             if (this.currentDrag.segment?.index === 1) {
                 this.currentDrag.name = "top-left";
-            } else if (this.currentDrag.segment?.index === 2) this.currentDrag.name = "top-right";
-            if (this.currentDrag.name === "top-center") {
+            } else if (this.currentDrag.segment?.index === 2) {
+                this.currentDrag.name = "top-right";
+            } else if (this.currentDrag.segment?.index === 3) {
+                this.currentDrag.name = "bottom-right";
+            } else this.currentDrag.name = "bottom-left";
+            if (this.currentDrag.isRotation) {
                 this.rotateGroup(event);
             } else this.scaleGroup(event);
         } else if (this.currentDrag.type === "segment") {
@@ -146,14 +152,16 @@ export default class Select extends Tool {
     }
 
     scaleGroup(event) {
+        if (!this.currentDrag.name) return;
         const bounds = this.currentDrag.item.bounds;
         const hitPoint = bounds[kebabCaseToCamelCase(this.currentDrag.name)];
         const oppositePoint = this.currentDrag.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(this.currentDrag.name))];
 
-        let diff = hitPoint.x - event.point.x;
-        if (this.currentDrag.name.endsWith("left")) diff = event.point.x - hitPoint.x;
+        const oldHypLength = Math.abs(oppositePoint.subtract(hitPoint).length);
+        const newHypLength = Math.abs(oppositePoint.subtract(event.point).length);
+        const diff = oldHypLength - newHypLength;
 
-        const scaleFactor = (bounds.width - diff) / bounds.width;
+        const scaleFactor = (oldHypLength - diff) / oldHypLength;
         this.currentDrag.item.scale(scaleFactor, oppositePoint);
         this.currentDrag.item.model.scale = this.currentDrag.item.model.scale * scaleFactor;
         this.currentDrag.item.model.position = [this.currentDrag.item.position.x, this.currentDrag.item.position.y];
