@@ -52,6 +52,7 @@
         "node_modules",
         "var",
         "dist",
+        "sciebo",
         "server.js",
         "webpack",
         "webpack.config.*.js",

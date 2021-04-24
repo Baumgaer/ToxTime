@@ -109,7 +109,7 @@ export default {
             const zoom = 0.1;
 
             let sign = 1;
-            if (event.wheelDelta < 0) sign = -1;
+            if (event.deltaY > 0) sign = -1;
 
             const scaleFactor = 1 + zoom * sign;
             paper.view.scale(scaleFactor);
