@@ -167,7 +167,7 @@ export default {
                 return;
             }
 
-            const [group, rotator] = this.buildActionObjectGroup(actionObjectMap, index);
+            const [group, rotator, bounds] = this.buildActionObjectGroup(actionObjectMap, index);
             this.setupClickAreas(actionObject, group, this.showClickAreas);
             group.onClick = (event) => this.clickFunction(event, group, actionObject);
 
@@ -179,7 +179,10 @@ export default {
                 group.position = this.calcPosition(actionObjectMap.ownerGroupModel, ownerGroup, actionObject.position);
                 group.locked = true;
                 ownerGroup.insertChild(group.model.layer + 1, group);
-            } else if (rotator) group.addChild(rotator);
+            } else if (rotator) {
+                group.addChild(rotator);
+                group.addChild(bounds);
+            }
 
             // Refresh view to be sure that the group is visible
             this.paper.view.draw();
@@ -236,17 +239,24 @@ export default {
             group.model = actionObject;
 
             let rotator = null;
+            let bounds = null;
             if (!actionObjectMap.ownerGroupModel) {
                 const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 1500);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
                 group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
+
+                bounds = this.paper.Path.Rectangle(raster.bounds.topLeft, raster.bounds.bottomRight);
+                bounds.name = "boundary";
+                bounds.strokeColor = "red";
+                bounds.opacity = 0.01;
+                bounds.strokeWidth = 3;
             }
 
             group.scale(actionObject.scale);
             group.rotation = actionObject.rotation;
 
-            return [group, rotator];
+            return [group, rotator, bounds];
         },
 
         buildRaster(backgroundRef) {

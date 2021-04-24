@@ -10,7 +10,7 @@ export default class Select extends Tool {
         stroke: true,
         fill: true,
         bounds: true,
-        tolerance: 10
+        tolerance: 15
     };
 
     /** @type {InstanceType<import("paper")["HitResult"]>} */
@@ -30,9 +30,11 @@ export default class Select extends Tool {
         if (!hitResult || hitResult.item === this.paper.view.background) return;
 
         // Select the group of the hit item if the parent is a group
+        if (hitResult?.item.name === "boundary") hitResult.isScale = true;
         if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
 
         if (hitResult.item === this.selection?.item) {
+            if (hitResult.isScale) return;
             // Modify a clickArea
             if (event.modifiers.shift && hitResult.type == 'segment') {
                 // Remove point from a clickArea
@@ -73,14 +75,18 @@ export default class Select extends Tool {
         let hitTestOptions = this.hitOptions;
         if (!(this.selection.item instanceof this.paper.Group)) {
             hitTestOptions = Object.assign({}, this.hitOptions);
-            delete hitTestOptions.bounds;
+            hitTestOptions.bounds = false;
+        } else {
+            hitTestOptions = Object.assign({}, this.hitOptions);
+            hitTestOptions.tolerance = 25;
         }
 
         if (!this.currentDrag) {
-            const hitResult = this.paper.project.hitTest(event.point, hitTestOptions);
+            const hitResult = this.selection.item.hitTest(event.point, hitTestOptions);
             if (!hitResult) return;
 
             // Select the group of the hit item if the parent is a group
+            if (hitResult.item.name === "boundary") hitResult.isScale = true;
             if (this.isGroup(hitResult)) hitResult.item = hitResult.item.parent;
             if (hitResult.item !== this.selection.item) return;
 
@@ -89,7 +95,10 @@ export default class Select extends Tool {
             this.currentDrag = hitResult;
         }
 
-        if (this.currentDrag.item instanceof this.paper.Group && this.currentDrag.type === "bounds") {
+        if (this.currentDrag.item instanceof this.paper.Group && this.currentDrag.type === "bounds" || this.currentDrag.isScale) {
+            if (this.currentDrag.segment?.index === 1) {
+                this.currentDrag.name = "top-left";
+            } else if (this.currentDrag.segment?.index === 2) this.currentDrag.name = "top-right";
             if (this.currentDrag.name === "top-center") {
                 this.rotateGroup(event);
             } else this.scaleGroup(event);
