@@ -68,7 +68,7 @@ export default {
     },
     methods: {
         async onCloseButtonClick() {
-            if (this.model.hasChangesDeep()) {
+            if (this.model?.hasChangesDeep()) {
                 const answer = await sweetAlert({
                     title: this.$t("closeItTitle"),
                     text: this.$t("closeItQuestion", {

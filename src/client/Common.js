@@ -67,6 +67,7 @@ import LabelIcon from "vue-material-design-icons/Label";
 import AlertIcon from "vue-material-design-icons/Alert";
 import GamepadVariantIcon from "vue-material-design-icons/GamepadVariant";
 import BagPersonalIcon from "vue-material-design-icons/BagPersonal";
+import SquareOutlineIcon from "vue-material-design-icons/SquareOutline";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -112,3 +113,4 @@ Vue.component('label-icon', LabelIcon);
 Vue.component('alert-icon', AlertIcon);
 Vue.component('gamepad-variant-icon', GamepadVariantIcon);
 Vue.component('bag-personal-icon', BagPersonalIcon);
+Vue.component('square-outline-icon', SquareOutlineIcon);

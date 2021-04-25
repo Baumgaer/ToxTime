@@ -73,6 +73,7 @@
             </section>
         </section>
         <section class="editor">
+            <Usage v-if="!window.activeUser.activeEditor" :category='category' />
             <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
             <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
             <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
@@ -99,6 +100,7 @@ import LessonEditor from "~client/components/LessonEditor";
 import UserEditor from "~client/components/UserEditor";
 import Player from "~client/components/Player";
 import RecipeEditor from "~client/components/RecipeEditor";
+import Usage from "~client/components/Usage";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
@@ -118,7 +120,8 @@ export default {
         LessonEditor,
         UserEditor,
         Player,
-        RecipeEditor
+        RecipeEditor,
+        Usage
     },
     data() {
         return {
