@@ -14,7 +14,7 @@
 
             <h3>2 Neues Szenenobjekt erstellen</h3>
             Um ein neues Szenenobjekt zu erstellen klicken Sie, während Sie sich in der Kategorie "Szenenobjekte" <ufo-icon />
-            befinden auf das Plussymbol <plus-icon /> am oberen rand der Auflistung oder auf den Button "Artikel hinzufügen" am unteren Ende der Auflistung.
+            befinden, auf das Plussymbol <plus-icon /> am oberen rand der Auflistung oder auf den Button "Artikel hinzufügen" am unteren Ende der Auflistung.
             Anschließend wird dieser Hilfetext durch ein grafisches Bearbeitungsprogramm ersetzt.
             Wechseln Sie dann in die Kategorie "Dateien" <file-multiple-icon />. Das Bearbeitungsprogramm bleibt dabei erhalten.
             Dateien dienen bei Szenenobjekten als Textur und sollten einen Gegenstand,
