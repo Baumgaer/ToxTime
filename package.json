@@ -133,7 +133,7 @@
         "renewed-nunjucks-loader": "file:./webpack/renewed-nunjucks-loader",
         "terser-webpack-plugin": "^4.2.3",
         "thread-loader": "^3.0.3",
-        "ts-loader": "^8.1.0",
+        "ts-loader": "^8.2.0",
         "tsconfig-paths-webpack-plugin": "^3.5.1",
         "typescript": "^4.2.4",
         "vue-template-compiler": "^2.6.11",
