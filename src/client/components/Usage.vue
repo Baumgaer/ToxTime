@@ -5,6 +5,7 @@
         <SceneObjectUsage v-if="category === 'sceneObjects'" />
         <FileUsage v-if="category === 'files'" />
         <LabelUsage v-if="category === 'labels'"/>
+        <RecipeUsage v-if="category === 'recipes'" />
     </div>
 </template>
 
@@ -14,6 +15,7 @@ import SceneUsage from "~client/components/SceneUsage.vue";
 import SceneObjectUsage from "~client/components/SceneObjectUsage.vue";
 import FileUsage from "~client/components/FilesUsage.vue";
 import LabelUsage from "~client/components/LabelUsage";
+import RecipeUsage from "~client/components/RecipeUsage.vue";
 
 export default {
     components: {
@@ -21,7 +23,8 @@ export default {
         SceneUsage,
         SceneObjectUsage,
         FileUsage,
-        LabelUsage
+        LabelUsage,
+        RecipeUsage
     },
     props: {
         category: {
