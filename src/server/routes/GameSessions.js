@@ -22,7 +22,9 @@ export default class GameSessions extends ApiRoute {
     @GameSessions.post("/", { allowUser: true })
     async create(request) {
         const filter = (session) => {
-            return session?.lesson?._id.toString() === request.body.lesson || session?.lesson === request.body.lesson;
+            const storedLessonId = session?.lesson?._id.toString();
+            if (!storedLessonId) return true;
+            return storedLessonId === request.body.lesson || storedLessonId === request.body.lesson._id;
         };
         if (!request.body.lesson || request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter)) return new Forbidden();
         return await super.create(request);

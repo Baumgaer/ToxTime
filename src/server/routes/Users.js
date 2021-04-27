@@ -45,7 +45,7 @@ export default class Users extends ApiRoute {
     @ApiRoute.patch("/:id", { allowUser: true })
     async update(request) {
         if (!isMongoId(request.params.id)) return httpErrors.BadRequest();
-        if (!request.user.isAdmin && request.user._id !== request.params.id) return new httpErrors.Forbidden();
+        if (!request.user.isAdmin && request.user._id.toString() !== request.params.id) return new httpErrors.Forbidden();
         if (("isAdmin" in request.body || "isConfirmed" in request.body || "isActive" in request.body) && !request.user.isAdmin) return new httpErrors.Forbidden();
         delete request.body.hash;
         delete request.body.salt;
