@@ -3,7 +3,7 @@ import arp from "app-root-path";
 import path from "path";
 import httpErrors, { isHttpError } from "http-errors";
 import CustomError from "~common/lib/CustomError";
-import { getPrototypeNamesRecursive, merge, isValue } from "~common/utils";
+import { getPrototypeNamesRecursive, merge, isValue, isMongoId } from "~common/utils";
 import fresh from "fresh";
 import { fromBuffer } from "file-type";
 
@@ -217,6 +217,15 @@ export default class DefaultRoute {
                 await request.user.save();
             } catch (error) {
                 console.error(error);
+            }
+        }
+
+        if (request.params.id && isMongoId(request.params.id) && this.claimedExport) {
+            request.object = this.claimedExport.Model.findById(request.params.id);
+            if (!request.object) {
+                const httpError = httpErrors.NotFound();
+                response.status(httpError.statusCode).send(httpError);
+                return;
             }
         }
 

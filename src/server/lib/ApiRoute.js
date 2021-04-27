@@ -319,7 +319,11 @@ export default class ApiRoute extends DefaultRoute {
                 await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = true; });
                 model.deleted = true;
                 await model.save();
-                return model;
+                const stickeReferencingNetwork = (await model.getStickyReferencingNetwork()).filter((aModel) => {
+                    return aModel?._id?.toString?.() !== request.object?._id?.toString?.();
+                });
+                const everyIsDeleted = stickeReferencingNetwork.length && stickeReferencingNetwork.every((subModel) => subModel.deleted || subModel.wasted);
+                if (!everyIsDeleted) return model;
             }
 
             // model is not sticky used by another model. So unmark pseudo
@@ -353,7 +357,7 @@ export default class ApiRoute extends DefaultRoute {
                 if (request.requestedModel) {
                     let currentModelResult = null;
                     eachDeep(request.requestedModel, (value, key, parentValue, context) => {
-                        if (value === result._id.toString()) {
+                        if (value === result?._id?.toString?.()) {
                             currentModelResult = parentValue;
                             context.break();
                         }

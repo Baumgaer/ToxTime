@@ -32,14 +32,16 @@ export function RequisiteMixinClass(MixinClass) {
                     { type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }
                 ],
                 default: [],
-                dependant: true
+                dependant: true,
+                sticky: true
             },
             actionObjects: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }
                 ],
                 default: [],
-                dependant: true
+                dependant: true,
+                sticky: true
             }
         };
 
