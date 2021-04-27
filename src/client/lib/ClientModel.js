@@ -349,7 +349,7 @@ export default class ClientModel extends BaseModel {
         ApiClient.store._trash?.__ob__?.dep.notify();
     }
 
-    @BaseModel.action("copy", { type: "component", name: "content-copy-icon" }, () => window.activeUser.isAdmin)
+    @BaseModel.action("copy", { type: "component", name: "content-copy-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     copy() {
         ApiClient.post(`/${this.collection}/copy/${this._id}`, {
             name: `${window.$t("copyOf")} ${this.getName()}`
