@@ -50,6 +50,15 @@ export default class ServerModel extends BaseModel {
         return flatten((await Promise.all(referencingModels)));
     }
 
+    async getStickyReferencingNetwork() {
+        let stickyReferencingModels = await this.getStickyReferencingModels();
+        const dependantReferencedModels = await this.getDependantReferencedModels();
+        for (const dependantReferencedModel of dependantReferencedModels) {
+            stickyReferencingModels = stickyReferencingModels.concat(await dependantReferencedModel.getStickyReferencingNetwork());
+        }
+        return stickyReferencingModels;
+    }
+
     async getStickyReferencedDeletedModels() {
         const referenceModelExports = this.getReferenceModelExports();
         let results = [];
