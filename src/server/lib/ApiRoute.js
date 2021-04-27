@@ -267,7 +267,7 @@ export default class ApiRoute extends DefaultRoute {
             if (!foundModel) {
                 request.params.id = model._id.toString();
                 const result = await modelApiMapping[schemaObj[field].type[0].ref].delete(request);
-                if (!result || result instanceof Error || !result.deleted) continue;
+                if (!result || result instanceof Error || !result.deleted || result.wasted) continue;
                 const resultId = result._id.toString();
                 if (mode === "missing" && !iterable.some((item) => item === resultId || item._id === resultId)) iterable.push(resultId);
             }
@@ -324,6 +324,11 @@ export default class ApiRoute extends DefaultRoute {
 
             // model is not sticky used by another model. So unmark pseudo
             // deletion and delete it finally
+            const [stickyReferencedDeletedModels, dependantReferencingModels] = await Promise.all([
+                model.getStickyReferencedDeletedModels(),
+                model.getDependantReferencingModels()
+            ]);
+
             await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = false; dependant.wasted = true; });
             model.deleted = false;
             model.wasted = true;
@@ -342,7 +347,6 @@ export default class ApiRoute extends DefaultRoute {
 
             // If there is at least one model, which is sticky used by this model but deleted
             // try to delete it finally. It will do it's dependency checks itself
-            const stickyReferencedDeletedModels = await model.getStickyReferencedDeletedModels();
             for (const stickyReferencedDeletedModel of stickyReferencedDeletedModels) {
                 request.params.id = stickyReferencedDeletedModel._id.toString();
                 const result = await this.webServer.modelApiMapping[stickyReferencedDeletedModel._getClassName()].delete(request);
@@ -358,6 +362,16 @@ export default class ApiRoute extends DefaultRoute {
                         currentModelResult.wasted = result.wasted;
                         currentModelResult.deleted = result.deleted;
                     }
+                }
+            }
+            for (const dependantReferencingModel of dependantReferencingModels) {
+                if (!dependantReferencingModel.deleted) continue;
+                request.params.id = dependantReferencingModel._id.toString();
+                const result = await this.webServer.modelApiMapping[dependantReferencingModel._getClassName()].delete(request);
+                if (request.requestedModel) {
+                    if (isArray(request.requestedModel)) {
+                        request.requestedModel.push(result.toObject());
+                    } else request.requestedModel = [request.requestedModel, result.toObject()];
                 }
             }
             if (returnRequested) return request.requestedModel;
