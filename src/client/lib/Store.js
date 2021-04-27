@@ -222,8 +222,20 @@ export class Store {
      * @memberof Store
      */
     removeModel(modelLike) {
-        delete this.collection(modelLike.collection)[modelLike._id || modelLike._dummyId];
         const collectionName = modelLike.collection;
+        const id = modelLike._id || modelLike._dummyId;
+        const model = this.getModelById(collectionName, id);
+        if (!model) return;
+
+        for (const key in this.indexes) {
+            if (Object.hasOwnProperty.call(this.indexes, key)) {
+                const index = this.indexes[key];
+                if (!index.has(model)) continue;
+                index.delete(model);
+            }
+        }
+
+        delete this.collection(collectionName)[id];
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }
 

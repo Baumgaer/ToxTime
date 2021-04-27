@@ -336,9 +336,7 @@ export default class ClientModel extends BaseModel {
 
         const result = await ApiClient.delete(`/${this.collection}/${this._id}`);
         if ((result instanceof Error)) return result;
-        if (result.deleted) return result;
-
-        ApiClient.store.removeModel(this);
+        if (result?.deleted) return result;
     }
 
     @BaseModel.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)

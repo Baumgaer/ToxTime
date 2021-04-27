@@ -1,6 +1,5 @@
 import { RequisiteMixinClass } from "~common/models/Requisite";
 import GameObject from "~client/models/GameObject";
-import ApiClient from "~client/lib/ApiClient";
 
 const CommonGameObjectRequisite = RequisiteMixinClass(GameObject.RawClass);
 export default GameObject.RawClass.buildClientExport(class Requisite extends CommonGameObjectRequisite {
@@ -11,20 +10,6 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
             name: `/requisites/${this._id}/avatar?v=${this.getModifyHash()}`,
             title: window.$t("requisite")
         };
-    }
-
-    @CommonGameObjectRequisite.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)
-    async delete() {
-        const result = await super.delete();
-        if (result) return result;
-
-        for (const clickArea of this.clickAreas) {
-            ApiClient.store.removeModel(clickArea);
-        }
-
-        for (const actionObject of this.actionObjects) {
-            ApiClient.store.removeModel(actionObject);
-        }
     }
 
     async save() {

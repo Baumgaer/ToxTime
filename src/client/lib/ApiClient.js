@@ -169,9 +169,12 @@ export default class ApiClient {
             // Seems to be a model, watch into every key to get submodels
             for (const key in responseJson) {
                 if (Object.hasOwnProperty.call(responseJson, key) && isObjectLike(responseJson[key])) {
-                    responseJson[key] = this.handleModels(responseJson[key]);
+                    if (responseJson[key].wasted) {
+                        this.handleModels(responseJson[key]);
+                    } else responseJson[key] = this.handleModels(responseJson[key]);
                 }
             }
+            if (responseJson.wasted) return this.store.removeModel(responseJson);
             return this.store.addModel(responseJson);
         }
 
