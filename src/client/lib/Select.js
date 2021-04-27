@@ -128,8 +128,13 @@ export default class Select extends Tool {
     onToolKeyDown(event) {
         super.onToolKeyDown(event);
         if (event.key !== "delete" || !this.selection) return;
-        this.model[this.selection.item.model.collection].splice(this.model[this.selection.item.model.collection].indexOf(this.selection.item.model), 1);
-        this.selection.item.model.isSelected = false;
+
+        const removedModel = this.selection.item.model;
+        const removedModelCollection = removedModel.collection;
+
+        this.model[removedModelCollection].splice(this.model[removedModelCollection].indexOf(removedModel), 1);
+        removedModel.isSelected = false;
+        if (removedModel.isNew()) removedModel.destroy();
         this.selection.item.remove();
         this.selection = null;
     }

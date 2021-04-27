@@ -290,6 +290,8 @@ export class Store {
             const fullPath = [key].concat(path);
             this._updateIndex(model, value, prev, fullPath);
             this._backupChanges(model, fullPath, value, prev, "arrayWatch");
+            model.__ob__?.dep.notify();
+            array.__ob__?.dep.notify();
         }, arrayOptions);
     }
 

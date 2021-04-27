@@ -106,7 +106,7 @@ export default {
     },
     computed: {
         hasSubObjects() {
-            return Boolean(this.model?.getSubObjects().length);
+            return Boolean(this.model.getSubObjects().length);
         },
 
         activeClass() {
