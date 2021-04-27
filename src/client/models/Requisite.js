@@ -7,7 +7,7 @@ export default GameObject.RawClass.buildClientExport(class Requisite extends Com
     getAvatar() {
         return {
             type: "image",
-            name: `/requisites/${this._id}/avatar?v=${this.getModifyHash()}`,
+            name: `/${this.collection}/${this._id}/avatar?v=${this.getModifyHash()}`,
             title: window.$t("requisite")
         };
     }
