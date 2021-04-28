@@ -221,7 +221,7 @@ export default class DefaultRoute {
         }
 
         if (request.params.id && isMongoId(request.params.id) && this.claimedExport) {
-            request.object = this.claimedExport.Model.findById(request.params.id);
+            request.object = await this.claimedExport.Model.findById(request.params.id).exec();
             if (!request.object) {
                 const httpError = httpErrors.NotFound();
                 response.status(httpError.statusCode).send(httpError);

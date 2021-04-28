@@ -1,15 +1,27 @@
 import { Forbidden } from "http-errors";
 import ApiRoute from "~server/lib/ApiRoute";
 import GameSession from "~server/models/GameSession";
+import User from "~server/models/User";
 
 export default class GameSessions extends ApiRoute {
 
     claimedExport = GameSession;
 
-    isAllowed(request) {
+    async isAllowed(request) {
         const id = request.params.id;
         const filter = (session) => session?._id.toString() === id || session === id;
-        return Boolean(request.user.currentGameSessions.find(filter) || request.user.solvedGameSessions.find(filter));
+
+        // In case of the user is edited
+        let gameSessionOwner = request.object;
+
+        // In case of the game session is edited
+        if (request.object instanceof GameSession.Model) gameSessionOwner = request.object.creator;
+
+        if (request.user._id?.toString() !== gameSessionOwner._id?.toString() && !request.user.isAdmin) return false;
+        if (!gameSessionOwner.populated("currentGameSessions") && !gameSessionOwner.populated("solvedGameSessions")) {
+            gameSessionOwner = await User.Model.findById(gameSessionOwner._id.toString()).exec();
+        }
+        return Boolean(gameSessionOwner.currentGameSessions.find(filter) || gameSessionOwner.solvedGameSessions.find(filter));
     }
 
     /**
@@ -39,7 +51,7 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.patch("/:id", { allowUser: true })
     async update(request) {
-        if (!this.isAllowed(request)) return new Forbidden();
+        if (!await this.isAllowed(request)) return new Forbidden();
         return await super.update(request);
     }
 
@@ -52,7 +64,7 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.delete("/:id", { allowUser: true })
     async delete(request) {
-        if (!this.isAllowed(request)) return new Forbidden();
+        if (!await this.isAllowed(request)) return new Forbidden();
         return await super.delete(request);
     }
 
