@@ -272,7 +272,7 @@ export default {
             // are on a fixed position
             const oldWidth = backgroundRef.naturalWidth;
             const oldHeight = backgroundRef.naturalHeight;
-            const newWidth = 3840;
+            const newWidth = 1080;
             const newHeight = parseInt(oldHeight) * newWidth / parseInt(oldWidth);
             raster.size = new this.paper.Size(newWidth, newHeight);
 
