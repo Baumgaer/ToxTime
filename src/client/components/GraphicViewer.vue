@@ -63,6 +63,7 @@ export default {
             const getRecursive = (model, ownerGroupModel) => {
                 if (!model || !model.actionObjects) return;
                 for (const actionObject of model.actionObjects) {
+                    if (actionObject.deleted) continue;
                     let promise = new Promise((resolve) => {
                         const prev = map[map.length - 1];
                         if (prev) prev.resolve = resolve;
@@ -242,7 +243,7 @@ export default {
             let rotator = null;
             let bounds = null;
             if (!actionObjectMap.ownerGroupModel) {
-                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 1500);
+                const endPoint = new this.paper.Point(group.bounds.topCenter.x, group.bounds.topCenter.y - 250);
                 rotator = new this.paper.Path([group.bounds.topCenter, endPoint]);
                 rotator.name = "rotator";
                 rotator.strokeColor = "white";
@@ -320,6 +321,7 @@ export default {
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
             for (const clickArea of model.sceneObject.clickAreas) {
+                if (clickArea.deleted) continue;
                 const path = PolyClickArea.build(this.paper, clickArea.shape, null, this.showClickAreas);
                 path.position = this.calcPosition(model, container, clickArea.position);
                 path.model = clickArea;
