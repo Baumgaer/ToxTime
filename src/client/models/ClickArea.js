@@ -24,8 +24,8 @@ export default GameObject.RawClass.buildClientExport(class ClickArea extends Com
 
     @CommonGameObjectClickArea.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => {
         const indexes = ApiClient.store.indexes;
-        const mayContainingScene = Array.from(indexes.scenes?.get(instance).values() || [])?.[0];
-        const mayContainingSceneObject = Array.from(indexes.sceneObjects?.get(instance).values() || [])?.[0];
+        const mayContainingScene = Array.from(indexes.scenes?.get(instance)?.values() || [])?.[0];
+        const mayContainingSceneObject = Array.from(indexes.sceneObjects?.get(instance)?.values() || [])?.[0];
         return window.activeUser.isAdmin && instance.deleted && !(mayContainingScene?.deleted || mayContainingSceneObject?.deleted);
     })
     restore() {

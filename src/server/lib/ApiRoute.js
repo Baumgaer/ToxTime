@@ -322,7 +322,7 @@ export default class ApiRoute extends DefaultRoute {
                 const stickeReferencingNetwork = (await model.getStickyReferencingNetwork()).filter((aModel) => {
                     return aModel?._id?.toString?.() !== request.object?._id?.toString?.();
                 });
-                const everyIsDeleted = stickeReferencingNetwork.length && stickeReferencingNetwork.every((subModel) => subModel.deleted || subModel.wasted);
+                const everyIsDeleted = !stickeReferencingNetwork.length || stickeReferencingNetwork.every((subModel) => subModel.deleted || subModel.wasted);
                 if (!everyIsDeleted) return model;
             }
 
