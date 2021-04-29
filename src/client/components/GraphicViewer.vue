@@ -129,6 +129,7 @@ export default {
         this.paper.project.activeLayer.applyMatrix = false;
         this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
+        window.paper = this.paper;
 
         this.paper.project.activeLayer.onClick = (event) => this.clickFunction(event, this.paper.project.activeLayer, null);
 
@@ -147,7 +148,7 @@ export default {
 
             raster.sendToBack();
             this.paper.view.background = raster;
-            this.paper.view.draw();
+            this.paper.view.update();
             this.adjustViewToBorder();
             this.initialBackgroundLoadedResolver();
         },
@@ -185,7 +186,7 @@ export default {
             }
 
             // Refresh view to be sure that the group is visible
-            this.paper.view.draw();
+            this.paper.view.update();
 
             // Poke next actionObject
             actionObjectMap.next();

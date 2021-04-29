@@ -19,7 +19,7 @@ export default class Arrange extends Tool {
         if (this.itemToBringForward) {
             const oldIndex = this.itemToBringForward.index;
             this.itemToBringForward.insertAbove(event.item);
-            this.paper.view.draw();
+            this.paper.view.update();
             const children = this.paper.project.activeLayer.children;
             for (let index = oldIndex; index < children.length; index++) {
                 const child = children[index];
