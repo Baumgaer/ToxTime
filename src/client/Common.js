@@ -16,7 +16,7 @@ window._modelMap = mMap;
 window._store = ApiClient.store;
 
 Vue.use(TextareaAutosize);
-Vue.use(Toasted, { duration: 5000 });
+Vue.use(Toasted, { duration: 5000, position: "bottom-right" });
 
 Vue.config.productionTip = false;
 Vue.prototype.window = window;
