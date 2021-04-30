@@ -77,6 +77,9 @@ export default {
             model: window.activeUser.editingModel
         };
     },
+    mounted() {
+        ApiClient.get("/recipes");
+    },
     methods: {
         async onSaveButtonClick() {
             const result = await this.model.save();

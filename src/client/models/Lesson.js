@@ -3,6 +3,7 @@ import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
 import GameObject from "~client/models/GameObject";
+import { intersection, flatten, difference, union } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
@@ -57,7 +58,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             model.iterateModels((model) => {
                 if (!(model instanceof GameObject.RawClass)) return false;
                 if (resources.includes(model)) return false;
-                resources.push(model);
+                resources.push(model, ...model.getLabels());
             });
         }
         for (const sceneObject of this.inventory) {
@@ -66,10 +67,28 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             sceneObject.iterateModels((model) => {
                 if (!(model instanceof GameObject.RawClass)) return false;
                 if (resources.includes(model)) return false;
-                resources.push(model);
+                resources.push(model, ...model.getLabels());
             });
         }
-        return resources;
+        return Array.from(new Set(resources));
+    }
+
+    findRecipes(resources = this.getResources()) {
+        let allRecipes = [];
+        for (const resource of resources) {
+            if (!ApiClient.store.indexes.recipeItems?.has(resource)) continue;
+            const recipeItems = ApiClient.store.indexes.recipeItems.get(resource).values();
+            for (const recipeItem of recipeItems) {
+                if (!ApiClient.store.indexes.recipes?.has(recipeItem)) continue;
+                allRecipes.push(Array.from(ApiClient.store.indexes.recipes.get(recipeItem).values()));
+            }
+        }
+        allRecipes = intersection(...allRecipes);
+
+        const outcomingResources = difference(flatten(allRecipes.map((recipe) => recipe.output)), resources);
+
+        if (!outcomingResources.length) return allRecipes;
+        return union(allRecipes, this.findRecipes(outcomingResources));
     }
 
 });
