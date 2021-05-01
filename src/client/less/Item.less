@@ -68,6 +68,10 @@
             background-color: var(--info-color, @infoColor) !important;
         }
 
+        &::v-deep .progressBar .bar {
+            background-color: @successColor;
+        }
+
         .subObjects {
             .item {
                 &:hover {
