@@ -3,7 +3,7 @@ import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
 import GameObject from "~client/models/GameObject";
-import { intersection, flatten, difference, union } from "~common/utils";
+import { flatten, difference, union } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
@@ -81,15 +81,17 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             const recipeItems = ApiClient.store.indexes.recipeItems.get(resource).values();
             for (const recipeItem of recipeItems) {
                 if (!ApiClient.store.indexes.recipes?.has(recipeItem)) continue;
-                allRecipes.push(Array.from(ApiClient.store.indexes.recipes.get(recipeItem).values()));
+                const recipe = ApiClient.store.indexes.recipes.get(recipeItem).values().next().value;
+                const validToUse = recipe.input.every((item) => resources.includes(item.object));
+                if (validToUse) allRecipes.push(recipe);
             }
         }
-        allRecipes = intersection(...allRecipes);
+        allRecipes = Array.from(new Set(allRecipes));
 
         const outcomingResources = difference(flatten(allRecipes.map((recipe) => recipe.output)), resources);
 
         if (!outcomingResources.length) return allRecipes;
-        return union(allRecipes, this.findRecipes(outcomingResources));
+        return union(allRecipes, this.findRecipes(union(outcomingResources, resources)));
     }
 
 });
