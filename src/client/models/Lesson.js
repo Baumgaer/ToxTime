@@ -27,7 +27,8 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
     }
 
     @CommonClientLesson.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
-    edit() {
+    async edit() {
+        await super.edit();
         window.activeUser.editingModel = this;
         window.activeUser.activeEditor = "addLessons";
     }

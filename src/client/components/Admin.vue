@@ -75,10 +75,10 @@
         <section class="editor">
             <Usage v-if="!window.activeUser.activeEditor" :category='category' />
             <AddUsers ref="addUsers" v-show="window.activeUser.activeEditor === 'addUsers'" />
-            <GraphicEditor v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
-            <LessonEditor v-if="window.activeUser.activeEditor === 'addLessons'" />
-            <UserEditor v-if="window.activeUser.activeEditor === 'editUser'" />
-            <RecipeEditor v-if="window.activeUser.activeEditor === 'addRecipes'" :model="window.activeUser.editingModel" />
+            <GraphicEditor :ref="window.activeUser.activeEditor" v-if="['scene', 'sceneObject'].includes(window.activeUser.activeEditor)" :type="window.activeUser.activeEditor" />
+            <LessonEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addLessons'" />
+            <UserEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'editUser'" />
+            <RecipeEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addRecipes'" :model="window.activeUser.editingModel" />
             <Player
                 v-if="window.activeUser.editingModel && window.activeUser.editingModel.className === 'GameSession'"
                 v-show="window.activeUser.activeEditor === 'playGame'"
@@ -131,7 +131,8 @@ export default {
             category: "users",
             itemsCollapsed: false,
             search: "",
-            focusInputField: null
+            focusInputField: null,
+            waitInterval: null
         };
     },
     computed: {
@@ -164,10 +165,27 @@ export default {
             this.itemsCollapsed = Boolean(this.$refs.items.clientWidth > 100);
         },
 
-        onAddItemButtonClick() {
+        async onAddItemButtonClick() {
             /** @type {string} */
             const category = this.category;
+            const oldActiveEditor = window.activeUser.activeEditor;
+
+            clearInterval(this.waitInterval);
+            const waitForEditorDistortion = () => {
+                const editorHead = this.$refs[oldActiveEditor]?.$refs?.editorHead;
+                return new Promise((resolve) => {
+                    if (!editorHead) return resolve();
+                    this.waitInterval = setInterval(() => {
+                        if (editorHead?.finishedDestroy) {
+                            clearInterval(this.waitInterval);
+                            resolve();
+                        }
+                    });
+                });
+            };
+
             window.activeUser.activeEditor = null;
+            if (oldActiveEditor) await waitForEditorDistortion();
             window.activeUser.editingModel = null;
             setTimeout(() => {
                 if (!category) return;

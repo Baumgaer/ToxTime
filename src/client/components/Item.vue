@@ -210,6 +210,10 @@ export default {
             this.model[this.nameEditDBField] = event.target.value;
             this.$refs.nameInput.blur();
 
+            // Do not save model when user is currently editing this model because
+            // it might happen that not all requirements are fulfilled
+            if (this.model === window.activeUser.editingModel) return;
+
             // Determine top most model to have recursive save.
             // Important to have more consistency when creating new objects
             // and renaming sub objects while current creating object is not

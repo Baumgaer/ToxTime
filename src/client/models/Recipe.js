@@ -22,7 +22,8 @@ export default ClientModel.buildClientExport(class Recipe extends CommonClientRe
     }
 
     @CommonClientRecipe.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
-    edit() {
+    async edit() {
+        await super.edit();
         window.activeUser.editingModel = this;
         window.activeUser.activeEditor = "addRecipes";
     }

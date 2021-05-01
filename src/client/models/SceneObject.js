@@ -23,7 +23,8 @@ export default Requisite.RawClass.buildClientExport(class SceneObject extends Co
     }
 
     @CommonSceneObjectRequisite.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
-    edit() {
+    async edit() {
+        await super.edit();
         window.activeUser.activeEditor = "sceneObject";
         window.activeUser.editingModel = this;
     }

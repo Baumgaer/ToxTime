@@ -312,6 +312,7 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     async save() {
+        this.loadingStatus = -1;
         if (!this.hasChangesDeep()) return;
         const data = this.toRequestObject();
 
@@ -322,7 +323,16 @@ export default class ClientModel extends BaseModel {
 
         const result = await method(`/${this.collection}${this._id ? "/" + this._id : ''}`, data);
         if (!(result instanceof Error)) this.deleteBackupDeep();
+        this.loadingStatus = 0;
         return result;
+    }
+
+    edit() {
+        return new Promise((resolve) => {
+            window.activeUser.editingModel = null;
+            window.activeUser.activeEditor = null;
+            setTimeout(resolve);
+        });
     }
 
     @BaseModel.action("delete", { type: "component", name: "delete-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted, true)

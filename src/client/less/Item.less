@@ -13,7 +13,7 @@
     grid-template-rows: @height;
     grid-template-areas: "avatar info" "avatar info";
     transition: opacity @transitionConfig, background-color @transitionConfig;
-    cursor: pointer;
+    cursor: grab;
 
     &.withChildren {
         grid-template-columns: @collapseSize @height 1fr;
@@ -103,6 +103,7 @@
         line-height: 24px;
         text-align: center;
         z-index: 2;
+        cursor: pointer;
 
         svg {
             bottom: 2px;

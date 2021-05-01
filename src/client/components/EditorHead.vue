@@ -38,17 +38,25 @@ export default {
     },
     data() {
         return {
-            closeButtonClicked: false
+            closeButtonClicked: false,
+            finishedDestroy: false
         };
     },
     async beforeDestroy() {
-        if (!this.model) return;
+        if (!this.model) {
+            this.finishedDestroy = true;
+            return;
+        }
         const hasChanges = this.model.hasChangesDeep();
         if (!this.closeButtonClicked) {
             // Cases editor was closed unexpected
             if (hasChanges || this.model.isNew()) {
                 const result = await this.model.save();
-                if (!result || result instanceof Error) return this.$emit("notSaved");
+                if (!result || result instanceof Error) {
+                    if (this.model.isNew()) this.model.destroy();
+                    this.finishedDestroy = true;
+                    return this.$emit("notSaved");
+                }
                 this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
                 this.$emit("saved");
             }
@@ -65,6 +73,7 @@ export default {
                 this.$emit("discarded");
             }
         }
+        this.finishedDestroy = true;
     },
     methods: {
         async onCloseButtonClick() {
