@@ -5,25 +5,67 @@
                 <header>
                     <h2>{{ $t('navigation') }}</h2>
                 </header>
-                <Button ref="users" name="users" :active="this.category === 'users'" :showLoadingSpinner="Boolean(this.$refs.addUsers && this.$refs.addUsers.progressModel.loadingStatus)" @click="onNavButtonClick('users')" >
+                <Button
+                    ref="users"
+                    name="users"
+                    :active="this.category === 'users'"
+                    :showLoadingSpinner="Boolean(this.$refs.addUsers && this.$refs.addUsers.progressModel.loadingStatus)"
+                    @click="onNavButtonClick('users')"
+                >
                     <account-icon />
                 </Button>
-                <Button ref="lessons" name="lessons" :active="this.category === 'lessons'" @click="onNavButtonClick('lessons')" >
+                <Button
+                    ref="lessons"
+                    name="lessons"
+                    :active="this.category === 'lessons'"
+                    :showLoadingSpinner="somethingIsLoading('lessons')"
+                    @click="onNavButtonClick('lessons')"
+                >
                     <school-icon />
                 </Button>
-                <Button ref="scenes" name="scenes" :active="this.category === 'scenes'" @click="onNavButtonClick('scenes')" >
+                <Button
+                    ref="scenes"
+                    name="scenes"
+                    :active="this.category === 'scenes'"
+                    :showLoadingSpinner="somethingIsLoading('scenes')"
+                    @click="onNavButtonClick('scenes')"
+                >
                     <theater-icon />
                 </Button>
-                <Button ref="sceneObjects" name="sceneObjects" :active="this.category === 'sceneObjects'" @click="onNavButtonClick('sceneObjects')" >
+                <Button
+                    ref="sceneObjects"
+                    name="sceneObjects"
+                    :active="this.category === 'sceneObjects'"
+                    :showLoadingSpinner="somethingIsLoading('sceneObjects')"
+                    @click="onNavButtonClick('sceneObjects')"
+                >
                     <ufo-icon />
                 </Button>
-                <Button ref="recipes" name="recipes" :active="this.category === 'recipes'" @click="onNavButtonClick('recipes')" >
+                <Button
+                    ref="recipes"
+                    name="recipes"
+                    :active="this.category === 'recipes'"
+                    :showLoadingSpinner="somethingIsLoading('recipes')"
+                    @click="onNavButtonClick('recipes')"
+                >
                     <graph-icon />
                 </Button>
-                <Button ref="files" name="files" :active="this.category === 'files'" :showLoadingSpinner="filesLoading" @click="onNavButtonClick('files')" >
+                <Button
+                    ref="files"
+                    name="files"
+                    :active="this.category === 'files'"
+                    :showLoadingSpinner="somethingIsLoading('files')"
+                    @click="onNavButtonClick('files')"
+                >
                     <file-multiple-icon />
                 </Button>
-                <Button ref="labels" name="labels" :active="this.category === 'labels'" @click="onNavButtonClick('labels')" >
+                <Button
+                    ref="labels"
+                    name="labels"
+                    :active="this.category === 'labels'"
+                    :showLoadingSpinner="somethingIsLoading('labels')"
+                    @click="onNavButtonClick('labels')"
+                >
                     <label-multiple-icon />
                 </Button>
                 <Button ref="trash" name="trash" :active="this.category === 'trash'" @click="onNavButtonClick('trash')" >
@@ -144,8 +186,8 @@ export default {
             });
             return itemFilterAndSort(items, this.search);
         },
-        filesLoading() {
-            return Object.values(this.filesStore).some((file) => file.loadingStatus);
+        somethingIsLoading() {
+            return (collection) => Object.values(ApiClient.store.collection(collection)).some((model) => model.loadingStatus);
         }
     },
     mounted() {
