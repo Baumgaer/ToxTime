@@ -13,7 +13,11 @@
     grid-template-rows: @height;
     grid-template-areas: "avatar info" "avatar info";
     transition: opacity @transitionConfig, background-color @transitionConfig;
-    cursor: grab;
+    cursor: pointer;
+
+    &[draggable~="true"] {
+        cursor: grab;
+    }
 
     &.withChildren {
         grid-template-columns: @collapseSize @height 1fr;

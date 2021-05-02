@@ -9,8 +9,8 @@
         />
         <div class="removeButton" @click="remove">X</div>
         <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file">
-            <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" :showTooltip="false" />
-            <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" />
+            <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" :showTooltip="false" draggable="false" />
+            <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" draggable="false" />
         </div>
         <ItemSelector
             v-if="itemSelectorCreated"

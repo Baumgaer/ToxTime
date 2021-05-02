@@ -312,8 +312,8 @@ export default class ClientModel extends BaseModel {
      * @memberof ClientModel
      */
     async save() {
-        this.loadingStatus = -1;
         if (!this.hasChangesDeep()) return;
+        this.loadingStatus = -1;
         const data = this.toRequestObject();
 
         let method;
