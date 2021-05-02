@@ -88,7 +88,8 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         }
         allRecipes = Array.from(new Set(allRecipes));
 
-        const outcomingResources = difference(flatten(allRecipes.map((recipe) => recipe.output)), resources);
+        const output = flatten(allRecipes.map((recipe) => recipe.output)).map((resource) => resource.object);
+        const outcomingResources = difference(output, resources);
 
         if (!outcomingResources.length) return allRecipes;
         return union(allRecipes, this.findRecipes(union(outcomingResources, resources)));
