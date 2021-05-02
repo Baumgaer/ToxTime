@@ -226,9 +226,12 @@ export default {
                 });
             };
 
-            window.activeUser.activeEditor = null;
-            if (oldActiveEditor) await waitForEditorDistortion();
-            window.activeUser.editingModel = null;
+            if (!["files", "labels"].includes(category)) {
+                window.activeUser.activeEditor = null;
+                if (oldActiveEditor) await waitForEditorDistortion();
+                window.activeUser.editingModel = null;
+            }
+
             setTimeout(() => {
                 if (!category) return;
                 if (category === "files") {
