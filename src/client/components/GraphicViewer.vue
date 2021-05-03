@@ -45,8 +45,8 @@ export default {
         }
     },
     data() {
+        this.paper = new paper.PaperScope();
         return {
-            paper: new paper.PaperScope(),
             isMounted: false,
             /** @type { null | Promise<void>} */
             initialBackgroundLoadedPromise: null,

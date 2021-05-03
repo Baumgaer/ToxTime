@@ -91,8 +91,8 @@ export default {
         preventTooltipHiding: Boolean
     },
     data() {
+        this.tippy = null;
         return {
-            tippy: null,
             pinned: false,
             itemSelectorCreated: false,
             itemSelectorOpen: false
