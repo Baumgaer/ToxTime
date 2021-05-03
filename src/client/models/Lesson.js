@@ -2,8 +2,7 @@ import { LessonMixinClass } from "~common/models/Lesson";
 import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
-import GameObject from "~client/models/GameObject";
-import { flatten, difference, union } from "~common/utils";
+import { flatten, difference, union, uniq } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
@@ -55,23 +54,9 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
 
     getResources() {
         const resources = [];
-        for (const model of [...this.scenes, ...this.inventory]) {
-            model.iterateModels((model) => {
-                if (!(model instanceof GameObject.RawClass)) return false;
-                if (resources.includes(model)) return false;
-                resources.push(model, ...model.getLabels());
-            });
-        }
-        for (const sceneObject of this.inventory) {
-            if (resources.includes(sceneObject)) continue;
-            resources.push(sceneObject);
-            sceneObject.iterateModels((model) => {
-                if (!(model instanceof GameObject.RawClass)) return false;
-                if (resources.includes(model)) return false;
-                resources.push(model, ...model.getLabels());
-            });
-        }
-        return Array.from(new Set(resources));
+        for (const model of [...this.scenes, ...this.inventory]) resources.push(...model.getResources());
+        for (const sceneObject of this.inventory) resources.push(sceneObject, ...sceneObject.getResources());
+        return uniq(resources);
     }
 
     findRecipes(resources = this.getResources()) {
@@ -86,13 +71,16 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
                 if (validToUse) allRecipes.push(recipe);
             }
         }
-        allRecipes = Array.from(new Set(allRecipes));
+        allRecipes = uniq(allRecipes);
 
         const output = flatten(allRecipes.map((recipe) => recipe.output)).map((resource) => resource.object);
-        const outcomingResources = difference(output, resources);
+        const outputResources = difference(output, resources);
 
-        if (!outcomingResources.length) return allRecipes;
-        return union(allRecipes, this.findRecipes(union(outcomingResources, resources)));
+        const allOutputResources = [...outputResources];
+        for (const outputResource of outputResources) allOutputResources.push(...(outputResource.getResources?.() ?? []));
+
+        if (!outputResources.length) return allRecipes;
+        return union(allRecipes, this.findRecipes(union(allOutputResources, resources)));
     }
 
 });

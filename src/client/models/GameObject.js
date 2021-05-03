@@ -7,4 +7,14 @@ export default ClientModel.buildClientExport(class GameObject extends CommonClie
     isSelected = false;
     loadingStatus = 0;
 
+    getResources() {
+        const resources = [];
+        this.iterateModels((model) => {
+            if (!(model instanceof GameObject)) return false;
+            if (resources.includes(model)) return false;
+            resources.push(model, ...model.getLabels());
+        });
+        return resources;
+    }
+
 });
