@@ -2,6 +2,8 @@ import { LessonMixinClass } from "~common/models/Lesson";
 import ClientModel from "~client/lib/ClientModel";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
+import ClickArea from "~client/models/ClickArea";
+import ActionObject from "~client/models/ActionObject";
 import { flatten, difference, union, uniq } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -61,6 +63,14 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
 
     findRecipes(resources = this.getResources()) {
         let allRecipes = [];
+
+        const invalidRecipeFilter = (recipe, allPossibleScenesResources) => {
+            return recipe.output.every((recipeItem) => {
+                if (!(recipeItem.object instanceof ClickArea.RawClass) && !(recipeItem.object instanceof ActionObject.RawClass)) return true;
+                return allPossibleScenesResources.includes(recipeItem.object);
+            });
+        };
+
         for (const resource of resources) {
             if (!ApiClient.store.indexes.recipeItems?.has(resource)) continue;
             const recipeItems = ApiClient.store.indexes.recipeItems.get(resource).values();
@@ -79,8 +89,11 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         const allOutputResources = [...outputResources];
         for (const outputResource of outputResources) allOutputResources.push(...(outputResource.getResources?.() ?? []));
 
-        if (!outputResources.length) return allRecipes;
-        return union(allRecipes, this.findRecipes(union(allOutputResources, resources)));
+        const allPossibleScenes = union(this.scenes, resources.filter((resource) => resource.className === "Scene"));
+        const allPossibleScenesResources = uniq(flatten(allPossibleScenes.map((scene) => scene.getResources())), this.inventory);
+
+        if (outputResources.length) return union(allRecipes, this.findRecipes(union(allOutputResources, resources))).filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
+        return allRecipes.filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
     }
 
 });
