@@ -14,9 +14,9 @@
                 <Avatar
                     v-for="(scene, index) of model.scenes"
                     :key="scene._id"
-                    draggable
                     :model="scene"
                     ratio="1:1"
+                    draggable
                     @dragstart="onDragStart($event, scene, 'scene')"
                     @dragend="onDragEnd($event, 'scene')"
                     @dragover="onDragOver($event, index, 'scene')"
@@ -34,10 +34,10 @@
                 <Avatar
                     v-for="(item, index) of model.inventory"
                     :key="item._id"
-                    draggable
                     :model="item"
                     ratio="1:1"
                     :fitImage="true"
+                    draggable
                     @dragstart="onDragStart($event, item, 'item')"
                     @dragend="onDragEnd($event, 'item')"
                     @dragover="onDragOver($event, index, 'item')"
@@ -52,7 +52,21 @@
             </section>
             <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button></h3>
             <section class="recipeList">
-                <RecipeViewer v-for="recipe of model.getRecipes()" :key="recipe._id" :model="recipe" />
+                <RecipeViewer
+                    v-for="(recipe, index) of model.getRecipes()"
+                    :key="recipe._id"
+                    :model="recipe"
+                    draggable
+                    @dragstart="onDragStart($event, recipe, 'recipe')"
+                    @dragend="onDragEnd($event, 'recipe')"
+                    @dragover="onDragOver($event, index, 'recipe')"
+                    @dragleave="onDragLeave($event, index, 'recipe')"
+                    @drop.prevent.stop="onInternalDrop($event, index)"
+                    :ref="`recipe${index}`"
+                >
+                    <component :is="'close-icon'" class="closeIcon" @click="onRecipeRemoveClick(recipe)"/>
+                    <div class="name">{{ recipe.name }}</div>
+                </RecipeViewer>
             </section>
             <h3>{{ $t("goals") }}</h3>
             <section></section>
@@ -69,6 +83,7 @@ import Button from "~client/components/Button";
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
 import SceneObject from "~client/models/SceneObject";
+import Recipe from "~client/models/Recipe";
 
 import { parseEventModelData } from "~client/utils";
 
@@ -105,10 +120,15 @@ export default {
             event.stopPropagation();
 
             let model = parseEventModelData(event);
-            if (!model || !(model instanceof Scene.RawClass) && !(model instanceof SceneObject.RawClass)) return;
+            if (!model || !(model instanceof Scene.RawClass) && !(model instanceof SceneObject.RawClass) && !(model instanceof Recipe.RawClass)) return;
 
-            const field = model instanceof Scene.RawClass ? "scenes" : "inventory";
-            const type = model instanceof Scene.RawClass ? "scene" : "item";
+            let field = "inventory";
+            if (model instanceof Scene.RawClass) field = "scenes";
+            if (model instanceof Recipe.RawClass) field = "autoDetectedRecipes";
+
+            let type = "item";
+            if (model instanceof Scene.RawClass) type = "scene";
+            if (model instanceof Recipe.RawClass) type = "recipe";
 
             if (typeof index === "number") {
                 const element = this.$refs[`${type}${index}`][0].$el;
@@ -126,7 +146,16 @@ export default {
                     this.model[field].splice(indexOfDraggedModel, 1);
                 } else indexOfDraggedModel = index;
                 this.model[field].splice(index + indexAddition, 0, model);
-            } else this.model[field].push(model);
+            } else {
+                if (field === "autoDetectedRecipes") {
+                    field = "addedRecipes";
+
+                    const index = this.model.excludedRecipes.indexOf(model);
+                    if (index >= 0) this.model.excludedRecipes.splice(index, 1);
+                }
+                this.model[field].push(model);
+            }
+            if (!(model instanceof Recipe.RawClass)) this.onCalculateButtonClick();
         },
 
         onSceneRemoveClick(scene) {
@@ -139,6 +168,12 @@ export default {
             const index = this.model.inventory.indexOf(item);
             if (index < 0) return;
             this.model.inventory.splice(index, 1);
+        },
+
+        onRecipeRemoveClick(recipe) {
+            const index = this.model.addedRecipes.indexOf(recipe);
+            if (index >= 0) this.model.addedRecipes.splice(index, 1);
+            this.model.excludedRecipes.push(recipe);
         },
 
         /**
@@ -189,7 +224,7 @@ export default {
 
         onCalculateButtonClick() {
             const result = this.model.findRecipes();
-            this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludesRecipes.includes(recipe));
+            this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludedRecipes.includes(recipe));
         }
     }
 };

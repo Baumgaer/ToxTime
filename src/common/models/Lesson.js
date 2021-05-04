@@ -40,7 +40,7 @@ export function LessonMixinClass(MixinClass) {
                 required: true,
                 default: []
             },
-            excludesRecipes: {
+            excludedRecipes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }
                 ],
@@ -67,11 +67,11 @@ export function LessonMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            return [...this.scenes, ...this.inventory];
+            return [...this.scenes, ...this.inventory, ...this.getRecipes()];
         }
 
         getRecipes() {
-            return difference(union(this.autoDetectedRecipes, this.addedRecipes), this.excludesRecipes);
+            return difference(union(this.autoDetectedRecipes, this.addedRecipes), this.excludedRecipes);
         }
     }
     return Lesson;

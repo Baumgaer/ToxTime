@@ -1,5 +1,5 @@
 <template>
-    <div class="recipeViewer">
+    <div class="recipeViewer" v-on="$listeners">
         <RecipePlaces :model="model" :changeable="changeable" prop="input" :forbiddenModels="forbiddenInputTypes" :itemFilter="itemFilter" />
         <div class="transitionInputLine"></div>
         <div class="transition">
@@ -24,6 +24,7 @@
         </div>
         <div class="transitionOutputLine"></div>
         <RecipePlaces :model="model" :changeable="changeable" prop="output" align="right" :forbiddenModels="forbiddenOutputTypes" :itemFilter="itemFilter" />
+        <slot></slot>
     </div>
 </template>
 

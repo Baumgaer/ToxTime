@@ -315,6 +315,7 @@ export class Store {
 
         // Install main observer first to be able to get previous values of arrays when they are changed
         const mainObserver = onChange(model, (path, value, prev, name) => {
+            if (isArray(value) && !isProxy(value)) value = this._createArrayChangeObserver(model, path[0], value);
             this._updateIndex(model, value, prev, path);
             this._backupChanges(model, path, value, prev, name);
         }, options);
