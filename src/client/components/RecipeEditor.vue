@@ -1,45 +1,22 @@
 <template>
     <div class="recipeEditor">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
-        <div class="recipe">
-            <RecipePlaces :model="model" prop="input" :forbiddenModels="forbiddenInputTypes" :itemFilter="itemFilter" />
-            <div class="transitionInputLine"></div>
-            <div class="transition">
-                <div>
-                    <div class="left">{{ $t("delay") }}</div>
-                    <div class="right"><input type="number" name="delay" min="0" v-model="model.transitionSettings.delay"></div>
-                </div>
-
-                <div>
-                    <div class="left">{{ $t("ingredientsExact") }}</div>
-                    <div class="right">
-                        <ToggleSwitch ref="ingredientsExact" @change="onToggleSwitched('ingredientsExact')" name="ingredientsExact" :checked="model.transitionSettings.ingredientsExact"/>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="left">{{ $t("quantityExact") }}</div>
-                    <div class="right">
-                        <ToggleSwitch ref="quantityExact" @change="onToggleSwitched('quantityExact')" name="quantityExact" :checked="model.transitionSettings.quantityExact"/>
-                    </div>
-                </div>
-            </div>
-            <div class="transitionOutputLine"></div>
-            <RecipePlaces :model="model" prop="output" align="right" :forbiddenModels="forbiddenOutputTypes" :itemFilter="itemFilter" />
-        </div>
-        <textarea-autosize
-            class="description"
-            :placeholder="$t('description')"
-            v-model="model.description"
-            :min-height="100"
+        <RecipeViewer
+            ref="viewer"
+            :model="model"
+            :itemFilter="itemFilter"
+            :forbiddenOutputTypes="forbiddenOutputTypes"
+            :forbiddenInputTypes="forbiddenInputTypes"
+            :changeable="true"
+            @settingsChange="onToggleSwitched"
         />
+        <textarea-autosize class="description" :placeholder="$t('description')" v-model="model.description" :min-height="100" />
     </div>
 </template>
 
 <script>
 import EditorHead from "~client/components/EditorHead";
-import RecipePlaces from "~client/components/RecipePlaces";
-import ToggleSwitch from "~client/components/ToggleSwitch";
+import RecipeViewer from "~client/components/RecipeViewer";
 
 import Recipe from "~client/models/Recipe";
 import ClickArea from "~client/models/ClickArea";
@@ -51,8 +28,7 @@ import Hand from "~client/models/Hand";
 export default {
     components: {
         EditorHead,
-        RecipePlaces,
-        ToggleSwitch
+        RecipeViewer
     },
     props: {
         model: {
@@ -67,8 +43,8 @@ export default {
         };
     },
     methods: {
-        onToggleSwitched(name) {
-            this.model.transitionSettings[name] = this.$refs[name].$refs.input.checked;
+        onToggleSwitched(name, value) {
+            this.model.transitionSettings[name] = value;
         },
 
         async onSaveButtonClick() {

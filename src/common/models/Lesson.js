@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { union, difference } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -39,7 +40,23 @@ export function LessonMixinClass(MixinClass) {
                 required: true,
                 default: []
             },
-            recipes: {
+            excludesRecipes: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }
+                ],
+                sticky: true,
+                required: true,
+                default: []
+            },
+            autoDetectedRecipes: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }
+                ],
+                sticky: true,
+                required: true,
+                default: []
+            },
+            addedRecipes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }
                 ],
@@ -51,6 +68,10 @@ export function LessonMixinClass(MixinClass) {
 
         getSubObjects() {
             return [...this.scenes, ...this.inventory];
+        }
+
+        getRecipes() {
+            return difference(union(this.autoDetectedRecipes, this.addedRecipes), this.excludesRecipes);
         }
     }
     return Lesson;

@@ -6,14 +6,15 @@
                v-model="model.amount"
                :max="`${locatedInActionObject || model.scene ? 1 : Infinity}`"
                :min="`${model.scene ? 1 : 0}`"
+               :disabled="!changeable"
         />
-        <div class="removeButton" @click="remove">X</div>
+        <div v-if="changeable" class="removeButton" @click="remove">X</div>
         <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file">
             <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" :showTooltip="false" draggable="false" />
             <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" draggable="false" />
         </div>
         <ItemSelector
-            v-if="itemSelectorCreated"
+            v-if="itemSelectorCreated && changeable"
             ref="itemSelector"
             :model="model"
             :attribute="'location'"
@@ -47,6 +48,10 @@ export default {
         model: {
             type: RecipeItem.RawClass,
             required: true
+        },
+        changeable: {
+            type: Boolean,
+            default: false
         },
         parentModel: {
             type: ClientModel,
@@ -99,6 +104,7 @@ export default {
         },
 
         openItemSelector() {
+            if (!this.changeable) return;
             this.itemSelectorCreated = true;
         }
     }

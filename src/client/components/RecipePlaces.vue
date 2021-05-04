@@ -9,7 +9,7 @@
         >
             <RecipePlace class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" :itemFilter="itemFilter" />
         </div>
-        <div class="item placeholder"
+        <div v-if="changeable" class="item placeholder"
              ref="placeholder"
              @dragover="onDragOver($event, 'placeholder')"
              @drop="onDrop($event, 'placeholder')"
@@ -45,6 +45,10 @@ export default {
         model: {
             type: Recipe.RawClass,
             required: true
+        },
+        changeable: {
+            type: Boolean,
+            default: false
         },
         prop: {
             type: String,

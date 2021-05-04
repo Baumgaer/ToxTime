@@ -2,6 +2,13 @@
     <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section class="editorBody">
+            <h3>{{ $t("description") }}</h3>
+            <section><textarea-autosize
+                class="description"
+                :placeholder="$t('description')"
+                v-model="model.description"
+                :min-height="100"
+            /></section>
             <h3>{{ $t("scenes") }}</h3>
             <section class="itemList">
                 <Avatar
@@ -43,15 +50,10 @@
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
             </section>
-            <h3>{{ $t("description") }}</h3>
-            <section><textarea-autosize
-                class="description"
-                :placeholder="$t('description')"
-                v-model="model.description"
-                :min-height="100"
-            /></section>
-            <h3>{{ $t("recipes") }}</h3>
-            <section></section>
+            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button></h3>
+            <section class="recipeList">
+                <RecipeViewer v-for="recipe of model.getRecipes()" :key="recipe._id" :model="recipe" />
+            </section>
             <h3>{{ $t("goals") }}</h3>
             <section></section>
         </section>
@@ -61,6 +63,9 @@
 <script>
 import EditorHead from "~client/components/EditorHead";
 import Avatar from "~client/components/Avatar";
+import RecipeViewer from "~client/components/RecipeViewer";
+import Button from "~client/components/Button";
+
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
 import SceneObject from "~client/models/SceneObject";
@@ -70,7 +75,9 @@ import { parseEventModelData } from "~client/utils";
 export default {
     components: {
         EditorHead,
-        Avatar
+        Avatar,
+        RecipeViewer,
+        Button
     },
     data() {
         return {
@@ -178,6 +185,11 @@ export default {
             const element = this.$refs[`${type}${index}`][0].$el;
             element.classList.remove("rightDropTarget");
             element.classList.remove("leftDropTarget");
+        },
+
+        onCalculateButtonClick() {
+            const result = this.model.findRecipes();
+            this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludesRecipes.includes(recipe));
         }
     }
 };
