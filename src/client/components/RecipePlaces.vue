@@ -7,7 +7,7 @@
              @drop="onDrop($event, item)"
              @dragleave="onDragLeave($event, item)"
         >
-            <RecipePlace class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" :itemFilter="itemFilter" />
+            <RecipePlace :changeable="changeable" class="item" :model="item" :prop="prop" :align="align" :parentModel="model" :ref="`place_${item._id}`" :itemFilter="itemFilter" />
         </div>
         <div v-if="changeable" class="item placeholder"
              ref="placeholder"
