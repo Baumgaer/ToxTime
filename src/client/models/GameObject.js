@@ -5,7 +5,6 @@ const CommonClientGameObject = GameObjectMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameObject extends CommonClientGameObject {
 
     isSelected = false;
-    loadingStatus = 0;
 
     getResources() {
         const resources = [];

@@ -1,5 +1,5 @@
 import onChange from "on-change";
-import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue } from "~common/utils";
+import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, set } from "~common/utils";
 import ClientModel from "~client/lib/ClientModel";
 
 /**
@@ -279,17 +279,24 @@ export class Store {
      * @memberof Store
      */
     _createArrayChangeObserver(model, key, array) {
-        if (!isArray(array)) return array;
+        if (!isArray(array) && !isPlainObject(array)) return array;
         const schemaObject = model.getSchemaObject();
 
         // Clone options and if the array is not an array with references, watch deep
         const arrayOptions = Object.assign({}, this.observerOptions);
-        if (!schemaObject[key].type[0].ref) arrayOptions.isShallow = false;
+        const type = schemaObject[key].type;
+        if (isArray(type) && !type[0].ref) arrayOptions.isShallow = false;
 
         return onChange(array, (path, value, prev) => {
-            const fullPath = [key].concat(path);
+            let fullPath = [key];
+            if (isPlainObject(array)) {
+                value = clone(resolveProxy(array));
+                prev = set(value, path, prev);
+            } else fullPath = [key].concat(path);
+
             this._updateIndex(model, value, prev, fullPath);
             this._backupChanges(model, fullPath, value, prev, "arrayWatch");
+
             model.__ob__?.dep.notify();
             array.__ob__?.dep.notify();
         }, arrayOptions);
@@ -315,14 +322,17 @@ export class Store {
 
         // Install main observer first to be able to get previous values of arrays when they are changed
         const mainObserver = onChange(model, (path, value, prev, name) => {
-            if (isArray(value) && !isProxy(value)) value = this._createArrayChangeObserver(model, path[0], value);
+            if (isArray(value) || isPlainObject(value) && !isProxy(value)) {
+                value = this._createArrayChangeObserver(model, path[0], value);
+            }
             this._updateIndex(model, value, prev, path);
             this._backupChanges(model, path, value, prev, name);
         }, options);
 
         // Watch changes of arrays
         for (const schemaObjectKey of schemaObjectKeys) {
-            if (!isArray(schemaObject[schemaObjectKey].type)) continue;
+            const type = schemaObject[schemaObjectKey].type;
+            if (!isArray(type) && !isPlainObject(type)) continue;
             model[schemaObjectKey] = this._createArrayChangeObserver(mainObserver, schemaObjectKey, model[schemaObjectKey]);
         }
 

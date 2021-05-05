@@ -187,7 +187,7 @@ export default {
             return itemFilterAndSort(items, this.search);
         },
         somethingIsLoading() {
-            return (collection) => Object.values(ApiClient.store.collection(collection)).some((model) => model.loadingStatus);
+            return (collection) => Object.values(ApiClient.store.collection(collection)).some((model) => model.loadingStatus !== 0);
         }
     },
     mounted() {

@@ -18,6 +18,8 @@ export default class ClientModel extends BaseModel {
 
     staging = false;
 
+    loadingStatus = 0;
+
     /**
      * Builds the essential export for client side with a RawClass, a Schema and the Model
      *
