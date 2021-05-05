@@ -126,5 +126,6 @@
     "quantityExact": "Exact quantities",
     "addRecipe": "Add recipe",
     "addCertainItem": "Add {type} \"{name}\"",
-    "hand": "Hand"
+    "hand": "Hand",
+    "reCalculate": "recalculate"
 }

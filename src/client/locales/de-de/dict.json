@@ -126,5 +126,6 @@
     "quantityExact": "Exakte Mengen",
     "addRecipe": "Rezept hinzufügen",
     "addCertainItem": "{type} \"{name}\" hinzufügen",
-    "hand": "Hand"
+    "hand": "Hand",
+    "reCalculate": "Erneut berechnen"
 }
