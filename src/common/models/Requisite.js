@@ -25,6 +25,7 @@ export function RequisiteMixinClass(MixinClass) {
                 required: true,
                 sticky: true,
                 ref: "File",
+                ignoreOnIteration: true,
                 autopopulate: true
             },
             clickAreas: {

@@ -39,7 +39,8 @@ export default {
     data() {
         return {
             closeButtonClicked: false,
-            finishedDestroy: false
+            finishedDestroy: false,
+            hasChanges: null
         };
     },
     async beforeDestroy() {
@@ -47,10 +48,10 @@ export default {
             this.finishedDestroy = true;
             return;
         }
-        const hasChanges = this.model.hasChangesDeep();
+        this.hasChanges = this.hasChanges === null ? this.model.hasChangesDeep() : this.hasChanges;
         if (!this.closeButtonClicked) {
             // Cases editor was closed unexpected
-            if (hasChanges || this.model.isNew()) {
+            if (this.hasChanges || this.model.isNew()) {
                 const result = await this.model.save();
                 if (!result || result instanceof Error) {
                     if (this.model.isNew()) this.model.destroy();
@@ -62,7 +63,7 @@ export default {
             }
         } else {
             if (!this.model.isNew()) {
-                if (hasChanges) {
+                if (this.hasChanges) {
                     this.$toasted.info(this.$t("discarded", { name: this.model.getName() }), { className: "infoToaster" });
                     this.model.discardDeep();
                     this.$emit("discarded");
@@ -77,7 +78,8 @@ export default {
     },
     methods: {
         async onCloseButtonClick() {
-            if (this.model?.hasChangesDeep()) {
+            this.hasChanges = this.model?.hasChangesDeep();
+            if (this.hasChanges) {
                 const answer = await sweetAlert({
                     title: this.$t("closeItTitle"),
                     text: this.$t("closeItQuestion", {

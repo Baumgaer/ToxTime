@@ -22,6 +22,7 @@ export function ClickAreaMixinClass(MixinClass) {
                     [Number]
                 ],
                 required: true,
+                ignoreOnIteration: true,
                 default: []
             }
         };
