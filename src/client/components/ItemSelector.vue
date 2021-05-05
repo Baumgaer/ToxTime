@@ -80,7 +80,7 @@ export default {
         this.tippy = tippy(this.attachTo, {
             appendTo: this.$root.$el,
             content: this.$el,
-            placement: "bottom",
+            placement: "auto",
             theme: "material",
             sticky: true,
             interactive: true,
