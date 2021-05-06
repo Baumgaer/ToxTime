@@ -64,6 +64,15 @@ export class Store {
         return this.collections[name];
     }
 
+    index(name) {
+        if (!this.indexes[name]) this.indexes[name] = new Map();
+        return this.indexes[name];
+    }
+
+    indexValuesOf(index, item) {
+        return Array.from(this.index(index).get(item)?.values() || []);
+    }
+
     get trash() {
         for (const key in this._trash) {
             if (key !== "__ob__") delete this._trash[key];
@@ -366,8 +375,7 @@ export class Store {
         if (newValue && !(newValue instanceof ClientModel) && oldValue && !(oldValue instanceof ClientModel)) return;
 
         // Build index collection if not available
-        let index = this.indexes[model.collection];
-        if (!index) index = this.indexes[model.collection] = new Map();
+        const index = this.index(model.collection);
 
         // Determine object to get associations from
         let reference = newValue;

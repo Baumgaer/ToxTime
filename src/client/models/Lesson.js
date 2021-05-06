@@ -73,10 +73,10 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
 
         for (const resource of resources) {
             if (!ApiClient.store.indexes.recipeItems?.has(resource)) continue;
-            const recipeItems = ApiClient.store.indexes.recipeItems.get(resource).values();
+            const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
             for (const recipeItem of recipeItems) {
-                if (!ApiClient.store.indexes.recipes?.has(recipeItem)) continue;
-                const recipe = ApiClient.store.indexes.recipes.get(recipeItem).values().next().value;
+                if (!ApiClient.store.index("recipes").has(recipeItem)) continue;
+                const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
                 const validToUse = recipe.input.every((item) => resources.includes(item.object));
                 if (validToUse) allRecipes.push(recipe);
             }
