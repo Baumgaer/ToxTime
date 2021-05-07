@@ -94,8 +94,8 @@ export default class ClientModel extends BaseModel {
         const result = tempDocument.validateSync();
 
         // Ignore id property
-        delete result.errors._id;
-        if (!Object.keys(result.errors).length) return true;
+        delete result?.errors?._id;
+        if (result?.errors && !Object.keys(result.errors).length) return true;
 
         if (result instanceof Error) return false;
         return true;
