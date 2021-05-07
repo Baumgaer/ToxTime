@@ -6,6 +6,7 @@
 
 <script>
 import "vue-material-design-icons/styles.css";
+import sweetAlert from "sweetalert";
 import ApiClient from "~client/lib/ApiClient";
 
 export default {
@@ -13,6 +14,23 @@ export default {
     beforeCreate() {
         window.$t = this.$t.bind(this);
         window.$toasted = this.$toasted;
+
+        window.missingRequirementsMessageTrigger = (model) => {
+            sweetAlert({
+                title: this.$t("missingRequirementsTitle"),
+                text: this.$t("missingRequirementsText", {
+                    name: model.name
+                }),
+                className: "alert",
+                buttons: {
+                    ok: {
+                        text: this.$t("ok"),
+                        className: "info",
+                        value: true
+                    }
+                }
+            });
+        };
 
         if (Object.keys(window.userInformation).length) {
             ApiClient.handleModels(window.userInformation);

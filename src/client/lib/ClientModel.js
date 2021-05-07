@@ -2,6 +2,7 @@ import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
 import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set } from "~common/utils";
 import { v4 as uuid } from "uuid";
+import { Document } from "mongoose";
 
 export default class ClientModel extends BaseModel {
 
@@ -56,6 +57,10 @@ export default class ClientModel extends BaseModel {
                 // Assign given values
                 Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
                 if (!params._id) this._dummyId = uuid();
+
+                schema._isVue = true; // Prevent vue from touching the schema
+                this.schema = schema;
+
                 this.staging = true;
             }
         };
@@ -82,6 +87,18 @@ export default class ClientModel extends BaseModel {
      */
     isNew() {
         return Boolean(this._dummyId && !this._id);
+    }
+
+    isValid() {
+        const tempDocument = new Document(this, this.schema);
+        const result = tempDocument.validateSync();
+
+        // Ignore id property
+        delete result.errors._id;
+        if (!Object.keys(result.errors).length) return true;
+
+        if (result instanceof Error) return false;
+        return true;
     }
 
     /**
@@ -330,10 +347,18 @@ export default class ClientModel extends BaseModel {
     }
 
     edit() {
+        let valid = true;
+        if (window.activeUser.editingModel) valid = window.activeUser.editingModel.isValid();
+        if (!valid) {
+            if (window.missingRequirementsMessageTrigger) {
+                window.missingRequirementsMessageTrigger(window.activeUser.editingModel);
+            }
+            return Promise.resolve(valid);
+        }
         return new Promise((resolve) => {
             window.activeUser.editingModel = null;
             window.activeUser.activeEditor = null;
-            setTimeout(resolve);
+            setTimeout(() => resolve(valid));
         });
     }
 

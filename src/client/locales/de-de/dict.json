@@ -127,5 +127,8 @@
     "addRecipe": "Rezept hinzufügen",
     "addCertainItem": "{type} \"{name}\" hinzufügen",
     "hand": "Hand",
-    "reCalculate": "Erneut berechnen"
+    "reCalculate": "Erneut berechnen",
+    "missingRequirementsTitle": "Fehlende Bedingungen",
+    "missingRequirementsText": "\"{name}\" kann nicht gespeichert werden, da es nicht vollständig ist.",
+    "ok": "OK"
 }

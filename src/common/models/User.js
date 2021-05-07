@@ -44,6 +44,7 @@ export function UserMixinClass(MixinClass) {
             },
             locale: {
                 type: String,
+                enum: ["de-de", "en-us"],
                 required: true,
                 default: global.process.environment.APP_DEFAULT_LANGUAGE
             },

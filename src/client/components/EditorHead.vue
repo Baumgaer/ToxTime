@@ -5,7 +5,7 @@
             <Button class="close" name="close" :showLabel="false" @click="onCloseButtonClick" >
                 <close-icon />
             </Button>
-            <Button class="save" name="save" :showLabel="false" @click="onSaveButtonClick()" >
+            <Button class="save" name="save" :showLabel="false" @click="onSaveClick" >
                 <content-save-icon />
             </Button>
             <slot></slot>
@@ -77,6 +77,11 @@ export default {
         this.finishedDestroy = true;
     },
     methods: {
+        async onSaveClick() {
+            if (this.model.isValid()) return this.onSaveButtonClick();
+            window.missingRequirementsMessageTrigger(this.model);
+        },
+
         async onCloseButtonClick() {
             this.hasChanges = this.model?.hasChangesDeep();
             if (this.hasChanges) {

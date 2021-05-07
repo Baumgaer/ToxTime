@@ -212,6 +212,11 @@ export default {
             const category = this.category;
             const oldActiveEditor = window.activeUser.activeEditor;
 
+            if (window.activeUser.editingModel && !window.activeUser.editingModel.isValid()) {
+                window.missingRequirementsMessageTrigger(window.activeUser.editingModel);
+                return;
+            }
+
             clearInterval(this.waitInterval);
             const waitForEditorDistortion = () => {
                 const editorHead = this.$refs[oldActiveEditor]?.$refs?.editorHead;

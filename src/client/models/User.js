@@ -53,7 +53,8 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
 
     @CommonClientUser.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin || instance === window.activeUser)
     async edit() {
-        await super.edit();
+        const shouldProceed = await super.edit();
+        if (!shouldProceed) return;
         window.activeUser.editingModel = this;
         window.activeUser.activeEditor = "editUser";
     }

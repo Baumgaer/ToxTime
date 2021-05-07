@@ -127,5 +127,8 @@
     "addRecipe": "Add recipe",
     "addCertainItem": "Add {type} \"{name}\"",
     "hand": "Hand",
-    "reCalculate": "recalculate"
+    "reCalculate": "recalculate",
+    "missingRequirementsTitle": "Missing requirements",
+    "missingRequirementsText": "\"{name}\" cannot be saved because it is incomplete.",
+    "ok": "OK"
 }

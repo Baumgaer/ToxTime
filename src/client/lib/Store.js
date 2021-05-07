@@ -1,6 +1,7 @@
 import onChange from "on-change";
 import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, set } from "~common/utils";
 import ClientModel from "~client/lib/ClientModel";
+import { Schema, Document } from "mongoose";
 
 /**
  * @typedef {import("~client/lib/ClientModel").default} Model
@@ -248,6 +249,21 @@ export class Store {
         if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
     }
 
+    _validate(model, path, value) {
+        const propDesc = Object.getOwnPropertyDescriptor(model, path[0]);
+        if (propDesc && ("value" in propDesc ? propDesc.value : propDesc.get?.()) !== value) return true;
+
+        const schema = model.getSchemaObject();
+        if (!(path[0] in schema)) return true;
+
+        const tempSchema = new Schema({ [path[0]]: schema[path[0]] });
+        const tempDocument = new Document({ [path[0]]: value }, tempSchema);
+        const result = tempDocument.validateSync();
+        if (result instanceof Error) return false;
+
+        return true;
+    }
+
     /**
      * Handles the changes inside a model or inside an array of a model.
      * When a value is changed its previous value will be stored in the backup
@@ -263,8 +279,8 @@ export class Store {
      */
     _backupChanges(model, path, value, prev, name) {
         // Workaround for bug of on-change package see: https://github.com/sindresorhus/on-change/issues/79
-        const propertyDescriptor = Object.getOwnPropertyDescriptor(model, path[0]);
-        if (propertyDescriptor && propertyDescriptor.get() !== value) return;
+        const propDesc = Object.getOwnPropertyDescriptor(model, path[0]);
+        if (propDesc && ("value" in propDesc ? propDesc.value : propDesc.get?.()) !== value) return;
         if ((value === undefined && prev === undefined && name === undefined) || !model.staging) return;
 
         // Notify all vue components about a change
@@ -295,7 +311,11 @@ export class Store {
         const schemaObject = model.getSchemaObject();
 
         // Clone options and if the array is not an array with references, watch deep
-        const arrayOptions = Object.assign({}, this.observerOptions);
+        const arrayOptions = Object.assign({
+            onValidate: (path, value) => {
+                return this._validate(model, path, value);
+            }
+        }, this.observerOptions);
         const type = schemaObject[key].type;
         if (isArray(type) && !type[0].ref) arrayOptions.isShallow = false;
 
@@ -329,7 +349,11 @@ export class Store {
         const schemaObjectKeys = Object.keys(schemaObject);
         const modelKeys = Object.keys(model);
         const ignoreKeys = difference(modelKeys, schemaObjectKeys);
-        const options = Object.assign({}, this.observerOptions, { ignoreKeys });
+        const options = Object.assign({
+            onValidate: (path, value) => {
+                return this._validate(model, path, value);
+            }
+        }, this.observerOptions, { ignoreKeys });
         model.staging = false;
 
         // Install main observer first to be able to get previous values of arrays when they are changed
