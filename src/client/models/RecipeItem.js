@@ -53,40 +53,6 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         }
     }
 
-    get location() {
-        if (this.locateInInventory) return "inventory";
-        if (this.locateInHand) return "hand";
-        if (!this.locateInActionObject) return "choose";
-        return this.locateInActionObject;
-    }
-
-    set location(value) {
-        const that = ApiClient.store.getModelById(this.collection, this._dummyId || this._id) || this;
-        if (!value || value.className === "Inventory") {
-            // Locate in inventory
-            that.locateInInventory = true;
-            that.locateInHand = false;
-            that.locateInActionObject = null;
-        } else if (value.className === "Scene") {
-            // Predefined rule to force the user to select an actionObject
-            that.locateInInventory = false;
-            that.locateInHand = false;
-            that.locateInActionObject = null;
-            that.amount = Math.min(this.amount, 1);
-        } else if (value.className === "ActionObject") {
-            // Locate at the position of the given action object
-            that.locateInInventory = false;
-            that.locateInHand = false;
-            that.locateInActionObject = value;
-            that.amount = Math.min(this.amount, 1);
-        } else if (value.className === "Hand") {
-            // Locate in hand
-            that.locateInActionObject = null;
-            that.locateInInventory = false;
-            that.locateInHand = true;
-        }
-    }
-
     @CommonItemRecipeItem.action("delete", { type: "component", name: "delete-icon" }, () => false)
     @CommonItemRecipeItem.action("restore", { type: "component", name: "delete-restore-icon" }, () => false)
     @CommonItemRecipeItem.action("copy", { type: "component", name: "content-copy-icon" }, () => false)

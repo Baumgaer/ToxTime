@@ -42,6 +42,10 @@ export default {
             type: Function,
             required: true
         },
+        itemClickFunction: {
+            type: Function,
+            required: false
+        },
         showAddButton: {
             type: Boolean,
             default: true
@@ -105,11 +109,13 @@ export default {
         },
 
         onItemClick(item) {
-            const attribute = this.model[this.attribute];
-            if (isArray(attribute)) {
-                attribute.push(item);
-            } else this.model[this.attribute] = item;
-            if (this.autoSave) this.model.save();
+            if (!this.itemClickFunction) {
+                const attribute = this.model[this.attribute];
+                if (isArray(attribute)) {
+                    attribute.push(item);
+                } else this.model[this.attribute] = item;
+                if (this.autoSave) this.model.save();
+            } else this.itemClickFunction(item);
             this.tippy.hide();
         },
 

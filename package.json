@@ -63,7 +63,7 @@
         "nodemailer": "^6.6.0",
         "normalize-url": "^6.0.0",
         "nunjucks": "^3.2.3",
-        "on-change": "^3.0.0",
+        "on-change": "^3.0.1",
         "paper": "^0.12.15",
         "passport": "^0.4.1",
         "passport-local": "^1.0.0",

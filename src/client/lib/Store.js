@@ -262,6 +262,9 @@ export class Store {
      * @memberof Store
      */
     _backupChanges(model, path, value, prev, name) {
+        // Workaround for bug of on-change package see: https://github.com/sindresorhus/on-change/issues/79
+        const propertyDescriptor = Object.getOwnPropertyDescriptor(model, path[0]);
+        if (propertyDescriptor && propertyDescriptor.get() !== value) return;
         if ((value === undefined && prev === undefined && name === undefined) || !model.staging) return;
 
         // Notify all vue components about a change

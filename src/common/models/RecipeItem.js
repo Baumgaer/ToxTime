@@ -56,20 +56,10 @@ export function RecipeItemMixinClass(MixinClass) {
                 required: false,
                 default: null
             },
-            locateInInventory: {
-                type: Boolean,
-                default: true
-            },
-            locateInHand: {
-                type: Boolean,
-                default: false
-            },
-            locateInActionObject: {
-                type: Schema.Types.ObjectId,
-                ref: "ActionObject",
-                default: null,
-                autopopulate: true,
-                sticky: true
+            location: {
+                type: String,
+                enum: ["inventory", "hand", "scene"],
+                default: "inventory"
             }
         };
 

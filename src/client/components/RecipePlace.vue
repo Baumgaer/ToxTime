@@ -23,6 +23,7 @@
             :attachTo="$refs.location"
             :autoSave="false"
             :showTooltip="false"
+            :itemClickFunction="setLocation"
         />
     </Avatar>
 </template>
@@ -85,7 +86,7 @@ export default {
             itemSelectorCreated: false,
             inventoryModel: new Inventory.Model(),
             handModel: new Hand.Model(),
-            chooseModel: new Scene.Model({ name: this.$t("scene") })
+            sceneModel: new Scene.Model({ name: this.$t("scene") })
         };
     },
     methods: {
@@ -106,6 +107,10 @@ export default {
         openItemSelector() {
             if (!this.changeable) return;
             this.itemSelectorCreated = true;
+        },
+
+        setLocation(model) {
+            this.model.location = model.className.toLowerCase();
         }
     }
 };
