@@ -4,6 +4,8 @@ import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
 import ClickArea from "~client/models/ClickArea";
 import ActionObject from "~client/models/ActionObject";
+import SceneObject from "~client/models/SceneObject";
+import Label from "~client/models/Label";
 import { flatten, difference, union, uniq } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -62,6 +64,24 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         return uniq(resources);
     }
 
+    hasValidAnchor(model, resources) {
+        if (model instanceof SceneObject.RawClass) {
+            const actionObjects = resources.filter((resource) => {
+                return resource instanceof ActionObject.RawClass && resource.sceneObject === model;
+            });
+            if (actionObjects.length) return true;
+        }
+
+        if (model instanceof Label.RawClass) {
+            let allAoAndCa = resources.filter((resource) => {
+                return (resource instanceof ActionObject.RawClass || resource instanceof ClickArea.RawClass) && resource.getLabels().includes(model);
+            });
+            if (allAoAndCa.length) return true;
+        }
+
+        return false;
+    }
+
     findRecipes(resources = this.getResources()) {
         let allRecipes = [];
 
@@ -78,7 +98,15 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             for (const recipeItem of recipeItems) {
                 if (!ApiClient.store.index("recipes").has(recipeItem)) continue;
                 const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                const validToUse = recipe.input.every((item) => resources.includes(item.object));
+                const validToUse = recipe.input.every((item) => {
+                    const isIncluded = resources.includes(item.object);
+                    if (!isIncluded) return false;
+
+                    let hasValidAnchor = true;
+                    const isAoOrCa = item.object instanceof ActionObject.RawClass || item.object instanceof ClickArea.RawClass;
+                    if (item.location === "scene" && !isAoOrCa) hasValidAnchor = this.hasValidAnchor(item.object, resources);
+                    return isIncluded && hasValidAnchor;
+                });
                 if (validToUse) allRecipes.push(recipe);
             }
         }
