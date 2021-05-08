@@ -1,6 +1,6 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
-import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set } from "~common/utils";
+import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set, isValue } from "~common/utils";
 import { v4 as uuid } from "uuid";
 import { Document } from "mongoose";
 
@@ -90,13 +90,40 @@ export default class ClientModel extends BaseModel {
     }
 
     isValid() {
-        const tempDocument = new Document(this, this.schema);
+        const validationObject = {};
+        eachDeep(resolveProxy(this), (value, key, parentValue, context) => {
+            if (!context.path) return;
+            if (context.isCircular) return false;
+
+            const thisSchemaObject = this.getSchemaObject();
+            if (key in thisSchemaObject && thisSchemaObject[key].ignoreOnValidation) return false;
+
+            // We don't want to assign original data to break out from circular structures on validation
+            if (isValue(value) && isObjectLike(value)) return;
+
+            const parentIsModel = isValue(parentValue) && isObjectLike(parentValue) && parentValue instanceof ClientModel;
+            const parentKey = context.path?.[context.path.length - 1];
+            if (parentIsModel && parentKey) {
+                const notInSchema = !(parentKey in parentValue.getSchemaObject());
+                const isId = parentKey === "_id";
+                const ignoredOnValidation = !notInSchema ? parentValue.getSchemaObject()[parentKey].ignoreOnValidation : false;
+                if (notInSchema || isId || ignoredOnValidation) return false;
+            }
+
+            set(validationObject, context.path, resolveProxy(value));
+        }, { checkCircular: true, pathFormat: "array" });
+        const tempDocument = new Document(validationObject, this.schema);
         const result = tempDocument.validateSync();
 
         // Ignore id property
-        delete result?.errors?._id;
-        if (result?.errors && !Object.keys(result.errors).length) return true;
-
+        if (!result) return true;
+        for (const errorKey in result.errors) {
+            if (Object.hasOwnProperty.call(result.errors, errorKey)) {
+                const error = result.errors[errorKey];
+                if (error.kind.includes("ObjectId")) delete result.errors[errorKey];
+            }
+        }
+        if (!Object.keys(result.errors).length) return true;
         if (result instanceof Error) return false;
         return true;
     }

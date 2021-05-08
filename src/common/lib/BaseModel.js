@@ -30,6 +30,7 @@ export default class BaseModel {
             required: true,
             sticky: true,
             ignoreOnIteration: true,
+            ignoreOnValidation: true,
             autopopulate: {
                 select: "-solvedGameSessions -currentGameSessions"
             }
