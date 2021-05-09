@@ -73,9 +73,9 @@ export default {
     methods: {
         allowedFields(model) {
             const amountValue = this.lesson.overwrites[model._id]?.amount ?? 1;
-            if (model instanceof ActionObject.RawClass) return [{...this.amount, value: amountValue, disabled: true}, this.activated];
-            if (model instanceof SceneObject.RawClass) return [{...this.amount, value: amountValue}];
-            if (model instanceof ClickArea.RawClass) return [{...this.amount, value: amountValue}, this.activated];
+            if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
+            if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
+            if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
             if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
             return [];
         },
