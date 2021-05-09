@@ -130,5 +130,8 @@
     "reCalculate": "recalculate",
     "missingRequirementsTitle": "Missing requirements",
     "missingRequirementsText": "\"{name}\" cannot be saved because it is incomplete.",
-    "ok": "OK"
+    "ok": "OK",
+    "amount": "Amount",
+    "object": "Specialized object",
+    "activated": "Activated"
 }

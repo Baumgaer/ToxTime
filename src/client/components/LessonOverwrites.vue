@@ -6,6 +6,7 @@
             <div class="value">
                 <input
                     :type="field.type"
+                    :list="`datalist_${field.name}_${index}`"
                     :name="field.name"
                     :min="field.min"
                     :max="field.max"
@@ -15,6 +16,9 @@
                     @change="overwriteValue(model, $event)"
                     :ref="`field_${field.name}_${index}`"
                 />
+                <datalist :id="`datalist_${field.name}_${index}`">
+                    <option value="1">test</option>
+                </datalist>
             </div>
         </div>
         <div v-for="(subObject, index) of model.getSubObjects(true)" :key="`sub_${subObject._id}_${index}`" class="subObject">
@@ -24,15 +28,19 @@
                 <div class="value">
                     <input
                         :type="field.type"
+                        :list="`datalist_${field.name}_${index}`"
                         :name="field.name"
                         :min="field.min"
                         :max="field.max"
-                        :value="field.value"
+                        :value="field.type !== 'model' ? field.value : field.value.getName()"
                         :checked="field.value"
                         :disabled="field.disabled"
                         @change="overwriteValue(subObject, $event)"
                         :ref="`field_${field.name}_${index}`"
                     />
+                    <datalist :id="`datalist_${field.name}_${index}`">
+                        <option value="1">test</option>
+                    </datalist>
                 </div>
             </div>
         </div>
@@ -50,6 +58,8 @@ import Requisite from "~client/models/Requisite";
 import File from "~client/models/File";
 import Label from "~client/models/Label";
 import ClientModel from "~client/lib/ClientModel";
+
+import ApiClient from "~client/lib/ApiClient";
 
 
 export default {
@@ -91,7 +101,10 @@ export default {
             const inScene = model.location === "scene";
             const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene;
 
-            const amountValue = this.lesson.overwrites[model._id]?.amount ?? model.amount;
+            const overwriteObject = this.lesson.overwrites[model._id];
+            const amountValue = overwriteObject?.amount ?? model.amount;
+            const objectValue = overwriteObject?.object ? ApiClient.store.getModelById(overwriteObject.object.split("_")[0], overwriteObject.object.split("_")[1]) : model.object;
+
             return [{
                 ...this.amount,
                 value: amountValue,
@@ -100,6 +113,7 @@ export default {
                 disabled: isActionObject || isScene || isFile
             }, {
                 ...this.object,
+                value: objectValue,
                 disabled: !isRequisite && !isLabel || isScene || isFile
             }];
         },
@@ -109,7 +123,10 @@ export default {
             const input = event.target;
             let valueField = "value";
             if (input.type === "checkbox") valueField = "checked";
-            this.lesson.overwrites[model._id][input.name] = JSON.parse(input[valueField]);
+
+            let value = event.target.value;
+            if (input.type !== "model") value = JSON.parse(input[valueField]);
+            this.lesson.overwrites[model._id][input.name] = value;
         }
     }
 };

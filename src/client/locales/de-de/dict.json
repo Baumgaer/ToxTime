@@ -130,5 +130,8 @@
     "reCalculate": "Erneut berechnen",
     "missingRequirementsTitle": "Fehlende Bedingungen",
     "missingRequirementsText": "\"{name}\" kann nicht gespeichert werden, da es nicht vollständig ist.",
-    "ok": "OK"
+    "ok": "OK",
+    "amount": "Anzahl",
+    "object": "Spezialisiertes Objekt",
+    "activated": "Aktiviert"
 }
