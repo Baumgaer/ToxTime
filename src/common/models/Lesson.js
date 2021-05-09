@@ -63,6 +63,11 @@ export function LessonMixinClass(MixinClass) {
                 sticky: true,
                 required: true,
                 default: []
+            },
+            overwrites: {
+                type: Schema.Types.Mixed,
+                required: true,
+                default: {}
             }
         };
 

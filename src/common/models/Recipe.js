@@ -54,7 +54,8 @@ export function RecipeMixinClass(MixinClass) {
             return [...this.input, ...this.output];
         }
 
-        getSubObjects() {
+        getSubObjects(real) {
+            if (real) return this.objects;
             return compact(flatten(this.objects.map((object) => object?.getSubObjects?.())));
         }
 

@@ -1,0 +1,51 @@
+@import (less) "variables";
+
+.lessonsOverwrites {
+    position: absolute;
+    top: 60px;
+    right: 30px;
+    width: max-content;
+    min-width: 100px;
+    z-index: 10;
+    box-shadow: 0 0 5px @dark;
+
+    background-color: @white;
+
+    div {
+        padding: 5px;
+    }
+
+    .title {
+        font-weight: bold;
+        border: 1px solid @black;
+    }
+
+    .field {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas: "key value";
+        padding: 0;
+
+        > div {
+            border: 1px solid @black;
+
+            &:first-child,
+            &:nth-child(2) {
+                border-top: none;
+            }
+        }
+
+        .key {
+            grid-area: key;
+            border-right: none;
+        }
+
+        .value {
+            grid-area: value;
+        }
+    }
+
+    .subObject {
+        padding: 0;
+    }
+}

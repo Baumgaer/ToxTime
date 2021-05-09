@@ -1,7 +1,8 @@
 <template>
     <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
         <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
-        <section class="editorBody">
+        <LessonOverwrites ref="lessonOverwrites" v-if="selectedModel" :lesson="model" :model="selectedModel" />
+        <section class="editorBody" @click.stop="onModelSelection(null)">
             <h3>{{ $t("description") }}</h3>
             <section><textarea-autosize
                 class="description"
@@ -22,6 +23,7 @@
                     @dragover="onDragOver($event, index, 'scene')"
                     @dragleave="onDragLeave($event, index, 'scene')"
                     @drop.prevent.stop="onInternalDrop($event, index)"
+                    @click.stop="onModelSelection(scene)"
                     :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
@@ -43,6 +45,7 @@
                     @dragover="onDragOver($event, index, 'item')"
                     @dragleave="onDragLeave($event, index, 'item')"
                     @drop.prevent.stop="onInternalDrop($event, index)"
+                    @click.stop="onModelSelection(item)"
                     :ref="`item${index}`"
                 >
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
@@ -62,6 +65,7 @@
                     @dragover="onDragOver($event, index, 'recipe')"
                     @dragleave="onDragLeave($event, index, 'recipe')"
                     @drop.prevent.stop="onInternalDrop($event, index)"
+                    @click.stop="onModelSelection(recipe)"
                     :ref="`recipe${index}`"
                 >
                     <component :is="'close-icon'" class="closeIcon" @click="onRecipeRemoveClick(recipe)"/>
@@ -79,6 +83,7 @@ import EditorHead from "~client/components/EditorHead";
 import Avatar from "~client/components/Avatar";
 import RecipeViewer from "~client/components/RecipeViewer";
 import Button from "~client/components/Button";
+import LessonOverwrites from "~client/components/LessonOverwrites";
 
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
@@ -92,11 +97,13 @@ export default {
         EditorHead,
         Avatar,
         RecipeViewer,
-        Button
+        Button,
+        LessonOverwrites
     },
     data() {
         return {
-            model: window.activeUser.editingModel
+            model: window.activeUser.editingModel,
+            selectedModel: null
         };
     },
     mounted() {
@@ -156,6 +163,12 @@ export default {
                 this.model[field].push(model);
             }
             if (!(model instanceof Recipe.RawClass)) this.onCalculateButtonClick();
+        },
+
+        onModelSelection(model) {
+            if (this.selectedModel) this.selectedModel.isSelected = false;
+            this.selectedModel = model;
+            if (model) model.isSelected = true;
         },
 
         onSceneRemoveClick(scene) {

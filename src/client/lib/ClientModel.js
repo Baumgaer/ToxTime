@@ -21,6 +21,8 @@ export default class ClientModel extends BaseModel {
 
     loadingStatus = 0;
 
+    isSelected = false;
+
     /**
      * Builds the essential export for client side with a RawClass, a Schema and the Model
      *

@@ -4,8 +4,6 @@ import ClientModel from "~client/lib/ClientModel";
 const CommonClientGameObject = GameObjectMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameObject extends CommonClientGameObject {
 
-    isSelected = false;
-
     getResources() {
         const resources = [];
         this.iterateModels((model) => {

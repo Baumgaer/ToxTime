@@ -67,6 +67,10 @@ export function RecipeItemMixinClass(MixinClass) {
             return [this.object];
         }
 
+        getName() {
+            return this.object.name;
+        }
+
     }
     return RecipeItem;
 }
