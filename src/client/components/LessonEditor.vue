@@ -18,6 +18,7 @@
                     :model="scene"
                     ratio="1:1"
                     draggable
+                    :class="scene.isSelected ? 'selected' : ''"
                     @dragstart="onDragStart($event, scene, 'scene')"
                     @dragend="onDragEnd($event, 'scene')"
                     @dragover="onDragOver($event, index, 'scene')"
@@ -40,6 +41,7 @@
                     ratio="1:1"
                     :fitImage="true"
                     draggable
+                    :class="item.isSelected ? 'selected' : ''"
                     @dragstart="onDragStart($event, item, 'item')"
                     @dragend="onDragEnd($event, 'item')"
                     @dragover="onDragOver($event, index, 'item')"
@@ -60,6 +62,7 @@
                     :key="recipe._id"
                     :model="recipe"
                     draggable
+                    :class="recipe.isSelected ? 'selected' : ''"
                     @dragstart="onDragStart($event, recipe, 'recipe')"
                     @dragend="onDragEnd($event, 'recipe')"
                     @dragover="onDragOver($event, index, 'recipe')"
