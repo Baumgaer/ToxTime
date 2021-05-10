@@ -64,22 +64,24 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         return uniq(resources);
     }
 
-    hasValidAnchor(model, resources) {
+    getSpecificObjectFor(model, resources = this.getResources()) {
         if (model instanceof SceneObject.RawClass) {
-            const actionObjects = resources.filter((resource) => {
+            return resources.filter((resource) => {
                 return resource instanceof ActionObject.RawClass && resource.sceneObject === model;
             });
-            if (actionObjects.length) return true;
         }
 
         if (model instanceof Label.RawClass) {
-            let allAoAndCa = resources.filter((resource) => {
+            return resources.filter((resource) => {
                 return (resource instanceof ActionObject.RawClass || resource instanceof ClickArea.RawClass) && resource.getLabels().includes(model);
             });
-            if (allAoAndCa.length) return true;
         }
 
-        return false;
+        return [];
+    }
+
+    hasValidAnchor(model, resources) {
+        return this.getSpecificObjectFor(model, resources).length > 0;
     }
 
     findRecipes(resources = this.getResources()) {

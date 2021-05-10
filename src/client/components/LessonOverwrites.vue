@@ -6,7 +6,6 @@
             <div class="value">
                 <input
                     :type="field.type"
-                    :list="`datalist_${field.name}_${index}`"
                     :name="field.name"
                     :min="field.min"
                     :max="field.max"
@@ -16,9 +15,6 @@
                     @change="overwriteValue(model, $event)"
                     :ref="`field_${field.name}_${index}`"
                 />
-                <datalist :id="`datalist_${field.name}_${index}`">
-                    <option value="1">test</option>
-                </datalist>
             </div>
         </div>
         <div v-for="(subObject, index) of model.getSubObjects(true)" :key="`sub_${subObject._id}_${index}`" class="subObject">
@@ -27,8 +23,8 @@
                 <div class="key">{{ $t(field.name) }}</div>
                 <div class="value">
                     <input
+                        v-if="field.type !== 'model'"
                         :type="field.type"
-                        :list="`datalist_${field.name}_${index}`"
                         :name="field.name"
                         :min="field.min"
                         :max="field.max"
@@ -38,9 +34,26 @@
                         @change="overwriteValue(subObject, $event)"
                         :ref="`field_${field.name}_${index}`"
                     />
-                    <datalist :id="`datalist_${field.name}_${index}`">
-                        <option value="1">test</option>
-                    </datalist>
+                    <div v-else class="specificObjectSelector" @click="openItemSelector(`specify_${subObject._id}_${index}`)">
+                        <Item
+                            :model="field.value"
+                            :compactMode="true"
+                            :showTooltip="false"
+                            :showSubObjects="false"
+                            draggable="false"
+                            :ref="`specify_${subObject._id}_${index}`"
+                        />
+                        <ItemSelector
+                            v-if="itemSelector === `specify_${subObject._id}_${index}`"
+                            :model="subObject.object"
+                            :attribute="'object'"
+                            :attachTo="$refs[`specify_${subObject._id}_${index}`][0].$el"
+                            :selectionFunction="getSpecificObject"
+                            :showAddButton="false"
+                            :autoSave="false"
+                            :itemClickFunction="(selection) => { onSpecification(subObject, selection) }"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -61,8 +74,15 @@ import ClientModel from "~client/lib/ClientModel";
 
 import ApiClient from "~client/lib/ApiClient";
 
+import ItemSelector from "~client/components/ItemSelector";
+import Item from "~client/components/Item";
+
 
 export default {
+    components: {
+        ItemSelector,
+        Item
+    },
     props: {
         lesson: {
             type: Lesson.RawClass,
@@ -77,18 +97,30 @@ export default {
         return {
             amount: Object.freeze({ name: "amount", type: 'number', value: null, min: 0, max: Infinity, disabled: false }),
             activated: Object.freeze({ name: "activated", type: 'checkbox', value: true, disabled: false }),
-            object: Object.freeze({ name: "object", type: 'model', value: null, disabled: false})
+            object: Object.freeze({ name: "object", type: 'model', value: null, disabled: false}),
+            itemSelector: ""
         };
     },
+    watch: {
+        model() {
+            console.log(this.itemSelector);
+            this.itemSelector = "";
+            console.log(this.itemSelector);
+        }
+    },
+    computed: {
+        allowedFields() {
+            return (model) => {
+                const amountValue = this.lesson.getOverwrite(model._id)?.amount ?? 1;
+                if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
+                if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
+                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
+                if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
+                return [];
+            };
+        }
+    },
     methods: {
-        allowedFields(model) {
-            const amountValue = this.lesson.overwrites[model._id]?.amount ?? 1;
-            if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
-            if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
-            if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
-            if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
-            return [];
-        },
 
         getRecipeItemFields(model) {
             const isRequisite = model.object instanceof Requisite.RawClass;
@@ -101,7 +133,7 @@ export default {
             const inScene = model.location === "scene";
             const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene;
 
-            const overwriteObject = this.lesson.overwrites[model._id];
+            const overwriteObject = this.lesson.getOverwrite(model._id);
             const amountValue = overwriteObject?.amount ?? model.amount;
             const objectValue = overwriteObject?.object ? ApiClient.store.getModelById(overwriteObject.object.split("_")[0], overwriteObject.object.split("_")[1]) : model.object;
 
@@ -118,15 +150,26 @@ export default {
             }];
         },
 
+        openItemSelector(name) {
+            this.itemSelector = name;
+        },
+
+        getSpecificObject(model) {
+            return this.lesson.getSpecificObjectFor(model);
+        },
+
+        onSpecification(model, selection) {
+            this.lesson.getOverwrite(model._id).object = `${selection.collection}_${selection._id}`;
+        },
+
         overwriteValue(model, event) {
-            if (!(model._id in this.lesson.overwrites)) this.lesson.overwrites[model._id] = {};
             const input = event.target;
             let valueField = "value";
             if (input.type === "checkbox") valueField = "checked";
 
             let value = event.target.value;
             if (input.type !== "model") value = JSON.parse(input[valueField]);
-            this.lesson.overwrites[model._id][input.name] = value;
+            this.lesson.getOverwrite(model._id)[input.name] = value;
         }
     }
 };

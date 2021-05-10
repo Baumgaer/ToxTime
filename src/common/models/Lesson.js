@@ -71,6 +71,11 @@ export function LessonMixinClass(MixinClass) {
             }
         };
 
+        getOverwrite(id) {
+            if (!(id in this.overwrites)) this.overwrites[id] = {};
+            return this.overwrites[id];
+        }
+
         getSubObjects() {
             return [...this.scenes, ...this.inventory, ...this.getRecipes()];
         }

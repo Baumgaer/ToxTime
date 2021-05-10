@@ -73,7 +73,7 @@ export default {
     computed: {
         items() {
             const items = this.selectionFunction(this.model, this.attribute).filter((item) => {
-                return !this.model[this.attribute].includes(item);
+                return !this.model[this.attribute]?.includes?.(item) || true;
             });
             return itemFilterAndSort(items, this.search);
         }

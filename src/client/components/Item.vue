@@ -1,6 +1,6 @@
 <template>
     <section
-        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects ? ' withChildren' : ''}${model.deleted ? ' deleted' : ''}`"
+        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects && showSubObjects ? ' withChildren' : ''}${model.deleted ? ' deleted' : ''}`"
         draggable
         @dragstart="onDragStart($event)"
         @dragend="onDragEnd($event)"
@@ -9,8 +9,8 @@
         v-on="$listeners"
         ref="itemRoot"
     >
-        <menu-down-icon v-if="opened && hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
-        <menu-right-icon v-else-if="hasSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
+        <menu-down-icon v-if="opened && hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
+        <menu-right-icon v-else-if="hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <Avatar :model="model" ratio="1:1" :fitImage="true" :overlayIcons="overlayIcons" />
         <div class="info">
             <div class="name">
@@ -41,7 +41,7 @@
             </div>
         </div>
         <ProgressBar :model="model" class="progressBar" />
-        <div :class="`subObjects${opened ? ' opened' : ''}`">
+        <div v-if="showSubObjects" :class="`subObjects${opened ? ' opened' : ''}`">
             <item-component
                 v-for="(subObject, index) of model.getSubObjects()"
                 :key="index"
@@ -89,6 +89,10 @@ export default {
             required: true
         },
         showTooltip: {
+            type: Boolean,
+            default: true
+        },
+        showSubObjects: {
             type: Boolean,
             default: true
         },
