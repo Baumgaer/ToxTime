@@ -27,6 +27,7 @@
                 />
                 <strong class="fixedName" v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
             </div>
+            <div v-if="!$parent.isItem && model.getParent()">{{ model.getParent().getName() }}</div>
             <div class="actions" v-if="!compactMode">
                 <div v-for="action of model.actions" :key="`${model._id || model._dummyId}${action.name}`" class="action">
                     <Button v-if="action.symbol.type === 'component' && action.condition"

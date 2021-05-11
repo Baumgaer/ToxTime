@@ -77,6 +77,10 @@ export default class ClientModel extends BaseModel {
         return "";
     }
 
+    getParent() {
+        return null;
+    }
+
     getModifyHash() {
         return (new Date(this.lastModifiedDate)).getTime().toString(6);
     }

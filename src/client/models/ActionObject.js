@@ -22,6 +22,12 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
         };
     }
 
+    getParent() {
+        const sceneObjectParent = ApiClient.store.indexValuesOf("sceneObjects", this)?.[0];
+        const sceneParent = ApiClient.store.indexValuesOf("scenes", this)?.[0];
+        return sceneObjectParent || sceneParent;
+    }
+
     @CommonGameObjectActionObject.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => {
         const store = ApiClient.store;
         const mayContainingScene = store.indexValuesOf("scenes", instance)[0];
