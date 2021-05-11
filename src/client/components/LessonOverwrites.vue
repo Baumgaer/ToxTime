@@ -103,9 +103,7 @@ export default {
     },
     watch: {
         model() {
-            console.log(this.itemSelector);
             this.itemSelector = "";
-            console.log(this.itemSelector);
         }
     },
     computed: {
@@ -155,11 +153,14 @@ export default {
         },
 
         getSpecificObject(model) {
-            return this.lesson.getSpecificObjectFor(model);
+            const specificObjects = this.lesson.getSpecificObjectFor(model);
+            specificObjects.push(model);
+            return specificObjects;
         },
 
         onSpecification(model, selection) {
             this.lesson.getOverwrite(model._id).object = `${selection.collection}_${selection._id}`;
+            this.lesson.overwrites.__ob__.dep.notify();
         },
 
         overwriteValue(model, event) {
