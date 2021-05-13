@@ -107,6 +107,15 @@
                     border-right: 2px solid var(--primary-color, @primaryColor) !important;
                 }
 
+                &.added {
+                    border-color: @successColor;
+                }
+
+                &.excluded {
+                    border-color: @failColor;
+                    opacity: 0.5;
+                }
+
                 .closeIcon {
                     position: absolute;
                     top: 0;

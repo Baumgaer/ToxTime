@@ -4,6 +4,7 @@ import ApiClient from "~client/lib/ApiClient";
 import "~client/less/common.less";
 import Toasted from 'vue-toasted';
 import TextareaAutosize from "vue-textarea-autosize";
+import 'vue-material-design-icons/styles.css';
 
 const mMap = { Error };
 const modelContext = require.context("~client/models", true, /[A-Za-z0-9-_,\s]+\.js$/i, "sync");

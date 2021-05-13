@@ -62,7 +62,7 @@
                     :key="recipe._id"
                     :model="recipe"
                     draggable
-                    :class="recipe.isSelected ? 'selected' : ''"
+                    :class="`${model.addedRecipes.includes(recipe) ? 'added ' : ''}${model.excludedRecipes.includes(recipe) ? 'excluded ' : ''}${recipe.isSelected ? 'selected' : ''}`"
                     @dragstart="onDragStart($event, recipe, 'recipe')"
                     @dragend="onDragEnd($event, 'recipe')"
                     @dragover="onDragOver($event, index, 'recipe')"
@@ -71,7 +71,10 @@
                     @click.stop="onModelSelection(recipe)"
                     :ref="`recipe${index}`"
                 >
-                    <component :is="'close-icon'" class="closeIcon" @click="onRecipeRemoveClick(recipe)"/>
+                    <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) ? $t('delete') : $t('restore')">
+                        <component v-if="!model.excludedRecipes.includes(recipe)" :is="'close-icon'" class="closeIcon" @click.stop="onRecipeRemoveClick(recipe)"/>
+                        <component v-else :is="'delete-restore-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
+                    </div>
                     <div class="name">{{ recipe.name }}</div>
                 </RecipeViewer>
             </section>
@@ -187,9 +190,16 @@ export default {
         },
 
         onRecipeRemoveClick(recipe) {
-            const index = this.model.addedRecipes.indexOf(recipe);
-            if (index >= 0) this.model.addedRecipes.splice(index, 1);
-            this.model.excludedRecipes.push(recipe);
+            const addedRecipes = this.model.addedRecipes;
+            if (addedRecipes.includes(recipe)) {
+                addedRecipes.splice(addedRecipes.indexOf(recipe), 1);
+            } else this.model.excludedRecipes.push(recipe);
+        },
+
+        onRecipeRestoreClick(recipe) {
+            const excludedRecipes = this.model.excludedRecipes;
+            if (!excludedRecipes.includes(recipe)) return;
+            excludedRecipes.splice(excludedRecipes.indexOf(recipe), 1);
         },
 
         /**

@@ -77,11 +77,13 @@ export function LessonMixinClass(MixinClass) {
         }
 
         getSubObjects() {
-            return [...this.scenes, ...this.inventory, ...this.getRecipes()];
+            return [...this.scenes, ...this.inventory, ...this.getRecipes(true)];
         }
 
-        getRecipes() {
-            return difference(union(this.autoDetectedRecipes, this.addedRecipes), this.excludedRecipes);
+        getRecipes(filtered) {
+            const activeRecipes = union(this.autoDetectedRecipes, this.addedRecipes);
+            if (!filtered) return union(activeRecipes, this.excludedRecipes);
+            return difference(activeRecipes, this.excludedRecipes);
         }
     }
     return Lesson;
