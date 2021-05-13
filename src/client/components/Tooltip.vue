@@ -49,8 +49,8 @@
         <div class="labels" v-if="model.labels">
             <span class="label" v-for="label of model.getLabels()" :key="label._id" :style="`${!model.labels.includes(label) ? 'opacity: 0.8;' : ''}`">
                 <item-component :model="label" :compactMode="true" :preventTooltipHiding="true">
-                    <div class="close" :title="$t('remove')">
-                        <close-icon v-if="model.labels.includes(label)" @click="onLabelDeleteButtonClick(label)" />
+                    <div v-if="model.labels.includes(label)" class="close" :title="$t('remove')">
+                        <close-icon @click="onLabelDeleteButtonClick(label)" />
                     </div>
                 </item-component>
             </span>
