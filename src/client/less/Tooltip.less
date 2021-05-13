@@ -146,7 +146,7 @@
                     }
                 }
 
-                .slotted > span {
+                .slotted > .close {
                     position: absolute;
                     top: 50%;
                     right: 5px;
@@ -155,6 +155,11 @@
                     width: 20px;
                     height: 20px;
                     text-align: center;
+                    cursor: pointer;
+
+                    svg {
+                        top: 3px;
+                    }
 
                     &:hover {
                         background-color: @dark;

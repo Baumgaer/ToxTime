@@ -28,7 +28,9 @@
                     :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
-                    <component :is="'close-icon'" class="closeIcon" @click="onSceneRemoveClick(scene)"/>
+                    <div class="closeIcon" :title="$t('remove')">
+                        <component :is="'close-icon'" @click="onSceneRemoveClick(scene)"/>
+                    </div>
                     <div class="name">{{ scene.name }}</div>
                 </Avatar>
             </section>
@@ -51,7 +53,9 @@
                     :ref="`item${index}`"
                 >
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
-                    <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
+                    <div class="closeIcon" :title="$t('remove')">
+                        <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
+                    </div>
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
             </section>
@@ -71,7 +75,7 @@
                     @click.stop="onModelSelection(recipe)"
                     :ref="`recipe${index}`"
                 >
-                    <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) ? $t('delete') : $t('restore')">
+                    <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) ? $t('remove') : $t('restore')">
                         <component v-if="!model.excludedRecipes.includes(recipe)" :is="'close-icon'" class="closeIcon" @click.stop="onRecipeRemoveClick(recipe)"/>
                         <component v-else :is="'delete-restore-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
                     </div>
