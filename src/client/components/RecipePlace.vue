@@ -8,7 +8,9 @@
                :min="`${model.scene ? 1 : 0}`"
                :disabled="!changeable"
         />
-        <div v-if="changeable" class="removeButton" @click="remove">X</div>
+        <div class="removeButton" :title="$t('remove')">
+            <close-icon v-if="changeable" @click="remove" />
+        </div>
         <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file">
             <Item v-if="model.location.className === 'ActionObject'" :model="model.location" :compactMode="true" :showTooltip="false" draggable="false" />
             <Item v-else :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" draggable="false" />
