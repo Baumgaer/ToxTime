@@ -181,7 +181,7 @@ export default {
         items() {
             const items = Object.values(this.store).filter((item) => {
                 if (this.category !== "trash" && item.deleted) return false;
-                if (this.category === "trash" && !item.deleted) return false;
+                if (this.category === "trash" && (!item.deleted || !item.actions?.restore?.condition)) return false;
                 return true;
             });
             return itemFilterAndSort(items, this.search);

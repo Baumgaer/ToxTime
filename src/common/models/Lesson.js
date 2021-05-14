@@ -30,7 +30,8 @@ export function LessonMixinClass(MixinClass) {
                 ],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                ignoreOnIteration: true
             },
             scenes: {
                 type: [
@@ -38,7 +39,8 @@ export function LessonMixinClass(MixinClass) {
                 ],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                ignoreOnIteration: true
             },
             excludedRecipes: {
                 type: [
@@ -46,7 +48,8 @@ export function LessonMixinClass(MixinClass) {
                 ],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                ignoreOnIteration: true
             },
             autoDetectedRecipes: {
                 type: [
@@ -54,7 +57,8 @@ export function LessonMixinClass(MixinClass) {
                 ],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                ignoreOnIteration: true
             },
             addedRecipes: {
                 type: [
@@ -62,7 +66,8 @@ export function LessonMixinClass(MixinClass) {
                 ],
                 sticky: true,
                 required: true,
-                default: []
+                default: [],
+                ignoreOnIteration: true
             },
             overwrites: {
                 type: Schema.Types.Mixed,

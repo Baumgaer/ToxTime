@@ -34,8 +34,7 @@ export function ActionObjectMixinClass(MixinClass) {
                 ref: "SceneObject",
                 required: true,
                 autopopulate: true,
-                sticky: true,
-                ignoreOnIteration: true
+                sticky: true
             }
         };
 

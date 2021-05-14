@@ -21,7 +21,8 @@ export function GameObjectMixinClass(MixinClass) {
             },
             position: {
                 type: [Number],
-                required: true
+                required: true,
+                ignoreOnIteration: true
             },
             layer: {
                 type: Number,
@@ -33,7 +34,8 @@ export function GameObjectMixinClass(MixinClass) {
                 sticky: true,
                 required: true,
                 default: [],
-                autopopulate: true
+                autopopulate: true,
+                ignoreOnIteration: true
             }
         };
     }

@@ -37,7 +37,8 @@ export function FileMixinClass(MixinClass) {
                 sticky: true,
                 required: true,
                 default: [],
-                autopopulate: true
+                autopopulate: true,
+                ignoreOnIteration: true
             }
         };
 

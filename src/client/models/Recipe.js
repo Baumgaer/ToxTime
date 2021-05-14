@@ -21,7 +21,7 @@ export default ClientModel.buildClientExport(class Recipe extends CommonClientRe
         };
     }
 
-    @CommonClientRecipe.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
+    @CommonClientRecipe.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async edit() {
         const shouldProceed = await super.edit();
         if (!shouldProceed) return;
