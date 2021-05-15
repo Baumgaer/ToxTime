@@ -4,8 +4,8 @@
                name="amount"
                class="amount"
                v-model="model.amount"
-               :max="`${locatedInActionObject || model.scene ? 1 : Infinity}`"
-               :min="`${model.scene ? 1 : 0}`"
+               :max="`${model.getMaximumAmount()}`"
+               :min="`${model.getMinimumAmount()}`"
                :disabled="!changeable"
         />
         <div v-if="changeable" class="removeButton" :title="$t('remove')">
@@ -74,9 +74,6 @@ export default {
         }
     },
     computed: {
-        locatedInActionObject() {
-            return this.model.locateInActionObject || !this.model.locateInActionObject && !this.model.locateInHand && !this.model.locateInInventory;
-        }
     },
     watch: {
         model() {

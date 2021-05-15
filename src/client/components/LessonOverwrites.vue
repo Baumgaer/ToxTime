@@ -125,11 +125,7 @@ export default {
             const isScene = model.object instanceof Scene.RawClass;
             const isFile = model.object instanceof File.RawClass;
             const isActionObject = model.object instanceof ActionObject.RawClass;
-            const isSceneObject = model.object instanceof SceneObject.RawClass;
             const isLabel = model.object instanceof Label.RawClass;
-
-            const inScene = model.location === "scene";
-            const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene;
 
             const overwriteObject = this.lesson.getOverwrite(model._id);
             const amountValue = overwriteObject?.amount ?? model.amount;
@@ -138,8 +134,8 @@ export default {
             return [{
                 ...this.amount,
                 value: amountValue,
-                min: isScene || isFile || isActionObject ? 1 : 0,
-                max: isUnique ? 1 : Infinity,
+                min: model.getMinimumAmount(),
+                max: model.getMaximumAmount(),
                 disabled: isActionObject || isScene || isFile
             }, {
                 ...this.object,

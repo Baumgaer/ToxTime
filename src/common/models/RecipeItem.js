@@ -63,6 +63,22 @@ export function RecipeItemMixinClass(MixinClass) {
             }
         };
 
+        getMinimumAmount() {
+            return Boolean(this.scene) || Boolean(this.file) ? 1 : 0;
+        }
+
+        getMaximumAmount() {
+            const isScene = Boolean(this.scene);
+            const isFile = Boolean(this.file);
+            const isActionObject = Boolean(this.actionObject);
+            const isSceneObject = Boolean(this.sceneObject);
+
+            const inScene = this.location === "scene";
+            const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene;
+
+            return isUnique ? 1 : Infinity;
+        }
+
         getSubObjects() {
             return [this.object];
         }
