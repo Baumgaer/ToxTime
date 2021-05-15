@@ -1,5 +1,5 @@
 <template>
-    <div class="recipeEditor">
+    <div class="recipeEditor" @dragover.prevent.stop="onInternalDragOver($event)" @dragleave.prevent.stop="onInternalDragLeave">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
         <RecipeViewer
             ref="viewer"
@@ -24,6 +24,11 @@ import File from "~client/models/File";
 import Scene from "~client/models/Scene";
 import Inventory from "~client/models/Inventory";
 import Hand from "~client/models/Hand";
+import Lesson from "~client/models/Lesson";
+import User from "~client/models/User";
+
+import ApiClient from "~client/lib/ApiClient";
+import { parseEventModelData } from "~client/utils";
 
 export default {
     components: {
@@ -38,11 +43,38 @@ export default {
     },
     data() {
         return {
-            forbiddenOutputTypes: [ClickArea.RawClass],
-            forbiddenInputTypes: [File.RawClass, Scene.RawClass]
+            forbiddenOutputTypes: [ClickArea.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass],
+            forbiddenInputTypes: [File.RawClass, Scene.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass]
         };
     },
     methods: {
+        onInternalDragOver(event) {
+            if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            event.dataTransfer.dropEffect = "none";
+            let model = parseEventModelData(event);
+            if (!model) return;
+
+            const targets = [];
+            let highlightInput = !this.forbiddenInputTypes.some((type) => model instanceof type);
+            let highlightOutput = !this.forbiddenOutputTypes.some((type) => model instanceof type);
+
+            if (highlightInput) targets.push("input");
+            if (highlightOutput) targets.push("output");
+
+            for (const target of targets) {
+                this.$refs.viewer.$refs[target].highlightAllowedPlaces = true;
+            }
+        },
+
+        onInternalDragLeave() {
+            this.$refs.viewer.$refs.input.highlightAllowedPlaces = false;
+            this.$refs.viewer.$refs.output.highlightAllowedPlaces = false;
+        },
+
         onToggleSwitched(name, value) {
             this.model.transitionSettings[name] = value;
         },

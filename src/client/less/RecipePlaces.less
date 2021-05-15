@@ -25,6 +25,26 @@
         }
     }
 
+    &.allowHighlighted {
+        .placeholder {
+            box-sizing: border-box;
+            border: 2px solid @successColor;
+        }
+
+        .item {
+            &::v-deep {
+                .item {
+                    box-sizing: border-box;
+                    border: 2px solid @successColor;
+                }
+
+                .location .item {
+                    border: none;
+                }
+            }
+        }
+    }
+
     .spreader {
         position: absolute;
         right: 0;

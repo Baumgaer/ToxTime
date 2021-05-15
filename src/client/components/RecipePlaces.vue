@@ -1,5 +1,5 @@
 <template>
-    <div :class="`recipePlaces ${align}Aligned`" @dragend="onDragEnd()">
+    <div :class="`recipePlaces ${align}Aligned ${highlightAllowedPlaces ? 'allowHighlighted' : ''}`" @dragend="onDragEnd()">
         <div v-for="item in model[prop]"
              :key="item._id || item._dummyId"
              class="item"
@@ -71,7 +71,8 @@ export default {
     },
     data() {
         return {
-            placeholderAvatarData: null
+            placeholderAvatarData: null,
+            highlightAllowedPlaces: false
         };
     },
     methods: {
@@ -105,6 +106,12 @@ export default {
 
             let model = parseEventModelData(event);
             if (!model) return;
+
+            if (this.forbiddenModels.some((type) => model instanceof type)) {
+                event.dataTransfer.dropEffect = "none";
+                return;
+            }
+            event.dataTransfer.dropEffect = "link";
 
             if (place === "placeholder") {
                 this.highlightPlaceholder(model);
