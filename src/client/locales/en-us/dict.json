@@ -133,5 +133,6 @@
     "ok": "OK",
     "amount": "Amount",
     "object": "Specialized object",
-    "activated": "Activated"
+    "activated": "Activated",
+    "selectFromList": "Please drag the object here from the list on the left"
 }

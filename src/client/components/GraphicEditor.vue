@@ -1,5 +1,5 @@
 <template>
-    <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
+    <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
         <EditorHead
             ref="editorHead"
             :model="model"
@@ -77,6 +77,22 @@ export default {
         this.$refs.graphicViewer.adjustViewToBorder(null, true);
     },
     methods: {
+
+        /**
+         * @param {DragEvent} event
+         */
+        onInternalDragOver(event) {
+            if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
+            event.preventDefault();
+            event.stopPropagation();
+
+            const model = parseEventModelData(event);
+            if (!model) return;
+            if (!(model instanceof File.RawClass) && !(model instanceof SceneObject.RawClass) || model === this.model || model.deleted) {
+                event.dataTransfer.dropEffect = "none";
+            } else event.dataTransfer.dropEffect = "link";
+        },
+
         /**
          * @param {DragEvent} event
          */

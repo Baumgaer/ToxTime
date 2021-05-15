@@ -14,6 +14,7 @@
              @dragover="onDragOver($event, 'placeholder')"
              @drop="onDrop($event, 'placeholder')"
              @dragleave="onDragLeave($event, 'placeholder')"
+             @click="onPlaceholderClick"
         >
             <component v-if="placeholderAvatarData && placeholderAvatarData.type === 'component'" :is="placeholderAvatarData.name" />
             <plus-icon v-else />
@@ -36,6 +37,7 @@ import File from "~client/models/File";
 
 import ApiClient from "~client/lib/ApiClient";
 import { parseEventModelData } from "~client/utils";
+import tippy from "tippy.js";
 
 export default {
     components: {
@@ -73,6 +75,21 @@ export default {
         };
     },
     methods: {
+
+        onPlaceholderClick() {
+            const tooltip = tippy(this.$refs.placeholder, {
+                appendTo: this.$el,
+                content: this.$t("selectFromList"),
+                placement: "auto",
+                theme: "material",
+                zIndex: 20,
+                hideOnClick: true,
+                trigger: "click",
+                showOnCreate: true,
+                duration: 500
+            });
+            setTimeout(tooltip.destroy.bind(tooltip), 3000);
+        },
 
         /**
          * Highlights the corresponding place to give feedback what will happen

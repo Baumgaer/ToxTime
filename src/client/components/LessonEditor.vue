@@ -1,5 +1,5 @@
 <template>
-    <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent @dragenter.prevent>
+    <div class="lessonEditor" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
         <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <LessonOverwrites ref="lessonOverwrites" v-if="selectedModel" :lesson="model" :model="selectedModel" />
         <section class="editorBody" @click.stop="onModelSelection(null)">
@@ -99,6 +99,9 @@ import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
 import SceneObject from "~client/models/SceneObject";
 import Recipe from "~client/models/Recipe";
+import Label from "~client/models/Label";
+import User from "~client/models/User";
+import File from "~client/models/File";
 
 import { parseEventModelData } from "~client/utils";
 
@@ -124,6 +127,37 @@ export default {
             const result = await this.model.save();
             if (!result || result instanceof Error) return;
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+        },
+
+        /**
+         * @param {DragEvent} event
+         * @param {"recipe" | "item" | "scene"} [type]
+         */
+        onInternalDragOver(event, type) {
+            if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
+            event.preventDefault();
+            event.stopPropagation();
+
+            const model = parseEventModelData(event);
+            if (!model) {
+                event.dataTransfer.dropEffect = "none";
+                return false;
+            }
+
+            if (!type && (model instanceof File.RawClass || model instanceof Label.RawClass || model instanceof User.RawClass) || model === this.model || model.deleted) {
+                event.dataTransfer.dropEffect = "none";
+                return false;
+            } else if(type === "recipe" && !(model instanceof Recipe.RawClass)) {
+                event.dataTransfer.dropEffect = "none";
+                return false;
+            } else if(type === "item" && !(model instanceof SceneObject.RawClass)) {
+                event.dataTransfer.dropEffect = "none";
+                return false;
+            } else if(type === "scene" && !(model instanceof Scene.RawClass)) {
+                event.dataTransfer.dropEffect = "none";
+                return false;
+            } else event.dataTransfer.dropEffect = "link";
+            return true;
         },
 
         /**
@@ -226,8 +260,8 @@ export default {
          * @param {"scene" | "item"} type
          */
         onDragOver(event, index, type) {
-            event.preventDefault();
-            event.stopPropagation();
+
+            if (!this.onInternalDragOver(event, type)) return;
 
             /** @type {HTMLElement} */
             const element = this.$refs[`${type}${index}`][0].$el;

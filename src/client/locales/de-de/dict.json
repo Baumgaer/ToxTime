@@ -133,5 +133,6 @@
     "ok": "OK",
     "amount": "Anzahl",
     "object": "Spezialisiertes Objekt",
-    "activated": "Aktiviert"
+    "activated": "Aktiviert",
+    "selectFromList": "Objekt bitte links aus der Liste hierher ziehen"
 }
