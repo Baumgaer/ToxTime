@@ -70,6 +70,7 @@ import GamepadVariantIcon from "vue-material-design-icons/GamepadVariant";
 import BagPersonalIcon from "vue-material-design-icons/BagPersonal";
 import SquareOutlineIcon from "vue-material-design-icons/SquareOutline";
 import CalculatorIcon from "vue-material-design-icons/Calculator";
+import HeadLightbulbIcon from "vue-material-design-icons/HeadLightbulb";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -117,3 +118,4 @@ Vue.component('gamepad-variant-icon', GamepadVariantIcon);
 Vue.component('bag-personal-icon', BagPersonalIcon);
 Vue.component('square-outline-icon', SquareOutlineIcon);
 Vue.component('calculator-icon', CalculatorIcon);
+Vue.component('head-lightbulb-icon', HeadLightbulbIcon);

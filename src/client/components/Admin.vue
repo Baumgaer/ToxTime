@@ -51,6 +51,15 @@
                     <graph-icon />
                 </Button>
                 <Button
+                    ref="knowledge"
+                    name="knowledge"
+                    :active="this.category === 'knowledge'"
+                    :showLoadingSpinner="somethingIsLoading('knowledge')"
+                    @click="onNavButtonClick('knowledge')"
+                >
+                    <head-lightbulb-icon />
+                </Button>
+                <Button
                     ref="files"
                     name="files"
                     :active="this.category === 'files'"
