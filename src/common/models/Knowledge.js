@@ -20,11 +20,13 @@ export function KnowledgeMixinClass(MixinClass) {
             },
             "description_de-de": {
                 type: String,
-                required: true
+                required: true,
+                default: null
             },
             "description_en-us": {
                 type: String,
-                required: true
+                required: true,
+                default: null
             }
         };
 

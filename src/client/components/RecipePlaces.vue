@@ -34,6 +34,7 @@ import Scene from "~client/models/Scene";
 import GameObject from "~client/models/GameObject";
 import Label from "~client/models/Label";
 import File from "~client/models/File";
+import Knowledge from "~client/models/Knowledge";
 
 import ApiClient from "~client/lib/ApiClient";
 import { parseEventModelData } from "~client/utils";
@@ -107,7 +108,7 @@ export default {
             let model = parseEventModelData(event);
             if (!model) return;
 
-            if (this.forbiddenModels.some((type) => model instanceof type)) {
+            if (!this.isAllowed(model)) {
                 event.dataTransfer.dropEffect = "none";
                 return;
             }
@@ -169,7 +170,7 @@ export default {
         },
 
         isAllowed(model) {
-            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass];
+            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass, Knowledge.RawClass];
             const isAllowed = defaultAllowed.some((type) => model instanceof type);
             if (!isAllowed) return false;
 

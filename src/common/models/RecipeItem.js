@@ -56,6 +56,14 @@ export function RecipeItemMixinClass(MixinClass) {
                 required: false,
                 default: null
             },
+            knowledge: {
+                type: Schema.Types.ObjectId,
+                ref: "Knowledge",
+                autopopulate: true,
+                sticky: true,
+                required: false,
+                default: null
+            },
             location: {
                 type: String,
                 enum: ["inventory", "hand", "scene"],
@@ -64,7 +72,7 @@ export function RecipeItemMixinClass(MixinClass) {
         };
 
         getMinimumAmount() {
-            return Boolean(this.scene) || Boolean(this.file) ? 1 : 0;
+            return Boolean(this.scene) || Boolean(this.file) || Boolean(this.knowledge) ? 1 : 0;
         }
 
         getMaximumAmount() {
@@ -72,9 +80,10 @@ export function RecipeItemMixinClass(MixinClass) {
             const isFile = Boolean(this.file);
             const isActionObject = Boolean(this.actionObject);
             const isSceneObject = Boolean(this.sceneObject);
+            const isKnowledge = Boolean(this.knowledge);
 
             const inScene = this.location === "scene";
-            const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene;
+            const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge;
 
             return isUnique ? 1 : Infinity;
         }
