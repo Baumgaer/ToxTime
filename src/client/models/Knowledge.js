@@ -13,10 +13,6 @@ export default ClientModel.buildClientExport(class Knowledge extends CommonClien
         }
     };
 
-    getName() {
-        return this[`description_${window.activeUser.locale}`];
-    }
-
     getAvatar() {
         return {
             type: "component",

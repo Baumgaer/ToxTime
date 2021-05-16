@@ -137,5 +137,8 @@
     "selectFromList": "Objekt bitte links aus der Liste hierher ziehen",
     "points": "Punkte",
     "totalPoints": "Punkte gesamt",
-    "knowledge": "Wissen"
+    "knowledge": "Wissen",
+    "knowledgeDescriptionDe": "Deutsche Wissenbeschreibung",
+    "knowledgeDescriptionEn": "Englische Wissenbeschreibung",
+    "addKnowledge": "Wissen hinzufügen"
 }

@@ -130,6 +130,7 @@
             <LessonEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addLessons'" />
             <UserEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'editUser'" />
             <RecipeEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addRecipes'" :model="window.activeUser.editingModel" />
+            <KnowledgeEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addKnowledge'" />
             <Player
                 v-if="window.activeUser.editingModel && window.activeUser.editingModel.className === 'GameSession'"
                 v-show="window.activeUser.activeEditor === 'playGame'"
@@ -152,12 +153,14 @@ import UserEditor from "~client/components/UserEditor";
 import Player from "~client/components/Player";
 import RecipeEditor from "~client/components/RecipeEditor";
 import Usage from "~client/components/Usage";
+import KnowledgeEditor from "~client/components/KnowledgeEditor";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
 import Lesson from "~client/models/Lesson";
 import Label from "~client/models/Label";
 import Recipe from "~client/models/Recipe";
+import Knowledge from "~client/models/Knowledge";
 
 import { capitalize } from "~common/utils";
 import { itemFilterAndSort } from "~client/utils";
@@ -172,7 +175,8 @@ export default {
         UserEditor,
         Player,
         RecipeEditor,
-        Usage
+        Usage,
+        KnowledgeEditor
     },
     data() {
         return {
@@ -263,6 +267,9 @@ export default {
                     addedModel.save();
                 } else if (category === "recipes") {
                     window.activeUser.editingModel = ApiClient.store.addModel(new Recipe.Model());
+                    window.activeUser.activeEditor = `add${capitalize(category)}`;
+                } else if (category === "knowledge") {
+                    window.activeUser.editingModel = ApiClient.store.addModel(new Knowledge.Model());
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });

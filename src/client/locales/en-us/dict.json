@@ -137,5 +137,8 @@
     "selectFromList": "Please drag the object here from the list on the left",
     "points": "Points",
     "totalPoints": "Total points",
-    "knowledge": "Knowledge"
+    "knowledge": "Knowledge",
+    "knowledgeDescriptionDe": "German knowledge description",
+    "knowledgeDescriptionEn": "English knowledge description",
+    "addKnowledge": "Add knowledge"
 }
