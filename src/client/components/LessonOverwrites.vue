@@ -115,7 +115,9 @@ export default {
                 if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
                 if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
                 if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
-                if (model instanceof Recipe.RawClass) return [{...this.points}];
+                if (model instanceof Recipe.RawClass) {
+                    return [{...this.points, value: this.lesson.getOverwrite(model._id)?.points ?? 0}];
+                }
                 if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
                 return [];
             };
@@ -170,6 +172,7 @@ export default {
             let value = event.target.value;
             if (input.type !== "model") value = JSON.parse(input[valueField]);
             this.lesson.getOverwrite(model._id)[input.name] = value;
+            this.lesson.overwrites.__ob__.dep.notify();
         }
     }
 };

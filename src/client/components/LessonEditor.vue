@@ -59,7 +59,7 @@
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
             </section>
-            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button></h3>
+            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button> <span class="points">{{ $t("totalPoints") }}: {{ totalPoints }}</span></h3>
             <section class="recipeList">
                 <RecipeViewer
                     v-for="(recipe, index) of model.getRecipes()"
@@ -118,6 +118,13 @@ export default {
             model: window.activeUser.editingModel,
             selectedModel: null
         };
+    },
+    computed: {
+        totalPoints() {
+            return this.model.getRecipes(true).reduce((total, recipe) => {
+                return total + (this.model.getOverwrite(recipe._id).points || 0);
+            }, 0);
+        }
     },
     mounted() {
         ApiClient.get("/recipes");

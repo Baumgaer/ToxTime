@@ -134,5 +134,7 @@
     "amount": "Anzahl",
     "object": "Spezialisiertes Objekt",
     "activated": "Aktiviert",
-    "selectFromList": "Objekt bitte links aus der Liste hierher ziehen"
+    "selectFromList": "Objekt bitte links aus der Liste hierher ziehen",
+    "points": "Punkte",
+    "totalPoints": "Punkte gesamt"
 }

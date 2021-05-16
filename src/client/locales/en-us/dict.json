@@ -134,5 +134,7 @@
     "amount": "Amount",
     "object": "Specialized object",
     "activated": "Activated",
-    "selectFromList": "Please drag the object here from the list on the left"
+    "selectFromList": "Please drag the object here from the list on the left",
+    "points": "Points",
+    "totalPoints": "Total points"
 }
