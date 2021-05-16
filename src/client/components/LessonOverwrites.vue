@@ -65,6 +65,7 @@ import Lesson from "~client/models/Lesson";
 import ActionObject from "~client/models/ActionObject";
 import SceneObject from "~client/models/SceneObject";
 import ClickArea from "~client/models/ClickArea";
+import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
 import Scene from "~client/models/Scene";
 import Requisite from "~client/models/Requisite";
@@ -96,6 +97,7 @@ export default {
     data() {
         return {
             amount: Object.freeze({ name: "amount", type: 'number', value: null, min: 0, max: Infinity, disabled: false }),
+            points: Object.freeze({ name: "points", type: 'number', value: 0, min: -Infinity, max: Infinity, disabled: false }),
             activated: Object.freeze({ name: "activated", type: 'checkbox', value: true, disabled: false }),
             object: Object.freeze({ name: "object", type: 'model', value: null, disabled: false}),
             itemSelector: ""
@@ -113,6 +115,7 @@ export default {
                 if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
                 if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
                 if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
+                if (model instanceof Recipe.RawClass) return [{...this.points}];
                 if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
                 return [];
             };
