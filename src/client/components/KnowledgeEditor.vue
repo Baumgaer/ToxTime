@@ -35,7 +35,6 @@ export default {
         async onSaveButtonClick() {
             const result = await this.model.save();
             if (result instanceof Error) return;
-            this.createAvatar();
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         }
     }
