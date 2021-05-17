@@ -10,10 +10,10 @@ export function SceneMixinClass(MixinClass) {
     class Scene extends MixinClass {
 
         static className = "Scene";
-        static collection = "scenes";
+        static dataCollectionName = "scenes";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `Scene`
             }

@@ -22,7 +22,7 @@ export function parseEventModelData(event) {
     if (!eventData) eventData = ApiClient.store.collection("localStorage").internalDnDData;
 
     if (!eventData) return null;
-    return ApiClient.store.getModelById(eventData.collection, eventData._id);
+    return ApiClient.store.getModelById(eventData.dataCollectionName, eventData._id);
 }
 
 /**

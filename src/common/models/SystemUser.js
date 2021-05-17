@@ -10,10 +10,10 @@ export function SystemUserMixinClass(MixinClass) {
     class SystemUser extends MixinClass {
 
         static className = "SystemUser";
-        static collection = "users";
+        static dataCollectionName = "users";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             creator: {
                 required: false
             }

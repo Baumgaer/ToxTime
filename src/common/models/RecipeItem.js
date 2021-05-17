@@ -12,10 +12,10 @@ export function RecipeItemMixinClass(MixinClass) {
     class RecipeItem extends MixinClass {
 
         static className = "RecipeItem";
-        static collection = "recipeItems";
+        static dataCollectionName = "recipeItems";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             actionObject: {
                 reverseDependant: false,
                 sticky: true

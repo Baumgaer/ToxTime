@@ -5,7 +5,7 @@ const CommonClientLabel = LabelMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Label extends CommonClientLabel {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newNeutral")} ${window.$t('label')} ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`;

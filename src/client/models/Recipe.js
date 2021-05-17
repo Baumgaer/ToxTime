@@ -5,7 +5,7 @@ const CommonClientRecipe = RecipeMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Recipe extends CommonClientRecipe {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newNeutral")} ${window.$t('recipe')} ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`;

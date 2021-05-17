@@ -8,10 +8,10 @@ export default class ClientModel extends BaseModel {
 
     static className = "ClientModel";
 
-    static collection = "clientModels";
+    static dataCollectionName = "clientModels";
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         creator: {
             default: () => window.activeUser
         }
@@ -57,7 +57,7 @@ export default class ClientModel extends BaseModel {
                 }
 
                 // Assign given values
-                Object.assign(this, params, { collection: RawClass.collection, className: RawClass.className });
+                Object.assign(this, params, { dataCollectionName: RawClass.dataCollectionName, className: RawClass.className });
                 if (!params._id) this._dummyId = uuid();
 
                 schema._isVue = true; // Prevent vue from touching the schema
@@ -373,7 +373,7 @@ export default class ClientModel extends BaseModel {
             method = ApiClient.patch.bind(ApiClient);
         } else method = ApiClient.post.bind(ApiClient);
 
-        const result = await method(`/${this.collection}${this._id ? "/" + this._id : ''}`, data);
+        const result = await method(`/${this.dataCollectionName}${this._id ? "/" + this._id : ''}`, data);
         if (!(result instanceof Error)) this.deleteBackupDeep();
         this.loadingStatus = 0;
         return result;
@@ -404,14 +404,14 @@ export default class ClientModel extends BaseModel {
             return;
         }
 
-        const result = await ApiClient.delete(`/${this.collection}/${this._id}`);
+        const result = await ApiClient.delete(`/${this.dataCollectionName}/${this._id}`);
         if ((result instanceof Error)) return result;
         if (result?.deleted) return result;
     }
 
     @BaseModel.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => window.activeUser.isAdmin && instance.deleted)
     async restore() {
-        const result = await ApiClient.patch(`/${this.collection}/restore/${this._id}`);
+        const result = await ApiClient.patch(`/${this.dataCollectionName}/restore/${this._id}`);
 
         // We do not want to delete sub objects in case of an error or object
         // was just marked as deleted because it's sticky
@@ -421,7 +421,7 @@ export default class ClientModel extends BaseModel {
 
     @BaseModel.action("copy", { type: "component", name: "content-copy-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     copy() {
-        ApiClient.post(`/${this.collection}/copy/${this._id}`, {
+        ApiClient.post(`/${this.dataCollectionName}/copy/${this._id}`, {
             name: `${window.$t("copyOf")} ${this.getName()}`
         });
     }

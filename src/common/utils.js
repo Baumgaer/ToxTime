@@ -73,7 +73,7 @@ export function getAllFuncs(toCheck) {
  */
 export function dataTransformer(doc, ret, modelClass) {
     ret.className = modelClass.className;
-    ret.collection = modelClass.collection;
+    ret.dataCollectionName = modelClass.dataCollectionName;
 }
 
 /**
@@ -141,12 +141,12 @@ export function csvToObject(csv, params) {
  * @param environmentExport
  */
 export function dbEnvironmentFilter(environmentExport) {
-    let keysToExclude = Object.keys(environmentExport.RawClass.schema || {}).map((key) => `-${key}`);
+    let keysToExclude = Object.keys(environmentExport.RawClass.schemaDefinition || {}).map((key) => `-${key}`);
 
     let commonProto = Object.getPrototypeOf(environmentExport.RawClass);
     let environmentProto = Object.getPrototypeOf(commonProto);
     while (environmentProto) {
-        keysToExclude = keysToExclude.concat(Object.keys(environmentExport.RawClass.schema || {}).map((key) => `-${key}`));
+        keysToExclude = keysToExclude.concat(Object.keys(environmentExport.RawClass.schemaDefinition || {}).map((key) => `-${key}`));
         commonProto = Object.getPrototypeOf(environmentProto);
         if (!commonProto) break;
         environmentProto = Object.getPrototypeOf(commonProto);

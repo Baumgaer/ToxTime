@@ -10,10 +10,10 @@ export function ClickAreaMixinClass(MixinClass) {
     class ClickArea extends MixinClass {
 
         static className = "ClickArea";
-        static collection = "clickAreas";
+        static dataCollectionName = "clickAreas";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `ClickArea`
             },

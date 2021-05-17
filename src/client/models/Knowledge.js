@@ -5,7 +5,7 @@ const CommonClientKnowledge = KnowledgeMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Knowledge extends CommonClientKnowledge {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newNeutral")} ${window.$t('knowledge')} ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`;

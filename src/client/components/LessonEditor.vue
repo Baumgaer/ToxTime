@@ -253,7 +253,7 @@ export default {
         onDragStart(event, model) {
             event.stopPropagation();
             ApiClient.store.collection("localStorage").isInternalDnD = true;
-            event.dataTransfer.setData("model", JSON.stringify({collection: model.collection, _id: model._id}));
+            event.dataTransfer.setData("model", JSON.stringify({dataCollectionName: model.dataCollectionName, _id: model._id}));
         },
 
         onDragEnd() {

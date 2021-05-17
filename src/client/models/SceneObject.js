@@ -5,7 +5,7 @@ const CommonSceneObjectRequisite = SceneObjectMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class SceneObject extends CommonSceneObjectRequisite {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newNeutral")} ${window.$t('sceneObject')}`;

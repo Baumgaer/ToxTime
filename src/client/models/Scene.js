@@ -5,7 +5,7 @@ const CommonSceneRequisite = SceneMixinClass(Requisite.RawClass);
 export default Requisite.RawClass.buildClientExport(class Scene extends CommonSceneRequisite {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newFeminin")} ${window.$t('scene')}`;

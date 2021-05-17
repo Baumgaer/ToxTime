@@ -12,10 +12,10 @@ export function FileMixinClass(MixinClass) {
     class File extends MixinClass {
 
         static className = "File";
-        static collection = "files";
+        static dataCollectionName = "files";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 type: String,
                 required: true

@@ -12,10 +12,10 @@ export function ActionObjectMixinClass(MixinClass) {
     class ActionObject extends MixinClass {
 
         static className = "ActionObject";
-        static collection = "actionObjects";
+        static dataCollectionName = "actionObjects";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `ActionObject`
             },

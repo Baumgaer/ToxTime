@@ -12,7 +12,7 @@ const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newFeminin")} ${window.$t('lesson')}`;

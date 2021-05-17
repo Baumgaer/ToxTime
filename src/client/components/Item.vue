@@ -163,7 +163,7 @@ export default {
 
             ApiClient.store.collection("localStorage").isInternalDnD = true;
 
-            const data = {collection: this.model.collection, _id: this.model._id};
+            const data = {dataCollectionName: this.model.dataCollectionName, _id: this.model._id};
             event.dataTransfer.setData("model", JSON.stringify(data));
             ApiClient.store.collection("localStorage").internalDnDData = data;
         },

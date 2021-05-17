@@ -160,7 +160,7 @@ export default {
         },
 
         onSpecification(model, selection) {
-            this.lesson.getOverwrite(model._id).object = `${selection.collection}_${selection._id}`;
+            this.lesson.getOverwrite(model._id).object = `${selection.dataCollectionName}_${selection._id}`;
             this.lesson.overwrites.__ob__.dep.notify();
         },
 

@@ -10,10 +10,10 @@ export function LabelMixinClass(MixinClass) {
     class Label extends MixinClass {
 
         static className = "Label";
-        static collection = "labels";
+        static dataCollectionName = "labels";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `Label`,
                 unique: true

@@ -216,7 +216,7 @@ export default {
                 if (!blob) return;
                 const formData = new FormData();
                 formData.append('file', blob, this.model._id);
-                ApiClient.upload("PUT", `/${this.model.collection}/${this.model._id}`, {
+                ApiClient.upload("PUT", `/${this.model.dataCollectionName}/${this.model._id}`, {
                     formData: formData,
                     onProgress: (progress) => this.model.loadingStatus = progress,
                     onSuccess: () => {

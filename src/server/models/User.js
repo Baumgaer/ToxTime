@@ -6,7 +6,7 @@ const CommonServerUser = UserMixinClass(ServerModel);
 export default ServerModel.buildServerExport(class User extends CommonServerUser {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         passwordResetToken: {
             type: String,
             unique: true,

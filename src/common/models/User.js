@@ -13,10 +13,10 @@ export function UserMixinClass(MixinClass) {
     class User extends MixinClass {
 
         static className = "User";
-        static collection = "users";
+        static dataCollectionName = "users";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             email: {
                 type: String,
                 required: true,

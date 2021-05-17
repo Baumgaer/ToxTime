@@ -34,7 +34,7 @@ export default {
 
         if (Object.keys(window.userInformation).length) {
             ApiClient.handleModels(window.userInformation);
-            window.activeUser = ApiClient.store.getModelById(window.userInformation.collection, window.userInformation._id);
+            window.activeUser = ApiClient.store.getModelById(window.userInformation.dataCollectionName, window.userInformation._id);
         }
     }
 };

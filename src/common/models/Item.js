@@ -12,10 +12,10 @@ export function ItemMixinClass(MixinClass) {
     class Item extends MixinClass {
 
         static className = "Item";
-        static collection = "items";
+        static dataCollectionName = "items";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 required: false
             },

@@ -15,10 +15,10 @@ export default class BaseModel {
     static className = "BaseModel";
 
     /** @type {string} The name of the collection where the model will be stored in */
-    static collection = "unknown";
+    static dataCollectionName = "unknown";
 
     /** @type {import("mongoose").SchemaDefinition} Contains a part of the model schema. Do NOT mix. This will be happen automatically*/
-    static schema = {
+    static schemaDefinition = {
         name: {
             type: String,
             required: true,
@@ -88,15 +88,15 @@ export default class BaseModel {
      */
     static buildSchema(RawClass) {
         let schemaDeclaration = {};
-        const prototypeSchemas = [RawClass.schema || {}];
+        const prototypeSchemas = [RawClass.schemaDefinition || {}];
         let proto = Object.getPrototypeOf(RawClass);
         while (proto) {
-            prototypeSchemas.unshift(proto.schema || {});
+            prototypeSchemas.unshift(proto.schemaDefinition || {});
             proto = Object.getPrototypeOf(proto);
         }
         for (const prototypeSchema of prototypeSchemas) schemaDeclaration = merge(schemaDeclaration, prototypeSchema);
         const schema = new Schema(schemaDeclaration, {
-            collection: RawClass.collection,
+            collection: RawClass.dataCollectionName,
             discriminatorKey: "className",
             toObject: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) },
             toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) }

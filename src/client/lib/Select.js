@@ -130,7 +130,7 @@ export default class Select extends Tool {
         if (event.key !== "delete" || !this.selection) return;
 
         const removedModel = this.selection.item.model;
-        const removedModelCollection = removedModel.collection;
+        const removedModelCollection = removedModel.dataCollectionName;
 
         this.model[removedModelCollection].splice(this.model[removedModelCollection].indexOf(removedModel), 1);
         removedModel.isSelected = false;

@@ -12,10 +12,10 @@ export function GameSessionMixinClass(MixinClass) {
     class GameSession extends MixinClass {
 
         static className = "GameSession";
-        static collection = "gameSessions";
+        static dataCollectionName = "gameSessions";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 required: false
             },

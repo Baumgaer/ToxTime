@@ -6,7 +6,7 @@ const CommonGameObjectClickArea = ClickAreaMixinClass(GameObject.RawClass);
 export default GameObject.RawClass.buildClientExport(class ClickArea extends CommonGameObjectClickArea {
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return `${window.$t("newMaskulin")} ${window.$t('clickArea')}`;

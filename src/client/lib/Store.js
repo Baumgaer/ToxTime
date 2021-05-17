@@ -94,13 +94,13 @@ export class Store {
     /**
      * Returns a model from collection name with given id if exists and null else
      *
-     * @param {string} collectionName
+     * @param {string} dataCollectionName
      * @param {string} id
      * @returns {Model | null}
      * @memberof Store
      */
-    getModelById(collectionName, id) {
-        const collection = this.collection(collectionName);
+    getModelById(dataCollectionName, id) {
+        const collection = this.collection(dataCollectionName);
         const model = collection[id];
         if (!model) return null;
         return model;
@@ -115,7 +115,7 @@ export class Store {
      * @memberof Store
      */
     hasModel(modelLike) {
-        return Boolean(this.getModelById(modelLike.collection, modelLike._dummyId || modelLike._id));
+        return Boolean(this.getModelById(modelLike.dataCollectionName, modelLike._dummyId || modelLike._id));
     }
 
     /**
@@ -126,19 +126,19 @@ export class Store {
      * @memberof Store
      */
     isModel(modelLike) {
-        return modelLike.collection && modelLike.className && (modelLike._dummyId || modelLike._id);
+        return modelLike.dataCollectionName && modelLike.className && (modelLike._dummyId || modelLike._id);
     }
 
     /**
      * Adds a given model like object as initialized model to the store.
-     * The object musst contain at least _id or _dummyId and a collection
+     * The object musst contain at least _id or _dummyId and a dataCollectionName
      *
      * @param {ModelLike} modelLike
      * @returns {Model}
      * @memberof Store
      */
     addModel(modelLike) {
-        const collectionName = modelLike.collection;
+        const dataCollectionName = modelLike.dataCollectionName;
         const id = modelLike._id || modelLike._dummyId;
         let model = modelLike;
         if (!this.hasModel(model)) {
@@ -155,7 +155,7 @@ export class Store {
                 }
 
                 // Assign the proxy model to the store
-                this.collection(collectionName)[id] = model;
+                this.collection(dataCollectionName)[id] = model;
 
                 // Build index
                 for (const key of Object.keys(model)) this._updateIndex(model, model[key], null, [key]);
@@ -165,7 +165,7 @@ export class Store {
             }
 
             // Notify components
-            if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
+            if (this.collection(dataCollectionName).__ob__) this.collection(dataCollectionName).__ob__.dep.notify();
             return model;
         } else return this.updateModel(model);
     }
@@ -181,8 +181,8 @@ export class Store {
      */
     updateModel(modelLike) {
         if (modelLike instanceof window._modelMap[modelLike.className].Model) throw new Error("You should not pass an instance here");
-        const dummyModel = this.getModelById(modelLike.collection, modelLike._dummyId);
-        let realModel = this.getModelById(modelLike.collection, modelLike._id);
+        const dummyModel = this.getModelById(modelLike.dataCollectionName, modelLike._dummyId);
+        let realModel = this.getModelById(modelLike.dataCollectionName, modelLike._id);
 
         let notify = true;
         if (dummyModel && modelLike._id) {
@@ -194,8 +194,8 @@ export class Store {
             notify = false;
         }
         if (!realModel) realModel = dummyModel;
-        const collectionName = realModel.collection;
-        if (notify && this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
+        const dataCollectionName = realModel.dataCollectionName;
+        if (notify && this.collection(dataCollectionName).__ob__) this.collection(dataCollectionName).__ob__.dep.notify();
         const changedKeys = realModel.getChangedKeys();
         mergeWith(resolveProxy(realModel), resolveProxy(modelLike), (targetValue, srcValue, key) => {
             this._updateIndex(realModel, srcValue, targetValue, [key]);
@@ -224,7 +224,7 @@ export class Store {
     }
 
     /**
-     * Removes a model from the collections by its collection and id.
+     * Removes a model from the collections by its dataCollectionName and id.
      * Also all components will be informed.
      *
      * @param {ModelLike} modelLike
@@ -232,9 +232,9 @@ export class Store {
      * @memberof Store
      */
     removeModel(modelLike) {
-        const collectionName = modelLike.collection;
+        const dataCollectionName = modelLike.dataCollectionName;
         const id = modelLike._id || modelLike._dummyId;
-        const model = this.getModelById(collectionName, id);
+        const model = this.getModelById(dataCollectionName, id);
         if (!model) return;
 
         for (const key in this.indexes) {
@@ -245,8 +245,8 @@ export class Store {
             }
         }
 
-        delete this.collection(collectionName)[id];
-        if (this.collection(collectionName).__ob__) this.collection(collectionName).__ob__.dep.notify();
+        delete this.collection(dataCollectionName)[id];
+        if (this.collection(dataCollectionName).__ob__) this.collection(dataCollectionName).__ob__.dep.notify();
     }
 
     _validate(model, path, value) {
@@ -285,7 +285,7 @@ export class Store {
 
         // Notify all vue components about a change
         const id = model._dummyId || model._id;
-        const vueObserver = this.getModelById(model.collection, id)?.__ob__;
+        const vueObserver = this.getModelById(model.dataCollectionName, id)?.__ob__;
         if (this.hasModel(model) && vueObserver) vueObserver.dep.notify();
 
         // Previous values are not wrapped into a proxy, so we need to store a
@@ -402,7 +402,7 @@ export class Store {
         if (newValue && !(newValue instanceof ClientModel) && oldValue && !(oldValue instanceof ClientModel)) return;
 
         // Build index collection if not available
-        const index = this.index(model.collection);
+        const index = this.index(model.dataCollectionName);
 
         // Determine object to get associations from
         let reference = newValue;

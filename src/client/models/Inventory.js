@@ -5,7 +5,7 @@ export default ClientModel.buildClientExport(class Inventory extends ClientModel
     static className = "Inventory"
 
     /** @type {import("mongoose").SchemaDefinition} */
-    static schema = {
+    static schemaDefinition = {
         name: {
             default: () => {
                 return window.$t("inventory");

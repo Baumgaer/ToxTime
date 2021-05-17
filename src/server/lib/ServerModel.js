@@ -7,7 +7,7 @@ export default class ServerModel extends BaseModel {
 
     static className = "ServerModel";
 
-    static collection = "serverModels";
+    static dataCollectionName = "serverModels";
 
     /**
      * Builds the essential export for server side with a RawClass, a Schema and the Model
@@ -26,8 +26,8 @@ export default class ServerModel extends BaseModel {
         let Model;
         const protoModel = Object.getPrototypeOf(Object.getPrototypeOf(RawClass));
         const protoClassName = protoModel.className;
-        const protoCollection = protoModel.collection;
-        if (mongooseBaseModels[protoClassName] && protoCollection === RawClass.collection) {
+        const protoCollection = protoModel.dataCollectionName;
+        if (mongooseBaseModels[protoClassName] && protoCollection === RawClass.dataCollectionName) {
             Model = mongooseBaseModels[protoClassName].discriminator(RawClass.className, schema);
         } else Model = mongoose.model(RawClass.className, schema);
         mongooseBaseModels[RawClass.className] = Model;

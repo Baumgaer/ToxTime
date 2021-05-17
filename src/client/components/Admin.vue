@@ -200,7 +200,7 @@ export default {
             return itemFilterAndSort(items, this.search);
         },
         somethingIsLoading() {
-            return (collection) => Object.values(ApiClient.store.collection(collection)).some((model) => model.loadingStatus !== 0);
+            return (dataCollectionName) => Object.values(ApiClient.store.collection(dataCollectionName)).some((model) => model.loadingStatus !== 0);
         }
     },
     mounted() {

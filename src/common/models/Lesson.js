@@ -13,10 +13,10 @@ export function LessonMixinClass(MixinClass) {
     class Lesson extends MixinClass {
 
         static className = "Lesson";
-        static collection = "lessons";
+        static dataCollectionName = "lessons";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `Lesson`
             },

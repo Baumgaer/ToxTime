@@ -13,10 +13,10 @@ export function RequisiteMixinClass(MixinClass) {
     class Requisite extends MixinClass {
 
         static className = "Requisite";
-        static collection = "requisites";
+        static dataCollectionName = "requisites";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `Requisite`
             },

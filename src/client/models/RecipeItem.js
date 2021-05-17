@@ -37,7 +37,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
     }
 
     set object(value) {
-        const that = ApiClient.store.getModelById(this.collection, this._dummyId || this._id) || this;
+        const that = ApiClient.store.getModelById(this.dataCollectionName, this._dummyId || this._id) || this;
 
         const setAllOtherToNull = (otherThan) => {
             if (otherThan !== "Knowledge") that.knowledge = null;

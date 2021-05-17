@@ -10,10 +10,10 @@ export function KnowledgeMixinClass(MixinClass) {
     class Knowledge extends MixinClass {
 
         static className = "Knowledge";
-        static collection = "knowledge";
+        static dataCollectionName = "knowledge";
 
         /** @type {import("mongoose").SchemaDefinition} */
-        static schema = {
+        static schemaDefinition = {
             name: {
                 default: `Knowledge`,
                 unique: true
