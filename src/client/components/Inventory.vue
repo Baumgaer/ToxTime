@@ -1,5 +1,5 @@
 <template>
-    <section class="inventory" @wheel="onScroll($event)">
+    <section class="inventory" :style="`display: ${model[field].length ? 'block' : 'none'}`" @wheel="onScroll($event)">
         <div v-for="(item, index) in model[field]"
              :key="index"
              class="slot"
@@ -9,6 +9,7 @@
         >
             <div class="amount" v-if="item.amount">{{ item.amount }}</div>
         </div>
+        <slot></slot>
     </section>
 </template>
 
@@ -94,13 +95,15 @@ export default {
             }
         },
         grab(item) {
-            this.add(item.object, "grabbing");
-            this.remove(item.object, "inventory");
+            let addTo = "grabbing";
+            if (this.field === "grabbing") addTo = "inventory";
+            this.add(item.object, addTo);
+            this.remove(item.object, this.field);
         },
         putBack() {
             for (const item of this.model.grabbing) {
                 for (let index = 0; index < item.amount; index++) {
-                    this.add(item.object, "inventory");
+                    this.add(item.object, this.field);
                 }
                 ApiClient.store.removeModel(item);
             }

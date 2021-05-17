@@ -1,5 +1,5 @@
 <template>
-    <div class="player" @contextmenu.prevent.stop="$refs.inventory.putBack" @mousemove.prevent.stop="adjustGrabbingPosition($event)">
+    <div class="player">
         <EditorHead :name="model.lesson.name" :model="model" :nameIsTranslated="true" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <section v-for="scene in model.lesson.scenes" :key="scene._id">
             <GraphicViewer
@@ -14,8 +14,8 @@
             <theater-icon />
         </Button>
         <section class="protocol"></section>
-        <Inventory :model="model" ref="inventory" />
         <Inventory :model="model" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing" />
+        <Inventory :model="model" ref="inventory" />
         <VueSimpleContextMenu
             :ref="'sceneSwitcherPopup'"
             :elementId="'sceneSwitcherPopup'"
@@ -115,10 +115,6 @@ export default {
             if (!item) return false;
             if (!item.opacity) return true;
             return this.itemIsInvisible(item.parent);
-        },
-        adjustGrabbingPosition(event) {
-            this.$refs.grabbing.$el.style.top = (event.pageY + 15) + "px";
-            this.$refs.grabbing.$el.style.left = (event.pageX + 15) + "px";
         },
         searchRecipe(model) {
             console.log("searching for Recipe with model:", model);
