@@ -20,9 +20,21 @@
 <script>
 import GameObject from "~client/models/GameObject";
 import PolyClickArea from "~client/lib/PolyClickArea";
-import { difference, capitalize } from "~common/utils";
+import { difference, capitalize, sortBy } from "~common/utils";
 
 import paper from "paper";
+
+/**
+ * @typedef {InstanceType<import("~client/models/ActionObject")["default"]["RawClass"]>} ActionObject
+ *
+ * @typedef {object} ActionObjectMapItem
+ * @property {ActionObject} actionObject
+ * @property {ActionObject} ownerGroupModel
+ * @property {Promise} promise
+ * @property {() => void} resolve
+ * @property {() => void} next
+ * @property {boolean} resolved
+ */
 
 export default {
     props: {
@@ -58,11 +70,21 @@ export default {
     computed: {
         actionObjectsMap() {
             if (!this.model || !this.isMounted) return [];
+            const that = this;
+
+            /** @type {ActionObjectMapItem[]} */
             const map = [];
 
+            /**
+             * @param {InstanceType<import("~client/models/SceneObject")["default"]["RawClass"]>} model
+             * @param {ActionObject} ownerGroupModel
+             * @returns {void}
+             */
             const getRecursive = (model, ownerGroupModel) => {
-                if (!model || !model.actionObjects) return;
-                for (const actionObject of model.actionObjects) {
+                let actionObjects = model?.actionObjects;
+                if (!actionObjects) return;
+                actionObjects = sortBy(actionObjects, ["layer"]);
+                for (const actionObject of actionObjects) {
                     if (actionObject.deleted) continue;
                     let promise = new Promise((resolve) => {
                         const prev = map[map.length - 1];
@@ -70,6 +92,7 @@ export default {
                     });
                     if (!map[map.length - 1]) promise = null;
                     map.push({ actionObject, ownerGroupModel, promise, next: function() {
+                        if (this === map[map.length - 1]) that.setupClickAreas({ sceneObject: that.model }, that.paper.project.activeLayer);
                         if (this.resolved) return;
                         this.resolved = true;
                         if (this.resolve) this.resolve();
@@ -130,12 +153,8 @@ export default {
         this.paper.project.activeLayer.applyMatrix = false;
         this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
-        window.paper = this.paper;
 
         this.paper.project.activeLayer.onClick = (event) => this.clickFunction(event, this.paper.project.activeLayer, null);
-
-        // Add clickAreas
-        this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
         if (this.adjustToBorder) this.paper.view.onResize = this.adjustViewToBorder.bind(this);
     },
     methods: {
@@ -154,6 +173,14 @@ export default {
             this.initialBackgroundLoadedResolver();
         },
 
+        /**
+         * When an image is loaded this method will be fired and create a new group
+         * when not already inserted and the initial background is loaded.
+         * It will also assign corresponding click areas and event listeners.
+         *
+         * @param {ActionObjectMapItem} actionObjectMap
+         * @param {number} index
+         */
         async onActionObjectBackgroundLoaded(actionObjectMap, index) {
             // If not the first one (which does not have an awaiting promise),
             // wait until the previous actionObject has fulfilled
@@ -193,6 +220,12 @@ export default {
             actionObjectMap.next();
         },
 
+        /**
+         * Scales the whole view up or down until it fits the view border
+         *
+         * @param {paper.ToolEvent} args
+         * @param {boolean} force
+         */
         async adjustViewToBorder(args, force) {
             if (!force && !this.adjustToBorder) return;
 
@@ -225,7 +258,7 @@ export default {
          *
          * @param {object} actionObjectMap
          * @param {number} indexOfBackground
-         * @returns {[InstanceType<import("paper")["Group"]>, InstanceType<import("paper")["Path"]>]}
+         * @returns {[paper.Group, paper.Path]}
          */
         buildActionObjectGroup(actionObjectMap, indexOfBackground) {
             const actionObject = actionObjectMap.actionObject;
@@ -264,6 +297,12 @@ export default {
             return [group, rotator, bounds];
         },
 
+        /**
+         * Creates a standardized background raster item for groups
+         *
+         * @param {HTMLElement} backgroundRef
+         * @returns {paper.Raster}
+         */
         buildRaster(backgroundRef) {
             const raster = new this.paper.Raster(backgroundRef);
 
@@ -298,8 +337,8 @@ export default {
          * Calculates the group which should hold the current action object.
          * It also waits until this group is rendered.
          *
-         * @param {object} theActionObjectMap
-         * @returns {Promise<InstanceType<import("paper")["Group"]>>}
+         * @param {ActionObjectMapItem} theActionObjectMap
+         * @returns {Promise<paper.Group>}
          */
         getOwnerGroup(theActionObjectMap) {
             return new Promise((resolve) => {
@@ -317,6 +356,14 @@ export default {
             });
         },
 
+        /**
+         * Adds click areas depending on the layer and already available items in paperJS container
+         *
+         * @param {InstanceType<import("~client/models/GameObject")["default"]["RawClass"]>} model
+         * @param {paper.Item} container
+         * @param {boolean} locked
+         * @returns {void}
+         */
         async setupClickAreas(model, container, locked = false) {
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
@@ -327,7 +374,12 @@ export default {
                 path.model = clickArea;
                 path.locked = locked;
                 path.onClick = (event) => this.clickFunction(event, path, clickArea);
-                container.insertChild(clickArea.layer + 1, path);
+
+                const itemAbove = container.children.find((item) => item.model && item.model.layer > clickArea.layer);
+                const indexOfItemAbove = container.children.indexOf(itemAbove);
+                if (indexOfItemAbove < 0) {
+                    container.addChild(path);
+                } else path.insertBelow(itemAbove);
             }
         }
     }
