@@ -159,8 +159,8 @@ export default class Select extends Tool {
     scaleGroup(event) {
         if (!this.currentDrag.name) return;
         const bounds = this.currentDrag.item.bounds;
-        const hitPoint = bounds[kebabCaseToCamelCase(this.currentDrag.name)];
-        const oppositePoint = this.currentDrag.item.bounds[kebabCaseToCamelCase(this.getOppositeBoundary(this.currentDrag.name))];
+        const hitPoint = bounds[this.getBoundaryName(this.currentDrag.name)];
+        const oppositePoint = this.currentDrag.item.bounds[this.getBoundaryName(this.currentDrag.name, true)];
 
         const oldHypLength = Math.abs(oppositePoint.subtract(hitPoint).length);
         const newHypLength = Math.abs(oppositePoint.subtract(event.point).length);
@@ -177,10 +177,12 @@ export default class Select extends Tool {
         return !(hitResult.item instanceof this.paper.Group) && hitResult.item.parent instanceof this.paper.Group && !(hitResult.item.parent instanceof this.paper.Layer);
     }
 
-    getOppositeBoundary(name) {
-        const mapping = { top: "bottom", bottom: "top", left: "right", right: "left" };
-        const directions = name.split("-");
-        return `${mapping[directions[0]]}-${mapping[directions[1]]}`;
+    getBoundaryName(name, opposite) {
+        const mapping = ["top-left", "top-right", "bottom-right", "bottom-left"];
+        const offset = Math.round(Math.ceil(this.currentDrag.item.rotation / 10) * 10 / 90) + (opposite ? 2 : 0);
+        const index = (mapping.indexOf(name) + offset) % 4;
+
+        return kebabCaseToCamelCase(mapping[index]);
     }
 
     remove() {
