@@ -1,5 +1,5 @@
 import onChange from "on-change";
-import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, set } from "~common/utils";
+import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, cloneDeep, set, isFunction } from "~common/utils";
 import ClientModel from "~client/lib/ClientModel";
 import { Schema, Document } from "mongoose";
 
@@ -317,13 +317,19 @@ export class Store {
             }
         }, this.observerOptions);
         const type = schemaObject[key].type;
-        if (isArray(type) && !type[0].ref) arrayOptions.isShallow = false;
+        let defaultValue = schemaObject[key].default;
+        if (isFunction(defaultValue)) defaultValue = defaultValue();
+        if ((isArray(type) || isArray(defaultValue) || isPlainObject(type) || isPlainObject(defaultValue)) && !type[0]?.ref) arrayOptions.isShallow = false;
 
         return onChange(array, (path, value, prev) => {
             let fullPath = [key];
             if (isPlainObject(array)) {
-                value = clone(resolveProxy(array));
-                prev = set(value, path, prev);
+                value = resolveProxy(array);
+                let tmpPrev;
+                if (!arrayOptions.isShallow) {
+                    tmpPrev = cloneDeep(resolveProxy(array));
+                } else tmpPrev = clone(resolveProxy(array));
+                prev = set(tmpPrev, path, prev);
             } else fullPath = [key].concat(path);
 
             this._updateIndex(model, value, prev, fullPath);
@@ -368,7 +374,9 @@ export class Store {
         // Watch changes of arrays
         for (const schemaObjectKey of schemaObjectKeys) {
             const type = schemaObject[schemaObjectKey].type;
-            if (!isArray(type) && !isPlainObject(type)) continue;
+            let defaultValue = schemaObject[schemaObjectKey].default;
+            if (isFunction(defaultValue)) defaultValue = defaultValue();
+            if (!isArray(type) && !isPlainObject(type) && !isArray(defaultValue) && !isPlainObject(defaultValue)) continue;
             model[schemaObjectKey] = this._createArrayChangeObserver(mainObserver, schemaObjectKey, model[schemaObjectKey]);
         }
 

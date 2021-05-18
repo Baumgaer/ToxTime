@@ -172,7 +172,6 @@ export default {
             let value = event.target.value;
             if (input.type !== "model") value = JSON.parse(input[valueField]);
             this.lesson.getOverwrite(model._id)[input.name] = value;
-            this.lesson.overwrites.__ob__.dep.notify();
         }
     }
 };

@@ -108,7 +108,10 @@ export default {
         },
         initializeInventory() {
             for (const itemSubObject of this.model.lesson.inventory) {
-                this.$refs.inventory.add(itemSubObject);
+                const amount = this.model.lesson.overwrites?.[itemSubObject._id]?.amount || 1;
+                for (let index = 0; index < amount; index++) {
+                    this.$refs.inventory.add(itemSubObject);
+                }
             }
         },
         itemIsInvisible(item) {
