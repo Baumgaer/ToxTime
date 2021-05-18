@@ -65,11 +65,26 @@ export class Store {
         return this.collections[name];
     }
 
+    /**
+     * Creates an index if not exists and returns it
+     *
+     * @param {string} name
+     * @returns {Map<ClientModel, Map<ClientModel, ClientModel>>}
+     * @memberof Store
+     */
     index(name) {
         if (!this.indexes[name]) this.indexes[name] = new Map();
         return this.indexes[name];
     }
 
+    /**
+     * Returns the references of an index as an array
+     *
+     * @param {string} index
+     * @param {ClientModel} item
+     * @returns {ClientModel[]}
+     * @memberof Store
+     */
     indexValuesOf(index, item) {
         return Array.from(this.index(index).get(item)?.values() || []);
     }
@@ -249,9 +264,32 @@ export class Store {
         if (this.collection(dataCollectionName).__ob__) this.collection(dataCollectionName).__ob__.dep.notify();
     }
 
-    _validate(model, path, value) {
+    /**
+     * Workaround for bug of on-change package see: https://github.com/sindresorhus/on-change/issues/79
+     *
+     * @param {Model} model
+     * @param {string[]} path
+     * @param {any} value
+     * @returns {boolean}
+     * @memberof Store
+     */
+    _valueEqualWithPropDesc(model, path, value) {
         const propDesc = Object.getOwnPropertyDescriptor(model, path[0]);
-        if (propDesc && ("value" in propDesc ? propDesc.value : propDesc.get?.()) !== value) return true;
+        if (path.length === 1 && propDesc && !isEqual(("value" in propDesc ? propDesc.value : propDesc.get?.()), value)) return false;
+        return true;
+    }
+
+    /**
+     * Checks if the certain value for the given path on the model is valid
+     *
+     * @param {Model} model
+     * @param {string[]} path
+     * @param {any} value
+     * @returns {boolean}
+     * @memberof Store
+     */
+    _validate(model, path, value) {
+        if (!this._valueEqualWithPropDesc(model, path, value)) return true;
 
         const schema = model.getSchemaObject();
         if (!(path[0] in schema)) return true;
@@ -278,9 +316,7 @@ export class Store {
      * @memberof Store
      */
     _backupChanges(model, path, value, prev, name) {
-        // Workaround for bug of on-change package see: https://github.com/sindresorhus/on-change/issues/79
-        const propDesc = Object.getOwnPropertyDescriptor(model, path[0]);
-        if (propDesc && !isEqual(("value" in propDesc ? propDesc.value : propDesc.get?.()), value)) return;
+        if (!this._valueEqualWithPropDesc(model, path, value)) return;
         if ((value === undefined && prev === undefined && name === undefined) || !model.staging) return;
 
         // Notify all vue components about a change
