@@ -23,12 +23,16 @@ export function GameSessionMixinClass(MixinClass) {
                 type: Schema.Types.ObjectId,
                 ref: "Lesson",
                 autopopulate: true,
-                reverseDependant: true
+                reverseDependant: true,
+                ignoreOnIteration: true,
+                ignoreOnValidation: true
             },
             currentScene: {
                 type: Schema.Types.ObjectId,
                 ref: "Scene",
-                autopopulate: true
+                autopopulate: true,
+                ignoreOnIteration: true,
+                ignoreOnValidation: true
             },
             grabbing: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Item", autopopulate: true }],
