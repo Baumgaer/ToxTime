@@ -76,6 +76,9 @@ export default class ApiRoute extends DefaultRoute {
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(myRequestBody, { creator: request.user._id });
             delete myRequestBody._id;
+            if (myRequestBody.name) {
+                myRequestBody.name = await this.findGenericUniqueName(this.claimedExport.RawClass.className, myRequestBody.name);
+            }
             const model = await this.claimedExport.Model.create(myRequestBody);
             const modelObject = merge(responseBody, model.toObject());
             return modelObject;
@@ -206,6 +209,9 @@ export default class ApiRoute extends DefaultRoute {
             if (myRequestBody instanceof Error) return myRequestBody;
             Object.assign(myRequestBody, { lastModifiedDate: new Date() });
             delete myRequestBody._id;
+            if (myRequestBody.name) {
+                myRequestBody.name = await this.findGenericUniqueName(this.claimedExport.RawClass.className, myRequestBody.name);
+            }
 
             let model = await this.claimedExport.Model.findByIdAndUpdate(id, myRequestBody).exec();
             if (!model) return new httpErrors.NotFound();
@@ -294,6 +300,25 @@ export default class ApiRoute extends DefaultRoute {
             if (await this.somehowStickyReferenced(dependantModel)) return true;
         }
         return false;
+    }
+
+    async findGenericUniqueName(className, baseName) {
+        const modelExport = global._modelMap[className];
+        if (!modelExport) return baseName;
+
+        const schemaObject = modelExport.RawClass.getSchemaObject();
+        if (!("name" in schemaObject) || !schemaObject.name.unique) return baseName;
+
+        let count = 0;
+        let name = baseName;
+        let result;
+        do {
+            if (count) name = `${baseName} (${count})`;
+            result = await modelExport.Model.countDocuments({ name }).exec();
+            count++;
+        } while (result);
+
+        return name;
     }
 
     /**
@@ -451,18 +476,20 @@ export default class ApiRoute extends DefaultRoute {
             }
         };
 
-        const processDependant = (referencePath) => {
+        const processDependant = async (referencePath) => {
             const references = get(plainObj, referencePath);
             if (isArray(references)) {
                 for (let i = 0; i < references.length; i++) {
                     const reference = references[i];
                     delete reference._id;
                     reference._dummyId = uuid();
+                    reference.name = await this.findGenericUniqueName(reference.className, reference.name);
                     processReferencesOfDirectReference(referencePath, [i]);
                 }
             } else if (isPlainObject(references)) {
                 delete references._id;
                 references._dummyId = uuid();
+                references.name = await this.findGenericUniqueName(references.className, references.name);
                 processReferencesOfDirectReference(referencePath, []);
             }
         };
@@ -473,11 +500,12 @@ export default class ApiRoute extends DefaultRoute {
             for (const referencePath of referencePaths) {
                 const referenceDeclaration = get(result.getSchemaObject(), referencePath);
                 if (referenceDeclaration.sticky) processSticky(referencePath);
-                if (referenceDeclaration.dependant) processDependant(referencePath);
+                if (referenceDeclaration.dependant) await processDependant(referencePath);
             }
         }
 
         merge(plainObj, request.body || {});
+        plainObj.name = await this.findGenericUniqueName(plainObj.className, plainObj.name);
         request.body = plainObj;
         request.params.id = null;
         return this.create(request);

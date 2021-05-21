@@ -135,6 +135,7 @@ export default class BaseModel {
      * @memberof BaseModel
      */
     static getReferencingModelExports() {
+        /** @type {ModelExport[]} */
         const referencingModelExports = [];
         for (const className in global._modelMap) {
             if (global._modelMap[className].Model) {

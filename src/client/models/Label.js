@@ -21,7 +21,4 @@ export default ClientModel.buildClientExport(class Label extends CommonClientLab
         };
     }
 
-    @CommonClientLabel.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
-    copy() { }
-
 });
