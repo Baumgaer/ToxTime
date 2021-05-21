@@ -24,4 +24,12 @@ export default ClientModel.buildClientExport(class Knowledge extends CommonClien
     @CommonClientKnowledge.action("copy", { type: "component", name: "content-copy-icon" }, () => false)
     copy() { }
 
+    @CommonClientKnowledge.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
+    async edit() {
+        const shouldProceed = await super.edit();
+        if (!shouldProceed) return;
+        window.activeUser.editingModel = this;
+        window.activeUser.activeEditor = "addKnowledge";
+    }
+
 });
