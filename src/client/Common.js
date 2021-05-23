@@ -71,6 +71,8 @@ import BagPersonalIcon from "vue-material-design-icons/BagPersonal";
 import SquareOutlineIcon from "vue-material-design-icons/SquareOutline";
 import CalculatorIcon from "vue-material-design-icons/Calculator";
 import HeadLightbulbIcon from "vue-material-design-icons/HeadLightbulb";
+import CollapseAllIcon from "vue-material-design-icons/CollapseAll";
+import ExpandAllIcon from "vue-material-design-icons/ExpandAll";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -119,3 +121,5 @@ Vue.component('bag-personal-icon', BagPersonalIcon);
 Vue.component('square-outline-icon', SquareOutlineIcon);
 Vue.component('calculator-icon', CalculatorIcon);
 Vue.component('head-lightbulb-icon', HeadLightbulbIcon);
+Vue.component('collapse-all-icon', CollapseAllIcon);
+Vue.component('expand-all-icon', ExpandAllIcon);

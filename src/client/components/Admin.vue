@@ -98,6 +98,9 @@
                         <arrow-collapse-right-icon v-if="this.itemsCollapsed" />
                         <arrow-collapse-left-icon v-else />
                     </Button>
+                    <Button ref="collapseAll" class="collapseAllButton" v-show="!itemsCollapsed" name="collapseAll" :showLabel="false" v-on:click="onCollapseAllButtonClick()" >
+                        <collapse-all-icon />
+                    </Button>
                     <Button class="addButton" v-show="!itemsCollapsed && category !== 'trash'" name="addItem" :showLabel="false" v-on:click="onAddItemButtonClick()">
                         <plus-icon />
                     </Button>
@@ -222,6 +225,24 @@ export default {
 
         onCollapseButtonClick() {
             this.itemsCollapsed = Boolean(this.$refs.items.clientWidth > 100);
+        },
+
+        onCollapseAllButtonClick() {
+
+            const collapseChildren = (children) => {
+                for (const child of children) {
+                    if (!child.isItem) continue;
+                    if (child.hasSubObjects) collapseChildren(child.$children);
+                    child.opened = false;
+                }
+            };
+
+            for (const item of this.items) {
+                const component = this.$refs[item._id][0];
+                const allChildrenCollapsed = component.$children.every((child) => !child.opened);
+                if (component.hasSubObjects) collapseChildren(component.$children);
+                if (allChildrenCollapsed) component.opened = false;
+            }
         },
 
         async onAddItemButtonClick() {
