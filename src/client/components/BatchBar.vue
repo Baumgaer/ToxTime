@@ -21,6 +21,7 @@ import ApiClient from "~client/lib/ApiClient";
 import { intersectionBy } from "~common/utils";
 
 import Button from "~client/components/Button";
+import sweetAlert from "sweetalert";
 
 export default {
     components: {
@@ -101,8 +102,29 @@ export default {
             }
         },
 
-        showConfirmation(action) {
-            this[action]();
+        async showConfirmation(action) {
+            const answer = await sweetAlert({
+                title: this.$t("confirmTitle", { type: this.$t(action.name) }),
+                text: this.$t("confirmQuestion", {
+                    name: this.$t("xElements", { count: this.checkedItems.length }),
+                    type: this.$t(action.name).toLowerCase()
+                }),
+                className: "alert",
+                buttons: {
+                    yes: {
+                        text: this.$t("true"),
+                        className: "confirm",
+                        value: true
+                    },
+                    no: {
+                        text: this.$t("false"),
+                        className: "reject",
+                        value: false
+                    }
+                }
+            });
+            if (!answer) return;
+            action.func();
         },
 
         getIdentities() {

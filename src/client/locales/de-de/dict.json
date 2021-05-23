@@ -140,5 +140,7 @@
     "knowledge": "Wissen",
     "knowledgeDescriptionDe": "Deutsche Wissenbeschreibung",
     "knowledgeDescriptionEn": "Englische Wissenbeschreibung",
-    "addKnowledge": "Wissen hinzufügen"
+    "addKnowledge": "Wissen hinzufügen",
+    "collapseAll": "Alles einklappen",
+    "xElements": "{count} Elemente"
 }

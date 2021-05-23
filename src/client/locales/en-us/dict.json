@@ -140,5 +140,7 @@
     "knowledge": "Knowledge",
     "knowledgeDescriptionDe": "German knowledge description",
     "knowledgeDescriptionEn": "English knowledge description",
-    "addKnowledge": "Add knowledge"
+    "addKnowledge": "Add knowledge",
+    "collapseAll": "Collapse all",
+    "xElements": "{count} elements"
 }
