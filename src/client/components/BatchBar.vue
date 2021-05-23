@@ -71,15 +71,15 @@ export default {
         },
 
         lock() {
-
+            ApiClient.post("/batch/toggleLock", { identities: this.getIdentities() });
         },
 
         unlock() {
-
+            ApiClient.post("/batch/toggleLock", { identities: this.getIdentities() });
         },
 
         resentConfirm() {
-
+            ApiClient.post("/batch/resentConfirm", { identities: this.getIdentities() });
         },
 
         copy() {
@@ -87,7 +87,7 @@ export default {
         },
 
         delete() {
-
+            ApiClient.post("/batch/delete", { identities: this.getIdentities() });
         },
 
         download() {
