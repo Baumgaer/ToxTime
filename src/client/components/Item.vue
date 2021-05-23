@@ -1,6 +1,18 @@
 <template>
     <section
-        :class="`item ${activeClass}${model.isSelected ? ' isSelected' : ''}${hasSubObjects && showSubObjects ? ' withChildren' : ''}${model.deleted ? ' deleted' : ''}`"
+        :class="`item ${
+            activeClass
+        }${
+            model.isSelected ? ' isSelected' : ''
+        }${
+            hasSubObjects && showSubObjects ? ' withChildren' : ''
+        }${
+            model.deleted ? ' deleted' : ''
+        }${
+            showCheckbox ? ' withCheckBox' : ''
+        }${
+            checked ? ' checked' : ''
+        }`"
         draggable
         @dragstart="onDragStart($event)"
         @dragend="onDragEnd($event)"
@@ -12,6 +24,7 @@
         <menu-down-icon v-if="opened && hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <menu-right-icon v-else-if="hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <Avatar :model="model" ratio="1:1" :fitImage="true" :overlayIcons="overlayIcons" />
+        <input v-if="showCheckbox" type="checkbox" class="checkbox" v-model="checked" />
         <div class="info">
             <div class="name">
                 <input
@@ -100,12 +113,14 @@ export default {
         nameEditDBField: String,
         overlayIcons: String,
         compactMode: Boolean,
-        preventTooltipHiding: Boolean
+        preventTooltipHiding: Boolean,
+        showCheckbox: Boolean
     },
     data() {
         this.isItem = true;
         return {
             opened: true,
+            checked: false,
             tooltipCreated: false
         };
     },

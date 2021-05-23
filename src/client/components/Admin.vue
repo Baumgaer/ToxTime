@@ -114,6 +114,7 @@
                                     :style="`${'isConfirmed' in item && !item.isConfirmed ? 'opacity: 0.5' : ''}`"
                                     :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
                                     :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
+                                    :showCheckbox="true"
                                     :ref="item._dummyId"
                     />
                 </div>

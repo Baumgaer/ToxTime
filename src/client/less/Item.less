@@ -104,6 +104,30 @@
         }
     }
 
+    &.checked {
+        background-color: @infoColor;
+
+        &:hover {
+            background-color: @primaryColor;
+        }
+    }
+
+    &.withCheckBox:hover, &.checked {
+        .avatar {
+            display: none;
+        }
+
+        .checkbox {
+            display: block;
+        }
+
+        .subObjects {
+            .avatar {
+                display: block;
+            }
+        }
+    }
+
     .expandCollapseButton {
         display: none;
         grid-area: collapse;
@@ -131,6 +155,21 @@
 
     .avatar {
         grid-area: avatar;
+    }
+
+    .checkbox {
+        grid-area: avatar;
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+
     }
 
     .info {
