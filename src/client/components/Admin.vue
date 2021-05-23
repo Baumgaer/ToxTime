@@ -106,8 +106,9 @@
             <section class="search">
                 <input v-show="!itemsCollapsed" v-model="search" type="text" name="search" autocomplete="disable" :placeholder="$t('search')" />
             </section>
+            <BatchBar :items="items" />
             <section ref="itemList" class="list" v-show="!itemsCollapsed">
-                <div v-if="items.length">
+                <div v-if="items.length" ref="itemsList">
                     <item-component v-for="item in items"
                                     :key="item._dummyId || item._id"
                                     :model="item"
@@ -115,10 +116,10 @@
                                     :overlayIcons="`${item.isAdmin ? 'crown-icon' : ''}`"
                                     :nameEditDBField="['User', 'SystemUser'].includes(item.className) ? 'email' : 'name'"
                                     :showCheckbox="true"
-                                    :ref="item._dummyId"
+                                    :ref="item._dummyId || item._id"
                     />
                 </div>
-                <div v-else class="empty">{{ $t('noContent') }}</div>
+                <div v-else class="empty" ref="itemsList">{{ $t('noContent') }}</div>
                 <Button v-show="category !== 'trash'" class="addButton" name="addItem" v-on:click="onAddItemButtonClick()">
                     <plus-icon />
                 </Button>
@@ -155,6 +156,7 @@ import Player from "~client/components/Player";
 import RecipeEditor from "~client/components/RecipeEditor";
 import Usage from "~client/components/Usage";
 import KnowledgeEditor from "~client/components/KnowledgeEditor";
+import BatchBar from "~client/components/BatchBar";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
@@ -177,7 +179,8 @@ export default {
         Player,
         RecipeEditor,
         Usage,
-        KnowledgeEditor
+        KnowledgeEditor,
+        BatchBar
     },
     data() {
         return {

@@ -1,0 +1,29 @@
+@import (less) "variables.less";
+
+.batchBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .checkbox {
+        width: 18px;
+        height: 18px;
+        margin: 15px;
+        cursor: pointer;
+    }
+
+    .actions {
+        white-space: nowrap;
+
+        .action {
+            --button-height: 25px;
+            --hover-color: none;
+            margin-left: 3px;
+            float: right;
+
+            &:hover {
+                color: var(--action-hover-color, @black);
+            }
+        }
+    }
+}
