@@ -1,8 +1,7 @@
 import ApiRoute from "~server/lib/ApiRoute";
 import Lesson from "~server/models/Lesson";
-import { isMongoId, merge } from "~common/utils";
+import { isMongoId } from "~common/utils";
 import httpErrors from "http-errors";
-import { v4 as uuid } from "uuid";
 import CustomError from "~common/lib/CustomError";
 import { copyFileSync } from "graceful-fs";
 import { resolve } from "path";

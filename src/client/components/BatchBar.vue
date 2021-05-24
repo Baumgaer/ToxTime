@@ -84,7 +84,7 @@ export default {
         },
 
         copy() {
-            console.log(this.checkedItems);
+            ApiClient.post("/batch/copy", { identities: this.getIdentities() });
         },
 
         delete() {
