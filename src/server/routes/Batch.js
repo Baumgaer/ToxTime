@@ -13,10 +13,10 @@ export default class Batch extends DefaultRoute {
      * @returns {string}
      * @memberof Batch
      */
-    @Batch.post("/:action")
+    @Batch.all("/:action")
     async action(request) {
         const myRequestBody = cloneDeep(request.body);
-        const allowedActions = ["logout", "toggleLock", "resentConfirm", "delete", "copy", "download"];
+        const allowedActions = ["logout", "toggleLock", "resentConfirm", "delete", "copy", "download", "restore"];
         const modelApiMapping = this.webServer.modelApiMapping;
         const isAllowed = allowedActions.includes(request.params.action);
         const hasValidBody = myRequestBody.identities && isArray(myRequestBody.identities);
