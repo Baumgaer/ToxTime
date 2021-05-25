@@ -5,7 +5,7 @@ const CommonClientGameSession = GameSessionMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameSession extends CommonClientGameSession {
 
     getName() {
-        return this.lesson.getName();
+        return this.lesson?.getName();
     }
 
     toRequestObject(modelFilter) {

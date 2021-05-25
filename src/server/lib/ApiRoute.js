@@ -353,9 +353,10 @@ export default class ApiRoute extends DefaultRoute {
 
             // model is not sticky used by another model. So unmark pseudo
             // deletion and delete it finally
-            const [stickyReferencedDeletedModels, dependantReferencingModels] = await Promise.all([
+            const [stickyReferencedDeletedModels, dependantReferencingModels, reverseDependantReferencingModels] = await Promise.all([
                 model.getStickyReferencedDeletedModels(),
-                model.getDependantReferencingModels()
+                model.getDependantReferencingModels(),
+                model.getReverseDependantReferencingModels()
             ]);
 
             await this.markDependentsOfModelWith(model, (dependant) => { dependant.deleted = false; dependant.wasted = true; });
@@ -393,6 +394,10 @@ export default class ApiRoute extends DefaultRoute {
                     }
                 }
             }
+
+            // Delete all dependant referencing models which are already marked as deleted
+            // and put them into the response to ensure that the client will also update its
+            // database and index
             for (const dependantReferencingModel of dependantReferencingModels) {
                 if (!dependantReferencingModel.deleted) continue;
                 request.params.id = dependantReferencingModel._id.toString();
@@ -403,6 +408,18 @@ export default class ApiRoute extends DefaultRoute {
                     } else request.requestedModel = [request.requestedModel, result.toObject()];
                 }
             }
+
+            // Delete all reverse dependant referencing models and put them into
+            // the response to ensure that the client will also update its
+            // database and index
+            for (const reverseDependantReferencingModel of reverseDependantReferencingModels) {
+                request.params.id = reverseDependantReferencingModel._id.toString();
+                const result = await this.webServer.modelApiMapping[reverseDependantReferencingModel._getClassName()].delete(request);
+                if (isArray(request.requestedModel)) {
+                    request.requestedModel.push(result.toObject());
+                } else request.requestedModel = [request.requestedModel, result.toObject()];
+            }
+
             if (returnRequested) return request.requestedModel;
             return model;
         } catch (error) {

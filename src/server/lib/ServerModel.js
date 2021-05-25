@@ -35,6 +35,21 @@ export default class ServerModel extends BaseModel {
         return { RawClass, Schema: schema, Model, isServerModel: true };
     }
 
+    async getReverseDependantReferencingModels() {
+        const referencingModels = [];
+        const referencingModelExports = this.getReferencingModelExports();
+        for (const referencingModelExport of referencingModelExports) {
+            const referencePaths = referencingModelExport.RawClass.getReferencePathsOf(this._getClassName());
+            for (const referencePath of referencePaths) {
+                const pathValue = get(referencingModelExport.Schema.obj, referencePath);
+                if (!pathValue.reverseDependant) continue;
+                referencingModels.push(referencingModelExport.Model.find({ [referencePath.join(".")]: this }).exec());
+            }
+        }
+
+        return flatten((await Promise.all(referencingModels)));
+    }
+
     async getStickyReferencingModels() {
         const referencingModels = [];
         const referencingModelExports = this.getReferencingModelExports();

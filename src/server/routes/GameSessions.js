@@ -13,9 +13,12 @@ export default class GameSessions extends ApiRoute {
 
         // In case of the user is edited
         let gameSessionOwner = request.object;
-
         // In case of the game session is edited
         if (request.object instanceof GameSession.Model) gameSessionOwner = request.object.creator;
+        // In case of another http method than patch is used
+        if (!(gameSessionOwner instanceof User.Model)) {
+            gameSessionOwner = await User.Model.findOne({ $or: [{ currentGameSessions: id }, { solvedGameSessions: id }] }).exec();
+        }
 
         if (request.user._id?.toString() !== gameSessionOwner._id?.toString() && !request.user.isAdmin) return false;
         if (!gameSessionOwner.populated("currentGameSessions") && !gameSessionOwner.populated("solvedGameSessions")) {
