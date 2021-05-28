@@ -231,7 +231,7 @@ const staticConfig = {
 
 const configString = fs.readFileSync(path.resolve(arp.path, "config.yaml")).toString();
 const parsedConfig = yaml.parse(configString);
-const config = Object.assign(defaults, parsedConfig, staticConfig);
+const config = Object.assign({}, defaults, parsedConfig, staticConfig);
 
 let shouldWatch = false;
 
@@ -246,6 +246,7 @@ for (const [index, argv] of process.argv.entries()) {
 console.log(shouldWatch ? "Watching for changes" : "");
 
 module.exports = {
+    defaults,
     apps: [{
         name: config.APP_NAME || "PACMaker",
         script: path.resolve(arp.path, "server.js"),
