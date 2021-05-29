@@ -38,4 +38,10 @@ export default ClientModel.buildClientExport(class Item extends CommonClientItem
         }
     }
 
+    getResources() {
+        const obj = this.object;
+        if (!obj) return [];
+        return [obj, ...obj.getResources()];
+    }
+
 });

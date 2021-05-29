@@ -64,7 +64,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         return uniq(resources);
     }
 
-    getSpecificObjectFor(model, resources = this.getResources()) {
+    getSpecificObjectsFor(model, resources = this.getResources()) {
         if (model instanceof SceneObject.RawClass) {
             return resources.filter((resource) => {
                 return resource instanceof ActionObject.RawClass && resource.sceneObject === model;
@@ -81,7 +81,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
     }
 
     hasValidAnchor(model, resources) {
-        return this.getSpecificObjectFor(model, resources).length > 0;
+        return this.getSpecificObjectsFor(model, resources).length > 0;
     }
 
     findRecipes(resources = this.getResources()) {
@@ -95,7 +95,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         };
 
         for (const resource of resources) {
-            if (!ApiClient.store.indexes.recipeItems?.has(resource)) continue;
+            if (!ApiClient.store.index("recipeItems").has(resource)) continue;
             const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
             for (const recipeItem of recipeItems) {
                 if (!ApiClient.store.index("recipes").has(recipeItem)) continue;

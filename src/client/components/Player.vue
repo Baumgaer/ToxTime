@@ -4,7 +4,7 @@
         <section v-for="scene in model.lesson.scenes" :key="scene._id">
             <GraphicViewer
                 :model="scene"
-                :showClickAreas="false"
+                :showClickAreas="showClickAreas"
                 :adjustToBorder="true"
                 :clickFunction="onSceneClick"
                 v-if="model.currentScene === scene"
@@ -48,6 +48,10 @@ export default {
         model: {
             type: GameSession.RawClass,
             required: true
+        },
+        showClickAreas: {
+            type: Boolean,
+            default: false
         },
         preventAutosave: {
             type: Boolean,
@@ -98,10 +102,11 @@ export default {
             // there is a none model including element which is inside model
             // including element
             if (!model || this.itemIsInvisible(item)) return;
-            const recipe = this.searchRecipe(model);
+            const recipes = this.searchRecipe(model);
 
-            if (recipe) {
-                recipe.exec();
+            if (recipes.length) {
+                console.log(recipes);
+                // recipe.exec();
                 // Stop propagation if a recipe was found which means return false
                 return false;
             }
@@ -120,7 +125,8 @@ export default {
             return this.itemIsInvisible(item.parent);
         },
         searchRecipe(model) {
-            console.log("searching for Recipe with model:", model);
+            const resources = this.model.getResources([model]);
+            return this.model.findRecipes(resources);
         },
         addPunishPoint() {
             console.log("PUNISHED");

@@ -171,6 +171,7 @@ export default {
             this.paper.view.update();
             this.adjustViewToBorder();
             this.initialBackgroundLoadedResolver();
+            if (!this.actionObjectsMap.length) this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
         },
 
         /**

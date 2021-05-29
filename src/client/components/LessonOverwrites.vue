@@ -154,7 +154,7 @@ export default {
         },
 
         getSpecificObject(model) {
-            const specificObjects = this.lesson.getSpecificObjectFor(model);
+            const specificObjects = this.lesson.getSpecificObjectsFor(model);
             specificObjects.push(model);
             return specificObjects;
         },

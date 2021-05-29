@@ -45,7 +45,7 @@ export function GameSessionMixinClass(MixinClass) {
                 dependant: true
             },
             knowledgeBase: {
-                type: [{ type: String }],
+                type: [{ type: Schema.Types.ObjectId, ref: "Knowledge", autopopulate: true }],
                 required: true,
                 default: []
             },

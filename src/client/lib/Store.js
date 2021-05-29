@@ -358,6 +358,7 @@ export class Store {
         if ((isArray(type) || isArray(defaultValue) || isPlainObject(type) || isPlainObject(defaultValue)) && !type[0]?.ref) arrayOptions.isShallow = false;
 
         return onChange(array, (path, value, prev) => {
+            if (!this._valueEqualWithPropDesc(array, path, value)) return;
             let fullPath = [key];
             if (isPlainObject(array)) {
                 value = resolveProxy(array);
@@ -400,10 +401,11 @@ export class Store {
 
         // Install main observer first to be able to get previous values of arrays when they are changed
         const mainObserver = onChange(model, (path, value, prev, name) => {
+            if (!this._valueEqualWithPropDesc(model, path, value)) return;
             if ((isArray(value) || isPlainObject(value)) && !isProxy(value)) {
                 value = this._createArrayChangeObserver(model, path[0], value);
             }
-            this._updateIndex(model, value, prev, path);
+            this._updateIndex(mainObserver, value, prev, path);
             this._backupChanges(model, path, value, prev, name);
         }, options);
 
