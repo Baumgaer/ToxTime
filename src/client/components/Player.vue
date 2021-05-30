@@ -32,6 +32,7 @@ import GraphicViewer from "~client/components/GraphicViewer";
 import EditorHead from "~client/components/EditorHead";
 import Button from "~client/components/Button";
 import GameSession from "~client/models/GameSession";
+import Label from "~client/models/Label";
 
 import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
 import VueSimpleContextMenu from 'vue-simple-context-menu';
@@ -71,6 +72,7 @@ export default {
     mounted() {
         if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
         const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
+        this.initOverwriteWatchers();
         if (!inventoryIsFilled) this.initializeInventory();
         if (!this.preventAutosave) this.onSaveButtonClick();
     },
@@ -145,10 +147,24 @@ export default {
 
             return false;
         },
-        itemIsInItem(item, container) {
-            if (!item.parent) return false;
-            if (item.parent === container) return true;
-            return this.itemIsInItem(item.parent, container);
+        onAmountChange(model, value) {
+            console.log("amountChange", model.className, value);
+        },
+        onActivatedChange(model, value) {
+            console.log("activationChange", model.className, value);
+        },
+        initOverwriteWatchers() {
+            for (const scene of this.model.lesson.scenes) {
+                const resources = scene.getResources().filter((resource) => !(resource instanceof Label.RawClass));
+                for (const resource of resources) {
+                    const objPath = `model.overwrites.${resource._id}`;
+                    const overwrite = this.model.getOverwrite(resource._id);
+                    overwrite.activated = overwrite.activated ?? null;
+                    overwrite.amount = overwrite.activated ?? null;
+                    this.$watch(`${objPath}.activated`, (value) => this.onActivatedChange(resource, value));
+                    this.$watch(`${objPath}.amount`, (value) => this.onAmountChange(resource, value));
+                }
+            }
         },
         getItemBoundary(item) {
             return item.children.filter((child) => child.name === "boundary")[0];
