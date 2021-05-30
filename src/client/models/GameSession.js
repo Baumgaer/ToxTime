@@ -33,13 +33,16 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         const recipes = [];
 
         const isValid = (recipe) => {
-            const allIngredientsAvailable = recipe.input.every((recipeItem) => resources.includes(recipeItem.object));
             // const isIngredientsExact = recipe.transitionSettings.ingredientsExact;
             // const isQuantityExact = recipe.transitionSettings.quantityExact;
+            const allIngredientsAvailable = recipe.input.every((recipeItem) => {
+                const overwrite = this.lesson.getOverwrite(recipeItem._id);
+                return resources.includes(overwrite.object || recipeItem.object);
+            });
 
             if (!allIngredientsAvailable) return false;
 
-            const allInRightLocation = recipe.input.every((recipeItem) => {
+            const allLocationAndQuantityCorrect = recipe.input.every((recipeItem) => {
                 let recipeResources = [];
                 if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources();
                 if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources()));
@@ -49,7 +52,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 return specificObjects.length > 0;
             });
 
-            if (!allInRightLocation) return false;
+            if (!allLocationAndQuantityCorrect) return false;
             return true;
         };
 

@@ -34,7 +34,7 @@ import GameSession from "~client/models/GameSession";
 import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
 import VueSimpleContextMenu from 'vue-simple-context-menu';
 import Inventory from "~client/components/Inventory";
-import { Layer } from "paper";
+import { Layer, Group } from "paper";
 
 export default {
     components: {
@@ -62,7 +62,8 @@ export default {
         return {
             scenes: this.model.lesson.scenes.map((scene) => {
                 return { name: scene.getName(), scene };
-            })
+            }),
+            markedItem: null
         };
     },
     mounted() {
@@ -91,8 +92,14 @@ export default {
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onSceneClick(event, item, model) {
+            if (this.markedItem && this.markedItem !== item) {
+                this.unmarkItem(this.markedItem);
+                this.markedItem = null;
+                if (item instanceof Layer) return false;
+            }
+
             // Stop propagating when it was not a left click
-            if (event.event.button > 0) return false;
+            if (event && event.event.button > 0) return false;
 
             // Event bubbled to the whole scene, so the player clicked into the void
             // or tried to make combos which are maybe nonsense
@@ -102,6 +109,15 @@ export default {
             // there is a none model including element which is inside model
             // including element
             if (!model || this.itemIsInvisible(item)) return;
+
+            if (!this.markedItem) {
+                this.markItem(item);
+                this.markedItem = item;
+                return false;
+            }
+
+            item.strokeColor = "";
+            item.strokeWidth = 0;
             const recipes = this.searchRecipe(model);
 
             if (recipes.length) {
@@ -110,6 +126,23 @@ export default {
                 // Stop propagation if a recipe was found which means return false
                 return false;
             }
+        },
+        getItemBoundary(item) {
+            return item.children.filter((child) => child.name === "boundary")[0];
+        },
+        unmarkItem(item) {
+            let mark = item;
+            if (item instanceof Group) mark = this.getItemBoundary(item);
+            mark.strokeColor = null;
+            mark.strokeWidth = 0;
+            mark.opacity = 0.01;
+        },
+        markItem(item) {
+            let mark = item;
+            if (item instanceof Group) mark = this.getItemBoundary(item);
+            mark.strokeColor = "red";
+            mark.strokeWidth = 3;
+            mark.opacity = 1;
         },
         initializeInventory() {
             for (const itemSubObject of this.model.lesson.inventory) {
@@ -122,6 +155,7 @@ export default {
         itemIsInvisible(item) {
             if (!item) return false;
             if (!item.opacity) return true;
+            if (!item.visible) return true;
             return this.itemIsInvisible(item.parent);
         },
         searchRecipe(model) {
