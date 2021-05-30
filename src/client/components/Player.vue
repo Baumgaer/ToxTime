@@ -92,20 +92,17 @@ export default {
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onSceneClick(event, item, model) {
-            if (this.markedItem && this.markedItem !== item && !this.itemIsInItem(this.markedItem, item)) {
-                this.unmarkItem(this.markedItem);
-                this.markedItem = null;
-                if (item instanceof Layer) return false;
-            }
-
             // Stop propagating when it was not a left click
             if (event && event.event.button > 0) return false;
 
             // Event bubbled to the whole scene, so the player clicked into the void
             // or tried to make combos which are maybe nonsense
             if (item instanceof Layer) {
-                this.unmarkItem(this.markedItem);
-                this.markedItem = null;
+                if (this.markedItem) {
+                    this.unmarkItem(this.markedItem);
+                    this.markedItem = null;
+                    return false;
+                }
                 return this.addPunishPoint();
             }
 
@@ -114,19 +111,27 @@ export default {
             // including element
             if (!model || this.itemIsInvisible(item)) return;
 
+            if (this.markedItem && this.markedItem !== item) {
+                this.unmarkItem(this.markedItem);
+                this.markedItem = null;
+            }
+
             if (!this.markedItem) {
                 this.markItem(item);
                 this.markedItem = item;
                 return false;
             }
-            const recipes = this.searchRecipe(model);
 
+            this.unmarkItem(item);
+            this.markedItem = null;
+
+            const recipes = this.searchRecipe(model);
             if (recipes.length) {
                 console.log(recipes);
                 // recipe.exec();
-                // Stop propagation if a recipe was found which means return false
-                return false;
-            }
+            } else this.addPunishPoint();
+
+            return false;
         },
         itemIsInItem(item, container) {
             if (!item.parent) return false;
