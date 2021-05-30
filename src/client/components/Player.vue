@@ -8,6 +8,8 @@
                 :adjustToBorder="true"
                 :clickFunction="onSceneClick"
                 v-if="model.currentScene === scene"
+                @actionObjectGroupPrepared="onActionObjectGroupOrClickAreaPrepared"
+                @clickAreaPrepared="onActionObjectGroupOrClickAreaPrepared"
             />
         </section>
         <Button ref="sceneSwitcherButton" class="button sceneSwitcher" name="scenes" :showLabel="false" @click.prevent.stop="onSceneButtonClick($event)">
@@ -90,6 +92,16 @@ export default {
                 this.$toasted.error(this.$t("errorWhileSaving", { name: this.model.getName() }), { className: "errorToaster" });
             } else if (result) this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
+        },
+        onActionObjectGroupOrClickAreaPrepared(item, model) {
+            const lessonActivated = this.model.lesson.getOverwrite(model._id).activated;
+            const sessionActivated = this.model.getOverwrite(model._id).activated;
+            const lessonAmount = this.model.lesson.getOverwrite(model._id).amount;
+            const sessionAmount = this.model.getOverwrite(model._id).amount;
+
+            const isActivated = sessionActivated ?? lessonActivated ?? true;
+            const hasAmount = sessionAmount ?? lessonAmount ?? 1;
+            item.visible = isActivated && Boolean(hasAmount);
         },
         onSceneClick(event, item, model) {
             // Stop propagating when it was not a left click

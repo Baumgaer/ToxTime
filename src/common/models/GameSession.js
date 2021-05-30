@@ -53,11 +53,21 @@ export function GameSessionMixinClass(MixinClass) {
                 type: [{ type: Schema.Types.Mixed }],
                 required: true,
                 default: []
+            },
+            overwrites: {
+                type: Schema.Types.Mixed,
+                required: true,
+                default: {}
             }
         };
 
         getAvatar() {
             return this.lesson.getAvatar();
+        }
+
+        getOverwrite(id) {
+            if (!(id in this.overwrites)) this.overwrites[id] = {};
+            return this.overwrites[id];
         }
 
     }

@@ -207,13 +207,19 @@ export default {
                 const ownerGroup = await this.getOwnerGroup(actionObjectMap);
                 this.paper.activate();
                 group.position = this.calcPosition(actionObjectMap.ownerGroupModel, ownerGroup, actionObject.position);
-                group.locked = true;
+                group.locked = this.showClickAreas;
+
+                const bounds = this.paper.Path.Rectangle({rectangle: group.firstChild.bounds});
+                bounds.name = "boundary";
+                group.addChild(bounds);
+
                 ownerGroup.insertChild(group.model.layer + 1, group);
             } else if (rotator) {
                 group.addChild(rotator);
                 group.addChild(bounds);
             }
 
+            this.$emit("actionObjectGroupPrepared", group, actionObject);
             // Refresh view to be sure that the group is visible
             this.paper.view.update();
 
@@ -285,7 +291,7 @@ export default {
                 rotator.strokeWidth = 3;
                 group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
 
-                bounds = this.paper.Path.Rectangle(raster.bounds.topLeft, raster.bounds.bottomRight);
+                bounds = this.paper.Path.Rectangle({ rectangle: raster.bounds });
                 bounds.name = "boundary";
                 bounds.strokeColor = "white";
                 bounds.opacity = 0.01;
@@ -381,6 +387,7 @@ export default {
                 if (indexOfItemAbove < 0) {
                     container.addChild(path);
                 } else path.insertBelow(itemAbove);
+                this.$emit("clickAreaPrepared", path, clickArea);
             }
         }
     }
