@@ -5,6 +5,8 @@ import ApiClient from "~client/lib/ApiClient";
 const CommonClientItem = ItemMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Item extends CommonClientItem {
 
+    _cachedResources = {};
+
     getAvatar() {
         if (!this.object) return { type: "image", name: "" };
         return this.object.file.getAvatar();
@@ -38,10 +40,13 @@ export default ClientModel.buildClientExport(class Item extends CommonClientItem
         }
     }
 
-    getResources() {
+    getResources(cacheHash) {
+        if (cacheHash && this._cachedResources[cacheHash]) return this._cachedResources[cacheHash];
         const obj = this.object;
         if (!obj) return [];
-        return [obj, ...obj.getResources()];
+        const resources = [obj, ...obj.getResources()];
+        if (cacheHash) this._cachedResources[cacheHash] = resources;
+        return resources;
     }
 
 });

@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { isValue } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -66,7 +67,7 @@ export function GameSessionMixinClass(MixinClass) {
         }
 
         getOverwrite(id) {
-            if (!(id in this.overwrites)) this.overwrites[id] = {};
+            if (!(id in this.overwrites) || !isValue(this.overwrites[id])) this.overwrites[id] = {};
             return this.overwrites[id];
         }
 

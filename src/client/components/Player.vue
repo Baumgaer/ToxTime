@@ -38,6 +38,7 @@ import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
 import VueSimpleContextMenu from 'vue-simple-context-menu';
 import Inventory from "~client/components/Inventory";
 import { Layer, Group } from "paper";
+import { makeId } from "~common/utils";
 
 export default {
     components: {
@@ -69,6 +70,10 @@ export default {
             markedItem: null,
             modelItemMap: new Map()
         };
+    },
+    beforeMount() {
+        console.log("CREATE HASH!!!!!!!!!!!!!!!!!!!");
+        this.model.cacheHash = makeId(10);
     },
     mounted() {
         if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
@@ -155,7 +160,7 @@ export default {
         },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
-                const resources = scene.getResources().filter((resource) => !(resource instanceof Label.RawClass));
+                const resources = scene.getResources(this.model.cacheHash).filter((resource) => !(resource instanceof Label.RawClass));
                 for (const resource of resources) {
                     const objPath = `model.overwrites.${resource._id}`;
                     const overwrite = this.model.getOverwrite(resource._id);

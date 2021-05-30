@@ -20,8 +20,6 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         }
     };
 
-    _cachedResources = null;
-
     getAvatar() {
         const value = { title: window.$t("lesson") };
         if (this._id && this.scenes[0]) return Object.assign(this.scenes[0].getAvatar(), value);
@@ -60,12 +58,10 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
     }
 
     getResources() {
-        if (this._cachedResources) return this._cachedResources;
         const resources = [];
         for (const model of [...this.scenes, ...this.inventory]) resources.push(...model.getResources());
         for (const sceneObject of this.inventory) resources.push(sceneObject, ...sceneObject.getResources());
-        this._cachedResources = uniq(resources);
-        return this._cachedResources;
+        return uniq(resources);
     }
 
     getSpecificObjectsFor(model, resources = this.getResources()) {

@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { union, difference } from "~common/utils";
+import { union, difference, isValue } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -77,7 +77,7 @@ export function LessonMixinClass(MixinClass) {
         };
 
         getOverwrite(id) {
-            if (!(id in this.overwrites)) this.overwrites[id] = {};
+            if (!(id in this.overwrites) || !isValue(this.overwrites[id])) this.overwrites[id] = {};
             return this.overwrites[id];
         }
 

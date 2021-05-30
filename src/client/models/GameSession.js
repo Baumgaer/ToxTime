@@ -8,6 +8,8 @@ import Item from "~client/models/Item";
 const CommonClientGameSession = GameSessionMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameSession extends CommonClientGameSession {
 
+    cacheHash = ""
+
     getName() {
         return this.lesson?.getName();
     }
@@ -44,9 +46,9 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
 
             const allLocationAndQuantityCorrect = recipe.input.every((recipeItem) => {
                 let recipeResources = [];
-                if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources();
-                if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources()));
-                if (recipeItem.location === "inventory") recipeResources = flatten(this.inventory.map((item) => item.getResources()));
+                if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources(this.cacheHash);
+                if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources(this.cacheHash)));
+                if (recipeItem.location === "inventory") recipeResources = flatten(this.inventory.map((item) => item.getResources(this.cacheHash)));
                 let specificObjects = this.lesson.getSpecificObjectsFor(recipeItem.object, uniq(recipeResources));
                 if (!specificObjects.length) specificObjects = recipeResources.filter((resource) => resource === recipeItem.object);
                 return specificObjects.length > 0;
