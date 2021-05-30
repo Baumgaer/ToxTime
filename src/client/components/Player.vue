@@ -66,7 +66,8 @@ export default {
             scenes: this.model.lesson.scenes.map((scene) => {
                 return { name: scene.getName(), scene };
             }),
-            markedItem: null
+            markedItem: null,
+            modelItemMap: new Map()
         };
     },
     mounted() {
@@ -96,6 +97,7 @@ export default {
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onActionObjectGroupOrClickAreaPrepared(item, model) {
+            if (!this.modelItemMap.has(model)) this.modelItemMap.set(model, item);
             const lessonActivated = this.model.lesson.getOverwrite(model._id).activated;
             const sessionActivated = this.model.getOverwrite(model._id).activated;
             const lessonAmount = this.model.lesson.getOverwrite(model._id).amount;
@@ -147,11 +149,9 @@ export default {
 
             return false;
         },
-        onAmountChange(model, value) {
-            console.log("amountChange", model.className, value);
-        },
-        onActivatedChange(model, value) {
-            console.log("activationChange", model.className, value);
+        onWatchChange(model) {
+            const item = this.modelItemMap.get(model);
+            this.onActionObjectGroupOrClickAreaPrepared(item, model);
         },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
@@ -161,8 +161,8 @@ export default {
                     const overwrite = this.model.getOverwrite(resource._id);
                     overwrite.activated = overwrite.activated ?? null;
                     overwrite.amount = overwrite.activated ?? null;
-                    this.$watch(`${objPath}.activated`, (value) => this.onActivatedChange(resource, value));
-                    this.$watch(`${objPath}.amount`, (value) => this.onAmountChange(resource, value));
+                    this.$watch(`${objPath}.activated`, () => this.onWatchChange(resource));
+                    this.$watch(`${objPath}.amount`, () => this.onWatchChange(resource));
                 }
             }
         },
