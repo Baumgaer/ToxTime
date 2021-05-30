@@ -92,7 +92,7 @@ export default {
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
         onSceneClick(event, item, model) {
-            if (this.markedItem && this.markedItem !== item) {
+            if (this.markedItem && this.markedItem !== item && !this.itemIsInItem(this.markedItem, item)) {
                 this.unmarkItem(this.markedItem);
                 this.markedItem = null;
                 if (item instanceof Layer) return false;
@@ -103,7 +103,11 @@ export default {
 
             // Event bubbled to the whole scene, so the player clicked into the void
             // or tried to make combos which are maybe nonsense
-            if (item instanceof Layer) return this.addPunishPoint();
+            if (item instanceof Layer) {
+                this.unmarkItem(this.markedItem);
+                this.markedItem = null;
+                return this.addPunishPoint();
+            }
 
             // Do not proceed when no model is given because it could be that
             // there is a none model including element which is inside model
@@ -115,9 +119,6 @@ export default {
                 this.markedItem = item;
                 return false;
             }
-
-            item.strokeColor = "";
-            item.strokeWidth = 0;
             const recipes = this.searchRecipe(model);
 
             if (recipes.length) {
@@ -126,6 +127,11 @@ export default {
                 // Stop propagation if a recipe was found which means return false
                 return false;
             }
+        },
+        itemIsInItem(item, container) {
+            if (!item.parent) return false;
+            if (item.parent === container) return true;
+            return this.itemIsInItem(item.parent, container);
         },
         getItemBoundary(item) {
             return item.children.filter((child) => child.name === "boundary")[0];
