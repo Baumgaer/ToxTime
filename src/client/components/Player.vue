@@ -33,13 +33,27 @@ import EditorHead from "~client/components/EditorHead";
 import Button from "~client/components/Button";
 import GameSession from "~client/models/GameSession";
 import Label from "~client/models/Label";
+import Item from "~client/models/Item";
+import Knowledge from "~client/models/Knowledge";
+import ActionObject from '~client/models/ActionObject';
+import ClickArea from '~client/models/ClickArea';
+import File from '~client/models/File';
+import Scene from '~client/models/Scene';
 
 import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
 import VueSimpleContextMenu from 'vue-simple-context-menu';
 import Inventory from "~client/components/Inventory";
 import { Layer, Group } from "paper";
-import { makeId } from "~common/utils";
+import { makeId, flatten, uniq } from "~common/utils";
 
+/**
+ * @typedef {InstanceType<import("~client/models/Recipe")["default"]["RawClass"]>} Recipe
+ * @typedef {InstanceType<import("~client/models/GameObject")["default"]["RawClass"]>} GameObject
+ * @typedef {InstanceType<import("~client/models/Label")["default"]["RawClass"]>} Label
+ * @typedef {InstanceType<import("~client/models/Knowledge")["default"]["RawClass"]>} Knowledge
+ * @typedef {InstanceType<import("~client/models/File")["default"]["RawClass"]>} File
+ * @typedef {InstanceType<import("~client/models/RecipeItem")["default"]["RawClass"]>} RecipeItem
+ */
 export default {
     components: {
         EditorHead,
@@ -103,13 +117,8 @@ export default {
         },
         onActionObjectGroupOrClickAreaPrepared(item, model) {
             if (!this.modelItemMap.has(model)) this.modelItemMap.set(model, item);
-            const lessonActivated = this.model.lesson.getOverwrite(model._id).activated;
-            const sessionActivated = this.model.getOverwrite(model._id).activated;
-            const lessonAmount = this.model.lesson.getOverwrite(model._id).amount;
-            const sessionAmount = this.model.getOverwrite(model._id).amount;
-
-            const isActivated = sessionActivated ?? lessonActivated ?? true;
-            const hasAmount = sessionAmount ?? lessonAmount ?? 1;
+            const isActivated = this.model.getOverwriteValue(model._id, "activated");
+            const hasAmount = this.model.getOverwriteValue(model._id, "amount");
             item.visible = isActivated && Boolean(hasAmount);
         },
         onSceneClick(event, item, model) {
@@ -148,8 +157,11 @@ export default {
 
             const recipes = this.searchRecipe(model);
             if (recipes.length) {
-                console.log(recipes);
-                // recipe.exec();
+                const resources = this.model.getResources([model]);
+                for (const recipe of recipes) {
+                    console.log(`Executing recipe ${recipe.getName()}`);
+                    this.execRecipe(recipe, resources);
+                }
             } else this.addPunishPoint();
 
             return false;
@@ -158,14 +170,100 @@ export default {
             const item = this.modelItemMap.get(model);
             this.onActionObjectGroupOrClickAreaPrepared(item, model);
         },
+        /**
+         * @param {Recipe} recipe
+         * @param {Array<GameObject | Label | Knowledge | File>} resources
+         */
+        execRecipe(recipe) {
+            /** @type {RecipeItem[]} */
+            const amountCorrect = recipe.input.every((recipeItem) => {
+                const itemOrSpecificObject = this.getItemFor(recipeItem);
+                if (itemOrSpecificObject instanceof Knowledge.RawClass) return true;
+                if (itemOrSpecificObject instanceof Item.RawClass) return itemOrSpecificObject.amount >= recipeItem.amount;
+                let amount = this.model.getOverwriteValue(itemOrSpecificObject._id, "amount");
+                return amount >= recipeItem.amount;
+            });
+
+            if (!amountCorrect) return;
+
+            // Collect items
+            for (const recipeItem of recipe.input) {
+                const itemOrSpecificObject = this.getItemFor(recipeItem);
+                if (itemOrSpecificObject instanceof Item.RawClass) {
+                    let inventory = "inventory";
+                    if (recipeItem.location === "hand") inventory = "grabbing";
+                    for (let index = 0; index < recipeItem.amount; index++) {
+                        this.$refs[inventory].remove(itemOrSpecificObject.object);
+                    }
+                }
+                if (itemOrSpecificObject instanceof ActionObject.RawClass || itemOrSpecificObject instanceof ClickArea.RawClass) {
+                    this.model.getOverwrite(itemOrSpecificObject._id).amount -= recipeItem.amount;
+                }
+            }
+
+            // Give items or exec functionality
+            for (const recipeItem of recipe.output) {
+                if (recipeItem.object instanceof Knowledge.RawClass) {
+                    this.model.knowledgeBase.push(recipeItem.object);
+                } else if (recipeItem.object instanceof File.RawClass) {
+                    console.log("SHOW POPUP");
+                } else if (recipeItem.object instanceof Scene.RawClass) {
+                    this.model.currentScene = recipeItem.object;
+                } else if(["inventory", "hand"].includes(recipeItem.location)) {
+                    let objectToAdd = recipeItem.object;
+                    if (recipeItem.object instanceof Label.RawClass) {
+                        objectToAdd = this.model.lesson.getSpecificObjectsFor(recipeItem.object, this.model.currentScene.getResources(this.model.cacheHash))[0];
+                    }
+                    if (!objectToAdd) continue;
+                    if (recipeItem.location === "inventory") {
+                        this.$refs.inventory.add(objectToAdd);
+                    } else this.$refs.grabbing.add(objectToAdd);
+                } else if (recipeItem.location === "scene") {
+                    console.log("assume object and display it");
+                }
+            }
+        },
+        /**
+         * @param {RecipeItem} recipeItem
+         */
+        getItemFor(recipeItem) {
+            let recipeResources;
+            let locationToGetItemFrom;
+            if (recipeItem.object instanceof Knowledge.RawClass) return recipeItem.object;
+
+            if (recipeItem.location === "scene") {
+                recipeResources = this.model.currentScene.getResources(this.model.cacheHash);
+                locationToGetItemFrom = "currentScene";
+            }
+            if (recipeItem.location === "hand") {
+                recipeResources = flatten(this.model.grabbing.map((item) => item.getResources(this.model.cacheHash)));
+                locationToGetItemFrom = "grabbing";
+            }
+            if (recipeItem.location === "inventory") {
+                recipeResources = flatten(this.model.inventory.map((item) => item.getResources(this.model.cacheHash)));
+                locationToGetItemFrom = "inventory";
+            }
+
+            let specificObjects = this.model.lesson.getSpecificObjectsFor(recipeItem.object, uniq(recipeResources));
+            if (!specificObjects.length) {
+                specificObjects = recipeResources.filter((resource) => {
+                    if (recipeItem.object instanceof Label.RawClass) return resource.getLabels().includes(recipeItem.object);
+                    return resource === recipeItem.object;
+                });
+            }
+
+            if (locationToGetItemFrom === "currentScene") return specificObjects[0];
+            return this.model[locationToGetItemFrom].find((item) => item.object === specificObjects[0]);
+        },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
                 const resources = scene.getResources(this.model.cacheHash).filter((resource) => !(resource instanceof Label.RawClass));
                 for (const resource of resources) {
                     const objPath = `model.overwrites.${resource._id}`;
-                    const overwrite = this.model.getOverwrite(resource._id);
-                    overwrite.activated = overwrite.activated ?? null;
-                    overwrite.amount = overwrite.activated ?? null;
+                    const sessionOverwrite = this.model.getOverwrite(resource._id);
+                    sessionOverwrite.activated = this.model.getOverwriteValue(resource._id, "activated");
+                    sessionOverwrite.amount = this.model.getOverwriteValue(resource._id, "amount");
+
                     this.$watch(`${objPath}.activated`, () => this.onWatchChange(resource));
                     this.$watch(`${objPath}.amount`, () => this.onWatchChange(resource));
                 }

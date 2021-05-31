@@ -9,6 +9,7 @@ export default ClientModel.buildClientExport(class Item extends CommonClientItem
 
     getAvatar() {
         if (!this.object) return { type: "image", name: "" };
+        if (!this.object.file) return this.object.sceneObject.file.getAvatar();
         return this.object.file.getAvatar();
     }
 
