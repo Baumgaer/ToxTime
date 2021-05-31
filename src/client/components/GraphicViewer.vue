@@ -20,7 +20,7 @@
 <script>
 import GameObject from "~client/models/GameObject";
 import PolyClickArea from "~client/lib/PolyClickArea";
-import { difference, capitalize, sortBy } from "~common/utils";
+import { difference, sortBy } from "~common/utils";
 
 import paper from "paper";
 
@@ -92,7 +92,10 @@ export default {
                     });
                     if (!map[map.length - 1]) promise = null;
                     map.push({ actionObject, ownerGroupModel, promise, next: function() {
-                        if (this === map[map.length - 1]) that.setupClickAreas({ sceneObject: that.model }, that.paper.project.activeLayer);
+                        if (this === map[map.length - 1]) {
+                            that.setupClickAreas({ sceneObject: that.model }, that.paper.project.activeLayer);
+                            that.adjustViewToBorder();
+                        }
                         if (this.resolved) return;
                         this.resolved = true;
                         if (this.resolve) this.resolve();
@@ -169,9 +172,11 @@ export default {
             raster.sendToBack();
             this.paper.view.background = raster;
             this.paper.view.update();
-            this.adjustViewToBorder();
             this.initialBackgroundLoadedResolver();
-            if (!this.actionObjectsMap.length) this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
+            if (!this.actionObjectsMap.length) {
+                this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
+                this.adjustViewToBorder();
+            }
         },
 
         /**
@@ -235,26 +240,10 @@ export default {
          */
         async adjustViewToBorder(args, force) {
             if (!force && !this.adjustToBorder) return;
-
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
-
-            const paper = this.paper;
-            const background = this.paper.view.background;
-            const surroundingElement = this.$parent.$parent.$el;
-
-            if (!background) return;
-
-            const diffHeight = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetHeight - background.size.height));
-            const diffWidth = paper.view.scaling.multiply(Math.abs(surroundingElement.offsetWidth - background.size.width));
-
-            let direction = "width";
-            if (diffHeight < diffWidth) direction = "height";
-
-            if (args) {
-                paper.view.scale(1 + (args.delta[direction] / surroundingElement[`offset${capitalize(direction)}`]));
-            } else paper.view.scale(paper.view.viewSize[direction] / background.size[direction]);
-            paper.view.translate(paper.view.center.subtract(paper.view.background.position));
+            if (!this.paper.view.background) return;
+            this.paper.project.activeLayer.fitBounds(this.paper.view.bounds);
         },
 
         /**

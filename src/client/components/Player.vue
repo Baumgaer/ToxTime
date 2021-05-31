@@ -7,7 +7,8 @@
                 :showClickAreas="showClickAreas"
                 :adjustToBorder="true"
                 :clickFunction="onSceneClick"
-                v-if="model.currentScene === scene"
+                :ref="`scene_${scene._id}`"
+                v-show="model.currentScene === scene"
                 @actionObjectGroupPrepared="onActionObjectGroupOrClickAreaPrepared"
                 @clickAreaPrepared="onActionObjectGroupOrClickAreaPrepared"
             />
@@ -86,7 +87,6 @@ export default {
         };
     },
     beforeMount() {
-        console.log("CREATE HASH!!!!!!!!!!!!!!!!!!!");
         this.model.cacheHash = makeId(10);
     },
     mounted() {
@@ -95,6 +95,7 @@ export default {
         this.initOverwriteWatchers();
         if (!inventoryIsFilled) this.initializeInventory();
         if (!this.preventAutosave) this.onSaveButtonClick();
+        window.gamePlayer = this;
     },
     async beforeDestroy() {
         if (!this.preventAutosave) await this.onSaveButtonClick();
@@ -106,6 +107,7 @@ export default {
         },
         onSceneSelect(event) {
             this.model.currentScene = event.option.scene;
+            setTimeout(() => this.$refs[`scene_${this.model.currentScene._id}`][0].paper.view._windowEvents.resize());
         },
         async onSaveButtonClick() {
             if (this.saveTimeout) clearTimeout(this.saveTimeout);
@@ -159,7 +161,6 @@ export default {
             if (recipes.length) {
                 const resources = this.model.getResources([model]);
                 for (const recipe of recipes) {
-                    console.log(`Executing recipe ${recipe.getName()}`);
                     this.execRecipe(recipe, resources);
                 }
             } else this.addPunishPoint();
@@ -197,7 +198,9 @@ export default {
                     }
                 }
                 if (itemOrSpecificObject instanceof ActionObject.RawClass || itemOrSpecificObject instanceof ClickArea.RawClass) {
-                    this.model.getOverwrite(itemOrSpecificObject._id).amount -= recipeItem.amount;
+                    const overwrite = this.model.getOverwrite(itemOrSpecificObject._id);
+                    overwrite.amount -= recipeItem.amount;
+                    if (overwrite.amount <= 0) overwrite.activated = false;
                 }
             }
 
