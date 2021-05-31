@@ -215,7 +215,7 @@ export default {
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {
                     let objectToAdd = recipeItem.object;
                     if (recipeItem.object instanceof Label.RawClass) {
-                        objectToAdd = this.model.lesson.getSpecificObjectsFor(recipeItem.object, this.model.currentScene.getResources(this.model.cacheHash))[0];
+                        objectToAdd = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), this.model.currentScene.getResources(this.model.cacheHash))[0];
                     }
                     if (!objectToAdd) continue;
                     if (recipeItem.location === "inventory") {
@@ -247,11 +247,12 @@ export default {
                 locationToGetItemFrom = "inventory";
             }
 
-            let specificObjects = this.model.lesson.getSpecificObjectsFor(recipeItem.object, uniq(recipeResources));
+            let specificObjects = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), uniq(recipeResources));
             if (!specificObjects.length) {
                 specificObjects = recipeResources.filter((resource) => {
-                    if (recipeItem.object instanceof Label.RawClass) return resource.getLabels().includes(recipeItem.object);
-                    return resource === recipeItem.object;
+                    const recipeItemObject = this.model.getRecipeObject(recipeItem);
+                    if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
+                    return resource === recipeItemObject;
                 });
             }
 

@@ -44,6 +44,13 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return uniq(resources);
     }
 
+    getRecipeObject(recipeItem) {
+        const sessionOverWriteObjectString = this.getOverwriteValue(recipeItem._id, "object");
+        if (!sessionOverWriteObjectString) return recipeItem.object;
+        const [collectionName, id] = sessionOverWriteObjectString.split("_");
+        return ApiClient.store.getModelById(collectionName, id);
+    }
+
     findRecipes(resources = this.getResources()) {
         const recipes = [];
 
@@ -51,8 +58,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             // const isIngredientsExact = recipe.transitionSettings.ingredientsExact;
             // const isQuantityExact = recipe.transitionSettings.quantityExact;
             const allIngredientsAvailable = recipe.input.every((recipeItem) => {
-                const overwrite = this.lesson.getOverwrite(recipeItem._id);
-                return resources.includes(overwrite.object || recipeItem.object);
+                return resources.includes(this.getRecipeObject(recipeItem));
             });
 
             if (!allIngredientsAvailable) return false;
@@ -63,11 +69,13 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources(this.cacheHash);
                 if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources(this.cacheHash)));
                 if (recipeItem.location === "inventory") recipeResources = flatten(this.inventory.map((item) => item.getResources(this.cacheHash)));
-                let specificObjects = this.lesson.getSpecificObjectsFor(recipeItem.object, uniq(recipeResources));
+                let specificObjects = this.lesson.getSpecificObjectsFor(this.getRecipeObject(recipeItem), uniq(recipeResources));
                 if (!specificObjects.length) {
+                    console.log(recipe);
                     specificObjects = recipeResources.filter((resource) => {
-                        if (recipeItem.object instanceof Label.RawClass) return resource.getLabels().includes(recipeItem.object);
-                        return resource === recipeItem.object;
+                        const recipeItemObject = this.getRecipeObject(recipeItem);
+                        if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
+                        return resource === recipeItemObject;
                     });
                 }
                 return specificObjects.length > 0;
