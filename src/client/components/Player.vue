@@ -13,25 +13,16 @@
                 @clickAreaPrepared="onActionObjectGroupOrClickAreaPrepared"
             />
         </section>
-        <Button ref="sceneSwitcherButton" class="button sceneSwitcher" name="scenes" :showLabel="false" @click.prevent.stop="onSceneButtonClick($event)">
-            <theater-icon />
-        </Button>
         <section class="protocol"></section>
         <Inventory :model="model" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing" />
         <Inventory :model="model" ref="inventory" />
-        <VueSimpleContextMenu
-            :ref="'sceneSwitcherPopup'"
-            :elementId="'sceneSwitcherPopup'"
-            :options="scenes"
-            @option-clicked="onSceneSelect"
-        />
+        <SceneSwitcher class="sceneSwitcher" :model="model" />
     </div>
 </template>
 
 <script>
 import GraphicViewer from "~client/components/GraphicViewer";
 import EditorHead from "~client/components/EditorHead";
-import Button from "~client/components/Button";
 import GameSession from "~client/models/GameSession";
 import Label from "~client/models/Label";
 import Item from "~client/models/Item";
@@ -41,8 +32,7 @@ import ClickArea from '~client/models/ClickArea';
 import File from '~client/models/File';
 import Scene from '~client/models/Scene';
 
-import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
-import VueSimpleContextMenu from 'vue-simple-context-menu';
+import SceneSwitcher from "~client/components/SceneSwitcher";
 import Inventory from "~client/components/Inventory";
 import { Layer, Group } from "paper";
 import { makeId, flatten, uniq } from "~common/utils";
@@ -58,9 +48,8 @@ import { makeId, flatten, uniq } from "~common/utils";
 export default {
     components: {
         EditorHead,
-        Button,
         GraphicViewer,
-        VueSimpleContextMenu,
+        SceneSwitcher,
         Inventory
     },
     props: {
@@ -79,9 +68,6 @@ export default {
     },
     data() {
         return {
-            scenes: this.model.lesson.scenes.map((scene) => {
-                return { name: scene.getName(), scene };
-            }),
             markedItem: null,
             modelItemMap: new Map()
         };
@@ -102,13 +88,6 @@ export default {
         clearTimeout(this.saveTimeout);
     },
     methods: {
-        onSceneButtonClick(event) {
-            this.$refs.sceneSwitcherPopup.showMenu(event, this.$refs.sceneSwitcherButton.$el);
-        },
-        onSceneSelect(event) {
-            this.model.currentScene = event.option.scene;
-            setTimeout(() => this.$refs[`scene_${this.model.currentScene._id}`][0].paper.view._windowEvents.resize());
-        },
         async onSaveButtonClick() {
             if (this.saveTimeout) clearTimeout(this.saveTimeout);
             const result = await this.model.save();
