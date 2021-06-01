@@ -21,6 +21,14 @@
                     <section v-show="category === 'information'">
                         {{ model.lesson.description }}
                     </section>
+                    <section v-show="category === 'knowledge'">
+                        <ul>
+                            <li v-for="knowledge of model.knowledgeBase" :key="`knowledge_${knowledge._id}`">
+                                <strong>{{ knowledge.getName() }}</strong><br />
+                                {{ knowledge[`description_${window.activeUser.locale}`] }}
+                            </li>
+                        </ul>
+                    </section>
                 </main>
             </div>
             <div class="button" @click="onDeviceButtonClick"></div>

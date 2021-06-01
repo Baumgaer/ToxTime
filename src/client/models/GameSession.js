@@ -71,7 +71,6 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 if (recipeItem.location === "inventory") recipeResources = flatten(this.inventory.map((item) => item.getResources(this.cacheHash)));
                 let specificObjects = this.lesson.getSpecificObjectsFor(this.getRecipeObject(recipeItem), uniq(recipeResources));
                 if (!specificObjects.length) {
-                    console.log(recipe);
                     specificObjects = recipeResources.filter((resource) => {
                         const recipeItemObject = this.getRecipeObject(recipeItem);
                         if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
