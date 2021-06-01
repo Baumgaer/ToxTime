@@ -7,15 +7,22 @@
         height: calc(100vh - 50px);
     }
 
-    .sceneSwitcher {
+    .sidebar {
         position: absolute;
         left: 20px;
         top: 50%;
         transform: translateY(-50%);
-        border-radius: 25px;
         --background-color: @infoColor;
         --hover-color: @primaryColor;
         color: @white;
+
+        > div {
+            margin: 5px;
+        }
+
+        .button {
+            border-radius: 25px;
+        }
     }
 
     .grabbing {

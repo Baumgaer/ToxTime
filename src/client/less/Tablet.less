@@ -1,0 +1,50 @@
+@import (less) "variables.less";
+
+.tablet {
+    .button {
+        cursor: pointer;
+        box-shadow: 0 0 5px @black;
+        color: @white;
+        background-color: @infoColor;
+        border-radius: 100%;
+        padding: 15px 17px;
+
+        &:hover {
+            background-color: @primaryColor;
+        }
+    }
+}
+
+.device {
+    height: 80vh;
+    width: 50vh;
+    border-radius: 5px;
+    background-color: @black;
+    box-shadow: 0 0 5px @dusk;
+    padding: 20px 10px;
+    padding-bottom: 30px;
+    position: relative;
+
+    .screen {
+        box-sizing: border-box;
+        height: 100%;
+        background-color: @white;
+    }
+
+    .button {
+        position: absolute;
+        width: 10%;
+        height: 10px;
+        left: 50%;
+        bottom: 8px;
+        transform: translateX(-50%);
+        border-radius: 10px;
+        border: 1px solid @white;
+        background-color: @black;
+        cursor: pointer;
+
+        &:hover {
+            background-color: @primaryColor;
+        }
+    }
+}

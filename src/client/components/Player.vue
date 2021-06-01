@@ -16,7 +16,10 @@
         <section class="protocol"></section>
         <Inventory :model="model" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing" />
         <Inventory :model="model" ref="inventory" />
-        <SceneSwitcher class="sceneSwitcher" :model="model" />
+        <div class="sidebar">
+            <SceneSwitcher class="sceneSwitcher" :model="model" />
+            <Tablet class="tablet" :model="model" />
+        </div>
     </div>
 </template>
 
@@ -33,6 +36,7 @@ import File from '~client/models/File';
 import Scene from '~client/models/Scene';
 
 import SceneSwitcher from "~client/components/SceneSwitcher";
+import Tablet from "~client/components/Tablet";
 import Inventory from "~client/components/Inventory";
 import { Layer, Group } from "paper";
 import { makeId, flatten, uniq } from "~common/utils";
@@ -50,6 +54,7 @@ export default {
         EditorHead,
         GraphicViewer,
         SceneSwitcher,
+        Tablet,
         Inventory
     },
     props: {
