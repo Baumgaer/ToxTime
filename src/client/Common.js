@@ -74,6 +74,8 @@ import HeadLightbulbIcon from "vue-material-design-icons/HeadLightbulb";
 import CollapseAllIcon from "vue-material-design-icons/CollapseAll";
 import ExpandAllIcon from "vue-material-design-icons/ExpandAll";
 import TabletAndroidIcon from "vue-material-design-icons/TabletAndroid";
+import InformationIcon from "vue-material-design-icons/Information";
+import NotebookIcon from "vue-material-design-icons/Notebook";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -125,3 +127,5 @@ Vue.component('head-lightbulb-icon', HeadLightbulbIcon);
 Vue.component('collapse-all-icon', CollapseAllIcon);
 Vue.component('expand-all-icon', ExpandAllIcon);
 Vue.component('tablet-android-icon', TabletAndroidIcon);
+Vue.component('information-icon', InformationIcon);
+Vue.component('notebook-icon', NotebookIcon);

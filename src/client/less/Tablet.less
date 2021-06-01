@@ -17,7 +17,7 @@
 
 .device {
     height: 80vh;
-    width: 50vh;
+    width: 55vh;
     border-radius: 5px;
     background-color: @black;
     box-shadow: 0 0 5px @dusk;
@@ -29,9 +29,51 @@
         box-sizing: border-box;
         height: 100%;
         background-color: @white;
+
+        nav {
+            display: flex;
+            border-bottom: 1px solid @dusk;
+
+            .button {
+                justify-content: space-between;
+                width: calc(25% - 10px);
+                padding-right: 10px;
+                color: @black;
+                --hover-color: @infoColor;
+                --active-color: @primaryColor;
+                --active-hover-color: @infoColor;
+
+                &::v-deep {
+                    white-space: nowrap;
+
+                    &.active {
+                        color: @white;
+                    }
+
+                    .label {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: calc(100% - 50px);
+                    }
+                }
+
+                &:hover {
+                    color: @white;
+                }
+            }
+        }
+
+        main {
+            height: calc(100% - 51px);
+            color: @black;
+            font-weight: normal;
+            box-sizing: border-box;
+            padding: 10px;
+        }
     }
 
-    .button {
+    > .button {
         position: absolute;
         width: 10%;
         height: 10px;
