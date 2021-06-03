@@ -38,7 +38,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return ApiClient.store.getModelById(collectionName, id);
     }
 
-    findRecipes(resources = this.getResources()) {
+    findRecipes(resources) {
         const recipes = [];
         const possibleRecipes = this.lesson.getRecipes(true);
 

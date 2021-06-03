@@ -289,7 +289,7 @@ export default {
             return this.itemIsInvisible(item.parent);
         },
         searchRecipe(model) {
-            const resources = this.model.getResources([model]);
+            const resources = [model, ...model.getResources(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
             return this.model.findRecipes(resources);
         },
         addPunishPoint() {
