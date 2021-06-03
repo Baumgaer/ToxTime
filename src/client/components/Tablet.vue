@@ -23,7 +23,7 @@
                     </section>
                     <section v-show="category === 'knowledge'">
                         <ul>
-                            <li v-for="knowledge of model.knowledgeBase" :key="`knowledge_${knowledge._id}`">
+                            <li v-for="knowledge of knowledgeBase" :key="`knowledge_${knowledge._id}`">
                                 <strong>{{ knowledge.getName() }}</strong><br />
                                 {{ knowledge[`description_${window.activeUser.locale}`] }}
                             </li>
@@ -41,6 +41,7 @@ import GameSession from "~client/models/GameSession";
 
 import Button from "~client/components/Button";
 
+import { uniq } from "~common/utils";
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/material.css';
@@ -59,6 +60,11 @@ export default {
         return {
             category: "information"
         };
+    },
+    computed: {
+        knowledgeBase() {
+            return uniq(this.model.knowledgeBase);
+        }
     },
     mounted() {
         this.tippy = tippy(this.$refs.button, {

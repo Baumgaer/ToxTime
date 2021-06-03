@@ -1,9 +1,22 @@
 import { GameSessionMixinClass } from "~common/models/GameSession";
 import ClientModel from "~client/lib/ClientModel";
-import { uniq, flatten } from "~common/utils";
+import { intersection, flatten, uniq } from "~common/utils";
 import ApiClient from "~client/lib/ApiClient";
-import Label from "~client/models/Label";
+import Knowledge from "~client/models/Knowledge";
 
+/**
+ * @typedef {InstanceType<import("~client/models/ClickArea")["default"]["RawClass"]>} ClickArea
+ * @typedef {InstanceType<import("~client/models/ActionObject")["default"]["RawClass"]>} ActionObject
+ * @typedef {InstanceType<import("~client/models/SceneObject")["default"]["RawClass"]>} SceneObject
+ * @typedef {InstanceType<import("~client/models/Knowledge")["default"]["RawClass"]>} Knowledge
+ * @typedef {InstanceType<import("~client/models/Label")["default"]["RawClass"]>} Label
+ * @typedef {InstanceType<import("~client/models/Item")["default"]["RawClass"]>} Item
+ * @typedef {InstanceType<import("~client/models/Recipe")["default"]["RawClass"]>} Recipe
+ * @typedef {InstanceType<import("~client/models/RecipeItem")["default"]["RawClass"]>} RecipeItem
+ *
+ * @typedef {ClickArea | ActionObject | Item} InputResource
+ * @typedef {ClickArea | ActionObject | SceneObject | Label | Knowledge} InputRecipeItemObject
+ */
 const CommonClientGameSession = GameSessionMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameSession extends CommonClientGameSession {
 
@@ -38,52 +51,73 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return ApiClient.store.getModelById(collectionName, id);
     }
 
-    findRecipes(resources) {
-        const recipes = [];
-        const possibleRecipes = this.lesson.getRecipes(true);
+    /**
+     *
+     *
+     * @param {RecipeItem} recipeItem
+     * @returns {boolean}
+     */
+    recipeItemObjectFoundInCorrectLocation(recipeItem) {
+        /** @type {InputRecipeItemObject} */
+        const obj = this.getOverwriteValue(recipeItem._id, "object") || recipeItem.object;
+        if (obj instanceof Knowledge.RawClass) return this.KnowledgeBase.includes(obj);
 
-        const isValid = (recipe) => {
-            if (!possibleRecipes.includes(recipe)) return false;
-
-            // const isIngredientsExact = recipe.transitionSettings.ingredientsExact;
-            // const isQuantityExact = recipe.transitionSettings.quantityExact;
-            const allIngredientsAvailable = recipe.input.every((recipeItem) => {
-                return resources.includes(this.getRecipeObject(recipeItem));
-            });
-
-            if (!allIngredientsAvailable) return false;
-
-            const allLocationCorrect = recipe.input.every((recipeItem) => {
-                let recipeResources = [];
-                if (recipeItem.object.className === "Knowledge") return this.knowledgeBase.includes(recipeItem.object);
-                if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources();
-                if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources()));
-                let specificObjects = this.lesson.getSpecificObjectsFor(this.getRecipeObject(recipeItem), uniq(recipeResources));
-                if (!specificObjects.length) {
-                    specificObjects = recipeResources.filter((resource) => {
-                        const recipeItemObject = this.getRecipeObject(recipeItem);
-                        if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
-                        return resource === recipeItemObject;
-                    });
-                }
-                return specificObjects.length > 0;
-            });
-
-            if (!allLocationCorrect) return false;
-            return true;
-        };
-
-        for (const resource of resources) {
-            if (!ApiClient.store.index("recipeItems").has(resource)) continue;
-            const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
-            for (const recipeItem of recipeItems) {
-                if (!ApiClient.store.index("recipes").has(recipeItem)) continue;
-                const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                if (isValid(recipe)) recipes.push(recipe);
-            }
+        if (recipeItem.location === "hand") {
+            return uniq(flatten(this.grabbing.map((item) => item.getResources()))).includes(obj);
         }
 
-        return uniq(recipes);
+        if (recipeItem.location === "scene") {
+            const resources = this.currentScene.getResources();
+            return resources.filter((resource) => {
+                const isActive = this.getOverwriteValue(resource._id, "amount") && this.getOverwriteValue(resource._id, "activated");
+                return isActive;
+            }).includes(obj);
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     *
+     * @param {Recipe} recipe
+     * @returns {boolean}
+     */
+    isValidRecipe(recipe) {
+        const possibleRecipes = this.lesson.getRecipes(true);
+        if (!possibleRecipes.includes(recipe)) return false;
+
+        const allItemsInCorrectLocation = recipe.input.every(this.recipeItemObjectFoundInCorrectLocation.bind(this));
+        if (!allItemsInCorrectLocation) return false;
+
+        return true;
+    }
+
+    /**
+     *
+     *
+     * @param {InputResource[]} inputResources
+     * @returns
+     */
+    findRecipes(inputResources) {
+        const allRecipes = [];
+
+        for (const inputResource of inputResources) {
+            const resources = [inputResource, ...inputResource.getResources()];
+            const resourceRecipes = [];
+            for (const resource of resources) {
+                const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
+                for (const recipeItem of recipeItems) {
+                    const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
+                    resourceRecipes.push(recipe);
+                }
+            }
+            allRecipes.push(resourceRecipes);
+        }
+
+        const result = intersection(...allRecipes).filter(this.isValidRecipe.bind(this));
+        console.log(result);
+        return result;
     }
 
 });
