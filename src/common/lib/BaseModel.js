@@ -372,6 +372,7 @@ export default class BaseModel {
         for (const subObject of subObjects) {
             resources.push(...subObject.getResources(), ...subObject.getLabels());
         }
+        resources.push(...this.getLabels());
         return uniq(resources);
     }
 
