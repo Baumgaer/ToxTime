@@ -77,9 +77,6 @@ export default {
             modelItemMap: new Map()
         };
     },
-    beforeMount() {
-        this.model.cacheHash = makeId(10);
-    },
     mounted() {
         if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
         const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
@@ -199,7 +196,7 @@ export default {
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {
                     let objectToAdd = recipeItem.object;
                     if (recipeItem.object instanceof Label.RawClass) {
-                        objectToAdd = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), this.model.currentScene.getResources(this.model.cacheHash))[0];
+                        objectToAdd = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), this.model.currentScene.getResources())[0];
                     }
                     if (!objectToAdd) continue;
                     if (recipeItem.location === "inventory") {
@@ -219,15 +216,15 @@ export default {
             if (recipeItem.object instanceof Knowledge.RawClass) return recipeItem.object;
 
             if (recipeItem.location === "scene") {
-                recipeResources = this.model.currentScene.getResources(this.model.cacheHash);
+                recipeResources = this.model.currentScene.getResources();
                 locationToGetItemFrom = "currentScene";
             }
             if (recipeItem.location === "hand") {
-                recipeResources = flatten(this.model.grabbing.map((item) => item.getResources(this.model.cacheHash)));
+                recipeResources = flatten(this.model.grabbing.map((item) => item.getResources()));
                 locationToGetItemFrom = "grabbing";
             }
             if (recipeItem.location === "inventory") {
-                recipeResources = flatten(this.model.inventory.map((item) => item.getResources(this.model.cacheHash)));
+                recipeResources = flatten(this.model.inventory.map((item) => item.getResources()));
                 locationToGetItemFrom = "inventory";
             }
 
@@ -245,7 +242,7 @@ export default {
         },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
-                const resources = scene.getResources(this.model.cacheHash).filter((resource) => !(resource instanceof Label.RawClass));
+                const resources = scene.getResources().filter((resource) => !(resource instanceof Label.RawClass));
                 for (const resource of resources) {
                     const objPath = `model.overwrites.${resource._id}`;
                     const sessionOverwrite = this.model.getOverwrite(resource._id);

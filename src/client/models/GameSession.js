@@ -20,8 +20,6 @@ import Knowledge from "~client/models/Knowledge";
 const CommonClientGameSession = GameSessionMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameSession extends CommonClientGameSession {
 
-    cacheHash = ""
-
     getName() {
         return this.lesson?.getName();
     }
@@ -57,20 +55,19 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      * @param {RecipeItem} recipeItem
      * @returns {boolean}
      */
-    recipeItemObjectFoundInCorrectLocation(recipeItem) {
+    checkRecipeItemLocation(recipeItem) {
         /** @type {InputRecipeItemObject} */
         const obj = this.getRecipeObject(recipeItem);
         if (obj instanceof Knowledge.RawClass) return this.KnowledgeBase.includes(obj);
 
-        if (recipeItem.location === "hand") {
-            return uniq(flatten(this.grabbing.map((item) => item.getResources()))).includes(obj);
-        }
+        if (recipeItem.location === "hand") return flatten(this.grabbing.map((item) => item.getResources())).includes(obj);
 
         if (recipeItem.location === "scene") {
             const resources = this.currentScene.getResources();
             return resources.filter((resource) => {
-                const isActive = this.getOverwriteValue(resource._id, "amount") && this.getOverwriteValue(resource._id, "activated");
-                return isActive;
+                const hasAmount = this.getOverwriteValue(resource._id, "amount") > 0;
+                const isActivated = this.getOverwriteValue(resource._id, "activated");
+                return hasAmount && isActivated;
             }).includes(obj);
         }
 
@@ -87,7 +84,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         const possibleRecipes = this.lesson.getRecipes(true);
         if (!possibleRecipes.includes(recipe)) return false;
 
-        const allItemsInCorrectLocation = recipe.input.every(this.recipeItemObjectFoundInCorrectLocation.bind(this));
+        const allItemsInCorrectLocation = recipe.input.every(this.checkRecipeItemLocation.bind(this));
         if (!allItemsInCorrectLocation) return false;
 
         return true;
@@ -115,8 +112,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             allRecipes.push(resourceRecipes);
         }
 
-        const result = intersection(...allRecipes).filter(this.isValidRecipe.bind(this));
-        return result;
+        return intersection(...allRecipes).filter(this.isValidRecipe.bind(this));
     }
 
 });
