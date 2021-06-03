@@ -59,7 +59,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      */
     recipeItemObjectFoundInCorrectLocation(recipeItem) {
         /** @type {InputRecipeItemObject} */
-        const obj = this.getOverwriteValue(recipeItem._id, "object") || recipeItem.object;
+        const obj = this.getRecipeObject(recipeItem);
         if (obj instanceof Knowledge.RawClass) return this.KnowledgeBase.includes(obj);
 
         if (recipeItem.location === "hand") {
@@ -116,7 +116,6 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         }
 
         const result = intersection(...allRecipes).filter(this.isValidRecipe.bind(this));
-        console.log(result);
         return result;
     }
 
