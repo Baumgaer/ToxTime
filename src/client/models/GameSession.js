@@ -1,6 +1,6 @@
 import { GameSessionMixinClass } from "~common/models/GameSession";
 import ClientModel from "~client/lib/ClientModel";
-import { intersection, flatten, uniq } from "~common/utils";
+import { intersection, flatten } from "~common/utils";
 import ApiClient from "~client/lib/ApiClient";
 import Knowledge from "~client/models/Knowledge";
 
