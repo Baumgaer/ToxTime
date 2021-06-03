@@ -39,7 +39,7 @@ import SceneSwitcher from "~client/components/SceneSwitcher";
 import Tablet from "~client/components/Tablet";
 import Inventory from "~client/components/Inventory";
 import { Layer, Group } from "paper";
-import { makeId, flatten, uniq } from "~common/utils";
+import { flatten, uniq } from "~common/utils";
 
 /**
  * @typedef {InstanceType<import("~client/models/Recipe")["default"]["RawClass"]>} Recipe
@@ -138,11 +138,11 @@ export default {
             this.unmarkItem(item);
             this.markedItem = null;
 
-            const recipes = this.searchRecipe(model);
+            const resources = [model, ...model.getLabels(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
+            const recipes = this.model.findRecipes(resources);
             if (recipes.length) {
-                const resources = this.model.getResources([model]);
                 for (const recipe of recipes) {
-                    this.execRecipe(recipe, resources);
+                    this.execRecipe(recipe);
                 }
             } else this.addPunishPoint();
 
@@ -284,10 +284,6 @@ export default {
             if (!item.opacity) return true;
             if (!item.visible) return true;
             return this.itemIsInvisible(item.parent);
-        },
-        searchRecipe(model) {
-            const resources = [model, ...model.getLabels(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
-            return this.model.findRecipes(resources);
         },
         addPunishPoint() {
             console.log("PUNISHED");
