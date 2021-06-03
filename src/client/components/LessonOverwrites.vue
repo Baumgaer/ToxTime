@@ -17,7 +17,7 @@
                 />
             </div>
         </div>
-        <div v-for="(subObject, index) of model.getSubObjects(true)" :key="`sub_${subObject._id}_${index}`" class="subObject">
+        <div v-for="(subObject, index) of resources" :key="`sub_${subObject._id}_${index}`" class="subObject">
             <div class="title">{{ subObject.getName() }}</div>
             <div class="field" v-for="(field, index) of allowedFields(subObject)" :key="`field_${field.name}_${index}`">
                 <div class="key">{{ $t(field.name) }}</div>
@@ -109,6 +109,12 @@ export default {
         }
     },
     computed: {
+        resources() {
+            return this.model.getResources().filter((resource) => {
+                return resource instanceof ActionObject.RawClass || resource instanceof ClickArea.RawClass;
+            });
+        },
+
         allowedFields() {
             return (model) => {
                 const amountValue = this.lesson.getOverwrite(model._id)?.amount ?? 1;
