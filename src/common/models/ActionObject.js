@@ -38,8 +38,8 @@ export function ActionObjectMixinClass(MixinClass) {
             }
         };
 
-        getSubObjects() {
-            if (this.sceneObject?.deleted) return [this.sceneObject];
+        getSubObjects(real) {
+            if (real || this.sceneObject?.deleted) return [this.sceneObject];
             return this.sceneObject.getSubObjects();
         }
 

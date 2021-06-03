@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { isValue } from "~common/utils";
+import { isValue, compact, flatten, uniq } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -69,6 +69,26 @@ export function GameSessionMixinClass(MixinClass) {
         getOverwrite(id) {
             if (!(id in this.overwrites) || !isValue(this.overwrites[id])) this.overwrites[id] = {};
             return this.overwrites[id];
+        }
+
+        getSubObjects(real) {
+            const subObjects = [this.lesson, this.currentScene, ...this.knowledgeBase];
+            const items = [...this.grabbing, ...this.inventory];
+            if (real) {
+                subObjects.push(...items);
+            } else subObjects.push(...compact(items.map((item) => item.object)));
+            return subObjects;
+        }
+
+        getResources() {
+            const grabbing = this.grabbing.map((item) => item.object);
+            const labels = flatten(grabbing.map((model) => model.getLabels()));
+            return uniq([
+                ...this.currentScene.getResources(),
+                ...grabbing,
+                ...labels,
+                ...this.knowledgeBase
+            ]);
         }
 
     }

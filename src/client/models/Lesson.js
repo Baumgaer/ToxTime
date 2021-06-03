@@ -57,13 +57,6 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         window.activeUser.activeEditor = "playGame";
     }
 
-    getResources() {
-        const resources = [];
-        for (const model of [...this.scenes, ...this.inventory]) resources.push(...model.getResources());
-        for (const sceneObject of this.inventory) resources.push(sceneObject, ...sceneObject.getResources());
-        return uniq(resources);
-    }
-
     getSpecificObjectsFor(model, resources = this.getResources()) {
         if (model instanceof SceneObject.RawClass) {
             return resources.filter((resource) => {

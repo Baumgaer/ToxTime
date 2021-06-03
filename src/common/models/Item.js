@@ -42,6 +42,10 @@ export function ItemMixinClass(MixinClass) {
             }
         };
 
+        getSubObjects() {
+            return [this.actionObject || this.sceneObject];
+        }
+
     }
     return Item;
 }

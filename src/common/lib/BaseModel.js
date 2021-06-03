@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction, isArray } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction, isArray, uniq } from "~common/utils";
 
 const globalActions = {};
 global.globalActions = globalActions;
@@ -363,6 +363,16 @@ export default class BaseModel {
 
     getLabels() {
         return [];
+    }
+
+    getResources() {
+        const resources = [];
+        const subObjects = this.getSubObjects(true);
+        resources.push(...subObjects);
+        for (const subObject of subObjects) {
+            resources.push(...subObject.getResources(), ...subObject.getLabels());
+        }
+        return uniq(resources);
     }
 
     _getClassName() {

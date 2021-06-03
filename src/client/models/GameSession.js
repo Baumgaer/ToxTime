@@ -2,8 +2,6 @@ import { GameSessionMixinClass } from "~common/models/GameSession";
 import ClientModel from "~client/lib/ClientModel";
 import { uniq, flatten } from "~common/utils";
 import ApiClient from "~client/lib/ApiClient";
-import ActionObject from "~client/models/ActionObject";
-import Item from "~client/models/Item";
 import Label from "~client/models/Label";
 
 const CommonClientGameSession = GameSessionMixinClass(ClientModel);
@@ -33,17 +31,6 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return sessionOverwrite[property] ?? lessonOverwrite[property] ?? defaultValue;
     }
 
-    getResources(include) {
-        const resources = [...this.knowledgeBase];
-        for (const model of [...include, ...this.grabbing, ...this.inventory]) {
-            let obj = model instanceof Item.RawClass ? model.object : model;
-            if (!obj) continue;
-            resources.push(obj, ...obj.getLabels());
-            if (obj instanceof ActionObject.RawClass) resources.push(obj.sceneObject, ...obj.sceneObject.getLabels());
-        }
-        return uniq(resources);
-    }
-
     getRecipeObject(recipeItem) {
         const sessionOverWriteObjectString = this.getOverwriteValue(recipeItem._id, "object");
         if (!sessionOverWriteObjectString) return recipeItem.object;
@@ -53,8 +40,11 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
 
     findRecipes(resources = this.getResources()) {
         const recipes = [];
+        const possibleRecipes = this.lesson.getRecipes(true);
 
         const isValid = (recipe) => {
+            if (!possibleRecipes.includes(recipe)) return false;
+
             // const isIngredientsExact = recipe.transitionSettings.ingredientsExact;
             // const isQuantityExact = recipe.transitionSettings.quantityExact;
             const allIngredientsAvailable = recipe.input.every((recipeItem) => {
@@ -66,9 +56,8 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             const allLocationCorrect = recipe.input.every((recipeItem) => {
                 let recipeResources = [];
                 if (recipeItem.object.className === "Knowledge") return this.knowledgeBase.includes(recipeItem.object);
-                if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources(this.cacheHash);
-                if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources(this.cacheHash)));
-                if (recipeItem.location === "inventory") recipeResources = flatten(this.inventory.map((item) => item.getResources(this.cacheHash)));
+                if (recipeItem.location === "scene") recipeResources = this.currentScene.getResources();
+                if (recipeItem.location === "hand") recipeResources = flatten(this.grabbing.map((item) => item.getResources()));
                 let specificObjects = this.lesson.getSpecificObjectsFor(this.getRecipeObject(recipeItem), uniq(recipeResources));
                 if (!specificObjects.length) {
                     specificObjects = recipeResources.filter((resource) => {

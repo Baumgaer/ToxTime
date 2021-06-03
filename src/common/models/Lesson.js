@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { union, difference, isValue } from "~common/utils";
+import { union, difference, isValue, uniq } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -83,6 +83,12 @@ export function LessonMixinClass(MixinClass) {
 
         getSubObjects() {
             return [...this.scenes, ...this.inventory, ...this.getRecipes(true)];
+        }
+
+        getResources() {
+            const resources = [...this.scenes, ...this.inventory];
+            for (const model of [...this.scenes, ...this.inventory]) resources.push(...model.getResources());
+            return uniq(resources);
         }
 
         getRecipes(filtered) {

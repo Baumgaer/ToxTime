@@ -110,9 +110,20 @@ export default {
     },
     computed: {
         resources() {
-            return this.model.getResources().filter((resource) => {
-                return resource instanceof ActionObject.RawClass || resource instanceof ClickArea.RawClass;
-            });
+            const recursiveSubObjects = (model, ...args) => {
+                const result = [];
+                const subObjects = model.getSubObjects(...args);
+                result.push(...subObjects);
+                for (const subObject of subObjects) {
+                    result.push(...recursiveSubObjects(subObject, ...args));
+                }
+                return result;
+            };
+            if (this.model instanceof Recipe.RawClass) return this.model.getSubObjects(true);
+            if (this.model instanceof Scene.RawClass) {
+                return recursiveSubObjects(this.model);
+            }
+            return [];
         },
 
         allowedFields() {

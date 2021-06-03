@@ -41,13 +41,4 @@ export default ClientModel.buildClientExport(class Item extends CommonClientItem
         }
     }
 
-    getResources(cacheHash) {
-        if (cacheHash && this._cachedResources[cacheHash]) return this._cachedResources[cacheHash];
-        const obj = this.object;
-        if (!obj) return [];
-        const resources = [obj, ...obj.getResources()];
-        if (cacheHash) this._cachedResources[cacheHash] = resources;
-        return resources;
-    }
-
 });
