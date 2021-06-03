@@ -72,20 +72,26 @@ export default {
             required: true
         }
     },
-    computed: {
-    },
     watch: {
         model() {
+            if (this.parentModel.input.includes(this.model) && this.model.location === "inventory") {
+                this.model.location = "hand";
+            }
             this.itemSelectorCreated = false;
         }
     },
     data() {
         return {
             itemSelectorCreated: false,
-            inventoryModel: new Inventory.Model(),
+            inventoryModel:  new Inventory.Model(),
             handModel: new Hand.Model(),
             sceneModel: new Scene.Model({ name: this.$t("scene") })
         };
+    },
+    mounted() {
+        if (this.parentModel.input.includes(this.model) && this.model.location === "inventory") {
+            this.model.location = "hand";
+        }
     },
     methods: {
         highlight() {

@@ -85,12 +85,10 @@ export default {
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
 
-        itemFilter() {
-            return [
-                new Inventory.Model(),
-                new Hand.Model(),
-                new Scene.Model({ name: this.$t("scene") })
-            ];
+        itemFilter(model) {
+            const locations = [ new Hand.Model(), new Scene.Model({ name: this.$t("scene") }) ];
+            if (this.model.output.includes(model)) locations.unshift(new Inventory.Model());
+            return locations;
         }
     }
 };
