@@ -153,7 +153,7 @@ export default {
         this.paper.setup(this.$refs.canvas);
         this.paper.activate();
         this.paper.settings.handleSize = 10;
-        this.paper.project.activeLayer.applyMatrix = false;
+        //this.paper.project.activeLayer.applyMatrix = false;
         this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
 
@@ -364,7 +364,8 @@ export default {
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
             for (const clickArea of model.sceneObject.clickAreas) {
-                if (clickArea.deleted) continue;
+                const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === clickArea });
+                if (clickArea.deleted || alreadyInserted) continue;
                 const path = PolyClickArea.build(this.paper, clickArea.shape, null, this.showClickAreas);
                 path.position = this.calcPosition(model, container, clickArea.position);
                 path.model = clickArea;

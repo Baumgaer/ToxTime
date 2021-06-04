@@ -77,7 +77,6 @@ export default {
         this.$refs.graphicViewer.adjustViewToBorder(null, true);
     },
     methods: {
-
         /**
          * @param {DragEvent} event
          */
