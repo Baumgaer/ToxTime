@@ -18,7 +18,7 @@
         <Inventory :model="model" ref="inventory" />
         <div class="sidebar">
             <SceneSwitcher class="sceneSwitcher" :model="model" />
-            <Tablet class="tablet" :model="model" />
+            <Tablet class="tablet" :model="model" ref="tablet" />
         </div>
     </div>
 </template>
@@ -187,10 +187,12 @@ export default {
 
             // Give items or exec functionality
             for (const recipeItem of recipe.output) {
-                if (recipeItem.object instanceof Knowledge.RawClass) {
+                if (recipeItem.object instanceof Knowledge.RawClass && !this.model.knowledgeBase.includes(recipeItem.object)) {
                     this.model.knowledgeBase.push(recipeItem.object);
                 } else if (recipeItem.object instanceof File.RawClass) {
-                    console.log("SHOW POPUP");
+                    this.$refs.tablet.showingFile = recipeItem.object;
+                    this.$refs.tablet.category = "files";
+                    this.$refs.tablet.tippy.show();
                 } else if (recipeItem.object instanceof Scene.RawClass) {
                     this.model.currentScene = recipeItem.object;
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {

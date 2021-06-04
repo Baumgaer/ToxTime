@@ -13,7 +13,7 @@
                     <Button :name="'notes'" :active="category === 'notes'" @click="onNavButtonClick('notes')">
                         <notebook-icon />
                     </Button>
-                    <Button :name="'files'" :active="category === 'files'" @click="onNavButtonClick('files')">
+                    <Button v-if="showingFile" :name="'files'" :active="category === 'files'" @click="onNavButtonClick('files')">
                         <file-document-icon />
                     </Button>
                 </nav>
@@ -29,6 +29,11 @@
                             </li>
                         </ul>
                     </section>
+                    <iframe v-if="category === 'files'"
+                            :src="`/files/${showingFile._id}/avatar?v=${showingFile.getModifyHash()}`"
+                            frameborder="0"
+                            class="fileFrame"
+                    ></iframe>
                 </main>
             </div>
             <div class="button" @click="onDeviceButtonClick"></div>
@@ -58,7 +63,8 @@ export default {
     },
     data() {
         return {
-            category: "information"
+            category: "information",
+            showingFile: null
         };
     },
     computed: {

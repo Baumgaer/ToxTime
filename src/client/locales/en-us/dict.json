@@ -142,5 +142,7 @@
     "knowledgeDescriptionEn": "English knowledge description",
     "addKnowledge": "Add knowledge",
     "collapseAll": "Collapse all",
-    "xElements": "{count} elements"
+    "xElements": "{count} elements",
+    "information": "Information",
+    "notes": "Notes"
 }
