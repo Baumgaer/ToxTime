@@ -51,7 +51,6 @@ export default {
     methods: {
         onSceneSelect(scene) {
             this.model.currentScene = scene;
-            setTimeout(() => this.$parent.$refs[`scene_${scene._id}`][0].paper.view._windowEvents.resize());
             this.tippy.hide();
         }
     }

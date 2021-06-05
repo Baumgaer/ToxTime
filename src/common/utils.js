@@ -270,20 +270,3 @@ export function svgToPng(svgText, options = {}) {
         }
     });
 }
-
-/**
- * Generates a random string
- *
- * @export
- * @param {number} length
- * @returns {string}
- */
-export function makeId(length) {
-    const result = [];
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
-    }
-    return result.join('');
-}

@@ -1,7 +1,7 @@
 <template>
     <div class="player">
         <EditorHead :name="model.lesson.name" :model="model" :nameIsTranslated="true" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
-        <section v-for="scene in model.lesson.scenes" :key="scene._id">
+        <section v-for="scene in scenes" :key="scene._id">
             <GraphicViewer
                 :model="scene"
                 :showClickAreas="showClickAreas"
@@ -69,6 +69,24 @@ export default {
         preventAutosave: {
             type: Boolean,
             default: false
+        }
+    },
+    computed: {
+        scenes() {
+            const recipes = this.model.lesson.getRecipes(true);
+            const scenes = [...this.model.lesson.scenes];
+            for (const recipe of recipes) {
+                scenes.push(...recipe.getResources().filter((resource) => resource instanceof Scene.RawClass));
+            }
+            return uniq(scenes);
+        }
+    },
+    watch: {
+        'model.currentScene': {
+            handler(scene) {
+                setTimeout(() => this.$refs[`scene_${scene._id}`][0].paper.view._windowEvents.resize());
+            },
+            immediate: false
         }
     },
     data() {

@@ -1,5 +1,5 @@
 import onChange from "on-change";
-import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, cloneDeep, set, isFunction } from "~common/utils";
+import { isProxy, resolveProxy, isEqual, mergeWith, isArray, difference, isValue, isPlainObject, clone, cloneDeep, set, get, isFunction } from "~common/utils";
 import ClientModel from "~client/lib/ClientModel";
 import { Schema, Document } from "mongoose";
 
@@ -274,8 +274,12 @@ export class Store {
      * @memberof Store
      */
     _valueEqualWithPropDesc(model, path, value) {
-        const propDesc = Object.getOwnPropertyDescriptor(model, path[0]);
-        if (path.length === 1 && propDesc && !isEqual(("value" in propDesc ? propDesc.value : propDesc.get?.()), value)) return false;
+        if (path[path.length - 1]?.startsWith("__")) return true;
+        let getDescriptorFrom = model;
+        if (path.length > 1) getDescriptorFrom = get(model, path.slice(0, path.length - 1));
+        if (!getDescriptorFrom) return true;
+        const propDesc = Object.getOwnPropertyDescriptor(getDescriptorFrom, path[path.length - 1]);
+        if (propDesc && !isEqual(("value" in propDesc ? propDesc.value : propDesc.get?.()), value)) return false;
         return true;
     }
 
