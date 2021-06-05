@@ -10,6 +10,8 @@
                 v-model="model.description"
                 :min-height="100"
             /></section>
+            <h3>{{ $t("entities") }}</h3>
+            <section class="entities"></section>
             <h3>{{ $t("scenes") }}</h3>
             <section class="itemList">
                 <Avatar

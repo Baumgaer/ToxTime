@@ -76,6 +76,7 @@ import ExpandAllIcon from "vue-material-design-icons/ExpandAll";
 import TabletAndroidIcon from "vue-material-design-icons/TabletAndroid";
 import InformationIcon from "vue-material-design-icons/Information";
 import NotebookIcon from "vue-material-design-icons/Notebook";
+import IdentifierIcon from "vue-material-design-icons/Identifier";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -129,3 +130,4 @@ Vue.component('expand-all-icon', ExpandAllIcon);
 Vue.component('tablet-android-icon', TabletAndroidIcon);
 Vue.component('information-icon', InformationIcon);
 Vue.component('notebook-icon', NotebookIcon);
+Vue.component('identifier-icon', IdentifierIcon);
