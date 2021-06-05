@@ -153,7 +153,7 @@ export default {
         this.paper.setup(this.$refs.canvas);
         this.paper.activate();
         this.paper.settings.handleSize = 10;
-        //this.paper.project.activeLayer.applyMatrix = false;
+        this.paper.project.activeLayer.applyMatrix = false;
         this.paper.project.currentStyle.strokeScaling = false;
         this.isMounted = true;
 
@@ -202,7 +202,7 @@ export default {
                 return;
             }
 
-            const [group, rotator, bounds] = this.buildActionObjectGroup(actionObjectMap, index);
+            const group = this.buildActionObjectGroup(actionObjectMap, index);
             this.setupClickAreas(actionObject, group, this.showClickAreas);
             group.onClick = (event) => this.clickFunction(event, group, actionObject);
 
@@ -219,9 +219,6 @@ export default {
                 group.addChild(bounds);
 
                 ownerGroup.insertChild(group.model.layer + 1, group);
-            } else if (rotator) {
-                group.addChild(rotator);
-                group.addChild(bounds);
             }
 
             this.$emit("actionObjectGroupPrepared", group, actionObject);
@@ -262,6 +259,7 @@ export default {
             const backgroundRef = this.$refs[`actionObjectBackground${actionObject._id}${indexOfBackground}`][0];
             const raster = this.buildRaster(backgroundRef);
 
+            /** @type {InstanceType<import("paper")["Group"]>} */
             const group = new this.paper.Group({
                 applyMatrix: false,
                 scaling: this.paper.project.activeLayer.getScaling(),
@@ -278,19 +276,23 @@ export default {
                 rotator.strokeColor = "white";
                 rotator.opacity = 0.01;
                 rotator.strokeWidth = 3;
-                group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
 
                 bounds = this.paper.Path.Rectangle({ rectangle: raster.bounds });
                 bounds.name = "boundary";
                 bounds.strokeColor = "white";
                 bounds.opacity = 0.01;
                 bounds.strokeWidth = 3;
+
+                group.addChild(rotator);
+                group.addChild(bounds);
+
+                group.position = this.calcPosition({ sceneObject: this.model }, this.paper.project.activeLayer, actionObject.position);
             }
 
             group.scale(actionObject.scale);
             group.rotation = actionObject.rotation;
 
-            return [group, rotator, bounds];
+            return group;
         },
 
         /**
@@ -364,7 +366,7 @@ export default {
             await this.initialBackgroundLoadedPromise;
             this.paper.activate();
             for (const clickArea of model.sceneObject.clickAreas) {
-                const alreadyInserted = this.paper.project.getItem({ recursive: true, match: (child) => child.model === clickArea });
+                const alreadyInserted = container.getItem({ recursive: true, match: (child) => child.model === clickArea });
                 if (clickArea.deleted || alreadyInserted) continue;
                 const path = PolyClickArea.build(this.paper, clickArea.shape, null, this.showClickAreas);
                 path.position = this.calcPosition(model, container, clickArea.position);
