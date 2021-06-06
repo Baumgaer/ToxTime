@@ -8,7 +8,7 @@ export default ClientModel.buildClientExport(class Entity extends CommonClientEn
     static schemaDefinition = {
         name: {
             default: () => {
-                return `${window.$t("newNeutral")} ${window.$t('entity')}`;
+                return `${window.$t("newFeminin")} ${window.$t('entity')}`;
             }
         }
     };

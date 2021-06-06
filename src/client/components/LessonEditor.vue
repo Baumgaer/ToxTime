@@ -11,7 +11,12 @@
                 :min-height="100"
             /></section>
             <h3>{{ $t("entities") }}</h3>
-            <section class="entities"></section>
+            <section class="entityList">
+                <EntityItem v-for="entity of model.entities" :key="entity._dummyId || entity._id" :model="entity" :parentModel="model" />
+                <Button name="addEntity" class="addEntity" @click="onAddEntityButtonClick">
+                    <identifier-icon />
+                </Button>
+            </section>
             <h3>{{ $t("scenes") }}</h3>
             <section class="itemList">
                 <Avatar
@@ -96,6 +101,7 @@ import Avatar from "~client/components/Avatar";
 import RecipeViewer from "~client/components/RecipeViewer";
 import Button from "~client/components/Button";
 import LessonOverwrites from "~client/components/LessonOverwrites";
+import EntityItem from "~client/components/EntityItem";
 
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
@@ -104,6 +110,7 @@ import Recipe from "~client/models/Recipe";
 import Label from "~client/models/Label";
 import User from "~client/models/User";
 import File from "~client/models/File";
+import Entity from "~client/models/Entity";
 
 import { parseEventModelData } from "~client/utils";
 
@@ -113,7 +120,8 @@ export default {
         Avatar,
         RecipeViewer,
         Button,
-        LessonOverwrites
+        LessonOverwrites,
+        EntityItem
     },
     data() {
         return {
@@ -216,6 +224,10 @@ export default {
                 this.model[field].push(model);
             }
             if (!(model instanceof Recipe.RawClass)) this.onCalculateButtonClick();
+        },
+
+        onAddEntityButtonClick() {
+            this.model.entities.push(ApiClient.store.addModel(new Entity.Model()));
         },
 
         onModelSelection(model) {

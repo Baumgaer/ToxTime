@@ -114,7 +114,8 @@ export default {
         overlayIcons: String,
         compactMode: Boolean,
         preventTooltipHiding: Boolean,
-        showCheckbox: Boolean
+        showCheckbox: Boolean,
+        collapse: Boolean
     },
     data() {
         this.isItem = true;
@@ -132,6 +133,9 @@ export default {
         activeClass() {
             return window.activeUser.editingModel && this.model._id === window.activeUser.editingModel._id ? "active" : "";
         }
+    },
+    beforeMount() {
+        this.opened = !this.collapse;
     },
     methods: {
         onMouseEnter() {

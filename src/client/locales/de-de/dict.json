@@ -146,5 +146,7 @@
     "information": "Informationen",
     "notes": "Notizen",
     "entity": "Entität",
-    "entities": "Entitäten"
+    "entities": "Entitäten",
+    "addEntity": "Entität hinzufügen",
+    "addObject": "Objekt hinzufügen"
 }

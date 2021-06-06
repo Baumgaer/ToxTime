@@ -22,12 +22,14 @@ export function EntityMixinClass(MixinClass) {
             actionObjects: {
                 type: [{ type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }],
                 default: [],
-                sticky: true
+                sticky: true,
+                ignoreOnIteration: true
             },
             sceneObjects: {
                 type: [{ type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }],
                 default: [],
-                sticky: true
+                sticky: true,
+                ignoreOnIteration: true
             }
         };
 

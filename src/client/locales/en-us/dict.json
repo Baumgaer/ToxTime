@@ -146,5 +146,7 @@
     "information": "Information",
     "notes": "Notes",
     "entity": "Entity",
-    "entities": "Entities"
+    "entities": "Entities",
+    "addEntity": "Add entity",
+    "addObject": "Add object"
 }

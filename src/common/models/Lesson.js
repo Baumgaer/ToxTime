@@ -42,6 +42,14 @@ export function LessonMixinClass(MixinClass) {
                 default: [],
                 ignoreOnIteration: true
             },
+            entities: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Entity", autopopulate: true }
+                ],
+                required: true,
+                default: [],
+                dependant: true
+            },
             excludedRecipes: {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Recipe", autopopulate: true }

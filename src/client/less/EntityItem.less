@@ -1,0 +1,42 @@
+@import (less) "variables.less";
+
+.entityItem {
+    position: relative;
+    background-color: @dusk;
+
+    .entity {
+        background-color: @dark;
+        color: @white;
+
+        &:hover {
+            background-color: @gray;
+        }
+    }
+
+    .deleteIcon {
+        position: absolute;
+        top: 22px;
+        right: 3px;
+        font-size: 20px;
+        color: @white;
+        cursor: pointer;
+
+        &:hover {
+            color: @primaryColor;
+        }
+    }
+
+    .addObject {
+        white-space: nowrap;
+        --background-color: @dusk;
+        --hover-color: @gray;
+        color: @white;
+
+        &::v-deep .label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: calc(100% - 50px);
+        }
+    }
+}

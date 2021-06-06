@@ -40,6 +40,38 @@
             font-size: 12px;
         }
 
+        .entityList {
+            display: flex;
+            padding-left: 5px;
+            flex-wrap: wrap;
+
+            .entityItem,
+            .addEntity {
+                width: calc(20% - 10px);
+                min-width: 150px;
+                max-width: 250px;
+                box-shadow: 0 0 5px @dusk;
+                border: 1px solid @black;
+                box-sizing: border-box;
+                margin: 5px;
+            }
+
+            .addEntity {
+                display: flex;
+                align-items: center;
+
+                --background-color: @dusk;
+                --hover-color: @gray;
+                color: @white;
+
+                &::v-deep .label {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
         .itemList {
             padding-left: 5px;
 
