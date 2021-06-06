@@ -4,24 +4,44 @@
         <div class="closeIcon" :title="$t('remove')">
             <component :is="'delete-icon'" class="deleteIcon" :title="$t('remove')" @click="onRemoveButtonClick()"/>
         </div>
-        <Item v-for="subObject of model.getSubObjects()" :key="subObject._id" class="subObject" :model="subObject" :compactMode="true" :showCheckbox="false" :collapse="true" />
-        <Button class="addObject" name="addObject" @click="onAddObjectButtonClick">
+        <Item v-for="subObject of model.getSubObjects()" :key="subObject._id" class="subObject" :model="subObject" :compactMode="true" :showCheckbox="false" :collapse="true">
+            <component :is="'delete-icon'" class="deleteIcon" :title="$t('remove')" @click="onObjectRemoveButtonClick(subObject)"/>
+        </Item>
+        <Button class="addObject" name="addObject" ref="addObject" @click="onAddObjectButtonClick">
             <identifier-icon />
         </Button>
+        <ItemSelector
+            v-if="itemSelectorCreated"
+            ref="itemSelector"
+            :model="model"
+            :attribute="'objects'"
+            :showAddButton="false"
+            :autoSave="false"
+            :selectionFunction="itemFilter"
+            :itemClickFunction="onItemSelect"
+            :attachTo="$refs.addObject.$el"
+        />
     </div>
 </template>
 
 <script>
 import Item from "~client/components/Item";
 import Button from "~client/components/Button";
+import ItemSelector from "~client/components/ItemSelector";
+
+import { flatten, uniq } from "~common/utils";
 
 import Entity from "~client/models/Entity";
 import Lesson from "~client/models/Lesson";
+import ActionObject from "~client/models/ActionObject";
+import ClickArea from "~client/models/ClickArea";
+import SceneObject from "~client/models/SceneObject";
 
 export default {
     components: {
         Item,
-        Button
+        Button,
+        ItemSelector
     },
     props: {
         model: {
@@ -33,15 +53,51 @@ export default {
             required: true
         }
     },
+    data() {
+        return {
+            itemSelectorCreated: false
+        };
+    },
     methods: {
         onAddObjectButtonClick() {
-            console.log("add an object");
+            this.itemSelectorCreated = true;
         },
 
         onRemoveButtonClick() {
             const index = this.parentModel.entities.indexOf(this.model);
             if (index < 0) return;
             this.parentModel.entities.splice(index, 1);
+        },
+
+        onObjectRemoveButtonClick(subObject) {
+            let fieldName;
+            if (subObject instanceof ActionObject.RawClass) fieldName = "actionObjects";
+            if (subObject instanceof SceneObject.RawClass) fieldName = "sceneObjects";
+            if (subObject instanceof ClickArea.RawClass) fieldName = "clickAreas";
+
+            const index = this.model[fieldName].indexOf(subObject);
+            if (index < 0) return;
+            this.model[fieldName].splice(index, 1);
+        },
+
+        onItemSelect(item) {
+            if (item instanceof ActionObject.RawClass) this.model.actionObjects.push(item);
+            if (item instanceof SceneObject.RawClass) this.model.sceneObjects.push(item);
+            if (item instanceof ClickArea.RawClass) this.model.clickAreas.push(item);
+        },
+
+        itemFilter() {
+            const resources = [...this.parentModel.getResources(), ...uniq(flatten(this.parentModel.getRecipes().map((recipe) => recipe.getResources())))];
+            const actionObjects = resources.filter((resource) => resource instanceof ActionObject.RawClass);
+
+            const isInActionObject = (clickArea) => actionObjects.some((actionObject) => actionObject.getResources().includes(clickArea));
+
+            const clickAreas = resources.filter((resource) => resource instanceof ClickArea.RawClass && !isInActionObject(resource));
+            const sceneObjects = resources.filter((resource) => resource instanceof SceneObject.RawClass && !isInActionObject(resource));
+
+            return uniq([...actionObjects, ...clickAreas, ...sceneObjects]).filter((model) => {
+                return !this.parentModel.entities.some((entity) => entity.objects.includes(model));
+            });
         }
     }
 };

@@ -21,4 +21,8 @@ export default ClientModel.buildClientExport(class Entity extends CommonClientEn
         };
     }
 
+    get objects() {
+        return [...this.actionObjects, ...this.clickAreas, ...this.sceneObjects];
+    }
+
 });

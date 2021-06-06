@@ -26,6 +26,24 @@
         }
     }
 
+    .subObject {
+        position: relative;
+        color: @white;
+
+        &::v-deep .info .parentName {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: calc(100% - 25px);
+        }
+
+        .deleteIcon {
+            position: absolute;
+            top: 22px;
+            right: 3px;
+        }
+    }
+
     .addObject {
         white-space: nowrap;
         --background-color: @dusk;

@@ -19,8 +19,21 @@ export function EntityMixinClass(MixinClass) {
             name: {
                 default: `Entity`
             },
+            labels: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Label", autopopulate: true }
+                ],
+                default: [],
+                sticky: true
+            },
             actionObjects: {
                 type: [{ type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }],
+                default: [],
+                sticky: true,
+                ignoreOnIteration: true
+            },
+            clickAreas: {
+                type: [{ type: Schema.Types.ObjectId, ref: "ClickArea", autopopulate: true }],
                 default: [],
                 sticky: true,
                 ignoreOnIteration: true
@@ -34,7 +47,7 @@ export function EntityMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            return this.actionObjects.concat(this.sceneObjects);
+            return this.actionObjects.concat(this.clickAreas).concat(this.sceneObjects);
         }
 
         getLabels() {
