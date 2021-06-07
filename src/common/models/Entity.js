@@ -37,23 +37,16 @@ export function EntityMixinClass(MixinClass) {
                 default: [],
                 sticky: true,
                 ignoreOnIteration: true
-            },
-            sceneObjects: {
-                type: [{ type: Schema.Types.ObjectId, ref: "SceneObject", autopopulate: true }],
-                default: [],
-                sticky: true,
-                ignoreOnIteration: true
             }
         };
 
         getSubObjects() {
-            return this.actionObjects.concat(this.clickAreas).concat(this.sceneObjects);
+            return this.actionObjects.concat(this.clickAreas);
         }
 
         getLabels() {
-            const actionObjectLabels = flatten(this.actionObjects.map((actionObject) => actionObject.getLabels()));
-            const sceneObjectLabels = flatten(this.sceneObjects.map((sceneObject) => sceneObject.getLabels()));
-            return uniq([...actionObjectLabels, ...sceneObjectLabels]);
+            const labels = flatten(this.actionObjects.map((actionObject) => actionObject.getLabels()));
+            return uniq(labels);
         }
     }
     return Entity;

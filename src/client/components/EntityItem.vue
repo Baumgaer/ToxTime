@@ -35,7 +35,6 @@ import Entity from "~client/models/Entity";
 import Lesson from "~client/models/Lesson";
 import ActionObject from "~client/models/ActionObject";
 import ClickArea from "~client/models/ClickArea";
-import SceneObject from "~client/models/SceneObject";
 
 export default {
     components: {
@@ -72,7 +71,6 @@ export default {
         onObjectRemoveButtonClick(subObject) {
             let fieldName;
             if (subObject instanceof ActionObject.RawClass) fieldName = "actionObjects";
-            if (subObject instanceof SceneObject.RawClass) fieldName = "sceneObjects";
             if (subObject instanceof ClickArea.RawClass) fieldName = "clickAreas";
 
             const index = this.model[fieldName].indexOf(subObject);
@@ -82,20 +80,19 @@ export default {
 
         onItemSelect(item) {
             if (item instanceof ActionObject.RawClass) this.model.actionObjects.push(item);
-            if (item instanceof SceneObject.RawClass) this.model.sceneObjects.push(item);
             if (item instanceof ClickArea.RawClass) this.model.clickAreas.push(item);
         },
 
         itemFilter() {
             const resources = [...this.parentModel.getResources(), ...uniq(flatten(this.parentModel.getRecipes().map((recipe) => recipe.getResources())))];
             const actionObjects = resources.filter((resource) => resource instanceof ActionObject.RawClass);
+            const clickAreas = resources.filter((resource) => {
+                return resource instanceof ClickArea.RawClass && !actionObjects.some((actionObject) => {
+                    return actionObject.getResources().includes(resource);
+                });
+            });
 
-            const isInActionObject = (clickArea) => actionObjects.some((actionObject) => actionObject.getResources().includes(clickArea));
-
-            const clickAreas = resources.filter((resource) => resource instanceof ClickArea.RawClass && !isInActionObject(resource));
-            const sceneObjects = resources.filter((resource) => resource instanceof SceneObject.RawClass && !isInActionObject(resource));
-
-            return uniq([...actionObjects, ...clickAreas, ...sceneObjects]).filter((model) => {
+            return uniq([...actionObjects, ...clickAreas]).filter((model) => {
                 return !this.parentModel.entities.some((entity) => entity.objects.includes(model));
             });
         }
