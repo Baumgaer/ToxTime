@@ -390,18 +390,24 @@ export default class BaseModel {
         eachDeep(iterate, (value, key, parentValue, context) => {
             if (context.isCircular) return false;
 
+            let ignoreIteration = false;
             if (isValue(parentValue) && isObjectLike(parentValue) && parentValue instanceof BaseModel) {
                 const parentSchemaObject = parentValue.getSchemaObject();
                 if (parentSchemaObject[context.path[context.path.length - 1]]?.ignoreOnIteration) {
-                    console.warn(`Ignoring Iteration of ${context.path.join(".")} on ${iterate._getClassName()}`);
-                    return false;
+                    console.warn(`Ignoring Iteration of ${context.path.join(".")} on ${iterate._getClassName?.() || typeof iterate}`);
+                    ignoreIteration = true;
                 }
             }
 
             const mayModel = get(this, context.path);
             if (isValue(mayModel) && isObjectLike(mayModel) && mayModel instanceof BaseModel) {
+                if (ignoreIteration) {
+                    modelCallback(mayModel, key, parentValue, context);
+                    return false;
+                }
                 return modelCallback(mayModel, key, parentValue, context);
             }
+            if (ignoreIteration) return false;
         }, Object.assign(options, { checkCircular: true, pathFormat: "array" }));
     }
 

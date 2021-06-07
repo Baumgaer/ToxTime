@@ -322,7 +322,8 @@ export default class ClientModel extends BaseModel {
                 return false;
             }
 
-            const value = get(changes, context.path);
+            let value = get(changes, context.path);
+            if (value instanceof ClientModel) value = value.getChanges();
             set(requestObject, context.path, value);
             const pathToExtend = [].concat(context.path);
 
