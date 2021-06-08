@@ -128,12 +128,13 @@ export default {
 
         allowedFields() {
             return (model) => {
-                const amountValue = this.lesson.getOverwrite(model._id)?.amount ?? 1;
-                if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, this.activated];
+                const amountValue = this.lesson.getOverwrite(model, "amount") ?? model.amount ?? 1;
+                const activatedValue = this.lesson.getOverwrite(model, "activated") ?? this.activated.value;
+                if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, {...this.activated, value: activatedValue}];
                 if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
-                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, this.activated];
+                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, {...this.activated, value: activatedValue}];
                 if (model instanceof Recipe.RawClass) {
-                    return [{...this.points, value: this.lesson.getOverwrite(model._id)?.points ?? 0}];
+                    return [{...this.points, value: this.lesson.getOverwrite(model, "points") ?? 0}];
                 }
                 if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
                 return [];
@@ -149,9 +150,11 @@ export default {
             const isActionObject = model.object instanceof ActionObject.RawClass;
             const isLabel = model.object instanceof Label.RawClass;
 
-            const overwriteObject = this.lesson.getOverwrite(model._id);
-            const amountValue = overwriteObject?.amount ?? model.amount;
-            const objectValue = overwriteObject?.object ? ApiClient.store.getModelById(overwriteObject.object.split("_")[0], overwriteObject.object.split("_")[1]) : model.object;
+            const overwriteObject = this.lesson.getOverwrite(model, "object");
+            const overwriteAmount = this.lesson.getOverwrite(model, "amount");
+
+            const amountValue = overwriteAmount ?? model.amount;
+            const objectValue = overwriteObject ? ApiClient.store.getModelById(overwriteObject.split("_")[0], overwriteObject.split("_")[1]) : model.object;
 
             return [{
                 ...this.amount,
@@ -177,7 +180,7 @@ export default {
         },
 
         onSpecification(model, selection) {
-            this.lesson.getOverwrite(model._id).object = `${selection.dataCollectionName}_${selection._id}`;
+            this.lesson.setOverwrite(model, "object", `${selection.dataCollectionName}_${selection._id}`);
             this.lesson.overwrites.__ob__.dep.notify();
         },
 
@@ -188,7 +191,11 @@ export default {
 
             let value = event.target.value;
             if (input.type !== "model") value = JSON.parse(input[valueField]);
-            this.lesson.getOverwrite(model._id)[input.name] = value;
+            this.lesson.setOverwrite(model, input.name, value);
+            for (const entity of this.lesson.entities) {
+                entity.overwrites.__ob__?.dep.notify();
+            }
+            this.lesson.overwrites.__ob__?.dep.notify();
         }
     }
 };

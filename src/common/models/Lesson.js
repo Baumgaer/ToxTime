@@ -2,6 +2,10 @@ import { Schema } from "mongoose";
 import { union, difference, isValue, uniq } from "~common/utils";
 
 /**
+ * @typedef {import("~common/lib/BaseModel")["default"]} BaseModel
+ */
+
+/**
  * Creates a new class with the returned class extended by the MixinClass
  *
  * @export
@@ -84,9 +88,60 @@ export function LessonMixinClass(MixinClass) {
             }
         };
 
-        getOverwrite(id) {
-            if (!(id in this.overwrites) || !isValue(this.overwrites[id])) this.overwrites[id] = {};
-            return this.overwrites[id];
+        /**
+         * Gets the overwrite from the corresponding entity when the model is
+         * inside of an entity and get the overwrite of the lesson else.
+         *
+         * @param {BaseModel} model
+         * @param {"activated" | "amount" | "points" | "object"} property
+         * @returns {boolean | number | string | null}
+         * @memberof Lesson
+         */
+        getOverwrite(model, property) {
+            const ownOverwrite = () => {
+                if (!(model._id in this.overwrites) || !isValue(this.overwrites[model._id])) this.overwrites[model._id] = {};
+                return this.overwrites[model._id][property] ?? null;
+            };
+
+            for (const entity of this.entities) {
+                if (!entity.getResources().includes(model)) continue;
+                if (property === "activated") {
+                    if (entity.actionObjects.includes(model)) return entity.getOverwrite(model, property);
+                    return ownOverwrite();
+                }
+                return entity.getOverwrite(model, property) ?? ownOverwrite();
+            }
+
+            return ownOverwrite();
+        }
+
+        /**
+         * Sets the overwrite on the corresponding entity when the model is
+         * inside of an entity and sets the overwrite on the lesson else.
+         *
+         * @param {BaseModel} model
+         * @param {"activated" | "amount" | "points" | "object"} property
+         * @param {boolean | number | string} value
+         * @returns {boolean | number | string | null}
+         * @memberof Lesson
+         */
+        setOverwrite(model, property, value) {
+            const ownOverwrite = () => {
+                if (!this.overwrites[model._id] && !isValue(this.overwrites[model._id])) this.overwrites[model._id] = {};
+                this.overwrites[model._id][property] = value;
+                return value;
+            };
+
+            for (const entity of this.entities) {
+                if (!entity.getResources().includes(model)) continue;
+                if (property === "activated") {
+                    if (entity.actionObjects.includes(model)) return entity.setOverwrite(model, property, value);
+                    return ownOverwrite();
+                }
+                return entity.setOverwrite(model, property, value) ?? ownOverwrite();
+            }
+
+            return ownOverwrite();
         }
 
         getSubObjects() {

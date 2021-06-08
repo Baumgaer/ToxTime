@@ -66,9 +66,10 @@ export function GameSessionMixinClass(MixinClass) {
             return this.lesson.getAvatar();
         }
 
-        getOverwrite(id) {
-            if (!(id in this.overwrites) || !isValue(this.overwrites[id])) this.overwrites[id] = {};
-            return this.overwrites[id];
+        getOverwrite(model, property) {
+            const lessonOverwrite = this.lesson.getOverwrite(model, property);
+            if (!(model._id in this.overwrites) || !isValue(this.overwrites[model._id])) this.overwrites[model._id] = {};
+            return this.overwrites[model._id][property] ?? lessonOverwrite ?? null;
         }
 
         getSubObjects(real) {

@@ -132,7 +132,7 @@ export default {
     computed: {
         totalPoints() {
             return this.model.getRecipes(true).reduce((total, recipe) => {
-                return total + (this.model.getOverwrite(recipe._id).points || 0);
+                return total + (this.model.getOverwrite(recipe, "points") || 0);
             }, 0);
         }
     },
