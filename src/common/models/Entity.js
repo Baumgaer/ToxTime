@@ -25,13 +25,6 @@ export function EntityMixinClass(MixinClass) {
             name: {
                 default: `Entity`
             },
-            labels: {
-                type: [
-                    { type: Schema.Types.ObjectId, ref: "Label", autopopulate: true }
-                ],
-                default: [],
-                sticky: true
-            },
             actionObjects: {
                 type: [{ type: Schema.Types.ObjectId, ref: "ActionObject", autopopulate: true }],
                 default: [],

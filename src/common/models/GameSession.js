@@ -28,6 +28,14 @@ export function GameSessionMixinClass(MixinClass) {
                 ignoreOnIteration: true,
                 ignoreOnValidation: true
             },
+            entities: {
+                type: [
+                    { type: Schema.Types.ObjectId, ref: "Entity", autopopulate: true }
+                ],
+                required: true,
+                default: [],
+                dependant: true
+            },
             currentScene: {
                 type: Schema.Types.ObjectId,
                 ref: "Scene",

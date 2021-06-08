@@ -6,7 +6,8 @@ import ClickArea from "~client/models/ClickArea";
 import ActionObject from "~client/models/ActionObject";
 import SceneObject from "~client/models/SceneObject";
 import Label from "~client/models/Label";
-import { flatten, difference, union, uniq } from "~common/utils";
+import Entity from "~client/models/Entity";
+import { flatten, difference, union, uniq, clone, cloneDeep } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
@@ -42,7 +43,20 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         let session = window.activeUser.getGameSessionByLesson(this);
 
         if (!session) {
-            session = ApiClient.store.addModel(new GameSession.Model({ lesson: this, currentScene: this.scenes[0] }));
+            const entities = this.entities.map((entity) => {
+                return ApiClient.store.addModel(new Entity.Model({
+                    name: entity.name,
+                    actionObjects: clone(entity.actionObjects),
+                    clickAreas: clone(entity.clickAreas),
+                    currentPhenotype: entity.currentPhenotype,
+                    overwrites: cloneDeep(entity.overwrites)
+                }));
+            });
+            session = ApiClient.store.addModel(new GameSession.Model({
+                lesson: this,
+                currentScene: this.scenes[0],
+                entities: entities
+            }));
             window.activeUser.currentGameSessions.push(session);
         } else {
             const indexInSolved = window.activeUser.solvedGameSessions.indexOf(session);
