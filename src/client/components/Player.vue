@@ -197,9 +197,9 @@ export default {
                     }
                 }
                 if (itemOrSpecificObject instanceof ActionObject.RawClass || itemOrSpecificObject instanceof ClickArea.RawClass) {
-                    const overwrite = this.model.getOverwrite(itemOrSpecificObject._id);
-                    overwrite.amount -= recipeItem.amount;
-                    if (overwrite.amount <= 0) overwrite.activated = false;
+                    let overwriteAmount = this.model.getOverwrite(itemOrSpecificObject, "amount");
+                    overwriteAmount -= recipeItem.amount;
+                    if (overwriteAmount <= 0) this.model.setOverwrite(itemOrSpecificObject, "amount", false);
                 }
             }
 
