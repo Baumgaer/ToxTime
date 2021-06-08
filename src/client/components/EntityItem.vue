@@ -84,9 +84,15 @@ export default {
         },
 
         itemFilter() {
-            const resources = [...this.parentModel.getResources(), ...uniq(flatten(this.parentModel.getRecipes().map((recipe) => recipe.getResources())))];
-            const actionObjects = resources.filter((resource) => resource instanceof ActionObject.RawClass);
-            const clickAreas = resources.filter((resource) => {
+            const lessonResources = [...this.parentModel.getResources(), ...uniq(flatten(this.parentModel.getRecipes().map((recipe) => recipe.getResources())))];
+            const entityResources = this.model.getResources().filter((resource) => {
+                return resource instanceof ActionObject.RawClass || resource instanceof ClickArea.RawClass;
+            });
+
+            const actionObjects = lessonResources.filter((resource) => {
+                return resource instanceof ActionObject.RawClass;
+            });
+            const clickAreas = lessonResources.filter((resource) => {
                 return resource instanceof ClickArea.RawClass && !actionObjects.some((actionObject) => {
                     return actionObject.getResources().includes(resource);
                 });
@@ -94,6 +100,11 @@ export default {
 
             return uniq([...actionObjects, ...clickAreas]).filter((model) => {
                 return !this.parentModel.entities.some((entity) => entity.objects.includes(model));
+            }).filter((model) => {
+                return !entityResources.includes(model);
+            }).filter((model) => {
+                const modelResources = model.getResources();
+                return !entityResources.some((resource) => modelResources.includes(resource));
             });
         }
     }
