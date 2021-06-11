@@ -72,10 +72,18 @@ export function RecipeItemMixinClass(MixinClass) {
         };
 
         getMinimumAmount() {
-            return Boolean(this.scene) || Boolean(this.file) || Boolean(this.knowledge) ? 1 : 0;
+            return this.isExistent() ? 1 : 0;
         }
 
         getMaximumAmount() {
+            return this.isUnique() ? 1 : Infinity;
+        }
+
+        isExistent() {
+            return Boolean(this.scene) || Boolean(this.file) || Boolean(this.knowledge);
+        }
+
+        isUnique() {
             const isScene = Boolean(this.scene);
             const isFile = Boolean(this.file);
             const isActionObject = Boolean(this.actionObject);
@@ -83,9 +91,11 @@ export function RecipeItemMixinClass(MixinClass) {
             const isKnowledge = Boolean(this.knowledge);
 
             const inScene = this.location === "scene";
-            const isUnique = isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge;
+            return isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge;
+        }
 
-            return isUnique ? 1 : Infinity;
+        canBeSpecifiedToActionObject() {
+            return this.amount <= 1;
         }
 
         getSubObjects() {

@@ -5,8 +5,11 @@ import ApiClient from "~client/lib/ApiClient";
 import Knowledge from "~client/models/Knowledge";
 import Item from "~client/models/Item";
 import Label from "~client/models/Label";
+import ClickArea from "~client/models/ClickArea";
+import ActionObject from "~client/models/ActionObject";
 
 /**
+ * @typedef {InstanceType<import("~client/models/GameObject")["default"]["RawClass"]>} GameObject
  * @typedef {InstanceType<import("~client/models/ClickArea")["default"]["RawClass"]>} ClickArea
  * @typedef {InstanceType<import("~client/models/ActionObject")["default"]["RawClass"]>} ActionObject
  * @typedef {InstanceType<import("~client/models/SceneObject")["default"]["RawClass"]>} SceneObject
@@ -44,40 +47,54 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return sessionOverwrite ?? lessonOverwrite ?? defaultValue;
     }
 
-    getRecipeObject(recipeItem) {
+    getRealRecipeItemObject(recipeItem) {
         const sessionOverWriteObjectString = this.getNormalizedOverwrite(recipeItem, "object");
         if (!sessionOverWriteObjectString) return recipeItem.object;
         const [collectionName, id] = sessionOverWriteObjectString.split("_");
         return ApiClient.store.getModelById(collectionName, id);
     }
 
-    recipeItemToItem(recipeItem) {
+    /**
+     *
+     *
+     * @param {RecipeItem} recipeItem
+     * @param {"validate" | "collect" | "spread"} [mode="validate"]
+     * @returns {Item | GameObject}
+     */
+    recipeItemToMostSpecificObject(recipeItem, mode = "validate") {
         let recipeResources;
         let locationToGetItemFrom;
+
+        const realRecipeItemObject = this.getRealRecipeItemObject(recipeItem);
         if (recipeItem.object instanceof Knowledge.RawClass) return recipeItem.object;
 
-        if (recipeItem.location === "scene") {
+        if (recipeItem.location === "scene" || mode === "spread") {
             recipeResources = this.currentScene.getResources();
             locationToGetItemFrom = "currentScene";
-        }
-        if (recipeItem.location === "hand") {
+        } else if (recipeItem.location === "hand") {
             recipeResources = flatten(this.grabbing.map((item) => item.getResources()));
             locationToGetItemFrom = "grabbing";
-        }
-        if (recipeItem.location === "inventory") {
+        } else if (recipeItem.location === "inventory") {
             recipeResources = flatten(this.inventory.map((item) => item.getResources()));
             locationToGetItemFrom = "inventory";
         }
 
-        let specificObjects = this.lesson.getSpecificObjectsFor(this.getRecipeObject(recipeItem), uniq(recipeResources));
-        if (!specificObjects.length) {
-            specificObjects = recipeResources.filter((resource) => {
-                const recipeItemObject = this.getRecipeObject(recipeItem);
-                if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
-                return resource === recipeItemObject;
+        if (mode === "spread") {
+            recipeResources = recipeResources.filter((resource) => {
+                if (!recipeItem.canBeSpecifiedToActionObject() && resource instanceof ActionObject.RawClass) return false;
+                return !(resource instanceof ClickArea.RawClass);
             });
         }
 
+        let specificObjects = this.lesson.getSpecificObjectsFor(realRecipeItemObject, uniq(recipeResources));
+        if (!specificObjects.length) {
+            specificObjects = recipeResources.filter((resource) => {
+                if (realRecipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(realRecipeItemObject);
+                return resource === realRecipeItemObject;
+            });
+        }
+
+        if (!specificObjects.length) return recipeItem.object;
         if (locationToGetItemFrom === "currentScene") return specificObjects[0];
         return this[locationToGetItemFrom].find((item) => item.object === specificObjects[0]);
     }
@@ -90,7 +107,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      */
     checkRecipeItemLocation(recipeItem) {
         /** @type {InputRecipeItemObject} */
-        const obj = this.getRecipeObject(recipeItem);
+        const obj = this.getRealRecipeItemObject(recipeItem);
         if (obj instanceof Knowledge.RawClass) return this.KnowledgeBase.includes(obj);
 
         if (recipeItem.location === "hand") return flatten(this.grabbing.map((item) => item.getResources())).includes(obj);
@@ -108,7 +125,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
     }
 
     checkRecipeItemAmount(recipeItem) {
-        const itemOrSpecificObject = this.recipeItemToItem(recipeItem);
+        const itemOrSpecificObject = this.recipeItemToMostSpecificObject(recipeItem);
         if (itemOrSpecificObject instanceof Knowledge.RawClass) return true;
         if (itemOrSpecificObject instanceof Item.RawClass) return itemOrSpecificObject.amount >= recipeItem.amount;
         let amount = this.getNormalizedOverwrite(itemOrSpecificObject, "amount");

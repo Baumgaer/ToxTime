@@ -233,6 +233,10 @@ export class Store {
                 return targetValue;
             }
 
+            if ((isArray(srcValue) || isPlainObject(srcValue)) && !isProxy(srcValue)) {
+                srcValue = this._createArrayChangeObserver(realModel, key, srcValue);
+            }
+
             return srcValue;
         });
         return realModel;

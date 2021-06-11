@@ -189,11 +189,12 @@ export default {
         },
         collectItemsByRecipe(recipe) {
             for (const recipeItem of recipe.input) {
-                const itemOrSpecificObject = this.model.recipeItemToItem(recipeItem);
+                const itemOrSpecificObject = this.model.recipeItemToMostSpecificObject(recipeItem, "collect");
                 if (itemOrSpecificObject instanceof Item.RawClass) {
                     let inventory = "inventory";
                     if (recipeItem.location === "hand") inventory = "grabbing";
-                    for (let index = 0; index < recipeItem.amount; index++) {
+                    const amount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+                    for (let index = 0; index < amount; index++) {
                         this.$refs[inventory].remove(itemOrSpecificObject.object);
                     }
                 }
@@ -214,14 +215,13 @@ export default {
                 } else if (recipeItem.object instanceof Scene.RawClass) {
                     this.model.currentScene = recipeItem.object;
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {
-                    let objectToAdd = recipeItem.object;
-                    if (recipeItem.object instanceof Label.RawClass) {
-                        objectToAdd = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), this.model.currentScene.getResources())[0];
-                    }
+                    let objectToAdd = this.model.recipeItemToMostSpecificObject(recipeItem, "spread");
                     if (!objectToAdd) continue;
-                    if (recipeItem.location === "inventory") {
-                        this.$refs.inventory.add(objectToAdd);
-                    } else this.$refs.grabbing.add(objectToAdd);
+                    for (let index = 0; index < recipeItem.amount; index++) {
+                        if (recipeItem.location === "inventory") {
+                            this.$refs.inventory.add(objectToAdd);
+                        } else this.$refs.grabbing.add(objectToAdd);
+                    }
                 } else if (recipeItem.location === "scene") {
                     console.log("assume object and display it");
                 }
