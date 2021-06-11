@@ -45,7 +45,7 @@
                         />
                         <ItemSelector
                             v-if="itemSelector === `specify_${subObject._id}_${index}`"
-                            :model="subObject.object"
+                            :model="subObject"
                             :attribute="'object'"
                             :attachTo="$refs[`specify_${subObject._id}_${index}`][0].$el"
                             :selectionFunction="getSpecificObject"
@@ -144,17 +144,18 @@ export default {
     methods: {
 
         getRecipeItemFields(model) {
-            const isRequisite = model.object instanceof Requisite.RawClass;
-            const isScene = model.object instanceof Scene.RawClass;
-            const isFile = model.object instanceof File.RawClass;
-            const isActionObject = model.object instanceof ActionObject.RawClass;
-            const isLabel = model.object instanceof Label.RawClass;
 
             const overwriteObject = this.lesson.getOverwrite(model, "object");
             const overwriteAmount = this.lesson.getOverwrite(model, "amount");
 
             const amountValue = overwriteAmount ?? model.amount;
             const objectValue = overwriteObject ? ApiClient.store.getModelById(overwriteObject.split("_")[0], overwriteObject.split("_")[1]) : model.object;
+
+            const isRequisite = objectValue instanceof Requisite.RawClass;
+            const isScene = objectValue instanceof Scene.RawClass;
+            const isFile = objectValue instanceof File.RawClass;
+            const isActionObject = objectValue instanceof ActionObject.RawClass;
+            const isLabel = objectValue instanceof Label.RawClass;
 
             return [{
                 ...this.amount,
@@ -174,12 +175,20 @@ export default {
         },
 
         getSpecificObject(model) {
-            const specificObjects = this.lesson.getSpecificObjectsFor(model);
-            specificObjects.push(model);
+            let specificObjects = this.lesson.getSpecificObjectsFor(model.object).filter((specificObject) => {
+                const isActionObject = specificObject instanceof ActionObject.RawClass;
+                const amountTooHigh = (this.lesson.getOverwrite(model, "amount") ?? model.amount) > 1;
+                if (isActionObject && amountTooHigh) return false;
+                return true;
+            });
+            specificObjects.push(model.object);
             return specificObjects;
         },
 
         onSpecification(model, selection) {
+            if (model instanceof RecipeItem.RawClass && selection instanceof ActionObject.RawClass) {
+                this.lesson.setOverwrite(model, "amount", Math.min(model.amount, 1));
+            }
             this.lesson.setOverwrite(model, "object", `${selection.dataCollectionName}_${selection._id}`);
             this.lesson.overwrites.__ob__.dep.notify();
         },
