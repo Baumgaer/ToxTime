@@ -88,6 +88,14 @@ export function LessonMixinClass(MixinClass) {
             }
         };
 
+        getEntity(model) {
+            for (const entity of this.entities) {
+                if (!entity.getResources().includes(model)) continue;
+                return entity;
+            }
+            return null;
+        }
+
         /**
          * Gets the overwrite from the corresponding entity when the model is
          * inside of an entity and get the overwrite of the lesson else.
@@ -99,12 +107,12 @@ export function LessonMixinClass(MixinClass) {
          */
         getOverwrite(model, property) {
             const ownOverwrite = () => {
-                if (!(model._id in this.overwrites) || !isValue(this.overwrites[model._id])) this.overwrites[model._id] = {};
+                if (!(model._id in this.overwrites) || !isValue(this.overwrites[model._id])) return null;
                 return this.overwrites[model._id][property] ?? null;
             };
 
-            for (const entity of this.entities) {
-                if (!entity.getResources().includes(model)) continue;
+            const entity = this.getEntity(model);
+            if (entity) {
                 if (property === "activated") {
                     if (entity.actionObjects.includes(model)) return entity.getOverwrite(model, property);
                     return ownOverwrite();
@@ -132,8 +140,8 @@ export function LessonMixinClass(MixinClass) {
                 return value;
             };
 
-            for (const entity of this.entities) {
-                if (!entity.getResources().includes(model)) continue;
+            const entity = this.getEntity(model);
+            if (entity) {
                 if (property === "activated") {
                     if (entity.actionObjects.includes(model)) return entity.setOverwrite(model, property, value);
                     return ownOverwrite();

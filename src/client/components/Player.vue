@@ -34,6 +34,7 @@ import ActionObject from '~client/models/ActionObject';
 import ClickArea from '~client/models/ClickArea';
 import File from '~client/models/File';
 import Scene from '~client/models/Scene';
+import SceneObject from '~client/models/SceneObject';
 
 import SceneSwitcher from "~client/components/SceneSwitcher";
 import Tablet from "~client/components/Tablet";
@@ -98,9 +99,9 @@ export default {
     mounted() {
         if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
         const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
-        this.initOverwriteWatchers();
         if (!inventoryIsFilled) this.initializeInventory();
         if (!this.preventAutosave) this.onSaveButtonClick();
+        this.initOverwriteWatchers();
         window.gamePlayer = this;
     },
     async beforeDestroy() {
@@ -118,8 +119,8 @@ export default {
         },
         onActionObjectGroupOrClickAreaPrepared(item, model) {
             if (!this.modelItemMap.has(model)) this.modelItemMap.set(model, item);
-            const isActivated = this.model.getOverwriteValue(model._id, "activated");
-            const hasAmount = this.model.getOverwriteValue(model._id, "amount");
+            const isActivated = this.model.getNormalizedOverwrite(model, "activated");
+            const hasAmount = this.model.getNormalizedOverwrite(model, "amount");
             item.visible = isActivated && Boolean(hasAmount);
         },
         onSceneClick(event, item, model) {
@@ -168,6 +169,7 @@ export default {
         },
         onWatchChange(model) {
             const item = this.modelItemMap.get(model);
+            if (!item) return;
             this.onActionObjectGroupOrClickAreaPrepared(item, model);
         },
         /**
@@ -180,7 +182,7 @@ export default {
                 const itemOrSpecificObject = this.getItemFor(recipeItem);
                 if (itemOrSpecificObject instanceof Knowledge.RawClass) return true;
                 if (itemOrSpecificObject instanceof Item.RawClass) return itemOrSpecificObject.amount >= recipeItem.amount;
-                let amount = this.model.getOverwriteValue(itemOrSpecificObject._id, "amount");
+                let amount = this.model.getNormalizedOverwrite(itemOrSpecificObject, "amount");
                 return amount >= recipeItem.amount;
             });
 
@@ -197,9 +199,8 @@ export default {
                     }
                 }
                 if (itemOrSpecificObject instanceof ActionObject.RawClass || itemOrSpecificObject instanceof ClickArea.RawClass) {
-                    let overwriteAmount = this.model.getOverwrite(itemOrSpecificObject, "amount");
-                    overwriteAmount -= recipeItem.amount;
-                    if (overwriteAmount <= 0) this.model.setOverwrite(itemOrSpecificObject, "amount", false);
+                    let overwriteAmount = this.model.getNormalizedOverwrite(itemOrSpecificObject, "amount");
+                    this.model.setOverwrite(itemOrSpecificObject, "amount", overwriteAmount - recipeItem.amount);
                 }
             }
 
@@ -226,6 +227,7 @@ export default {
                     console.log("assume object and display it");
                 }
             }
+            this.model.__ob__.dep.notify();
         },
         /**
          * @param {RecipeItem} recipeItem
@@ -262,15 +264,19 @@ export default {
         },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
-                const resources = scene.getResources().filter((resource) => !(resource instanceof Label.RawClass));
+                const resources = scene.getResources().filter((resource) => {
+                    return !(resource instanceof Label.RawClass) && !(resource instanceof SceneObject.RawClass);
+                });
                 for (const resource of resources) {
-                    const objPath = `model.overwrites.${resource._id}`;
-                    const sessionOverwrite = this.model.getOverwrite(resource._id);
-                    sessionOverwrite.activated = this.model.getOverwriteValue(resource._id, "activated");
-                    sessionOverwrite.amount = this.model.getOverwriteValue(resource._id, "amount");
-
-                    this.$watch(`${objPath}.activated`, () => this.onWatchChange(resource));
-                    this.$watch(`${objPath}.amount`, () => this.onWatchChange(resource));
+                    const entity = this.model.getEntity(resource);
+                    let path = "";
+                    if (entity) {
+                        const bucket = entity.getBestBucket(resource);
+                        const entityIndex = this.model.entities.indexOf(entity);
+                        path = `model.entities.${entityIndex}.overwrites.${bucket}`;
+                    } else path = `model.overwrites.${resource._id}`;
+                    const amountPath = `${path}.amount`;
+                    this.$watch(amountPath, () => this.onWatchChange(resource));
                 }
             }
         },

@@ -30,20 +30,20 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         }));
     }
 
-    getOverwriteValue(id, property) {
-        const sessionOverwrite = this.getOverwrite(id);
-        const lessonOverwrite = this.lesson.getOverwrite(id);
+    getNormalizedOverwrite(model, property) {
+        const sessionOverwrite = this.getOverwrite(model, property);
+        const lessonOverwrite = this.lesson.getOverwrite(model, property);
 
         let defaultValue;
         if (property === "amount") defaultValue = 1;
         if (property === "activated") defaultValue = true;
         if (property === "object") defaultValue = null;
 
-        return sessionOverwrite[property] ?? lessonOverwrite[property] ?? defaultValue;
+        return sessionOverwrite ?? lessonOverwrite ?? defaultValue;
     }
 
     getRecipeObject(recipeItem) {
-        const sessionOverWriteObjectString = this.getOverwriteValue(recipeItem._id, "object");
+        const sessionOverWriteObjectString = this.getNormalizedOverwrite(recipeItem, "object");
         if (!sessionOverWriteObjectString) return recipeItem.object;
         const [collectionName, id] = sessionOverWriteObjectString.split("_");
         return ApiClient.store.getModelById(collectionName, id);
@@ -65,8 +65,8 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         if (recipeItem.location === "scene") {
             const resources = this.currentScene.getResources();
             return resources.filter((resource) => {
-                const hasAmount = this.getOverwriteValue(resource._id, "amount") > 0;
-                const isActivated = this.getOverwriteValue(resource._id, "activated");
+                const hasAmount = this.getNormalizedOverwrite(resource, "amount") > 0;
+                const isActivated = this.getNormalizedOverwrite(resource, "activated");
                 return hasAmount && isActivated;
             }).includes(obj);
         }
@@ -109,7 +109,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                     resourceRecipes.push(recipe);
                 }
             }
-            allRecipes.push(resourceRecipes);
+            if (resourceRecipes.length) allRecipes.push(resourceRecipes);
         }
 
         return intersection(...allRecipes).filter(this.isValidRecipe.bind(this));

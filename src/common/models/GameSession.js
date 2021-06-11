@@ -74,6 +74,10 @@ export function GameSessionMixinClass(MixinClass) {
             return this.lesson.getAvatar();
         }
 
+        getEntity(model) {
+            return this.lesson.getEntity.call(this, model);
+        }
+
         getOverwrite(model, property) {
             return this.lesson.getOverwrite.call(this, model, property);
         }
