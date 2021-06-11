@@ -174,23 +174,22 @@ export default {
         },
         /**
          * @param {Recipe} recipe
-         * @param {Array<GameObject | Label | Knowledge | File>} resources
          */
-        execRecipe(recipe) {
-            /** @type {RecipeItem[]} */
-            const amountCorrect = recipe.input.every((recipeItem) => {
-                const itemOrSpecificObject = this.getItemFor(recipeItem);
-                if (itemOrSpecificObject instanceof Knowledge.RawClass) return true;
-                if (itemOrSpecificObject instanceof Item.RawClass) return itemOrSpecificObject.amount >= recipeItem.amount;
-                let amount = this.model.getNormalizedOverwrite(itemOrSpecificObject, "amount");
-                return amount >= recipeItem.amount;
+        async execRecipe(recipe) {
+            this.collectItemsByRecipe(recipe);
+            await this.awaitRecipeDelay(recipe);
+            this.spreadItemsByRecipe(recipe);
+            this.model.__ob__.dep.notify();
+        },
+        awaitRecipeDelay(recipe) {
+            if (!recipe.transitionSettings.delay) return Promise.resolve();
+            return new Promise((resolve) => {
+                setTimeout(resolve, recipe.transitionSettings.delay);
             });
-
-            if (!amountCorrect) return;
-
-            // Collect items
+        },
+        collectItemsByRecipe(recipe) {
             for (const recipeItem of recipe.input) {
-                const itemOrSpecificObject = this.getItemFor(recipeItem);
+                const itemOrSpecificObject = this.model.recipeItemToItem(recipeItem);
                 if (itemOrSpecificObject instanceof Item.RawClass) {
                     let inventory = "inventory";
                     if (recipeItem.location === "hand") inventory = "grabbing";
@@ -203,8 +202,8 @@ export default {
                     this.model.setOverwrite(itemOrSpecificObject, "amount", overwriteAmount - recipeItem.amount);
                 }
             }
-
-            // Give items or exec functionality
+        },
+        spreadItemsByRecipe(recipe) {
             for (const recipeItem of recipe.output) {
                 if (recipeItem.object instanceof Knowledge.RawClass && !this.model.knowledgeBase.includes(recipeItem.object)) {
                     this.model.knowledgeBase.push(recipeItem.object);
@@ -227,40 +226,6 @@ export default {
                     console.log("assume object and display it");
                 }
             }
-            this.model.__ob__.dep.notify();
-        },
-        /**
-         * @param {RecipeItem} recipeItem
-         */
-        getItemFor(recipeItem) {
-            let recipeResources;
-            let locationToGetItemFrom;
-            if (recipeItem.object instanceof Knowledge.RawClass) return recipeItem.object;
-
-            if (recipeItem.location === "scene") {
-                recipeResources = this.model.currentScene.getResources();
-                locationToGetItemFrom = "currentScene";
-            }
-            if (recipeItem.location === "hand") {
-                recipeResources = flatten(this.model.grabbing.map((item) => item.getResources()));
-                locationToGetItemFrom = "grabbing";
-            }
-            if (recipeItem.location === "inventory") {
-                recipeResources = flatten(this.model.inventory.map((item) => item.getResources()));
-                locationToGetItemFrom = "inventory";
-            }
-
-            let specificObjects = this.model.lesson.getSpecificObjectsFor(this.model.getRecipeObject(recipeItem), uniq(recipeResources));
-            if (!specificObjects.length) {
-                specificObjects = recipeResources.filter((resource) => {
-                    const recipeItemObject = this.model.getRecipeObject(recipeItem);
-                    if (recipeItemObject instanceof Label.RawClass) return resource.getLabels().includes(recipeItemObject);
-                    return resource === recipeItemObject;
-                });
-            }
-
-            if (locationToGetItemFrom === "currentScene") return specificObjects[0];
-            return this.model[locationToGetItemFrom].find((item) => item.object === specificObjects[0]);
         },
         initOverwriteWatchers() {
             for (const scene of this.model.lesson.scenes) {
