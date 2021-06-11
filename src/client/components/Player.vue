@@ -84,8 +84,11 @@ export default {
     },
     watch: {
         'model.currentScene': {
-            handler(scene) {
-                setTimeout(() => this.$refs[`scene_${scene._id}`][0].paper.view._windowEvents.resize());
+            async handler(scene) {
+                const graphicViewer = this.$refs[`scene_${scene._id}`][0];
+                await graphicViewer.initialBackgroundLoadedPromise;
+                await Promise.all(graphicViewer.actionObjectsMap.map((item) => item.promise));
+                setTimeout(() => graphicViewer.paper.view._windowEvents.resize());
             },
             immediate: false
         }
