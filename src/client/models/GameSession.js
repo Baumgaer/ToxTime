@@ -107,10 +107,10 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      */
     checkRecipeItemLocation(recipeItem) {
         /** @type {InputRecipeItemObject} */
-        const obj = this.getRealRecipeItemObject(recipeItem);
+        const obj = this.recipeItemToMostSpecificObject(recipeItem);
         if (obj instanceof Knowledge.RawClass) return this.KnowledgeBase.includes(obj);
 
-        if (recipeItem.location === "hand") return flatten(this.grabbing.map((item) => item.getResources())).includes(obj);
+        if (recipeItem.location === "hand") return flatten(this.grabbing.map((item) => item.getResources())).concat(this.grabbing).includes(obj);
 
         if (recipeItem.location === "scene") {
             const resources = this.currentScene.getResources();
@@ -132,15 +132,26 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return amount >= recipeItem.amount;
     }
 
+    checkRecipeItemNecessaryResources(recipeItem, resources) {
+        const allResources = uniq(flatten(resources.map((resource) => resource.getResources())).concat(resources));
+        const realRecipeItemObject = this.getRealRecipeItemObject(recipeItem);
+        return allResources.includes(realRecipeItemObject) || realRecipeItemObject instanceof Knowledge.RawClass && this.KnowledgeBase.includes(realRecipeItemObject);
+    }
+
     /**
      *
      *
      * @param {Recipe} recipe
      * @returns {boolean}
      */
-    isValidRecipe(recipe) {
+    isValidRecipe(recipe, resources) {
         const possibleRecipes = this.lesson.getRecipes(true);
         if (!possibleRecipes.includes(recipe)) return false;
+
+        if (resources) {
+            const allItemsInNecessaryResources = recipe.input.every((recipeItem) => this.checkRecipeItemNecessaryResources(recipeItem, resources));
+            if (!allItemsInNecessaryResources) return false;
+        }
 
         const allItemsInCorrectLocation = recipe.input.every(this.checkRecipeItemLocation.bind(this));
         if (!allItemsInCorrectLocation) return false;
@@ -167,13 +178,13 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
                 for (const recipeItem of recipeItems) {
                     const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                    resourceRecipes.push(recipe);
+                    if (this.isValidRecipe(recipe, inputResources)) resourceRecipes.push(recipe);
                 }
             }
             if (resourceRecipes.length) allRecipes.push(resourceRecipes);
         }
 
-        return intersection(...allRecipes).filter(this.isValidRecipe.bind(this));
+        return intersection(...allRecipes);
     }
 
 });

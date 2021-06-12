@@ -42,7 +42,8 @@ export function EntityMixinClass(MixinClass) {
                 ref: "ActionObject",
                 default: null,
                 autopopulate: true,
-                sticky: true
+                sticky: true,
+                ignoreOnIteration: true
             },
             overwrites: {
                 type: Schema.Types.Mixed,

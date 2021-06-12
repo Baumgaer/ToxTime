@@ -161,11 +161,9 @@ export default {
             this.markedItem = null;
 
             const resources = [model, ...model.getLabels(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
-            const recipes = this.model.findRecipes(resources);
-            if (recipes.length) {
-                for (const recipe of recipes) {
-                    this.execRecipe(recipe);
-                }
+            const recipe = this.model.findRecipes(resources)[0];
+            if (recipe) {
+                this.execRecipe(recipe, model);
             } else this.addPunishPoint();
 
             return false;
@@ -178,10 +176,10 @@ export default {
         /**
          * @param {Recipe} recipe
          */
-        async execRecipe(recipe) {
+        async execRecipe(recipe, clickedModel) {
             this.collectItemsByRecipe(recipe);
             await this.awaitRecipeDelay(recipe);
-            this.spreadItemsByRecipe(recipe);
+            this.spreadItemsByRecipe(recipe, clickedModel);
             this.model.__ob__.dep.notify();
         },
         awaitRecipeDelay(recipe) {
@@ -201,13 +199,20 @@ export default {
                         this.$refs[inventory].remove(itemOrSpecificObject.object);
                     }
                 }
-                if (itemOrSpecificObject instanceof ActionObject.RawClass || itemOrSpecificObject instanceof ClickArea.RawClass) {
-                    let overwriteAmount = this.model.getNormalizedOverwrite(itemOrSpecificObject, "amount");
-                    this.model.setOverwrite(itemOrSpecificObject, "amount", overwriteAmount - recipeItem.amount);
+                const objectAmount = this.model.getNormalizedOverwrite(itemOrSpecificObject, "amount");
+                const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+                if (itemOrSpecificObject instanceof ClickArea.RawClass) {
+                    this.model.setOverwrite(itemOrSpecificObject, "amount", objectAmount - recipeItemAmount);
+                } else if (itemOrSpecificObject instanceof ActionObject.RawClass) {
+                    const entity = this.model.getEntity(itemOrSpecificObject);
+                    if (!entity) {
+                        this.model.setOverwrite(itemOrSpecificObject, "amount", objectAmount - recipeItemAmount);
+                    } else if (recipeItemAmount) entity.currentPhenotype = null;
+                    this.onWatchChange(itemOrSpecificObject);
                 }
             }
         },
-        spreadItemsByRecipe(recipe) {
+        spreadItemsByRecipe(recipe, clickedModel) {
             for (const recipeItem of recipe.output) {
                 if (recipeItem.object instanceof Knowledge.RawClass && !this.model.knowledgeBase.includes(recipeItem.object)) {
                     this.model.knowledgeBase.push(recipeItem.object);
@@ -226,7 +231,14 @@ export default {
                         } else this.$refs.grabbing.add(objectToAdd);
                     }
                 } else if (recipeItem.location === "scene") {
-                    console.log("assume object and display it");
+                    const entity = this.model.getEntity(recipeItem.object);
+                    if (entity) {
+                        const newPhenotype = entity.actionObjects.find((actionObject) => {
+                            return (actionObject.getResources().includes(recipeItem.object) || actionObject.getLabels().includes(recipeItem.object)) && actionObject !== clickedModel;
+                        });
+                        entity.currentPhenotype = newPhenotype;
+                        this.onWatchChange(newPhenotype);
+                    }
                 }
             }
         },
