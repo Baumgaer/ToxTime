@@ -42,9 +42,10 @@
                             :showSubObjects="false"
                             draggable="false"
                             :ref="`specify_${subObject._id}_${index}`"
+                            :style="`${field.disabled ? 'opacity: 0.8; pointer-events: none' : ''}`"
                         />
                         <ItemSelector
-                            v-if="itemSelector === `specify_${subObject._id}_${index}`"
+                            v-if="itemSelector === `specify_${subObject._id}_${index}` && !field.disabled"
                             :model="subObject"
                             :attribute="'object'"
                             :attachTo="$refs[`specify_${subObject._id}_${index}`][0].$el"
@@ -71,6 +72,7 @@ import Scene from "~client/models/Scene";
 import Requisite from "~client/models/Requisite";
 import File from "~client/models/File";
 import Label from "~client/models/Label";
+import Knowledge from "~client/models/Knowledge";
 import ClientModel from "~client/lib/ClientModel";
 
 import ApiClient from "~client/lib/ApiClient";
@@ -130,9 +132,9 @@ export default {
             return (model) => {
                 const amountValue = this.lesson.getOverwrite(model, "amount") ?? model.amount ?? 1;
                 const activatedValue = this.lesson.getOverwrite(model, "activated") ?? this.activated.value;
-                if (model instanceof ActionObject.RawClass) return [{ ...this.amount, value: amountValue, disabled: true }, {...this.activated, value: activatedValue}];
+                if (model instanceof ActionObject.RawClass) return [{...this.activated, value: activatedValue}];
                 if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
-                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }, {...this.activated, value: activatedValue}];
+                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }];
                 if (model instanceof Recipe.RawClass) {
                     return [{...this.points, value: this.lesson.getOverwrite(model, "points") ?? 0}];
                 }
@@ -156,17 +158,18 @@ export default {
             const isFile = objectValue instanceof File.RawClass;
             const isActionObject = objectValue instanceof ActionObject.RawClass;
             const isLabel = objectValue instanceof Label.RawClass;
+            const isKnowledge = objectValue instanceof Knowledge.RawClass;
 
             return [{
                 ...this.amount,
                 value: amountValue,
                 min: model.getMinimumAmount(),
                 max: model.getMaximumAmount(),
-                disabled: isActionObject || isScene || isFile
+                disabled: isActionObject || isScene || isFile || isKnowledge
             }, {
                 ...this.object,
                 value: objectValue,
-                disabled: !isRequisite && !isLabel || isScene || isFile
+                disabled: !isRequisite && !isLabel || isScene || isFile || isKnowledge
             }];
         },
 
