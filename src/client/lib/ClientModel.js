@@ -1,6 +1,6 @@
 import BaseModel from "~common/lib/BaseModel";
 import ApiClient from "~client/lib/ApiClient";
-import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set, isValue } from "~common/utils";
+import { resolveProxy, isObjectLike, clone, cloneDeep, eachDeep, isFunction, isArray, get, set, isValue, unescape } from "~common/utils";
 import { v4 as uuid } from "uuid";
 import { Document } from "mongoose";
 
@@ -70,7 +70,7 @@ export default class ClientModel extends BaseModel {
     }
 
     getName(preferredField) {
-        return this[preferredField] || this.name;
+        return unescape(this[preferredField] || this.name);
     }
 
     getOverlayIcons() {

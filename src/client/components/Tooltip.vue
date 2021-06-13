@@ -7,7 +7,7 @@
                 type="text" name="name"
                 ref="nameInput"
                 autocomplete="off"
-                :value="model.getName() ? model.getName() : $t('unnamed')"
+                :value="displayName"
                 @change="onNameChange($event, model)"
             />
             <strong v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
@@ -99,6 +99,11 @@ export default {
             itemSelectorCreated: false,
             itemSelectorOpen: false
         };
+    },
+    computed: {
+        displayName() {
+            return unescape(this.model.getName());
+        }
     },
     beforeDestroy() {
         if (!this.tippy) return;

@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import { isEmail } from "validator";
+import { escape, unescape } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -23,6 +24,7 @@ export function UserMixinClass(MixinClass) {
                 unique: true,
                 lowercase: true,
                 trim: true,
+                set: escape,
                 validate: {
                     validator: (value) => {
                         return typeof value === "string" && isEmail(value);
@@ -36,17 +38,20 @@ export function UserMixinClass(MixinClass) {
             },
             firstName: {
                 type: String,
-                default: ""
+                default: "",
+                set: escape
             },
             lastName: {
                 type: String,
-                default: ""
+                default: "",
+                set: escape
             },
             locale: {
                 type: String,
                 enum: ["de-de", "en-us"],
                 required: true,
-                default: global.process.environment.APP_DEFAULT_LANGUAGE
+                default: global.process.environment.APP_DEFAULT_LANGUAGE,
+                set: escape
             },
             isAdmin: {
                 type: Boolean,
@@ -78,7 +83,7 @@ export function UserMixinClass(MixinClass) {
         };
 
         getName(preferredField) {
-            return `${this[preferredField] || this.email}`;
+            return unescape(`${this[preferredField] || this.email}`);
         }
     }
     return User;

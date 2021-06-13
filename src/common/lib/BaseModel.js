@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction, isArray, uniq } from "~common/utils";
+import { dataTransformer, getPrototypeNamesRecursive, merge, eachDeep, isValue, isObjectLike, get, isFunction, isArray, uniq, escape, unescape } from "~common/utils";
 
 const globalActions = {};
 global.globalActions = globalActions;
@@ -22,7 +22,8 @@ export default class BaseModel {
         name: {
             type: String,
             required: true,
-            default: ""
+            default: "",
+            set: escape
         },
         creator: {
             type: Schema.Types.ObjectId,
@@ -350,7 +351,7 @@ export default class BaseModel {
     }
 
     getName(preferredField) {
-        return this[preferredField] || "";
+        return unescape(this[preferredField] || "");
     }
 
     getAvatar() {

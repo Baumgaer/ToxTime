@@ -1,6 +1,6 @@
 import { GameSessionMixinClass } from "~common/models/GameSession";
 import ClientModel from "~client/lib/ClientModel";
-import { intersection, flatten, uniq } from "~common/utils";
+import { intersection, flatten, uniq, unescape } from "~common/utils";
 import ApiClient from "~client/lib/ApiClient";
 import Knowledge from "~client/models/Knowledge";
 import Item from "~client/models/Item";
@@ -26,7 +26,7 @@ const CommonClientGameSession = GameSessionMixinClass(ClientModel);
 export default ClientModel.buildClientExport(class GameSession extends CommonClientGameSession {
 
     getName() {
-        return this.lesson?.getName();
+        return unescape(this.lesson?.getName());
     }
 
     toRequestObject(modelFilter) {

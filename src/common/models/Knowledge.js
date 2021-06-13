@@ -1,3 +1,4 @@
+import { escape } from "~common/utils";
 /**
  * Creates a new class with the returned class extended by the MixinClass
  *
@@ -21,12 +22,14 @@ export function KnowledgeMixinClass(MixinClass) {
             "description_de-de": {
                 type: String,
                 required: true,
-                default: null
+                default: null,
+                set: escape
             },
             "description_en-us": {
                 type: String,
                 required: true,
-                default: null
+                default: null,
+                set: escape
             }
         };
 

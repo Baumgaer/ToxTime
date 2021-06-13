@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { escape, unescape } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -22,7 +23,8 @@ export function FileMixinClass(MixinClass) {
             },
             fileName: {
                 type: String,
-                required: true
+                required: true,
+                set: escape
             },
             size: {
                 type: Number,
@@ -30,7 +32,8 @@ export function FileMixinClass(MixinClass) {
             },
             mime: {
                 type: String,
-                required: true
+                required: true,
+                set: escape
             },
             labels: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
@@ -43,7 +46,7 @@ export function FileMixinClass(MixinClass) {
         };
 
         getName(preferredField) {
-            return `${this[preferredField] || this.name}`;
+            return unescape(`${this[preferredField] || this.name}`);
         }
 
         getLabels() {

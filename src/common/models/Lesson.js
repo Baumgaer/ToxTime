@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { union, difference, isValue, uniq } from "~common/utils";
+import { union, difference, isValue, uniq, escape } from "~common/utils";
 
 /**
  * @typedef {import("~common/lib/BaseModel")["default"]} BaseModel
@@ -26,7 +26,8 @@ export function LessonMixinClass(MixinClass) {
             },
             description: {
                 type: String,
-                default: ""
+                default: "",
+                set: escape
             },
             inventory: {
                 type: [

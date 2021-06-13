@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { escape } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -67,7 +68,8 @@ export function RecipeItemMixinClass(MixinClass) {
             location: {
                 type: String,
                 enum: ["inventory", "hand", "scene"],
-                default: "inventory"
+                default: "inventory",
+                set: escape
             }
         };
 
@@ -103,7 +105,7 @@ export function RecipeItemMixinClass(MixinClass) {
         }
 
         getName() {
-            return this.object.name;
+            return this.object.getName();
         }
 
     }

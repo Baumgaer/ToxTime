@@ -7,7 +7,7 @@
             <section><textarea-autosize
                 class="description"
                 :placeholder="$t('description')"
-                v-model="model.description"
+                v-model="description"
                 :min-height="100"
             /></section>
             <h3>{{ $t("entities") }}</h3>
@@ -113,6 +113,7 @@ import File from "~client/models/File";
 import Entity from "~client/models/Entity";
 
 import { parseEventModelData } from "~client/utils";
+import { unescape } from "~common/utils";
 
 export default {
     components: {
@@ -130,6 +131,14 @@ export default {
         };
     },
     computed: {
+        description: {
+            get() {
+                return unescape(this.model.description);
+            },
+            set(value) {
+                this.model.description = value;
+            }
+        },
         totalPoints() {
             return this.model.getRecipes(true).reduce((total, recipe) => {
                 return total + (this.model.getOverwrite(recipe, "points") || 0);

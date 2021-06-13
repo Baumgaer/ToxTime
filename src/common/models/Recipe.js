@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { flatten, compact } from "~common/utils";
+import { flatten, compact, escape } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -23,7 +23,8 @@ export function RecipeMixinClass(MixinClass) {
             },
             description: {
                 type: String,
-                default: ""
+                default: "",
+                set: escape
             },
             input: {
                 type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
