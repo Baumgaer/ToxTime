@@ -19,7 +19,7 @@
                 </nav>
                 <main>
                     <section v-show="category === 'information'">
-                        {{ model.lesson.description }}
+                        {{ lessonDescription }}
                     </section>
                     <section v-show="category === 'knowledge'">
                         <ul>
@@ -46,7 +46,7 @@ import GameSession from "~client/models/GameSession";
 
 import Button from "~client/components/Button";
 
-import { uniq } from "~common/utils";
+import { uniq, unescape } from "~common/utils";
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/material.css';
@@ -68,6 +68,9 @@ export default {
         };
     },
     computed: {
+        lessonDescription() {
+            return unescape(this.model.lesson.description);
+        },
         knowledgeBase() {
             return uniq(this.model.knowledgeBase);
         }
