@@ -1,6 +1,6 @@
 import { GameSessionMixinClass } from "~common/models/GameSession";
 import ClientModel from "~client/lib/ClientModel";
-import { intersection, flatten, uniq, unescape } from "~common/utils";
+import { intersection, flatten, flattenDeep, uniq, unescape, difference } from "~common/utils";
 import ApiClient from "~client/lib/ApiClient";
 import Knowledge from "~client/models/Knowledge";
 import Item from "~client/models/Item";
@@ -37,14 +37,13 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
 
     getNormalizedOverwrite(model, property) {
         const sessionOverwrite = this.getOverwrite(model, property);
-        const lessonOverwrite = this.lesson.getOverwrite(model, property);
 
         let defaultValue;
         if (property === "amount") defaultValue = 1;
         if (property === "activated") defaultValue = true;
         if (property === "object") defaultValue = null;
 
-        return sessionOverwrite ?? lessonOverwrite ?? defaultValue;
+        return sessionOverwrite ?? defaultValue;
     }
 
     getRealRecipeItemObject(recipeItem) {
@@ -114,11 +113,15 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
 
         if (recipeItem.location === "scene") {
             const resources = this.currentScene.getResources();
-            return resources.filter((resource) => {
+            return Boolean(resources.find((resource) => {
+                if (resource instanceof Label.RawClass) return false;
+                if (resource !== obj) return false;
                 const hasAmount = this.getNormalizedOverwrite(resource, "amount") > 0;
+                if (!hasAmount) return false;
                 const isActivated = this.getNormalizedOverwrite(resource, "activated");
-                return hasAmount && isActivated;
-            }).includes(obj);
+                if (!isActivated) return false;
+                return true;
+            }));
         }
 
         return false;
@@ -139,9 +142,27 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
     }
 
     checkRecipeItemNecessaryResources(recipeItem, resources) {
-        const allResources = uniq(flatten(resources.map((resource) => resource.getResources())).concat(resources));
+        const allResources = uniq(flattenDeep(resources.map((resource) => [resource.getSubObjects(true), resource.getLabels()])).concat(resources));
         const realRecipeItemObject = this.getRealRecipeItemObject(recipeItem);
         return allResources.includes(realRecipeItemObject) || realRecipeItemObject instanceof Knowledge.RawClass && this.KnowledgeBase.includes(realRecipeItemObject);
+    }
+
+    compactResources(resources) {
+        const compactedResources = [];
+        resourceLoop: for (const resource of resources) {
+            const resourceResources = resource.getResources();
+            for (let index = 0; index < compactedResources.length; index++) {
+                const compactedResource = compactedResources[index];
+                const compactedResourceResources = compactedResource.getResources();
+                if (compactedResourceResources.includes(resource)) continue resourceLoop;
+                if (resourceResources.includes(compactedResource)) {
+                    compactedResources[index] = resource;
+                    continue resourceLoop;
+                }
+            }
+            compactedResources.push(resource);
+        }
+        return compactedResources;
     }
 
     /**
@@ -154,16 +175,27 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         const possibleRecipes = this.lesson.getRecipes(true);
         if (!possibleRecipes.includes(recipe)) return false;
 
-        if (resources) {
-            const allItemsInNecessaryResources = recipe.input.every((recipeItem) => this.checkRecipeItemNecessaryResources(recipeItem, resources));
-            if (!allItemsInNecessaryResources) return false;
-        }
+        const allItemsHaveCorrectAmount = recipe.input.every(this.checkRecipeItemAmount.bind(this));
+        if (!allItemsHaveCorrectAmount) return false;
 
         const allItemsInCorrectLocation = recipe.input.every(this.checkRecipeItemLocation.bind(this));
         if (!allItemsInCorrectLocation) return false;
 
-        const allItemsHaveCorrectAmount = recipe.input.every(this.checkRecipeItemAmount.bind(this));
-        if (!allItemsHaveCorrectAmount) return false;
+        if (resources) {
+            const allItemsInNecessaryResources = recipe.input.every((recipeItem) => this.checkRecipeItemNecessaryResources(recipeItem, resources));
+            if (!allItemsInNecessaryResources) return false;
+
+            if (recipe.isIngredientsExact()) {
+                const mostSpecificRecipeItemObjects = recipe.input.map((recipeItem) => {
+                    const mostSpecificObject = this.recipeItemToMostSpecificObject(recipeItem);
+                    if (mostSpecificObject instanceof Item.RawClass) return mostSpecificObject.object;
+                    return mostSpecificObject;
+                });
+                const compactedResources = this.compactResources(resources);
+                const objectDifference = difference(compactedResources, mostSpecificRecipeItemObjects);
+                return objectDifference.filter((recipeItemObject) => !(recipeItemObject instanceof Knowledge.RawClass)).length === 0;
+            }
+        }
 
         return true;
     }
@@ -184,7 +216,9 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
                 for (const recipeItem of recipeItems) {
                     const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                    if (this.isValidRecipe(recipe, inputResources)) resourceRecipes.push(recipe);
+                    if (flatten(allRecipes).includes(recipe)) {
+                        resourceRecipes.push(recipe);
+                    } else if (!resourceRecipes.includes(recipe) && this.isValidRecipe(recipe, inputResources)) resourceRecipes.push(recipe);
                 }
             }
             if (resourceRecipes.length) allRecipes.push(resourceRecipes);

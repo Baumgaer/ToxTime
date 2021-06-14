@@ -64,6 +64,10 @@ export function RecipeMixinClass(MixinClass) {
             return this.transitionSettings.quantityExact ?? false;
         }
 
+        isIngredientsExact() {
+            return this.transitionSettings.ingredientsExact ?? false;
+        }
+
     }
     return Recipe;
 }

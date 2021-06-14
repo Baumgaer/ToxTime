@@ -185,7 +185,7 @@ export default {
         awaitRecipeDelay(recipe) {
             if (!recipe.transitionSettings.delay) return Promise.resolve();
             return new Promise((resolve) => {
-                setTimeout(resolve, recipe.transitionSettings.delay);
+                setTimeout(resolve, recipe.transitionSettings.delay * 1000);
             });
         },
         collectItemsByRecipe(recipe) {
