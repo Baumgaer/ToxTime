@@ -60,6 +60,10 @@ export function RecipeMixinClass(MixinClass) {
             return compact(flatten(this.objects.map((object) => object?.getSubObjects?.())));
         }
 
+        isQuantityExact() {
+            return this.transitionSettings.quantityExact ?? false;
+        }
+
     }
     return Recipe;
 }

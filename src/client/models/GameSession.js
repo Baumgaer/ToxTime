@@ -59,7 +59,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      *
      * @param {RecipeItem} recipeItem
      * @param {"validate" | "collect" | "spread"} [mode="validate"]
-     * @returns {Item | GameObject}
+     * @returns {Item | GameObject | Knowledge}
      */
     recipeItemToMostSpecificObject(recipeItem, mode = "validate") {
         let recipeResources;
@@ -127,9 +127,15 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
     checkRecipeItemAmount(recipeItem) {
         const itemOrSpecificObject = this.recipeItemToMostSpecificObject(recipeItem);
         if (itemOrSpecificObject instanceof Knowledge.RawClass) return true;
-        if (itemOrSpecificObject instanceof Item.RawClass) return itemOrSpecificObject.amount >= recipeItem.amount;
-        let amount = this.getNormalizedOverwrite(itemOrSpecificObject, "amount");
-        return amount >= recipeItem.amount;
+
+        let amountToCheck = this.getNormalizedOverwrite(itemOrSpecificObject, "amount");
+        if (itemOrSpecificObject instanceof Item.RawClass) amountToCheck = itemOrSpecificObject.amount;
+
+        const recipeItemAmount = this.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+        const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
+        if (recipe.isQuantityExact() && recipeItemAmount && amountToCheck !== recipeItemAmount) return false;
+
+        return amountToCheck >= recipeItemAmount;
     }
 
     checkRecipeItemNecessaryResources(recipeItem, resources) {
