@@ -214,8 +214,8 @@ export default {
         },
         spreadItemsByRecipe(recipe, clickedModel) {
             for (const recipeItem of recipe.output) {
-                if (recipeItem.object instanceof Knowledge.RawClass && !this.model.knowledgeBase.includes(recipeItem.object)) {
-                    this.model.knowledgeBase.push(recipeItem.object);
+                if (recipeItem.object instanceof Knowledge.RawClass) {
+                    if (!this.model.knowledgeBase.includes(recipeItem.object)) this.model.knowledgeBase.push(recipeItem.object);
                 } else if (recipeItem.object instanceof File.RawClass) {
                     this.$refs.tablet.showingFile = recipeItem.object;
                     this.$refs.tablet.category = "files";
