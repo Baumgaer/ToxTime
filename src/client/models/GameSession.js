@@ -7,6 +7,7 @@ import Item from "~client/models/Item";
 import Label from "~client/models/Label";
 import ClickArea from "~client/models/ClickArea";
 import ActionObject from "~client/models/ActionObject";
+import SceneObject from "~client/models/SceneObject";
 
 /**
  * @typedef {InstanceType<import("~client/models/GameObject")["default"]["RawClass"]>} GameObject
@@ -148,6 +149,32 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return allResources.includes(realRecipeItemObject) || realRecipeItemObject instanceof Knowledge.RawClass && this.KnowledgeBase.includes(realRecipeItemObject);
     }
 
+    checkRecipeItemToInventoryAvailable(recipeItem, sceneResources) {
+        const toAnInventory = ["inventory", "hand"].includes(recipeItem.location);
+        if (!toAnInventory) return true;
+
+        const amount = this.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+        if (amount > 1) return true;
+
+        const recipeItemObject = this.getRealRecipeItemObject(recipeItem);
+        const isActionObject = recipeItemObject instanceof ActionObject.RawClass;
+        const isLabel = recipeItemObject instanceof Label.RawClass;
+        const isSceneObject = recipeItemObject instanceof SceneObject.RawClass;
+        if (!isActionObject && !isLabel && !isSceneObject) return true;
+
+        let specificObject = recipeItemObject;
+        if (!(specificObject instanceof ActionObject.RawClass)) {
+            const specificObjects = this.lesson.getSpecificObjectsFor(recipeItemObject, sceneResources);
+            specificObject = specificObjects.filter((mostSpecificObject) => mostSpecificObject instanceof ActionObject.RawClass)[0];
+        }
+
+        const hasAmount = this.getNormalizedOverwrite(specificObject, "amount") > 0;
+        if (!hasAmount) return false;
+        const isActivated = this.getNormalizedOverwrite(specificObject, "activated");
+        if (!isActivated) return false;
+        return sceneResources.includes(recipeItemObject);
+    }
+
     compactResources(resources) {
         const compactedResources = [];
         resourceLoop: for (const resource of resources) {
@@ -197,6 +224,10 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
                 return objectDifference.filter((recipeItemObject) => !(recipeItemObject instanceof Knowledge.RawClass)).length === 0;
             }
         }
+
+        const sceneResources = this.currentScene.getResources();
+        const allItemsToInventoryAreVisible = recipe.output.every((recipeItem) => this.checkRecipeItemToInventoryAvailable(recipeItem, sceneResources));
+        if (!allItemsToInventoryAreVisible) return false;
 
         return true;
     }
