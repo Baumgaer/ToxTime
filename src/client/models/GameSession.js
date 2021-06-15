@@ -167,6 +167,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             const specificObjects = this.lesson.getSpecificObjectsFor(recipeItemObject, sceneResources);
             specificObject = specificObjects.filter((mostSpecificObject) => mostSpecificObject instanceof ActionObject.RawClass)[0];
         }
+        if (!specificObject) return true;
 
         const hasAmount = this.getNormalizedOverwrite(specificObject, "amount") > 0;
         if (!hasAmount) return false;
