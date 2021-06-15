@@ -232,6 +232,24 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return true;
     }
 
+    sortRecipes(recipes) {
+        const recipeSumMap = new Map();
+        for (const recipe of recipes) {
+            let sum = 0;
+            const recipeItems = recipe.getSubObjects(true);
+            for (const recipeItem of recipeItems) {
+                const realRecipeItemObject = this.getRealRecipeItemObject(recipeItem);
+                if (realRecipeItemObject instanceof ActionObject.RawClass) sum += 4;
+                else if (realRecipeItemObject instanceof ClickArea.RawClass) sum += 3;
+                else if (realRecipeItemObject instanceof SceneObject.RawClass) sum += 2;
+                else if (realRecipeItemObject instanceof Label.RawClass) sum += 1;
+                else sum += 5;
+            }
+            recipeSumMap.set(recipe, sum);
+        }
+        return recipes.sort((a, b) => recipeSumMap.get(b) - recipeSumMap.get(a));
+    }
+
     /**
      *
      *
@@ -256,7 +274,8 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             if (resourceRecipes.length) allRecipes.push(resourceRecipes);
         }
 
-        return intersection(...allRecipes);
+        const possibleRecipes = intersection(...allRecipes);
+        return this.sortRecipes(possibleRecipes);
     }
 
 });
