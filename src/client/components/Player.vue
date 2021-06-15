@@ -214,14 +214,16 @@ export default {
         },
         spreadItemsByRecipe(recipe, clickedModel) {
             for (const recipeItem of recipe.output) {
-                if (recipeItem.object instanceof Knowledge.RawClass) {
-                    if (!this.model.knowledgeBase.includes(recipeItem.object)) this.model.knowledgeBase.push(recipeItem.object);
-                } else if (recipeItem.object instanceof File.RawClass) {
-                    this.$refs.tablet.showingFile = recipeItem.object;
+                const recipeItemObject = this.model.getRealRecipeItemObject(recipeItem);
+
+                if (recipeItemObject instanceof Knowledge.RawClass) {
+                    if (!this.model.knowledgeBase.includes(recipeItemObject)) this.model.knowledgeBase.push(recipeItemObject);
+                } else if (recipeItemObject instanceof File.RawClass) {
+                    this.$refs.tablet.showingFile = recipeItemObject;
                     this.$refs.tablet.category = "files";
                     this.$refs.tablet.tippy.show();
-                } else if (recipeItem.object instanceof Scene.RawClass) {
-                    this.model.currentScene = recipeItem.object;
+                } else if (recipeItemObject instanceof Scene.RawClass) {
+                    this.model.currentScene = recipeItemObject;
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {
                     let objectToAdd = this.model.recipeItemToMostSpecificObject(recipeItem, "spread");
                     if (!objectToAdd) continue;
@@ -231,13 +233,37 @@ export default {
                         } else this.$refs.grabbing.add(objectToAdd);
                     }
                 } else if (recipeItem.location === "scene") {
-                    const entity = this.model.getEntity(recipeItem.object);
+                    const entity = this.model.getEntity(recipeItemObject);
                     if (entity) {
                         const newPhenotype = entity.actionObjects.find((actionObject) => {
-                            return (actionObject.getResources().includes(recipeItem.object) || actionObject.getLabels().includes(recipeItem.object)) && actionObject !== clickedModel;
+                            const resources = actionObject.getResources();
+                            const labels = actionObject.getLabels();
+                            return (resources.includes(recipeItemObject) || labels.includes(recipeItemObject)) && actionObject !== clickedModel;
                         });
                         entity.currentPhenotype = newPhenotype;
                         this.onWatchChange(newPhenotype);
+                    } else {
+                        const lesson = this.model.lesson;
+                        const scenes = lesson.scenes;
+                        const currentSceneIndex = scenes.indexOf(this.model.currentScene);
+                        const scenesNumber = scenes.length;
+                        for (let index = 0; index < scenesNumber; index++) {
+                            const scene = scenes[(index + currentSceneIndex) % scenesNumber];
+                            const resources = scene.getResources();
+                            let specificObject = recipeItemObject;
+                            if (!(specificObject instanceof ActionObject.RawClass) || specificObject === clickedModel) {
+                                specificObject = lesson.getSpecificObjectsFor(recipeItemObject, resources).filter((specificObject) => {
+                                    return specificObject !== clickedModel && specificObject instanceof ActionObject.RawClass;
+                                })[0];
+                            }
+                            if (!specificObject) continue;
+
+                            const objectAmount = this.model.getNormalizedOverwrite(specificObject, "amount");
+                            const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+                            this.model.setOverwrite(specificObject, "amount", Math.min(1, objectAmount + recipeItemAmount));
+                            this.model.setOverwrite(specificObject, "activated", true);
+                            break;
+                        }
                     }
                 }
             }

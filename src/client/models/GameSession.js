@@ -37,13 +37,14 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
 
     getNormalizedOverwrite(model, property) {
         const sessionOverwrite = this.getOverwrite(model, property);
+        const lessonOverwrite = this.lesson.getOverwrite(model, property);
 
         let defaultValue;
         if (property === "amount") defaultValue = 1;
         if (property === "activated") defaultValue = true;
         if (property === "object") defaultValue = null;
 
-        return sessionOverwrite ?? defaultValue;
+        return sessionOverwrite ?? lessonOverwrite ?? defaultValue;
     }
 
     getRealRecipeItemObject(recipeItem) {
