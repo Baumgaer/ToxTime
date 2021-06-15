@@ -242,30 +242,31 @@ export default {
                         });
                         entity.currentPhenotype = newPhenotype;
                         this.onWatchChange(newPhenotype);
-                    } else {
-                        const lesson = this.model.lesson;
-                        const scenes = lesson.scenes;
-                        const currentSceneIndex = scenes.indexOf(this.model.currentScene);
-                        const scenesNumber = scenes.length;
-                        for (let index = 0; index < scenesNumber; index++) {
-                            const scene = scenes[(index + currentSceneIndex) % scenesNumber];
-                            const resources = scene.getResources();
-                            let specificObject = recipeItemObject;
-                            if (!(specificObject instanceof ActionObject.RawClass) || specificObject === clickedModel) {
-                                specificObject = lesson.getSpecificObjectsFor(recipeItemObject, resources).filter((specificObject) => {
-                                    return specificObject !== clickedModel && specificObject instanceof ActionObject.RawClass;
-                                })[0];
-                            }
-                            if (!specificObject) continue;
-
-                            const objectAmount = this.model.getNormalizedOverwrite(specificObject, "amount");
-                            const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
-                            this.model.setOverwrite(specificObject, "amount", Math.min(1, objectAmount + recipeItemAmount));
-                            this.model.setOverwrite(specificObject, "activated", true);
-                            break;
-                        }
-                    }
+                    } else this.spreadToEntityLessObject(recipeItem, recipeItemObject, clickedModel);
                 }
+            }
+        },
+        spreadToEntityLessObject(recipeItem, recipeItemObject, clickedModel) {
+            const lesson = this.model.lesson;
+            const scenes = lesson.scenes;
+            const currentSceneIndex = scenes.indexOf(this.model.currentScene);
+            const scenesNumber = scenes.length;
+            for (let index = 0; index < scenesNumber; index++) {
+                const scene = scenes[(index + currentSceneIndex) % scenesNumber];
+                const resources = scene.getResources();
+                let specificObject = recipeItemObject;
+                if (!(specificObject instanceof ActionObject.RawClass) || specificObject === clickedModel) {
+                    specificObject = lesson.getSpecificObjectsFor(recipeItemObject, resources).filter((specificObject) => {
+                        return specificObject !== clickedModel && specificObject instanceof ActionObject.RawClass;
+                    })[0];
+                }
+                if (!specificObject) continue;
+
+                const objectAmount = this.model.getNormalizedOverwrite(specificObject, "amount");
+                const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
+                this.model.setOverwrite(specificObject, "amount", Math.min(1, objectAmount + recipeItemAmount));
+                this.model.setOverwrite(specificObject, "activated", true);
+                break;
             }
         },
         initOverwriteWatchers() {
