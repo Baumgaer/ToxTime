@@ -14,8 +14,10 @@
             />
         </section>
         <section class="protocol"></section>
-        <Inventory :model="model" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing" />
-        <Inventory :model="model" ref="inventory" />
+        <Inventory :model="model" icon="hand-left-icon" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing">
+            <Button name="combine" @click="onCombineButtonClick" />
+        </Inventory>
+        <Inventory :model="model" icon="bag-personal-icon" ref="inventory" />
         <div class="sidebar">
             <SceneSwitcher class="sceneSwitcher" :model="model" />
             <Tablet class="tablet" :model="model" ref="tablet" />
@@ -39,6 +41,7 @@ import SceneObject from '~client/models/SceneObject';
 import SceneSwitcher from "~client/components/SceneSwitcher";
 import Tablet from "~client/components/Tablet";
 import Inventory from "~client/components/Inventory";
+import Button from "~client/components/Button";
 import { Layer, Group } from "paper";
 import { flatten, uniq } from "~common/utils";
 
@@ -56,7 +59,8 @@ export default {
         GraphicViewer,
         SceneSwitcher,
         Tablet,
-        Inventory
+        Inventory,
+        Button
     },
     props: {
         model: {
@@ -125,6 +129,13 @@ export default {
             const isActivated = this.model.getNormalizedOverwrite(model, "activated");
             const hasAmount = this.model.getNormalizedOverwrite(model, "amount");
             item.visible = isActivated && Boolean(hasAmount);
+        },
+        onCombineButtonClick() {
+            const resources = [...flatten(this.model.grabbing.map((item) => item.getResources()))];
+            const recipe = this.model.findRecipes(resources)[0];
+            if (recipe) {
+                this.execRecipe(recipe);
+            } else this.addPunishPoint();
         },
         onSceneClick(event, item, model) {
             // Stop propagating when it was not a left click

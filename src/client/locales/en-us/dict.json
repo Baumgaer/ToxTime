@@ -148,5 +148,6 @@
     "entity": "Entity",
     "entities": "Entities",
     "addEntity": "Add entity",
-    "addObject": "Add object"
+    "addObject": "Add object",
+    "combine": "Combine"
 }

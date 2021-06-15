@@ -1,6 +1,6 @@
 <template>
     <div :class="`${active ? 'button active' : 'button'} ${showLoadingSpinner ? 'buttonLoading' : ''}`" :title="transName" v-on:click="$emit('click', $event)">
-        <div class="icon"><slot></slot></div>
+        <div v-if="$slots.default" class="icon"><slot></slot></div>
         <div v-show="showLabel" class="label">{{ transName }}</div>
     </div>
 </template>

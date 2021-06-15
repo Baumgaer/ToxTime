@@ -2,6 +2,7 @@
 
 .inventory {
     position: absolute;
+    display: flex;
     left: 50%;
     bottom: 10px;
     transform: translateX(-50%);
@@ -22,9 +23,31 @@
         background-color: var(--gray-color, @gray);
     }
 
+    .icon {
+        height: var(--slot-height, 50px);
+        width: var(--slot-height, 50px);
+        border: 1px solid @black;
+        background-color: @white;
+        font-size: 50px;
+
+        svg {
+            bottom: 0;
+        }
+    }
+
+    .button {
+        --background-color: @infoColor;
+        --hover-color: @primaryColor;
+        color: @white;
+        border: 1px solid @black;
+
+        &::v-deep .label {
+            padding: 0 15px;
+        }
+    }
+
     .slot {
         position: relative;
-        display: inline-block;
         height: var(--slot-height, 50px);
         width: var(--slot-height, 50px);
         background-position: center center;

@@ -1,5 +1,8 @@
 <template>
-    <section class="inventory" :style="`display: ${model[field].length ? 'block' : 'none'}`" @wheel="onScroll($event)">
+    <section class="inventory" :style="`display: ${model[field].length ? 'flex' : 'none'}`" @wheel="onScroll($event)">
+        <div class="icon">
+            <component :is="icon" />
+        </div>
         <div v-for="(item, index) in model[field]"
              :key="index"
              class="slot"
@@ -27,6 +30,10 @@ export default {
         field: {
             type: String,
             default: "inventory"
+        },
+        icon: {
+            type: String,
+            required: true
         },
         minimumSlots: {
             type: Number,
