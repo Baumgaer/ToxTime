@@ -106,7 +106,7 @@
                         <input type="number" v-model="model.goals[index].points" :ref="`goal_${index}_points`" value="0">
                     </div>
                 </div>
-                <div class="goal">
+                <div class="goal" ref="goalPlaceholder">
                     <div class="action"><close-thick-icon /></div>
                     <div class="name">
                         <input type="text" :placeholder="$t('goalDescriptionDe')" @focus="onGoalPlaceholderClick('name_de-de')">
@@ -356,6 +356,7 @@ export default {
                 points: 0
             });
             setTimeout(() => {
+                this.$refs.goalPlaceholder.scrollIntoView();
                 this.$refs[`goal_${this.model.goals.length - 1}_${field}`][0].focus();
             });
         },
