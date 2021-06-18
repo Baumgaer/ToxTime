@@ -82,6 +82,33 @@ export function LessonMixinClass(MixinClass) {
                 default: [],
                 ignoreOnIteration: true
             },
+            goals: {
+                type: [
+                    {
+                        type: new Schema({
+                            "name_de-de": {
+                                type: String,
+                                required: true,
+                                default: "",
+                                set: escape
+                            },
+                            "name_en-us": {
+                                type: String,
+                                required: true,
+                                default: "",
+                                set: escape
+                            },
+                            points: {
+                                type: Number,
+                                required: true,
+                                default: 0
+                            }
+                        })
+                    }
+                ],
+                required: true,
+                default: []
+            },
             overwrites: {
                 type: Schema.Types.Mixed,
                 required: true,

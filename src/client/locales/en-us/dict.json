@@ -140,6 +140,8 @@
     "knowledge": "Knowledge",
     "knowledgeDescriptionDe": "German knowledge description",
     "knowledgeDescriptionEn": "English knowledge description",
+    "goalDescriptionDe": "German goal description",
+    "goalDescriptionEn": "English goal description",
     "addKnowledge": "Add knowledge",
     "collapseAll": "Collapse all",
     "xElements": "{count} elements",

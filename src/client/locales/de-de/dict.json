@@ -140,6 +140,8 @@
     "knowledge": "Wissen",
     "knowledgeDescriptionDe": "Deutsche Wissenbeschreibung",
     "knowledgeDescriptionEn": "Englische Wissenbeschreibung",
+    "goalDescriptionDe": "Deutsche Zielbeschreibung",
+    "goalDescriptionEn": "Englische Zielbeschreibung",
     "addKnowledge": "Wissen hinzufügen",
     "collapseAll": "Alles einklappen",
     "xElements": "{count} Elemente",

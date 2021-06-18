@@ -90,7 +90,33 @@
                 </RecipeViewer>
             </section>
             <h3>{{ $t("goals") }}</h3>
-            <section></section>
+            <section class="goalList">
+                <div class="goalsHead">
+                    <div class="action"></div>
+                    <div class="names">{{ $t('description') }}</div>
+                    <div class="points">{{ $t('points') }}</div>
+                </div>
+                <div v-for="(goal, index) of model.goals" :key="`goal_${index}`" class="goal">
+                    <div class="action" @click="onGoalRemoveButtonClick(index)"><close-thick-icon /></div>
+                    <div class="name">
+                        <input type="text" v-model="model.goals[index]['name_de-de']" :ref="`goal_${index}_name_de-de`" :placeholder="$t('goalDescriptionDe')">
+                        <input type="text" v-model="model.goals[index]['name_en-us']" :ref="`goal_${index}_name_en-us`" :placeholder="$t('goalDescriptionEn')">
+                    </div>
+                    <div class="points">
+                        <input type="number" v-model="model.goals[index].points" :ref="`goal_${index}_points`" value="0">
+                    </div>
+                </div>
+                <div class="goal">
+                    <div class="action"><close-thick-icon /></div>
+                    <div class="name">
+                        <input type="text" :placeholder="$t('goalDescriptionDe')" @focus="onGoalPlaceholderClick('name_de-de')">
+                        <input type="text" :placeholder="$t('goalDescriptionEn')" @focus="onGoalPlaceholderClick('name_en-us')">
+                    </div>
+                    <div class="points">
+                        <input type="number" value="0" @focus="onGoalPlaceholderClick('points')">
+                    </div>
+                </div>
+            </section>
         </section>
     </div>
 </template>
@@ -321,6 +347,21 @@ export default {
         onCalculateButtonClick() {
             const result = this.model.findRecipes();
             this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludedRecipes.includes(recipe));
+        },
+
+        onGoalPlaceholderClick(field) {
+            this.model.goals.push({
+                "name_de-de": "",
+                "name_en-us": "",
+                points: 0
+            });
+            setTimeout(() => {
+                this.$refs[`goal_${this.model.goals.length - 1}_${field}`][0].focus();
+            });
+        },
+
+        onGoalRemoveButtonClick(index) {
+            this.model.goals.splice(index, 1);
         }
     }
 };

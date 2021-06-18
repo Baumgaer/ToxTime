@@ -184,6 +184,74 @@
                 }
             }
         }
+
+        .goalList {
+            .goalsHead {
+                display: flex;
+                align-items: stretch;
+
+                > div {
+                    background-color: @white;
+                    font-weight: bold;
+                    border: 1px solid @black;
+                    box-sizing: border-box;
+                    padding: 10px;
+                }
+
+                .action {
+                    width: 30px;
+                }
+
+                .names {
+                    width: calc(100% - 131px);
+                }
+
+                .points {
+                    width: 101px;
+                }
+            }
+            .goal {
+                display: flex;
+                align-items: stretch;
+
+                > div {
+                    border: 1px solid @black;
+                }
+
+                .action {
+                    width: 28px;
+                    line-height: 74px;
+                    text-align: center;
+                    background-color: @white;
+
+                    &:hover {
+                        background-color: @primaryColor;
+                        color: @white;
+                        cursor: pointer;
+                    }
+                }
+
+                .name {
+                    width: calc(100% - 128px);
+                }
+
+                .points {
+                    width: 100px;
+
+                    input {
+                        height: 54px;
+                    }
+                }
+
+                input {
+                    width: calc(100% - 20px);
+                    font-size: 14px;
+                    border: none;
+
+                    padding: 10px;
+                }
+            }
+        }
     }
 }
 
