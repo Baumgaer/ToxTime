@@ -66,7 +66,7 @@
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
             </section>
-            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button> <span class="points">{{ $t("totalPoints") }}: {{ totalPoints }}</span></h3>
+            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button> <span class="points">{{ $t("points") }}: {{ recipePoints }}</span></h3>
             <section class="recipeList">
                 <RecipeViewer
                     v-for="(recipe, index) of model.getRecipes()"
@@ -89,7 +89,7 @@
                     <div class="name">{{ recipe.name }}</div>
                 </RecipeViewer>
             </section>
-            <h3>{{ $t("goals") }}</h3>
+            <h3>{{ $t("goals") }} <span class="points">{{ $t("points") }}: {{ goalPoints }}</span></h3>
             <section class="goalList">
                 <div class="goalsHead">
                     <div class="action"></div>
@@ -115,6 +115,33 @@
                     <div class="points">
                         <input type="number" value="0" @focus="onGoalPlaceholderClick('points')">
                     </div>
+                </div>
+            </section>
+            <h3>{{ $t("abstract") }}</h3>
+            <section class="abstract">
+                <div>
+                    <div>{{ $t("recipePoints") }}:</div><div>{{ recipePoints }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("goalPoints") }}:</div><div>{{ goalPoints }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("totalPoints") }}:</div><div>{{ totalPoints }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("entities") }}:</div><div>{{ model.entities.length }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("scenes") }}:</div><div>{{ model.scenes.length }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("inventoryObjects") }}:</div><div>{{ model.inventory.reduce((total, sceneObject) => total + model.getOverwrite(sceneObject, "amount") || 1, 0) }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("recipes") }}:</div><div>{{ model.getRecipes(true).length }}</div>
+                </div>
+                <div>
+                    <div>{{ $t("goals") }}:</div><div>{{ model.goals.length }}</div>
                 </div>
             </section>
         </section>
@@ -165,10 +192,18 @@ export default {
                 this.model.description = value;
             }
         },
-        totalPoints() {
+        recipePoints() {
             return this.model.getRecipes(true).reduce((total, recipe) => {
-                return total + (this.model.getOverwrite(recipe, "points") || 0);
+                return total + Number((this.model.getOverwrite(recipe, "points") || 0));
             }, 0);
+        },
+        goalPoints() {
+            return this.model.goals.reduce((total, goal) => {
+                return total + Number(goal.points);
+            }, 0);
+        },
+        totalPoints() {
+            return Number(this.recipePoints) + Number(this.goalPoints);
         }
     },
     mounted() {
