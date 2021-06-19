@@ -155,5 +155,7 @@
     "entities": "Entities",
     "addEntity": "Add entity",
     "addObject": "Add object",
-    "combine": "Combine"
+    "combine": "Combine",
+    "finishLesson": "Finish lesson",
+    "finishLessonDescription": "Please select an answer from the following options to complete the lesson. After choosing the answer, you will find out whether you passed or not."
 }

@@ -19,7 +19,15 @@
                 </nav>
                 <main>
                     <section v-show="category === 'information'">
+                        <h2>{{ $t("description") }}</h2>
                         {{ lessonDescription }}
+                        <h2>{{ $t("finishLesson") }}</h2>
+                        {{ $t('finishLessonDescription') }}<br /><br />
+                        <ol>
+                            <li v-for="(goal, index) of model.lesson.goals" :key="`goal_${index}`" class="goal">
+                                {{ goal[`name_${window.activeUser.locale}`] }}
+                            </li>
+                        </ol>
                     </section>
                     <section v-show="category === 'knowledge'">
                         <ul>

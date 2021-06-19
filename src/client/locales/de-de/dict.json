@@ -155,5 +155,7 @@
     "entities": "Entitäten",
     "addEntity": "Entität hinzufügen",
     "addObject": "Objekt hinzufügen",
-    "combine": "Kombinieren"
+    "combine": "Kombinieren",
+    "finishLesson": "Lektion abschließen",
+    "finishLessonDescription": "Bitte wählen Sie eine Antwort aus den folgenden Möglichkeiten aus um die Lektion abzuschließen. Nach Auswahl der Antwort erfahren Sie, ob Sie bestanden haben oder nicht."
 }

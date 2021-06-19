@@ -71,6 +71,26 @@
             font-weight: normal;
             box-sizing: border-box;
             padding: 10px;
+            overflow: auto;
+
+            h2 {
+                border-bottom: 1px solid @black;
+            }
+
+            .goal {
+                box-sizing: border-box;
+                padding: 10px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: @primaryColor;
+                    color: @white;
+
+                    &::marker {
+                        color: @black;
+                    }
+                }
+            }
 
             .fileFrame {
                 margin: -10px;

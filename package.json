@@ -128,7 +128,7 @@
         "concurrently": "^6.2.0",
         "eslint": "^6.7.2",
         "eslint-plugin-vue": "^6.2.2",
-        "fork-ts-checker-webpack-plugin": "^6.2.10",
+        "fork-ts-checker-webpack-plugin": "^6.2.12",
         "less": "^4.1.1",
         "less-loader": "^7.3.0",
         "renewed-nunjucks-loader": "file:./webpack/renewed-nunjucks-loader",
