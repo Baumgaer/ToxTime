@@ -13,6 +13,9 @@
                     <Button :name="'notes'" :active="category === 'notes'" @click="onNavButtonClick('notes')">
                         <notebook-icon />
                     </Button>
+                    <Button :name="'protocol'" :active="category === 'protocol'" @click="onNavButtonClick('protocol')">
+                        <text-icon />
+                    </Button>
                     <Button v-if="showingFile" :name="'files'" :active="category === 'files'" @click="onNavButtonClick('files')">
                         <file-document-icon />
                     </Button>
@@ -28,6 +31,13 @@
                                 {{ goal[`name_${window.activeUser.locale}`] }}
                             </li>
                         </ol>
+                    </section>
+                    <section v-show="category === 'protocol'">
+                        <ul>
+                            <li v-for="(entry, index) of model.protocol" :key="`protocol_${index}`">
+                                <strong>{{ new Date(entry.time).toLocaleString() }}:</strong> {{ $t(`protocol_${entry.type}`, { name: modelStringToModelName(entry.object), location: $t(entry.location) }) }}
+                            </li>
+                        </ul>
                     </section>
                     <section v-show="category === 'knowledge'">
                         <ul>
@@ -54,6 +64,7 @@ import GameSession from "~client/models/GameSession";
 
 import Button from "~client/components/Button";
 
+import ApiClient from "~client/lib/ApiClient";
 import { uniq, unescape } from "~common/utils";
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
@@ -103,6 +114,13 @@ export default {
         },
         onDeviceButtonClick() {
             this.tippy.hide();
+        },
+        modelStringToModelName(modelString) {
+            const [className, id] = modelString.split("_");
+            const modelClass = global._modelMap[className].RawClass;
+            const model = ApiClient.store.getModelById(modelClass.dataCollectionName, id);
+            if (!model) return "";
+            return model.getName();
         }
     }
 };

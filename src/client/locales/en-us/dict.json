@@ -157,5 +157,12 @@
     "addObject": "Add object",
     "combine": "Combine",
     "finishLesson": "Finish lesson",
-    "finishLessonDescription": "Please select an answer from the following options to complete the lesson. After choosing the answer, you will find out whether you passed or not."
+    "finishLessonDescription": "Please select an answer from the following options to complete the lesson. After choosing the answer, you will find out whether you passed or not.",
+    "tablet": "Tablet",
+    "knowledgeBase": "Knowledge base",
+    "protocol_exec": "{name} was executed",
+    "protocol_add": "{name} was added to {location}",
+    "protocol_remove": "{name} was removed from {location}",
+    "protocol_show": "{name} was shown in {location}",
+    "protocol_hide": "{name} has been hidden from {location}"
 }

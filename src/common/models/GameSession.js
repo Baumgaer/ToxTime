@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { compact, flatten, uniq } from "~common/utils";
+import { compact, flatten, uniq, escape, isMongoId } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -59,7 +59,41 @@ export function GameSessionMixinClass(MixinClass) {
                 default: []
             },
             protocol: {
-                type: [{ type: Schema.Types.Mixed }],
+                type: [
+                    {
+                        type: new Schema({
+                            time: {
+                                type: Date,
+                                required: true
+                            },
+                            type: {
+                                type: String,
+                                enum: ["add", "remove", "show", "hide", "exec"],
+                                required: true,
+                                set: escape
+                            },
+                            location: {
+                                type: String,
+                                enum: ["inventory", "hand", "scene", "knowledgeBase", "tablet", ""],
+                                set: escape
+                            },
+                            object: {
+                                type: String,
+                                required: true,
+                                validate: {
+                                    validator: (value) => {
+                                        if (typeof value !== "string") return false;
+                                        const [className, id] = value.split("_");
+                                        if (!global._modelMap[className]) return false;
+                                        return isMongoId(id);
+                                    },
+                                    name: "notAModelString",
+                                    type: "invalid"
+                                }
+                            }
+                        })
+                    }
+                ],
                 required: true,
                 default: []
             },
@@ -104,6 +138,23 @@ export function GameSessionMixinClass(MixinClass) {
                 ...labels,
                 ...this.knowledgeBase
             ]);
+        }
+
+        /**
+         *
+         *
+         * @param {"add" | "remove" | "show" | "hide" | "exec"} type
+         * @param {import("~common/lib/BaseModel").default} object
+         * @param {"inventory" | "hand" | "scene"} [location]
+         * @memberof GameSession
+         */
+        addToProtocol(type, object, location) {
+            this.protocol.push({
+                time: new Date().toString(),
+                type,
+                object: `${object.className}_${object._id}`,
+                location
+            });
         }
 
     }

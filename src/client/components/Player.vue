@@ -188,6 +188,7 @@ export default {
          * @param {Recipe} recipe
          */
         async execRecipe(recipe, clickedModel) {
+            this.model.addToProtocol("exec", recipe);
             this.collectItemsByRecipe(recipe);
             await this.awaitRecipeDelay(recipe);
             this.spreadItemsByRecipe(recipe, clickedModel);
@@ -207,6 +208,7 @@ export default {
                     if (recipeItem.location === "hand") inventory = "grabbing";
                     const amount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
                     for (let index = 0; index < amount; index++) {
+                        this.model.addToProtocol("remove", itemOrSpecificObject.object, inventory === "inventory" ? "inventory" : "hand");
                         this.$refs[inventory].remove(itemOrSpecificObject.object);
                     }
                 }
@@ -214,11 +216,19 @@ export default {
                 const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
                 if (itemOrSpecificObject instanceof ClickArea.RawClass) {
                     this.model.setOverwrite(itemOrSpecificObject, "amount", objectAmount - recipeItemAmount);
+                    for (let index = 0; index < recipeItemAmount; index++) {
+                        this.model.addToProtocol("remove", itemOrSpecificObject, "scene");
+                    }
                 } else if (itemOrSpecificObject instanceof ActionObject.RawClass) {
                     const entity = this.model.getEntity(itemOrSpecificObject);
                     if (!entity) {
                         this.model.setOverwrite(itemOrSpecificObject, "amount", objectAmount - recipeItemAmount);
-                    } else if (recipeItemAmount) entity.currentPhenotype = null;
+                        if (recipeItemAmount > 0) this.model.addToProtocol("remove", itemOrSpecificObject, "scene");
+                        if (objectAmount - recipeItemAmount <= 0) this.model.addToProtocol("hide", itemOrSpecificObject, "scene");
+                    } else if (recipeItemAmount) {
+                        entity.currentPhenotype = null;
+                        this.model.addToProtocol("hide", itemOrSpecificObject, "scene");
+                    }
                     this.onWatchChange(itemOrSpecificObject);
                 }
             }
@@ -228,13 +238,18 @@ export default {
                 const recipeItemObject = this.model.getRealRecipeItemObject(recipeItem);
 
                 if (recipeItemObject instanceof Knowledge.RawClass) {
-                    if (!this.model.knowledgeBase.includes(recipeItemObject)) this.model.knowledgeBase.push(recipeItemObject);
+                    if (!this.model.knowledgeBase.includes(recipeItemObject)) {
+                        this.model.knowledgeBase.push(recipeItemObject);
+                        this.model.addToProtocol("add", recipeItemObject, "knowledgeBase");
+                    }
                 } else if (recipeItemObject instanceof File.RawClass) {
+                    this.model.addToProtocol("show", recipeItemObject, "tablet");
                     this.$refs.tablet.showingFile = recipeItemObject;
                     this.$refs.tablet.category = "files";
                     this.$refs.tablet.tippy.show();
                 } else if (recipeItemObject instanceof Scene.RawClass) {
                     this.model.currentScene = recipeItemObject;
+                    this.model.addToProtocol("show", recipeItemObject);
                 } else if(["inventory", "hand"].includes(recipeItem.location)) {
                     let objectToAdd = this.model.recipeItemToMostSpecificObject(recipeItem, "spread");
                     if (!objectToAdd) continue;
@@ -242,6 +257,7 @@ export default {
                         if (recipeItem.location === "inventory") {
                             this.$refs.inventory.add(objectToAdd);
                         } else this.$refs.grabbing.add(objectToAdd);
+                        this.model.addToProtocol("add", objectToAdd, recipeItem.location === "inventory" ? "inventory" : "hand");
                     }
                 } else if (recipeItem.location === "scene") {
                     const entity = this.model.getEntity(recipeItemObject);
@@ -252,6 +268,7 @@ export default {
                             return (resources.includes(recipeItemObject) || labels.includes(recipeItemObject)) && actionObject !== clickedModel;
                         });
                         entity.currentPhenotype = newPhenotype;
+                        this.model.addToProtocol("show", newPhenotype, "scene");
                         this.onWatchChange(newPhenotype);
                     } else this.spreadToEntityLessObject(recipeItem, recipeItemObject, clickedModel);
                 }
@@ -277,6 +294,10 @@ export default {
                 const recipeItemAmount = this.model.getOverwrite(recipeItem, "amount") ?? recipeItem.amount;
                 this.model.setOverwrite(specificObject, "amount", Math.min(1, objectAmount + recipeItemAmount));
                 this.model.setOverwrite(specificObject, "activated", true);
+                for (let index = 0; index < recipeItemAmount; index++) {
+                    this.model.addToProtocol("add", specificObject, "scene");
+                }
+                this.model.addToProtocol("show", specificObject, "scene");
                 break;
             }
         },
