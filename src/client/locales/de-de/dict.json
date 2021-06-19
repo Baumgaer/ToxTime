@@ -160,6 +160,7 @@
     "finishLessonDescription": "Bitte wählen Sie eine Antwort aus den folgenden Möglichkeiten aus um die Lektion abzuschließen. Nach Auswahl der Antwort erfahren Sie, ob Sie bestanden haben oder nicht.",
     "tablet": "Tablet",
     "knowledgeBase": "Wissensbasis",
+    "protocol": "Protokoll",
     "protocol_exec": "\"{name}\" wurde ausgeführt",
     "protocol_add": "\"{name}\" wurde zu \"{location}\" hinzugefügt",
     "protocol_remove": "\"{name}\" wurde von \"{location}\" entfernt",
