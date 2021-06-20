@@ -1,12 +1,20 @@
 @import (less) "variables";
 
-.toasted-container.bottom-right {
-    bottom: 20px !important;
-    right: 20px !important;
+.toasted-container {
     font-size: 16px !important;
     font-family: Avenir, Helvetica, Arial, sans-serif !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
+
+    &.bottom-right {
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+
+    &.top-right {
+        right: 20px !important;
+        right: 60px !important;
+    }
 }
 
 .errorToaster {
@@ -19,6 +27,19 @@
 
 .infoToaster {
     background: var(--info-color, @infoColor) !important;
+}
+
+.recipeToaster {
+    background: @primaryColor !important;
+
+    .time {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        background-color: @failColor;
+    }
 }
 
 .swal-modal {

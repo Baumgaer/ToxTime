@@ -110,6 +110,17 @@ export default {
         if (!this.preventAutosave) this.onSaveButtonClick();
         this.initOverwriteWatchers();
         window.gamePlayer = this;
+        this.$toasted.register("recipe", (recipe) => {
+            const parser = new DOMParser();
+            const html = parser.parseFromString(`
+                <div class="recipeToaster" ref="recipeToaster">
+                    <div class="name">${recipe.getName()}</div>
+                    <div class="time" style="transition: width ${recipe.transitionSettings.delay}s linear"></div>
+                </div>`, "text/html").body.firstElementChild;
+            const timeNode = html.getElementsByClassName("time")[0];
+            setTimeout(() => { timeNode.style.width = "0%"; }, 10);
+            return html;
+        }, { type: "info", position: "top-right", className: "recipeToaster" });
     },
     async beforeDestroy() {
         if (!this.preventAutosave) await this.onSaveButtonClick();
@@ -195,9 +206,11 @@ export default {
             this.model.__ob__.dep.notify();
         },
         awaitRecipeDelay(recipe) {
-            if (!recipe.transitionSettings.delay) return Promise.resolve();
+            const delay = recipe.transitionSettings.delay;
+            if (!delay) return Promise.resolve();
+            this.$toasted.global.recipe(recipe).goAway(delay * 1000);
             return new Promise((resolve) => {
-                setTimeout(resolve, recipe.transitionSettings.delay * 1000);
+                setTimeout(resolve, delay * 1000);
             });
         },
         collectItemsByRecipe(recipe) {
