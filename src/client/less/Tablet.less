@@ -92,6 +92,29 @@
                 }
             }
 
+            .note {
+                margin-bottom: 20px;
+
+                input {
+                    display: inline-block;
+                    width: calc(100% - 60px);
+                    padding: 5px;
+                }
+
+                .removeNote {
+                    display: inline-block;
+                    width: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: @primaryColor;
+                        color: @white;
+                    }
+                }
+            }
+
             .fileFrame {
                 margin: -10px;
                 height: calc(100% + 20px);

@@ -165,5 +165,7 @@
     "protocol_add": "\"{name}\" wurde zu \"{location}\" hinzugefügt",
     "protocol_remove": "\"{name}\" wurde von \"{location}\" entfernt",
     "protocol_show": "\"{name}\" wurde in \"{location}\" angezeigt",
-    "protocol_hide": "\"{name}\" wurde von \"{location}\" ausgeblendet"
+    "protocol_hide": "\"{name}\" wurde von \"{location}\" ausgeblendet",
+    "addNote": "Notiz hinzufügen",
+    "newNote": "Neue Notiz"
 }

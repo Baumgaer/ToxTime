@@ -58,6 +58,12 @@ export function GameSessionMixinClass(MixinClass) {
                 required: true,
                 default: []
             },
+            notes: {
+                type: [{ type: String }],
+                required: true,
+                default: [],
+                set: escape
+            },
             protocol: {
                 type: [
                     {

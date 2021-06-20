@@ -165,5 +165,7 @@
     "protocol_add": "{name} was added to {location}",
     "protocol_remove": "{name} was removed from {location}",
     "protocol_show": "{name} was shown in {location}",
-    "protocol_hide": "{name} has been hidden from {location}"
+    "protocol_hide": "{name} has been hidden from {location}",
+    "addNote": "Add note",
+    "newNote": "New note"
 }

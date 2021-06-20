@@ -32,6 +32,17 @@
                             </li>
                         </ol>
                     </section>
+                    <section v-show="category === 'notes'">
+                        <ol>
+                            <li v-for="(note, index) of model.notes" :key="`note_${index}`" class="note">
+                                <input type="text" :placeholder="$t('newNote')" :ref="`note_${index}`" v-model="model.notes[index]" />
+                                <div class="removeNote" @click="onNoteRemoveClick(index)"><close-thick-icon /></div>
+                            </li>
+                            <li class="note">
+                                <input type="text" :placeholder="$t('addNote')" @focus="onNotePlaceholderFocus" />
+                            </li>
+                        </ol>
+                    </section>
                     <section v-show="category === 'protocol'">
                         <ul>
                             <li v-for="(entry, index) of model.protocol" :key="`protocol_${index}`">
@@ -121,6 +132,13 @@ export default {
             const model = ApiClient.store.getModelById(modelClass.dataCollectionName, id);
             if (!model) return "";
             return model.getName();
+        },
+        onNotePlaceholderFocus() {
+            this.model.notes.push("");
+            setTimeout(() => this.$refs[`note_${this.model.notes.length - 1}`][0].focus());
+        },
+        onNoteRemoveClick(index) {
+            this.model.notes.splice(index, 1);
         }
     }
 };
