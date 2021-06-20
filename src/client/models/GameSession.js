@@ -279,4 +279,10 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
         return this.sortRecipes(possibleRecipes);
     }
 
+    async finish(answerIndex) {
+        this.answer = answerIndex;
+        const data = this.toRequestObject();
+        ApiClient.patch(`${this.dataCollectionName}/${this._id}`, data);
+    }
+
 });

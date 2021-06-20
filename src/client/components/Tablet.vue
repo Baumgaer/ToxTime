@@ -27,7 +27,7 @@
                         <h2>{{ $t("finishLesson") }}</h2>
                         {{ $t('finishLessonDescription') }}<br /><br />
                         <ol>
-                            <li v-for="(goal, index) of model.lesson.goals" :key="`goal_${index}`" class="goal">
+                            <li v-for="(goal, index) of model.lesson.goals" :key="`goal_${index}`" class="goal" @click="model.finish(index)">
                                 {{ goal[`name_${window.activeUser.locale}`] }}
                             </li>
                         </ol>

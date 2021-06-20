@@ -1,7 +1,9 @@
-import { Forbidden } from "http-errors";
+import { Forbidden, NotFound } from "http-errors";
 import ApiRoute from "~server/lib/ApiRoute";
 import GameSession from "~server/models/GameSession";
 import User from "~server/models/User";
+import Recipe from "~server/models/Recipe";
+import { isMongoId, isValue } from "~common/utils";
 
 export default class GameSessions extends ApiRoute {
 
@@ -9,6 +11,34 @@ export default class GameSessions extends ApiRoute {
 
     async isAllowed(request) {
         const id = request.params.id;
+        if (!isMongoId(id)) return false;
+        if (request.body.lesson && !isMongoId(request.body.lesson)) return false;
+        if (request.body.currentScene && !isMongoId(request.body.currentScene)) return false;
+        if (request.body.knowledgeBase?.some((entry) => !isMongoId(entry)) ?? false) return false;
+
+        const inventoryValidator = (entry) => {
+            const isSelfValid = isMongoId(entry);
+            const actionObjectOrSceneObjectIsValid = isMongoId(entry.actionObject || entry.sceneObject);
+            const bothAreNull = (!isValue(entry.actionObject) && !isValue(entry.sceneObject));
+            return !(isSelfValid || actionObjectOrSceneObjectIsValid || bothAreNull);
+        };
+
+        // If these are not arrays it will fail on write
+        console.log("inventory");
+        if (request.body.inventory?.some?.(inventoryValidator) ?? false) return false;
+        console.log("grabbing");
+        if (request.body.grabbing?.some?.(inventoryValidator) ?? false) return false;
+
+        const entityValidator = (entity) => {
+            if (isMongoId(entity)) return false;
+            const someActionObjectsInvalid = entity.actionObjects?.some?.(actionObject => !isMongoId(actionObject));
+            const someClickAreasInvalid = entity.clickAreas?.some?.(clickArea => !isMongoId(clickArea));
+            const phenotypeIsInvalid = isValue(entity.currentPhenotype) && !isMongoId(entity.currentPhenotype);
+            return phenotypeIsInvalid && someActionObjectsInvalid && someClickAreasInvalid;
+        };
+
+        if (request.body.entities?.some?.(entityValidator) ?? false) return false;
+
         const filter = (session) => session?._id.toString() === id || session === id;
 
         // In case of the user is edited
@@ -36,6 +66,8 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.post("/", { allowUser: true })
     async create(request) {
+        if (!request.user.isAdmin) delete request.body.grade;
+        if (request.body.lesson && !isMongoId(request.body.lesson)) return new Forbidden();
         const filter = (session) => {
             const storedLessonId = session?.lesson?._id.toString();
             if (!storedLessonId) return true;
@@ -55,6 +87,7 @@ export default class GameSessions extends ApiRoute {
     @GameSessions.patch("/:id", { allowUser: true })
     async update(request) {
         if (!await this.isAllowed(request)) return new Forbidden();
+        if (!request.user.isAdmin) delete request.body.grade;
         return await super.update(request);
     }
 
@@ -69,6 +102,44 @@ export default class GameSessions extends ApiRoute {
     async delete(request) {
         if (!await this.isAllowed(request)) return new Forbidden();
         return await super.delete(request);
+    }
+
+    /**
+     * Uses the default update function. This is just for overwriting permissions
+     *
+     * @param {import("express").Request} request
+     * @returns {Promise<Error | import("~server/lib/ServerModel").default>}
+     * @memberof ApiRoute
+     */
+    @GameSessions.patch("/:id/finish", { allowUser: true })
+    async finish(request) {
+        if (!await this.isAllowed(request)) return new Forbidden();
+        if (!request.user.isAdmin) delete request.body.grade;
+
+        const id = request.params.id;
+
+        const updateResult = await super.update(request);
+        if (request.body.grade) return updateResult;
+
+        const model = await this.claimedExport.Model.findById(id).exec();
+        if (!model) return new NotFound();
+
+        const executedRecipes = model.protocol.map((entry) => {
+            if (entry.type !== "exec") return false;
+            const _id = entry.object.split("_")[1];
+            return Recipe.Model.findById(_id).exec();
+        });
+
+        let points = 0;
+        (await Promise.all(executedRecipes)).forEach((recipe) => {
+            points += Number(model.getOverwrite(recipe, "points"));
+        });
+
+        points += Number(model.lesson.goals[model.answer].points);
+
+        console.log(points);
+
+        return updateResult;
     }
 
 }

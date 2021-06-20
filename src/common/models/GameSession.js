@@ -64,6 +64,14 @@ export function GameSessionMixinClass(MixinClass) {
                 default: [],
                 set: escape
             },
+            answer: {
+                type: Number
+            },
+            grade: {
+                type: Number,
+                min: 1,
+                max: 5
+            },
             protocol: {
                 type: [
                     {

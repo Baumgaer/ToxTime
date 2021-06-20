@@ -1,7 +1,6 @@
 import DefaultRoute from "~server/lib/DefaultRoute";
 import { cloneDeep, isArray, isMongoId } from "~common/utils";
 import httpErrors from "http-errors";
-import ServerModel from "~server/lib/ServerModel";
 
 export default class Batch extends DefaultRoute {
 
