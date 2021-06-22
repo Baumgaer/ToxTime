@@ -167,5 +167,7 @@
     "protocol_show": "\"{name}\" wurde in \"{location}\" angezeigt",
     "protocol_hide": "\"{name}\" wurde von \"{location}\" ausgeblendet",
     "addNote": "Notiz hinzufügen",
-    "newNote": "Neue Notiz"
+    "newNote": "Neue Notiz",
+    "finishedLessonTitle": "Lektion abgeschlossen",
+    "finishedLessonText": "Sie haben diese Lektion mit {grade}% der möglichen Punkte abgeschlossen"
 }

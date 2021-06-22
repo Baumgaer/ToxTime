@@ -167,5 +167,7 @@
     "protocol_show": "{name} was shown in {location}",
     "protocol_hide": "{name} has been hidden from {location}",
     "addNote": "Add note",
-    "newNote": "New note"
+    "newNote": "New note",
+    "finishedLessonTitle": "Lesson finished",
+    "finishedLessonText": "You have finished this lesson with {grade}% of possible points"
 }

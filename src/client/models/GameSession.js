@@ -282,7 +282,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
     async finish(answerIndex) {
         this.answer = answerIndex;
         const data = this.toRequestObject();
-        ApiClient.patch(`${this.dataCollectionName}/${this._id}/finish`, data);
+        return ApiClient.patch(`${this.dataCollectionName}/${this._id}/finish`, data);
     }
 
 });

@@ -27,7 +27,7 @@
                         <h2>{{ $t("finishLesson") }}</h2>
                         {{ $t('finishLessonDescription') }}<br /><br />
                         <ol>
-                            <li v-for="(goal, index) of model.lesson.goals" :key="`goal_${index}`" class="goal" @click="model.finish(index)">
+                            <li v-for="(goal, index) of model.lesson.goals" :key="`goal_${index}`" class="goal" @click="onGoalClick(index)">
                                 {{ goal[`name_${window.activeUser.locale}`] }}
                             </li>
                         </ol>
@@ -77,6 +77,7 @@ import Button from "~client/components/Button";
 
 import ApiClient from "~client/lib/ApiClient";
 import { uniq, unescape } from "~common/utils";
+import sweetAlert from "sweetalert";
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/material.css';
@@ -139,6 +140,26 @@ export default {
         },
         onNoteRemoveClick(index) {
             this.model.notes.splice(index, 1);
+        },
+        async onGoalClick(index) {
+            await this.model.finish(index);
+            ApiClient.get(`users/${window.activeUser._id}`);
+            await sweetAlert({
+                title: this.$t("finishedLessonTitle"),
+                text: this.$t("finishedLessonText", {
+                    grade: Math.round(this.model.grade)
+                }),
+                className: "alert",
+                buttons: {
+                    ok: {
+                        text: this.$t("ok"),
+                        className: "info",
+                        value: true
+                    }
+                }
+            });
+            window.activeUser.editingModel = null;
+            window.activeUser.activeEditor = null;
         }
     }
 };
