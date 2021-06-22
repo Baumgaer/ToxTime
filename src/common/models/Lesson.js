@@ -195,6 +195,41 @@ export function LessonMixinClass(MixinClass) {
             if (!filtered) return union(activeRecipes, this.excludedRecipes);
             return difference(activeRecipes, this.excludedRecipes);
         }
+
+        /**
+         * Returns the ordinary sum, the positive sum or the negative sum
+         * depending on mode.
+         *
+         * @param {"sum" | "positive" | "negative"} [mode="sum"]
+         * @returns {number}
+         * @memberof Lesson
+         */
+        getRecipePoints(mode = "positive") {
+            return this.getRecipes(true).reduce((total, recipe) => {
+                const points = Number(this.getOverwrite(recipe, "points") || 0);
+                if (mode === "sum") {
+                    return total + points;
+                } else if (mode === "positive" && points > 0) {
+                    return total + points;
+                } else if (mode === "negative" && points < 0) return total + points;
+                return total;
+            }, 0);
+        }
+
+        /**
+         * Returns the minimum or the maximum points of the goals
+         *
+         * @param {"max" | "min"} [mode="max"]
+         * @returns {number}
+         * @memberof Lesson
+         */
+        getGoalPoints(mode = "max") {
+            return Math[mode](...this.goals.map((goal) => goal.points));
+        }
+
+        getTotalPoints() {
+            return this.getRecipePoints() + this.getGoalPoints();
+        }
     }
     return Lesson;
 }

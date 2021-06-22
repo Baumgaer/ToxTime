@@ -66,7 +66,7 @@
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
             </section>
-            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button> <span class="points">{{ $t("points") }}: {{ recipePoints }}</span></h3>
+            <h3>{{ $t("recipes") }} <Button name="reCalculate" class="calcRecipesButton" @click="onCalculateButtonClick"><calculator-icon /></Button> <span class="points">{{ $t("points") }}: {{ model.getRecipePoints() }}</span></h3>
             <section class="recipeList">
                 <RecipeViewer
                     v-for="(recipe, index) of model.getRecipes()"
@@ -89,7 +89,7 @@
                     <div class="name">{{ recipe.name }}</div>
                 </RecipeViewer>
             </section>
-            <h3>{{ $t("goals") }} <span class="points">{{ $t("points") }}: {{ goalPoints }}</span></h3>
+            <h3>{{ $t("goals") }} <span class="points">{{ $t("points") }}: {{ model.getGoalPoints() }}</span></h3>
             <section class="goalList">
                 <div class="goalsHead">
                     <div class="action"></div>
@@ -120,13 +120,13 @@
             <h3>{{ $t("abstract") }}</h3>
             <section class="abstract">
                 <div>
-                    <div>{{ $t("recipePoints") }}:</div><div>{{ recipePoints }}</div>
+                    <div>{{ $t("recipePoints") }}:</div><div>{{ model.getRecipePoints() }} | {{ model.getRecipePoints("negative") }}</div>
                 </div>
                 <div>
-                    <div>{{ $t("goalPoints") }}:</div><div>{{ goalPoints }}</div>
+                    <div>{{ $t("goalPoints") }}:</div><div>{{ model.getGoalPoints() }} | {{ model.getGoalPoints("min") }}</div>
                 </div>
                 <div>
-                    <div>{{ $t("totalPoints") }}:</div><div>{{ totalPoints }}</div>
+                    <div>{{ $t("totalPoints") }}:</div><div>{{ model.getTotalPoints() }} | {{ model.getRecipePoints("negative") + model.getGoalPoints("min") }}</div>
                 </div>
                 <div>
                     <div>{{ $t("entities") }}:</div><div>{{ model.entities.length }}</div>
@@ -191,19 +191,6 @@ export default {
             set(value) {
                 this.model.description = value;
             }
-        },
-        recipePoints() {
-            return this.model.getRecipes(true).reduce((total, recipe) => {
-                return total + Number((this.model.getOverwrite(recipe, "points") || 0));
-            }, 0);
-        },
-        goalPoints() {
-            return this.model.goals.reduce((total, goal) => {
-                return total + Number(goal.points);
-            }, 0);
-        },
-        totalPoints() {
-            return Number(this.recipePoints) + Number(this.goalPoints);
         }
     },
     mounted() {

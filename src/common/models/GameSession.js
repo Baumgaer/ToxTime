@@ -69,8 +69,8 @@ export function GameSessionMixinClass(MixinClass) {
             },
             grade: {
                 type: Number,
-                min: 1,
-                max: 5
+                min: 0,
+                max: 100
             },
             protocol: {
                 type: [

@@ -9,6 +9,24 @@ export default class GameSessions extends ApiRoute {
 
     claimedExport = GameSession;
 
+    async getOwner(request) {
+        const id = request.params.id;
+        // In case of the user is edited
+        let gameSessionOwner = request.object;
+        // In case of the game session is edited
+        if (request.object instanceof GameSession.Model) gameSessionOwner = request.object.creator;
+        // In case of another http method than patch is used
+        if (!(gameSessionOwner instanceof User.Model)) {
+            gameSessionOwner = await User.Model.findOne({ $or: [{ currentGameSessions: id }, { solvedGameSessions: id }] }).exec();
+        }
+
+        if (request.user._id?.toString() !== gameSessionOwner._id?.toString() && !request.user.isAdmin) return false;
+        if (!gameSessionOwner.populated("currentGameSessions") && !gameSessionOwner.populated("solvedGameSessions")) {
+            gameSessionOwner = await User.Model.findById(gameSessionOwner._id.toString()).exec();
+        }
+        return gameSessionOwner;
+    }
+
     async isAllowed(request) {
         const id = request.params.id;
         if (!isMongoId(id)) return false;
@@ -24,9 +42,7 @@ export default class GameSessions extends ApiRoute {
         };
 
         // If these are not arrays it will fail on write
-        console.log("inventory");
         if (request.body.inventory?.some?.(inventoryValidator) ?? false) return false;
-        console.log("grabbing");
         if (request.body.grabbing?.some?.(inventoryValidator) ?? false) return false;
 
         const entityValidator = (entity) => {
@@ -41,19 +57,7 @@ export default class GameSessions extends ApiRoute {
 
         const filter = (session) => session?._id.toString() === id || session === id;
 
-        // In case of the user is edited
-        let gameSessionOwner = request.object;
-        // In case of the game session is edited
-        if (request.object instanceof GameSession.Model) gameSessionOwner = request.object.creator;
-        // In case of another http method than patch is used
-        if (!(gameSessionOwner instanceof User.Model)) {
-            gameSessionOwner = await User.Model.findOne({ $or: [{ currentGameSessions: id }, { solvedGameSessions: id }] }).exec();
-        }
-
-        if (request.user._id?.toString() !== gameSessionOwner._id?.toString() && !request.user.isAdmin) return false;
-        if (!gameSessionOwner.populated("currentGameSessions") && !gameSessionOwner.populated("solvedGameSessions")) {
-            gameSessionOwner = await User.Model.findById(gameSessionOwner._id.toString()).exec();
-        }
+        const gameSessionOwner = await this.getOwner(request);
         return Boolean(gameSessionOwner.currentGameSessions.find(filter) || gameSessionOwner.solvedGameSessions.find(filter));
     }
 
@@ -124,22 +128,28 @@ export default class GameSessions extends ApiRoute {
         const model = await this.claimedExport.Model.findById(id).exec();
         if (!model) return new NotFound();
 
-        const executedRecipes = model.protocol.map((entry) => {
+        const executedRecipes = model.protocol.filter((entry) => {
             if (entry.type !== "exec") return false;
+            return true;
+        }).map((entry) => {
             const _id = entry.object.split("_")[1];
             return Recipe.Model.findById(_id).exec();
         });
 
+        const totalPoints = model.lesson.getTotalPoints();
         let points = 0;
         (await Promise.all(executedRecipes)).forEach((recipe) => {
-            points += Number(model.getOverwrite(recipe, "points"));
+            points += Number(model.lesson.getOverwrite(recipe, "points"));
         });
 
         points += Number(model.lesson.goals[model.answer].points);
-
-        console.log(points);
-
-        return updateResult;
+        model.grade = Math.max((totalPoints !== 0 ? (points / totalPoints) : 0) * 100, 0);
+        const owner = await this.getOwner(request);
+        const sessionIndex = owner.currentGameSessions.indexOf(model);
+        owner.currentGameSessions.splice(sessionIndex, 1);
+        owner.solvedGameSessions.push(model);
+        await owner.save();
+        return model.save();
     }
 
 }
