@@ -120,13 +120,8 @@ export default class GameSessions extends ApiRoute {
         if (!await this.isAllowed(request)) return new Forbidden();
         if (!request.user.isAdmin) delete request.body.grade;
 
-        const id = request.params.id;
-
-        const updateResult = await super.update(request);
-        if (request.body.grade) return updateResult;
-
-        const model = await this.claimedExport.Model.findById(id).exec();
-        if (!model) return new NotFound();
+        const model = await super.update(request);
+        if (request.body.grade) return model;
 
         const executedRecipes = model.protocol.filter((entry) => {
             if (entry.type !== "exec") return false;
@@ -148,7 +143,7 @@ export default class GameSessions extends ApiRoute {
         const sessionIndex = owner.currentGameSessions.indexOf(model);
         owner.currentGameSessions.splice(sessionIndex, 1);
         owner.solvedGameSessions.push(model);
-        await owner.save();
+        owner.save();
         return model.save();
     }
 
