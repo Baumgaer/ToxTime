@@ -117,12 +117,15 @@ export default class GameSessions extends ApiRoute {
      */
     @GameSessions.patch("/:id/finish", { allowUser: true })
     async finish(request) {
+        const id = request.params.id;
         if (!await this.isAllowed(request)) return new Forbidden();
         if (!request.user.isAdmin) delete request.body.grade;
 
-        const model = await super.update(request);
-        if (request.body.grade) return model;
+        const updateResult = await super.update(request);
+        if (request.body.grade || updateResult instanceof Error) return updateResult;
 
+        const model = await this.claimedExport.Model.findById(id).exec();
+        if (!model) return new NotFound();
         const executedRecipes = model.protocol.filter((entry) => {
             if (entry.type !== "exec") return false;
             return true;
