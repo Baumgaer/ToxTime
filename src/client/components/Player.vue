@@ -42,8 +42,12 @@ import SceneSwitcher from "~client/components/SceneSwitcher";
 import Tablet from "~client/components/Tablet";
 import Inventory from "~client/components/Inventory";
 import Button from "~client/components/Button";
+import tippy from "tippy.js";
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/themes/material.css';
+
 import { Layer, Group } from "paper";
-import { flatten, uniq } from "~common/utils";
+import { flatten, uniq, clone } from "~common/utils";
 
 /**
  * @typedef {InstanceType<import("~client/models/Recipe")["default"]["RawClass"]>} Recipe
@@ -95,12 +99,22 @@ export default {
                 setTimeout(() => graphicViewer.paper.view._windowEvents.resize());
             },
             immediate: false
+        },
+        'model.knowledgeBase': {
+            handler(knowledgeBase) {
+                if (knowledgeBase.length && knowledgeBase.length !== this.oldKnowledgeBase?.length) {
+                    this.tippy.setContent(this.$t('addedNewKnowledge'));
+                    this.tippy.show();
+                }
+                this.oldKnowledgeBase = clone(knowledgeBase);
+            }
         }
     },
     data() {
         return {
             markedItem: null,
-            modelItemMap: new Map()
+            modelItemMap: new Map(),
+            oldKnowledgeBase: null
         };
     },
     mounted() {
@@ -121,10 +135,24 @@ export default {
             setTimeout(() => { timeNode.style.width = "0%"; }, 10);
             return html;
         }, { type: "info", position: "top-right", className: "recipeToaster" });
+
+        this.tippy = tippy(this.$refs.tablet.$el, {
+            appendTo: this.$root.$el,
+            content: "",
+            placement: "right",
+            theme: "material",
+            zIndex: 20,
+            showOnCreate: false,
+            duration: 300,
+            onShown: (instance) => {
+                setTimeout(instance.hide.bind(instance), 2500);
+            }
+        });
     },
     async beforeDestroy() {
         if (!this.preventAutosave) await this.onSaveButtonClick();
         clearTimeout(this.saveTimeout);
+        this.tippy.destroy();
     },
     methods: {
         async onSaveButtonClick() {

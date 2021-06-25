@@ -169,5 +169,6 @@
     "addNote": "Add note",
     "newNote": "New note",
     "finishedLessonTitle": "Lesson finished",
-    "finishedLessonText": "You have finished this lesson with {grade}% of possible points"
+    "finishedLessonText": "You have finished this lesson with {grade}% of possible points",
+    "addedNewKnowledge": "Added new knowledge"
 }
