@@ -102,7 +102,7 @@ export default {
         },
         'model.knowledgeBase': {
             handler(knowledgeBase) {
-                if (knowledgeBase.length && knowledgeBase.length !== this.oldKnowledgeBase?.length) {
+                if (this.oldKnowledgeBase && knowledgeBase.length && knowledgeBase.length !== this.oldKnowledgeBase?.length) {
                     this.tippy.setContent(this.$t('addedNewKnowledge'));
                     this.tippy.show();
                 }
@@ -144,6 +144,7 @@ export default {
             zIndex: 20,
             showOnCreate: false,
             duration: 300,
+            trigger: "",
             onShown: (instance) => {
                 setTimeout(instance.hide.bind(instance), 2500);
             }
