@@ -171,6 +171,7 @@ export default {
         },
 
         isAllowed(model) {
+            if (model.getResources().includes(this.model)) return false;
             const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass, Knowledge.RawClass, SpeechBubble.RawClass];
             const isAllowed = defaultAllowed.some((type) => model instanceof type);
             if (!isAllowed) return false;

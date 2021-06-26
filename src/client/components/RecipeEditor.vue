@@ -58,6 +58,7 @@ export default {
             event.dataTransfer.dropEffect = "none";
             let model = parseEventModelData(event);
             if (!model) return;
+            if (model.getResources().includes(this.model)) return;
 
             const targets = [];
             let highlightInput = !this.forbiddenInputTypes.some((type) => model instanceof type);

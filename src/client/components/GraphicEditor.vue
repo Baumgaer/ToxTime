@@ -77,6 +77,10 @@ export default {
         });
     },
     methods: {
+        isAllowed(model) {
+            return model && (model instanceof File.RawClass || model instanceof SceneObject.RawClass) && model !== this.model && !model.deleted && !model.getResources().includes(this.model);
+        },
+
         /**
          * @param {DragEvent} event
          */
@@ -87,7 +91,7 @@ export default {
 
             const model = parseEventModelData(event);
             if (!model) return;
-            if (!(model instanceof File.RawClass) && !(model instanceof SceneObject.RawClass) || model === this.model || model.deleted) {
+            if (!this.isAllowed(model)) {
                 event.dataTransfer.dropEffect = "none";
             } else event.dataTransfer.dropEffect = "link";
         },
@@ -102,7 +106,8 @@ export default {
             event.stopPropagation();
 
             const model = parseEventModelData(event);
-            if (model) this.addObject(model);
+            if (!this.isAllowed(model)) return;
+            this.addObject(model);
         },
 
         /**

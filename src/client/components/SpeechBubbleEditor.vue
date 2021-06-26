@@ -54,7 +54,7 @@ export default {
             event.stopPropagation();
 
             const model = parseEventModelData(event);
-            if (!model || !(model instanceof Recipe.RawClass)) {
+            if (!model || !(model instanceof Recipe.RawClass) || model.getResources().includes(this.model)) {
                 event.dataTransfer.dropEffect = "none";
                 return false;
             }
@@ -68,7 +68,7 @@ export default {
             event.stopPropagation();
 
             let model = parseEventModelData(event);
-            if (!model || !(model instanceof Recipe.RawClass)) return;
+            if (!model || !(model instanceof Recipe.RawClass) || model.getResources().includes(this.model)) return;
             this.model.recipe = model;
         }
     }
