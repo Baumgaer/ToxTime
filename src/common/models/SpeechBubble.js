@@ -25,7 +25,9 @@ export function SpeechBubbleMixinClass(MixinClass) {
                 type: Schema.Types.ObjectId,
                 ref: "Recipe",
                 required: false,
-                default: null
+                default: null,
+                sticky: true,
+                ignoreOnIteration: true
             },
             "error_de-de": {
                 type: String,
