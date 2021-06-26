@@ -4,22 +4,22 @@
  * @export
  * @template T
  * @param {T} MixinClass
- * @returns {Knowledge & T}
+ * @returns {SpeechBubble & T}
  */
-export function KnowledgeMixinClass(MixinClass) {
-    class Knowledge extends MixinClass {
+export function SpeechBubbleMixinClass(MixinClass) {
+    class SpeechBubble extends MixinClass {
 
-        static className = "Knowledge";
-        static dataCollectionName = "knowledge";
+        static className = "SpeechBubble";
+        static dataCollectionName = "speechBubbles";
 
         /** @type {import("mongoose").SchemaDefinition} */
         static schemaDefinition = {
             name: {
-                default: `Knowledge`,
+                default: `SpeechBubble`,
                 unique: true
             }
         };
 
     }
-    return Knowledge;
+    return SpeechBubble;
 }

@@ -1,5 +1,5 @@
 import { KnowledgeMixinClass } from "~common/models/Knowledge";
-import ServerModel from "~server/lib/ServerModel";
+import MultiLingualDescribed from "~server/models/MultiLingualDescribed";
 
-const CommonServerKnowledge = KnowledgeMixinClass(ServerModel);
-export default ServerModel.buildServerExport(class Knowledge extends CommonServerKnowledge { });
+const CommonMultiLingualDescribedKnowledge = KnowledgeMixinClass(MultiLingualDescribed.RawClass);
+export default MultiLingualDescribed.RawClass.buildServerExport(class Knowledge extends CommonMultiLingualDescribedKnowledge { });

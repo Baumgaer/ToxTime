@@ -1,8 +1,8 @@
 import { KnowledgeMixinClass } from "~common/models/Knowledge";
-import ClientModel from "~client/lib/ClientModel";
+import MultiLingualDescribed from "~client/models/MultiLingualDescribed";
 
-const CommonClientKnowledge = KnowledgeMixinClass(ClientModel);
-export default ClientModel.buildClientExport(class Knowledge extends CommonClientKnowledge {
+const CommonMultiLingualDescribedKnowledge = KnowledgeMixinClass(MultiLingualDescribed.RawClass);
+export default MultiLingualDescribed.RawClass.buildClientExport(class Knowledge extends CommonMultiLingualDescribedKnowledge {
 
     /** @type {import("mongoose").SchemaDefinition} */
     static schemaDefinition = {
@@ -21,7 +21,7 @@ export default ClientModel.buildClientExport(class Knowledge extends CommonClien
         };
     }
 
-    @CommonClientKnowledge.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
+    @CommonMultiLingualDescribedKnowledge.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async edit() {
         const shouldProceed = await super.edit();
         if (!shouldProceed) return;

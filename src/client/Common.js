@@ -78,6 +78,7 @@ import InformationIcon from "vue-material-design-icons/Information";
 import NotebookIcon from "vue-material-design-icons/Notebook";
 import IdentifierIcon from "vue-material-design-icons/Identifier";
 import TextIcon from "vue-material-design-icons/Text";
+import CommentTextIcon from "vue-material-design-icons/CommentText";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -133,3 +134,4 @@ Vue.component('information-icon', InformationIcon);
 Vue.component('notebook-icon', NotebookIcon);
 Vue.component('identifier-icon', IdentifierIcon);
 Vue.component('text-icon', TextIcon);
+Vue.component('comment-text-icon', CommentTextIcon);

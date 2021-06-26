@@ -60,6 +60,15 @@
                     <head-lightbulb-icon />
                 </Button>
                 <Button
+                    ref="speechBubbles"
+                    name="speechBubbles"
+                    :active="this.category === 'speechBubbles'"
+                    :showLoadingSpinner="somethingIsLoading('speechBubbles')"
+                    @click="onNavButtonClick('speechBubbles')"
+                >
+                    <comment-text-icon />
+                </Button>
+                <Button
                     ref="files"
                     name="files"
                     :active="this.category === 'files'"

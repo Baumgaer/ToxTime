@@ -170,5 +170,6 @@
     "newNote": "Neue Notiz",
     "finishedLessonTitle": "Lektion abgeschlossen",
     "finishedLessonText": "Sie haben diese Lektion mit {grade}% der möglichen Punkte abgeschlossen",
-    "addedNewKnowledge": "Neues Wissen hinzugefügt"
+    "addedNewKnowledge": "Neues Wissen hinzugefügt",
+    "speechBubbles": "Sprechblasen"
 }
