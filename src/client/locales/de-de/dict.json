@@ -142,8 +142,8 @@
     "inventoryObjects": "Inventarobjekte",
     "abstract": "Zusammenfassung",
     "knowledge": "Wissen",
-    "knowledgeDescriptionDe": "Deutsche Wissenbeschreibung",
-    "knowledgeDescriptionEn": "Englische Wissenbeschreibung",
+    "descriptionDe": "Deutsche Beschreibung",
+    "descriptionEn": "Englische Beschreibung",
     "goalDescriptionDe": "Deutsche Zielbeschreibung",
     "goalDescriptionEn": "Englische Zielbeschreibung",
     "addKnowledge": "Wissen hinzufügen",
@@ -171,5 +171,11 @@
     "finishedLessonTitle": "Lektion abgeschlossen",
     "finishedLessonText": "Sie haben diese Lektion mit {grade}% der möglichen Punkte abgeschlossen",
     "addedNewKnowledge": "Neues Wissen hinzugefügt",
-    "speechBubbles": "Sprechblasen"
+    "speechBubble": "Sprechblase",
+    "speechBubbles": "Sprechblasen",
+    "addSpeechBubble": "Sprechblase hinzufügen",
+    "normalSpeechCase": "Bitte hier die Aussage für den Normalfall eingeben. Diese wird immer angezeigt und ist unabhängig vom angegebenen Rezept.",
+    "errorSpeechCase": "Bitte hier die Aussage für den Fehlerfall eingeben. Diese wird angezeigt, wenn die Vorbedingungen für das angegebene Rezept nicht erfüllt wurden.",
+    "recipeAfterClickOnNext": "Rezept nach Klick auf \"weiter\" ausführen",
+    "noRecipeSelected": "Kein Rezept ausgewählt"
 }

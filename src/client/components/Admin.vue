@@ -66,7 +66,7 @@
                     :showLoadingSpinner="somethingIsLoading('speechBubbles')"
                     @click="onNavButtonClick('speechBubbles')"
                 >
-                    <comment-text-icon />
+                    <comment-text-multiple-icon />
                 </Button>
                 <Button
                     ref="files"
@@ -145,6 +145,7 @@
             <UserEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'editUser'" />
             <RecipeEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addRecipes'" :model="window.activeUser.editingModel" />
             <KnowledgeEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addKnowledge'" />
+            <SpeechBubbleEditor :ref="window.activeUser.activeEditor" v-if="window.activeUser.activeEditor === 'addSpeechBubbles'" />
             <Player
                 v-if="window.activeUser.editingModel && window.activeUser.editingModel.className === 'GameSession'"
                 v-show="window.activeUser.activeEditor === 'playGame'"
@@ -169,6 +170,7 @@ import RecipeEditor from "~client/components/RecipeEditor";
 import Usage from "~client/components/Usage";
 import KnowledgeEditor from "~client/components/KnowledgeEditor";
 import BatchBar from "~client/components/BatchBar";
+import SpeechBubbleEditor from "~client/components/SpeechBubbleEditor";
 
 import SceneObject from "~client/models/SceneObject";
 import Scene from "~client/models/Scene";
@@ -176,6 +178,7 @@ import Lesson from "~client/models/Lesson";
 import Label from "~client/models/Label";
 import Recipe from "~client/models/Recipe";
 import Knowledge from "~client/models/Knowledge";
+import SpeechBubble from "~client/models/SpeechBubble";
 
 import { capitalize } from "~common/utils";
 import { itemFilterAndSort } from "~client/utils";
@@ -192,7 +195,8 @@ export default {
         RecipeEditor,
         Usage,
         KnowledgeEditor,
-        BatchBar
+        BatchBar,
+        SpeechBubbleEditor
     },
     data() {
         return {
@@ -304,6 +308,9 @@ export default {
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else if (category === "knowledge") {
                     window.activeUser.editingModel = ApiClient.store.addModel(new Knowledge.Model());
+                    window.activeUser.activeEditor = `add${capitalize(category)}`;
+                } else if (category === "speechBubbles") {
+                    window.activeUser.editingModel = ApiClient.store.addModel(new SpeechBubble.Model());
                     window.activeUser.activeEditor = `add${capitalize(category)}`;
                 } else window.activeUser.activeEditor = `add${capitalize(category)}`;
             });

@@ -142,8 +142,8 @@
     "inventoryObjects": "Inventory objects",
     "abstract": "Abstract",
     "knowledge": "Knowledge",
-    "knowledgeDescriptionDe": "German knowledge description",
-    "knowledgeDescriptionEn": "English knowledge description",
+    "descriptionDe": "German description",
+    "descriptionEn": "English description",
     "goalDescriptionDe": "German goal description",
     "goalDescriptionEn": "English goal description",
     "addKnowledge": "Add knowledge",
@@ -171,5 +171,11 @@
     "finishedLessonTitle": "Lesson finished",
     "finishedLessonText": "You have finished this lesson with {grade}% of possible points",
     "addedNewKnowledge": "Added new knowledge",
-    "speechBubbles": "Speech bubbles"
+    "speechBubble": "Speech bubble",
+    "speechBubbles": "Speech bubbles",
+    "addSpeechBubble": "Add speech bubble",
+    "normalSpeechCase": "Please enter the statement for the normal case here. This is always displayed and is independent of the specified recipe.",
+    "errorSpeechCase": "Please enter the statement for the error case here. This is displayed if the preconditions for the specified recipe were not met.",
+    "recipeAfterClickOnNext": "Execute recipe after clicking on \"continue\".",
+    "noRecipeSelected": "No recipe selected"
 }
