@@ -10,6 +10,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         const object = this.object;
         if (!object) return null;
         if (object === this.knowledge) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
+        if (object === this.speechBubble) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.label) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.sceneObject) return object.getAvatar();
         if (object === this.clickArea) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
@@ -23,6 +24,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         const object = this.object;
         if (!object) return "";
         if (object === this.knowledge) return "head-lightbulb-icon";
+        if (object === this.speechBubble) return "comment-text-icon";
         if (object === this.label) return "label-icon";
         if (object === this.sceneObject) return "ufo-icon";
         if (object === this.clickArea) return "cursor-default-click-icon";
@@ -33,7 +35,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
     }
 
     get object() {
-        return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.knowledge || this.label;
+        return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.knowledge || this.speechBubble || this.label;
     }
 
     set object(value) {
@@ -41,6 +43,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
 
         const setAllOtherToNull = (otherThan) => {
             if (otherThan !== "Knowledge") that.knowledge = null;
+            if (otherThan !== "SpeechBubble") that.speechBubble = null;
             if (otherThan !== "Label") that.label = null;
             if (otherThan !== "SceneObject") that.sceneObject = null;
             if (otherThan !== "ActionObject") that.actionObject = null;

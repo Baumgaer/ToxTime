@@ -26,6 +26,7 @@ import Inventory from "~client/models/Inventory";
 import Hand from "~client/models/Hand";
 import Lesson from "~client/models/Lesson";
 import User from "~client/models/User";
+import SpeechBubble from "~client/models/SpeechBubble";
 
 import ApiClient from "~client/lib/ApiClient";
 import { parseEventModelData } from "~client/utils";
@@ -44,7 +45,7 @@ export default {
     data() {
         return {
             forbiddenOutputTypes: [ClickArea.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass],
-            forbiddenInputTypes: [File.RawClass, Scene.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass]
+            forbiddenInputTypes: [File.RawClass, Scene.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass, SpeechBubble.RawClass]
         };
     },
     methods: {

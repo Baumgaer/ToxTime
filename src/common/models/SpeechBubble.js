@@ -27,6 +27,7 @@ export function SpeechBubbleMixinClass(MixinClass) {
                 required: false,
                 default: null,
                 sticky: true,
+                autopopulate: true,
                 ignoreOnIteration: true
             },
             "error_de-de": {
@@ -42,6 +43,11 @@ export function SpeechBubbleMixinClass(MixinClass) {
                 set: escape
             }
         };
+
+        getSubObjects() {
+            if (!this.recipe) return [];
+            return [this.recipe];
+        }
 
     }
     return SpeechBubble;

@@ -35,6 +35,7 @@ import GameObject from "~client/models/GameObject";
 import Label from "~client/models/Label";
 import File from "~client/models/File";
 import Knowledge from "~client/models/Knowledge";
+import SpeechBubble from "~client/models/SpeechBubble";
 
 import ApiClient from "~client/lib/ApiClient";
 import { parseEventModelData } from "~client/utils";
@@ -170,7 +171,7 @@ export default {
         },
 
         isAllowed(model) {
-            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass, Knowledge.RawClass];
+            const defaultAllowed = [GameObject.RawClass, Label.RawClass, File.RawClass, Knowledge.RawClass, SpeechBubble.RawClass];
             const isAllowed = defaultAllowed.some((type) => model instanceof type);
             if (!isAllowed) return false;
 

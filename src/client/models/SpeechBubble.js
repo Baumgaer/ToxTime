@@ -26,7 +26,7 @@ export default MultiLingualDescribed.RawClass.buildClientExport(class SpeechBubb
         const shouldProceed = await super.edit();
         if (!shouldProceed) return;
         window.activeUser.editingModel = this;
-        window.activeUser.activeEditor = "addSpeechBubble";
+        window.activeUser.activeEditor = "addSpeechBubbles";
     }
 
 });
