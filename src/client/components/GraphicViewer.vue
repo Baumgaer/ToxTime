@@ -57,7 +57,9 @@ export default {
         }
     },
     data() {
-        this.paper = new paper.PaperScope();
+        const myPaper = new paper.PaperScope();
+        myPaper._isVue = true;
+        this.paper = myPaper;
         return {
             isMounted: false,
             /** @type { null | Promise<void>} */

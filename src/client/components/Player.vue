@@ -12,6 +12,7 @@
                 @actionObjectGroupPrepared="onActionObjectGroupOrClickAreaPrepared"
                 @clickAreaPrepared="onActionObjectGroupOrClickAreaPrepared"
             />
+            <SpeechBubbleComponent :ref="`speechBubble_${scene._id}`" :execRecipeFunc="execRecipe" />
         </section>
         <section class="protocol"></section>
         <Inventory :model="model" icon="hand-left-icon" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing">
@@ -37,7 +38,9 @@ import ClickArea from '~client/models/ClickArea';
 import File from '~client/models/File';
 import Scene from '~client/models/Scene';
 import SceneObject from '~client/models/SceneObject';
+import SpeechBubble from '~client/models/SpeechBubble';
 
+import SpeechBubbleComponent from '~client/components/SpeechBubble';
 import SceneSwitcher from "~client/components/SceneSwitcher";
 import Tablet from "~client/components/Tablet";
 import Inventory from "~client/components/Inventory";
@@ -64,7 +67,8 @@ export default {
         SceneSwitcher,
         Tablet,
         Inventory,
-        Button
+        Button,
+        SpeechBubbleComponent
     },
     props: {
         model: {
@@ -284,6 +288,11 @@ export default {
                         this.model.knowledgeBase.push(recipeItemObject);
                         this.model.addToProtocol("add", recipeItemObject, "knowledgeBase");
                     }
+                } else if (recipeItemObject instanceof SpeechBubble.RawClass) {
+                    const id = this.model.currentScene._id;
+                    const scene = this.$refs[`scene_${id}`][0];
+                    const speechBubble = this.$refs[`speechBubble_${id}`][0];
+                    speechBubble.show(scene, clickedModel, recipeItemObject);
                 } else if (recipeItemObject instanceof File.RawClass) {
                     this.model.addToProtocol("show", recipeItemObject, "tablet");
                     this.$refs.tablet.showingFile = recipeItemObject;

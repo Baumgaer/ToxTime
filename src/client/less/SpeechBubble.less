@@ -1,0 +1,29 @@
+@import (less) "variables.less";
+
+.speechBubble {
+    position: absolute;
+    pointer-events: none;
+}
+
+.speechBubblePopup {
+    position: relative;
+    font-weight: normal;
+
+    div {
+        .speech {
+            padding: 5px 10px 5px 0;
+        }
+        .closeButton,
+        .button {
+            cursor: pointer;
+            font-size: 20px;
+            width: fit-content;
+            margin-left: auto;
+            padding: 5px 10px;
+
+            &:hover {
+                background-color: @primaryColor;
+            }
+        }
+    }
+}

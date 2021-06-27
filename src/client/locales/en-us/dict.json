@@ -177,5 +177,7 @@
     "normalSpeechCase": "Please enter the statement for the normal case here. This is always displayed and is independent of the specified recipe.",
     "errorSpeechCase": "Please enter the statement for the error case here. This is displayed if the preconditions for the specified recipe were not met.",
     "recipeAfterClickOnNext": "Execute recipe after clicking on \"continue\".",
-    "noRecipeSelected": "No recipe selected"
+    "noRecipeSelected": "No recipe selected",
+    "next": "Next",
+    "finish": "Finish"
 }

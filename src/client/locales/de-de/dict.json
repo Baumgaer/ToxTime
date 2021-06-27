@@ -177,5 +177,7 @@
     "normalSpeechCase": "Bitte hier die Aussage für den Normalfall eingeben. Diese wird immer angezeigt und ist unabhängig vom angegebenen Rezept.",
     "errorSpeechCase": "Bitte hier die Aussage für den Fehlerfall eingeben. Diese wird angezeigt, wenn die Vorbedingungen für das angegebene Rezept nicht erfüllt wurden.",
     "recipeAfterClickOnNext": "Rezept nach Klick auf \"weiter\" ausführen",
-    "noRecipeSelected": "Kein Rezept ausgewählt"
+    "noRecipeSelected": "Kein Rezept ausgewählt",
+    "next": "Weiter",
+    "finish": "Fertig"
 }
