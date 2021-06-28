@@ -43,12 +43,13 @@ export default {
                     userName: window.activeUser.getName(),
                     session: this.session,
                     lessonName: this.session.getName(),
+                    currentSceneName: this.session.currentScene.getName(),
                     recipes: this.session.lesson.getRecipes(true),
-                    randomRecipe: (...args) => {
+                    randomRecipeName: (...args) => {
                         if (randomRecipe === null) randomRecipe = this.randomRecipe(...args);
-                        return randomRecipe || new Recipe.Model({
+                        return (randomRecipe || new Recipe.Model({
                             name: this.$t('nothingFound')
-                        });
+                        })).getName();
                     },
                     anotherRandomRecipe: (...args) => {
                         let counter = 0;

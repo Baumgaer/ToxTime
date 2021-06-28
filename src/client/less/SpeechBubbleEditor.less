@@ -4,7 +4,21 @@
     height: 100%;
 
     .editorBody {
-        margin: 0 10px;
+        padding: 0 10px;
+        overflow: auto;
+        height: calc(100vh - 50px);
+
+        .documentationButton {
+            cursor: pointer;
+
+            &:hover {
+                color: @primaryColor;
+            }
+
+            .expandCollapseButton {
+                font-size: 20px;
+            }
+        }
 
         .explanation {
             padding: 10px 0;

@@ -2,6 +2,12 @@
     <div class="speechBubbleEditor" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
         <EditorHead :model="model" :name="`addSpeechBubble`" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <div class="editorBody">
+            <h4 class="documentationButton" @click="onExpandCollapseButtonClick">
+                <menu-down-icon v-if="openDoc" class="expandCollapseButton" :title="null" />
+                <menu-right-icon v-else class="expandCollapseButton" :title="null" />
+                {{ $t('documentation') }}
+            </h4>
+            <SpeechBubbleProgramming v-show="openDoc" />
             <div class="explanation">{{ $t('normalSpeechCase') }}</div>
             <MultiLingualDescribedEditor :model="model" />
             <h3>{{ $t('recipeAfterClickOnNext') }}</h3>
@@ -22,6 +28,7 @@
 <script>
 import EditorHead from "~client/components/EditorHead";
 import MultiLingualDescribedEditor from "~client/components/MultiLingualDescribedEditor";
+import SpeechBubbleProgramming from "~client/components/SpeechBubbleProgramming";
 import Item from "~client/components/Item";
 
 import Recipe from "~client/models/Recipe";
@@ -32,11 +39,13 @@ export default {
     components: {
         EditorHead,
         MultiLingualDescribedEditor,
+        SpeechBubbleProgramming,
         Item
     },
     data() {
         return {
-            model: window.activeUser.editingModel
+            model: window.activeUser.editingModel,
+            openDoc: false
         };
     },
     methods: {
@@ -70,6 +79,9 @@ export default {
             let model = parseEventModelData(event);
             if (!model || !(model instanceof Recipe.RawClass) || model.getResources().includes(this.model)) return;
             this.model.recipe = model;
+        },
+        onExpandCollapseButtonClick() {
+            this.openDoc = !this.openDoc;
         }
     }
 };
