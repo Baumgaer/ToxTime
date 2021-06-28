@@ -12,7 +12,7 @@
                 @actionObjectGroupPrepared="onActionObjectGroupOrClickAreaPrepared"
                 @clickAreaPrepared="onActionObjectGroupOrClickAreaPrepared"
             />
-            <SpeechBubbleComponent :ref="`speechBubble_${scene._id}`" :execRecipeFunc="execRecipe" />
+            <SpeechBubbleComponent :ref="`speechBubble_${scene._id}`" :execRecipeFunc="execRecipe" :session="model" />
         </section>
         <section class="protocol"></section>
         <Inventory :model="model" icon="hand-left-icon" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing">
