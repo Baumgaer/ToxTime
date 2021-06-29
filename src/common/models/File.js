@@ -36,11 +36,10 @@ export function FileMixinClass(MixinClass) {
                 set: escape
             },
             labels: {
-                type: [{ type: Schema.Types.ObjectId, ref: "Label" }],
+                type: [{ type: Schema.Types.ObjectId, ref: "Label", autopopulate: true }],
                 sticky: true,
                 required: true,
                 default: [],
-                autopopulate: true,
                 ignoreOnIteration: true
             }
         };

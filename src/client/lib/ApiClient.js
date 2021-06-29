@@ -1,5 +1,5 @@
 import { stripHtml } from "string-strip-html";
-import { isObjectLike, isArray, isPlainObject } from "~common/utils";
+import { isObjectLike, isArray, isPlainObject, isMongoId } from "~common/utils";
 import { Store } from "~client/lib/Store";
 
 import CustomError from "~common/lib/CustomError";
@@ -158,24 +158,36 @@ export default class ApiClient {
      * @returns {any}
      * @memberof ApiClient
      */
-    static handleModels(responseJson) {
+    static handleModels(responseJson, className, keyName) {
 
         if (isArray(responseJson)) {
             // We maybe have an array of models
             const processedModels = [];
-            for (const model of responseJson) processedModels.push(this.handleModels(model));
+            for (const model of responseJson) processedModels.push(this.handleModels(model, className, keyName));
             return processedModels;
         } else if (this.store.isModel(responseJson)) {
             // Seems to be a model, watch into every key to get submodels
             for (const key in responseJson) {
-                if (Object.hasOwnProperty.call(responseJson, key) && isObjectLike(responseJson[key])) {
+                if (Object.hasOwnProperty.call(responseJson, key) && (isObjectLike(responseJson[key]) || isMongoId(responseJson[key]))) {
                     if (responseJson[key].wasted) {
-                        this.handleModels(responseJson[key]);
-                    } else responseJson[key] = this.handleModels(responseJson[key]);
+                        this.handleModels(responseJson[key], className, key);
+                    } else responseJson[key] = this.handleModels(responseJson[key], responseJson.className, key);
                 }
             }
             if (responseJson.wasted) return this.store.removeModel(responseJson);
             return this.store.addModel(responseJson);
+        } else if (isMongoId(responseJson)) {
+            const rawClass = window._modelMap[className]?.RawClass;
+            let field = rawClass?.getSchemaObject()[keyName];
+            if (field) {
+                let ref = field.ref;
+                if (!ref) ref = field.type?.ref;
+                if (!ref) ref = field?.type[0].ref;
+                const dataCollectionName = window._modelMap[ref].RawClass.dataCollectionName;
+                let model = this.store.getModelById(dataCollectionName, responseJson);
+                if (!model) model = this.store.addModel({ dataCollectionName, className: ref, _id: responseJson });
+                return model;
+            }
         }
 
         const mayError = this.handleOtherErrors(responseJson);

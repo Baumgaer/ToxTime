@@ -314,13 +314,18 @@ export default {
                     const entity = this.model.getEntity(recipeItemObject);
                     if (entity) {
                         const newPhenotype = entity.actionObjects.find((actionObject) => {
-                            const resources = actionObject.getResources();
+                            const resources = [actionObject, ...actionObject.getResources()];
                             const labels = actionObject.getLabels();
-                            return (resources.includes(recipeItemObject) || labels.includes(recipeItemObject)) && actionObject !== clickedModel;
+                            if (!(recipeItemObject instanceof ActionObject.RawClass) && actionObject === clickedModel) return false;
+                            return (resources.includes(recipeItemObject) || labels.includes(recipeItemObject));
                         });
-                        entity.currentPhenotype = newPhenotype;
-                        this.model.addToProtocol("show", newPhenotype, "scene");
-                        this.onWatchChange(newPhenotype);
+                        if (newPhenotype) {
+                            const oldPhenotype = entity.currentPhenotype;
+                            entity.currentPhenotype = newPhenotype;
+                            this.model.addToProtocol("show", newPhenotype, "scene");
+                            this.onWatchChange(oldPhenotype);
+                            this.onWatchChange(newPhenotype);
+                        }
                     } else this.spreadToEntityLessObject(recipeItem, recipeItemObject, clickedModel);
                 }
             }

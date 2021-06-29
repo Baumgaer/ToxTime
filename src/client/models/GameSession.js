@@ -202,7 +202,7 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
      */
     isValidRecipe(recipe, resources) {
         const possibleRecipes = this.lesson.getRecipes(true);
-        if (!possibleRecipes.includes(recipe)) return false;
+        if (!possibleRecipes.includes(recipe) && !uniq(flatten(possibleRecipes.map(recipe => recipe.getResources()))).includes(recipe)) return false;
 
         const allItemsHaveCorrectAmount = recipe.input.every(this.checkRecipeItemAmount.bind(this));
         if (!allItemsHaveCorrectAmount) return false;

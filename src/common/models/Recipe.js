@@ -27,10 +27,9 @@ export function RecipeMixinClass(MixinClass) {
                 set: escape
             },
             input: {
-                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
+                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem", autopopulate: true }],
                 required: true,
                 default: [],
-                autopopulate: true,
                 dependant: true
             },
             transitionSettings: {
@@ -43,10 +42,9 @@ export function RecipeMixinClass(MixinClass) {
                 default: {}
             },
             output: {
-                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem" }],
+                type: [{ type: Schema.Types.ObjectId, ref: "RecipeItem", autopopulate: true }],
                 required: true,
                 default: [],
-                autopopulate: true,
                 dependant: true
             }
         };

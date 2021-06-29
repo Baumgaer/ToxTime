@@ -7,8 +7,8 @@
                     <close-icon />
                 </div>
                 <div class="speech"><pre>{{ content }}</pre></div>
-                <div class="button" v-if="model.recipe" @click="next">{{ $t('next') }}</div>
-                <div class="button" v-else @click="hide">{{ $t('finish') }}</div>
+                <div class="button" v-if="hasNextBubble" @click="next">{{ $t('next') }}</div>
+                <div class="button" v-else @click="finish">{{ $t('finish') }}</div>
             </div>
         </div>
     </div>
@@ -34,7 +34,12 @@ export default {
         }
     },
     computed: {
+        hasNextBubble() {
+            return this.model.recipe && this.model.recipe.output.some((recipeItem) => recipeItem.speechBubble);
+        },
         content() {
+            if (this.error) return this.error;
+            if (this.preparedContent) return this.preparedContent;
             const template = compile(unescape(this.model[`${this.property}_${window.activeUser.locale}`]), this.env);
             let randomRecipe = null;
             try {
@@ -61,6 +66,8 @@ export default {
                         return anotherRandomRecipe;
                     }
                 });
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+                this.preparedContent = rendered;
                 return rendered;
             } catch (error) {
                 return this.$t('somethingWentWrong', {
@@ -79,11 +86,13 @@ export default {
             tippy: null,
             sceneItem: null,
             model: null,
+            preparedContent: null,
             property: "description",
             env: new Environment(null, {
                 lstripBlocks: true,
                 trimBlocks: true
-            })
+            }),
+            error: null
         };
     },
     mounted() {
@@ -152,12 +161,17 @@ export default {
                 try {
                     await this.execRecipeFunc(this.model.recipe, this.sceneItem.model);
                     this.property = "description";
-                } catch (_error) {
-                    this.property = "error";
+                } catch (error) {
+                    this.error = error.toString();
                 }
             }
         },
+        async finish() {
+            await this.next();
+            if (!this.error && this.property !== "error") this.hide();
+        },
         show(scene, clickedModel, speechBubbleModel) {
+            this.preparedContent = null;
             this.model = speechBubbleModel;
             this.createTippy();
             const project = scene.paper.project;
@@ -169,6 +183,7 @@ export default {
         hide() {
             this.sceneItem = null;
             this.model = null;
+            this.error = null;
             this.tippy.hide();
         }
     }
