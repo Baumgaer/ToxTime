@@ -16,7 +16,6 @@
 
 <script>
 import tippy, {sticky} from "tippy.js";
-import { compile, Environment } from "nunjucks/browser/nunjucks";
 import { uniq, random, unescape } from "~common/utils";
 import GameSession from "~client/models/GameSession";
 import Recipe from "~client/models/Recipe";
@@ -40,35 +39,38 @@ export default {
         content() {
             if (this.error) return this.error;
             if (this.preparedContent) return this.preparedContent;
-            const template = compile(unescape(this.model[`${this.property}_${window.activeUser.locale}`]), this.env);
+
             let randomRecipe = null;
+            const literals = {
+                userName: window.activeUser.getName(),
+                lessonName: this.session.getName(),
+                currentSceneName: this.session.currentScene.getName(),
+                randomRecipeName: (...args) => {
+                    if (randomRecipe === null) randomRecipe = this.randomRecipe(...args);
+                    return (randomRecipe || new Recipe.Model({
+                        name: this.$t('nothingFound')
+                    })).getName();
+                }
+            };
             try {
-                const rendered = template.render({
-                    activeUser: window.activeUser,
-                    userName: window.activeUser.getName(),
-                    session: this.session,
-                    lessonName: this.session.getName(),
-                    currentSceneName: this.session.currentScene.getName(),
-                    recipes: this.session.lesson.getRecipes(true),
-                    randomRecipeName: (...args) => {
-                        if (randomRecipe === null) randomRecipe = this.randomRecipe(...args);
-                        return (randomRecipe || new Recipe.Model({
-                            name: this.$t('nothingFound')
-                        })).getName();
-                    },
-                    anotherRandomRecipe: (...args) => {
-                        let counter = 0;
-                        let anotherRandomRecipe = this.randomRecipe(...args);
-                        while(randomRecipe && randomRecipe === anotherRandomRecipe && counter < 10) {
-                            anotherRandomRecipe = this.randomRecipe(...args);
-                            counter++;
-                        }
-                        return anotherRandomRecipe;
+                const regex = /\{\{\s(.*?)(?:\((?:(.*),?)*\))?\s\}\}/ig;
+                /** @type {string} */
+                let result = unescape(this.model[`${this.property}_${window.activeUser.locale}`]);
+                const matches = result.match(regex);
+                if (matches) {
+                    for (const match of matches) {
+                        if (match.includes("(") && match.includes(")")) {
+                            const firstIndex = match.indexOf("(");
+                            const lastIndex = match.lastIndexOf(")");
+                            const funcName = match.slice(2, firstIndex).trim();
+                            const params = "[" + match.slice(firstIndex + 1, lastIndex).trim().replaceAll("'", "\"") + "]";
+                            result = result.replace(match, literals[funcName]?.(...JSON.parse(params)));
+                        } else result = result.replace(match, literals[match.slice(2, match.length - 2).trim()]);
                     }
-                });
+                }
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-                this.preparedContent = rendered;
-                return rendered;
+                this.preparedContent = result;
+                return result;
             } catch (error) {
                 return this.$t('somethingWentWrong', {
                     adminMail: window.process.environment.APP_MAINTAINER_MAIL,
@@ -88,10 +90,6 @@ export default {
             model: null,
             preparedContent: null,
             property: "description",
-            env: new Environment(null, {
-                lstripBlocks: true,
-                trimBlocks: true
-            }),
             error: null
         };
     },
