@@ -30,6 +30,15 @@ export function SpeechBubbleMixinClass(MixinClass) {
                 autopopulate: true,
                 ignoreOnIteration: true
             },
+            exitRecipe: {
+                type: Schema.Types.ObjectId,
+                ref: "Recipe",
+                required: false,
+                default: null,
+                sticky: true,
+                autopopulate: true,
+                ignoreOnIteration: true
+            },
             "error_de-de": {
                 type: String,
                 required: false,

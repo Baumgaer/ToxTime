@@ -3,7 +3,7 @@
         <div class="speechBubble" ref="speechBubble" :style="`top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px`"></div>
         <div class="speechBubblePopup" ref="speechBubblePopup" v-show="sceneItem">
             <div v-if="model">
-                <div class="closeButton" @click="hide">
+                <div class="closeButton" @click="close">
                     <close-icon />
                 </div>
                 <div class="speech"><pre>{{ content }}</pre></div>
@@ -154,12 +154,14 @@ export default {
                 showOnCreate: false
             });
         },
-        async next() {
-            if (!window.activeUser.editingModel.isValidRecipe(this.model.recipe)) {
+        async next(recipe) {
+            if (!recipe || recipe instanceof Event) recipe = this.model.recipe;
+            if (!window.activeUser.editingModel.isValidRecipe(recipe)) {
+                this.preparedContent = null;
                 this.property = "error";
             } else {
                 try {
-                    await this.execRecipeFunc(this.model.recipe, this.sceneItem.model);
+                    await this.execRecipeFunc(recipe, this.sceneItem.model);
                     this.property = "description";
                 } catch (error) {
                     this.error = error.toString();
@@ -169,6 +171,10 @@ export default {
         async finish() {
             await this.next();
             if (!this.error && this.property !== "error") this.hide();
+        },
+        async close() {
+            if (this.model.exitRecipe) await this.next(this.model.exitRecipe);
+            this.hide();
         },
         show(scene, clickedModel, speechBubbleModel) {
             this.preparedContent = null;

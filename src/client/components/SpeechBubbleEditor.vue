@@ -1,5 +1,5 @@
 <template>
-    <div class="speechBubbleEditor" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
+    <div class="speechBubbleEditor">
         <EditorHead :model="model" :name="`addSpeechBubble`" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <div class="editorBody">
             <h4 class="documentationButton" @click="onExpandCollapseButtonClick">
@@ -11,16 +11,57 @@
             <div class="explanation">{{ $t('normalSpeechCase') }}</div>
             <MultiLingualDescribedEditor :model="model" />
             <h3>{{ $t('recipeAfterClickOnNext') }}</h3>
-            <Item v-if="model.recipe" :model="model.recipe" :compactMode="true" :showSubObjects="false" draggable="false" >
+            <Item v-if="model.recipe"
+                  ref="recipe"
+                  :model="model.recipe"
+                  :compactMode="true"
+                  :showSubObjects="false"
+                  draggable="false"
+                  @drop="onInternalDrop($event, 'recipe')"
+                  @dragover.prevent="onInternalDragOver($event, 'recipe')"
+                  @dragenter.prevent
+                  @dragleave.prevent="onInternalDragLeave('recipe')"
+            >
                 <div class="removeRecipeButton">
-                    <component :is="'delete-icon'" class="deleteIcon" :title="$t('remove')" @click="onRecipeRemoveButtonClick"/>
+                    <component :is="'delete-icon'" class="deleteIcon" :title="$t('remove')" @click="onRecipeRemoveButtonClick('recipe')"/>
                 </div>
             </Item>
-            <div v-else class="noRecipe">{{ $t('noRecipeSelected') }}</div>
+            <div v-else
+                 ref="recipe"
+                 class="noRecipe"
+                 @drop="onInternalDrop($event, 'recipe')"
+                 @dragover.prevent="onInternalDragOver($event, 'recipe')"
+                 @dragenter.prevent
+                 @dragleave.prevent="onInternalDragLeave('recipe')"
+            >{{ $t('noRecipeSelected') }}</div>
             <div v-if="model.recipe">
                 <div class="explanation">{{ $t('errorSpeechCase') }}</div>
                 <MultiLingualDescribedEditor :model="model" :prefix="'error'" />
             </div>
+            <h3>{{ $t('recipeAfterClickOnClose') }}</h3>
+            <Item v-if="model.exitRecipe"
+                  ref="exitRecipe"
+                  :model="model.exitRecipe"
+                  :compactMode="true"
+                  :showSubObjects="false"
+                  draggable="false"
+                  @drop="onInternalDrop($event, 'recipe')"
+                  @dragover.prevent="onInternalDragOver($event, 'exitRecipe')"
+                  @dragenter.prevent
+                  @dragleave.prevent="onInternalDragLeave('exitRecipe')"
+            >
+                <div class="removeRecipeButton">
+                    <component :is="'delete-icon'" class="deleteIcon" :title="$t('remove')" @click="onRecipeRemoveButtonClick('exitRecipe')"/>
+                </div>
+            </Item>
+            <div v-else
+                 ref="exitRecipe"
+                 class="noRecipe"
+                 @drop="onInternalDrop($event, 'exitRecipe')"
+                 @dragover.prevent="onInternalDragOver($event, 'exitRecipe')"
+                 @dragenter.prevent
+                 @dragleave.prevent="onInternalDragLeave('exitRecipe')"
+            >{{ $t('noRecipeSelected') }}</div>
         </div>
     </div>
 </template>
@@ -54,10 +95,10 @@ export default {
             if (result instanceof Error) return;
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
         },
-        onRecipeRemoveButtonClick() {
-            this.model.recipe = null;
+        onRecipeRemoveButtonClick(property) {
+            this.model[property] = null;
         },
-        onInternalDragOver(event) {
+        onInternalDragOver(event, property) {
             if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
             event.preventDefault();
             event.stopPropagation();
@@ -68,9 +109,18 @@ export default {
                 return false;
             }
             event.dataTransfer.dropEffect = "link";
+
+            let highlight = this.$refs[property];
+            if (!highlight.classList) highlight = highlight.$el;
+            highlight.classList.add("highlighted");
             return true;
         },
-        onInternalDrop(event) {
+        onInternalDragLeave(property) {
+            let highlight = this.$refs[property];
+            if (!highlight.classList) highlight = highlight.$el;
+            highlight.classList.remove("highlighted");
+        },
+        onInternalDrop(event, property) {
             if (!ApiClient.store.collection("localStorage").isInternalDnD) return;
 
             event.preventDefault();
@@ -78,7 +128,7 @@ export default {
 
             let model = parseEventModelData(event);
             if (!model || !(model instanceof Recipe.RawClass) || model.getResources().includes(this.model)) return;
-            this.model.recipe = model;
+            this.model[property] = model;
         },
         onExpandCollapseButtonClick() {
             this.openDoc = !this.openDoc;
