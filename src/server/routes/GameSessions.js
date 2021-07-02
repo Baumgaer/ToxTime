@@ -140,7 +140,7 @@ export default class GameSessions extends ApiRoute {
             points += Number(model.lesson.getOverwrite(recipe, "points"));
         });
 
-        points += Number(model.lesson.goals[model.answer].points);
+        points += Number(model.lesson.goals[model.answer].points) - Number(model.punishments) * Number(model.lesson.punishPoints);
         model.grade = Math.max((totalPoints !== 0 ? (points / totalPoints) : 0) * 100, 0);
         const owner = await this.getOwner(request);
         const sessionIndex = owner.currentGameSessions.indexOf(model);

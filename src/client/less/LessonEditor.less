@@ -6,6 +6,7 @@
     .editorBody {
         height: calc(100% - 50px);
         overflow: auto;
+        overflow-x: hidden;
 
         h3 {
             font-size: 16px;
@@ -255,16 +256,49 @@
 
         .abstract {
             padding-left: 5px;
+            display: flex;
 
-            div {
-                display: flex;
+            .stats {
+                display: inline-block;
+                width: 50%;
 
                 div {
-                    padding: 5px;
+                    display: flex;
+                    div {
+                        padding: 5px;
+
+                        &:first-child {
+                            min-width: 175px;
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+
+            .punish {
+                display: inline-block;
+                position: relative;
+                padding-left: 35px;
+                border-left: 1px solid @black;
+                width: 50%;
+
+                .row {
+                    display: flex;
+
+                    > input,
+                    > span {
+                        padding: 8px;
+                        border: none;
+                        background: transparent;
+                    }
 
                     &:first-child {
-                        min-width: 175px;
-                        font-weight: bold;
+                        border-bottom: 1px solid @black;
+                    }
+
+                    &:last-child {
+                        margin-top: 20px;
+                        border-top: 1px double @black;
                     }
                 }
             }

@@ -182,5 +182,9 @@
     "finish": "Finish",
     "nothingFound": "Nothing found",
     "somethingWentWrong": "Something went wrong. Please try again. Please write an E-Mail to the administrator to the following address if the problem still exists:\n\n{adminMail}\n\n{error}",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "addedPunishment": "Added punishment due to too much clicks",
+    "clicks": "Clicks",
+    "seconds": "Seconds",
+    "punishPoints": "Punish points"
 }

@@ -64,9 +64,8 @@ export function GameSessionMixinClass(MixinClass) {
                 default: [],
                 set: escape
             },
-            answer: {
-                type: Number
-            },
+            answer: Number,
+            punishments: Number,
             grade: {
                 type: Number,
                 min: 0,

@@ -118,7 +118,8 @@ export default {
         return {
             markedItem: null,
             modelItemMap: new Map(),
-            oldKnowledgeBase: null
+            oldKnowledgeBase: null,
+            clicks: []
         };
     },
     mounted() {
@@ -407,7 +408,16 @@ export default {
             return this.itemIsInvisible(item.parent);
         },
         addPunishPoint() {
-            console.log("PUNISHED");
+            const lesson = this.model.lesson;
+            if (!lesson.punishClicks || !lesson.punishSeconds || !lesson.punishPoints) return;
+            this.clicks.push(new Date());
+            if (this.clicks.length < lesson.punishClicks) return;
+            if (this.clicks.length > lesson.punishClicks) this.clicks.shift();
+            if ((this.clicks[lesson.punishClicks - 1] - this.clicks[0]) < lesson.punishSeconds * 1000) {
+                this.model.punishments++;
+                this.tippy.setContent(this.$t('addedPunishment'));
+                this.tippy.show();
+            }
         }
     }
 };

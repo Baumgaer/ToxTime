@@ -82,6 +82,21 @@ export function LessonMixinClass(MixinClass) {
                 default: [],
                 ignoreOnIteration: true
             },
+            punishClicks: {
+                type: Number,
+                required: true,
+                default: 0
+            },
+            punishSeconds: {
+                type: Number,
+                required: true,
+                default: 0
+            },
+            punishPoints: {
+                type: Number,
+                required: true,
+                default: 0
+            },
             goals: {
                 type: [
                     {

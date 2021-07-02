@@ -119,29 +119,45 @@
             </section>
             <h3>{{ $t("abstract") }}</h3>
             <section class="abstract">
-                <div>
-                    <div>{{ $t("recipePoints") }}:</div><div>{{ model.getRecipePoints() }} | {{ model.getRecipePoints("negative") }}</div>
+                <div class="stats">
+                    <div>
+                        <div>{{ $t("recipePoints") }}:</div><div>{{ model.getRecipePoints() }} | {{ model.getRecipePoints("negative") }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("goalPoints") }}:</div><div>{{ model.getGoalPoints() }} | {{ model.getGoalPoints("min") }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("totalPoints") }}:</div><div>{{ model.getTotalPoints() }} | {{ model.getRecipePoints("negative") + model.getGoalPoints("min") }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("entities") }}:</div><div>{{ model.entities.length }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("scenes") }}:</div><div>{{ model.scenes.length }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("inventoryObjects") }}:</div><div>{{ model.inventory.reduce((total, sceneObject) => total + model.getOverwrite(sceneObject, "amount") || 1, 0) }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("recipes") }}:</div><div>{{ model.getRecipes(true).length }}</div>
+                    </div>
+                    <div>
+                        <div>{{ $t("goals") }}:</div><div>{{ model.goals.length }}</div>
+                    </div>
                 </div>
-                <div>
-                    <div>{{ $t("goalPoints") }}:</div><div>{{ model.getGoalPoints() }} | {{ model.getGoalPoints("min") }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("totalPoints") }}:</div><div>{{ model.getTotalPoints() }} | {{ model.getRecipePoints("negative") + model.getGoalPoints("min") }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("entities") }}:</div><div>{{ model.entities.length }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("scenes") }}:</div><div>{{ model.scenes.length }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("inventoryObjects") }}:</div><div>{{ model.inventory.reduce((total, sceneObject) => total + model.getOverwrite(sceneObject, "amount") || 1, 0) }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("recipes") }}:</div><div>{{ model.getRecipes(true).length }}</div>
-                </div>
-                <div>
-                    <div>{{ $t("goals") }}:</div><div>{{ model.goals.length }}</div>
+                <div class="punish">
+                    <div class="row">
+                        <input type="number" v-model="model.punishClicks">
+                        <span>{{ $t('clicks') }}</span>
+                    </div>
+                    <div class="row">
+                        <input type="number" v-model="model.punishSeconds">
+                        <span>{{ $t('seconds') }}</span>
+                    </div>
+                    <div class="row">
+                        <input type="number" v-model="model.punishPoints">
+                        <span>{{ $t('punishPoints') }}</span>
+                    </div>
                 </div>
             </section>
         </section>

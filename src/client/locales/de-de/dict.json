@@ -182,5 +182,9 @@
     "finish": "Fertig",
     "nothingFound": "Nichts gefunden",
     "somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuche es erneut. Sollte das Problem weiterhin bestehen, kontaktiere bitte den Administrator unter folgeder E-Mail-Adresse:\n\n{adminMail}\n\n{error}",
-    "documentation": "Dokumentation"
+    "documentation": "Dokumentation",
+    "addedPunishment": "Bestrafung wegen zu vieler Klicks hinzugefügt",
+    "clicks": "Klicks",
+    "seconds": "Sekunden",
+    "punishPoints": "Strafpunkte"
 }
