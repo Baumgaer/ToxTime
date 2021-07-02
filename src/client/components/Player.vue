@@ -339,7 +339,7 @@ export default {
                 const scene = scenes[(index + currentSceneIndex) % scenesNumber];
                 const resources = scene.getResources();
                 let specificObject = recipeItemObject;
-                if (!(specificObject instanceof ActionObject.RawClass) || specificObject === clickedModel) {
+                if (!(specificObject instanceof ActionObject.RawClass)) {
                     specificObject = lesson.getSpecificObjectsFor(recipeItemObject, resources).filter((specificObject) => {
                         return specificObject !== clickedModel && specificObject instanceof ActionObject.RawClass;
                     })[0];
