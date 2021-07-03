@@ -186,5 +186,6 @@
     "addedPunishment": "Bestrafung wegen zu vieler Klicks hinzugefügt",
     "clicks": "Klicks",
     "seconds": "Sekunden",
-    "punishPoints": "Strafpunkte"
+    "punishPoints": "Strafpunkte",
+    "recipeAfterClickOnClose": "Rezept nach Klick auf \"schließen\" ausführen"
 }

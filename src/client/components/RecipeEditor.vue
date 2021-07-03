@@ -44,7 +44,7 @@ export default {
     },
     data() {
         return {
-            forbiddenOutputTypes: [ClickArea.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass],
+            forbiddenOutputTypes: [ClickArea.RawClass, Lesson.RawClass, User.RawClass],
             forbiddenInputTypes: [File.RawClass, Scene.RawClass, Recipe.RawClass, Lesson.RawClass, User.RawClass, SpeechBubble.RawClass]
         };
     },

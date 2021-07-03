@@ -73,6 +73,14 @@ export function RecipeItemMixinClass(MixinClass) {
                 required: false,
                 default: null
             },
+            recipe: {
+                type: Schema.Types.ObjectId,
+                ref: "Recipe",
+                autopopulate: true,
+                sticky: true,
+                required: false,
+                default: null
+            },
             location: {
                 type: String,
                 enum: ["inventory", "hand", "scene"],
@@ -90,7 +98,7 @@ export function RecipeItemMixinClass(MixinClass) {
         }
 
         isExistent() {
-            return Boolean(this.scene) || Boolean(this.file) || Boolean(this.knowledge) || Boolean(this.speechBubble);
+            return Boolean(this.scene) || Boolean(this.file) || Boolean(this.knowledge) || Boolean(this.speechBubble) || Boolean(this.recipe);
         }
 
         isUnique() {
@@ -100,9 +108,10 @@ export function RecipeItemMixinClass(MixinClass) {
             const isSceneObject = Boolean(this.sceneObject);
             const isKnowledge = Boolean(this.knowledge);
             const isSpeechBubble = Boolean(this.speechBubble);
+            const isRecipe = Boolean(this.recipe);
 
             const inScene = this.location === "scene";
-            return isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge || isSpeechBubble;
+            return isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge || isSpeechBubble || isRecipe;
         }
 
         canBeSpecifiedToActionObject() {

@@ -11,7 +11,7 @@
         <div v-if="changeable" class="removeButton" :title="$t('remove')">
             <close-icon @click="remove" />
         </div>
-        <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file && !model.knowledge && !model.speechBubble">
+        <div class="location" @click="openItemSelector" ref="location" v-if="!model.scene && !model.file && !model.knowledge && !model.speechBubble && !model.recipe">
             <Item :model="this[`${model.location}Model`]" :compactMode="true" :showTooltip="false" draggable="false" />
         </div>
         <ItemSelector

@@ -186,5 +186,6 @@
     "addedPunishment": "Added punishment due to too much clicks",
     "clicks": "Clicks",
     "seconds": "Seconds",
-    "punishPoints": "Punish points"
+    "punishPoints": "Punish points",
+    "recipeAfterClickOnClose": "Execute recipe after click on \"close\""
 }

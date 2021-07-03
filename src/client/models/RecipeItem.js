@@ -9,6 +9,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
     getAvatar() {
         const object = this.object;
         if (!object) return null;
+        if (object === this.recipe) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.knowledge) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.speechBubble) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
         if (object === this.label) return Object.assign({}, object.getAvatar(), { type: "text", name: object.name });
@@ -23,6 +24,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
     getOverlayIcons() {
         const object = this.object;
         if (!object) return "";
+        if (object === this.recipe) return "graph-icon";
         if (object === this.knowledge) return "head-lightbulb-icon";
         if (object === this.speechBubble) return "comment-text-icon";
         if (object === this.label) return "label-icon";
@@ -35,13 +37,14 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
     }
 
     get object() {
-        return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.knowledge || this.speechBubble || this.label;
+        return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.knowledge || this.speechBubble || this.recipe || this.label;
     }
 
     set object(value) {
         const that = ApiClient.store.getModelById(this.dataCollectionName, this._dummyId || this._id) || this;
 
         const setAllOtherToNull = (otherThan) => {
+            if (otherThan !== "Recipe") that.recipe = null;
             if (otherThan !== "Knowledge") that.knowledge = null;
             if (otherThan !== "SpeechBubble") that.speechBubble = null;
             if (otherThan !== "Label") that.label = null;

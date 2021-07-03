@@ -39,6 +39,7 @@ import File from '~client/models/File';
 import Scene from '~client/models/Scene';
 import SceneObject from '~client/models/SceneObject';
 import SpeechBubble from '~client/models/SpeechBubble';
+import Recipe from '~client/models/Recipe';
 
 import SpeechBubbleComponent from '~client/components/SpeechBubble';
 import SceneSwitcher from "~client/components/SceneSwitcher";
@@ -240,8 +241,8 @@ export default {
             this.model.__ob__.dep.notify();
         },
         awaitRecipeDelay(recipe) {
-            const delay = recipe.transitionSettings.delay;
-            if (!delay) return Promise.resolve();
+            const delay = parseInt(recipe.transitionSettings.delay);
+            if (!delay || isNaN(delay)) return Promise.resolve();
             this.$toasted.global.recipe(recipe).goAway(delay * 1000);
             return new Promise((resolve) => {
                 setTimeout(resolve, delay * 1000);
@@ -289,6 +290,12 @@ export default {
                         this.model.knowledgeBase.push(recipeItemObject);
                         this.model.addToProtocol("add", recipeItemObject, "knowledgeBase");
                     }
+                } else if (recipeItemObject instanceof Recipe.RawClass) {
+                    let resources = null;
+                    if (clickedModel) {
+                        resources = [clickedModel, ...clickedModel.getLabels(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
+                    }
+                    if (this.model.isValidRecipe(recipeItemObject, resources)) this.execRecipe(recipeItemObject);
                 } else if (recipeItemObject instanceof SpeechBubble.RawClass) {
                     const id = this.model.currentScene._id;
                     const scene = this.$refs[`scene_${id}`][0];
