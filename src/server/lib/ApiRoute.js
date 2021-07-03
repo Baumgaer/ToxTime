@@ -213,7 +213,7 @@ export default class ApiRoute extends DefaultRoute {
                 myRequestBody.name = await this.findGenericUniqueName(this.claimedExport.RawClass.className, myRequestBody.name);
             }
 
-            let model = await this.claimedExport.Model.findByIdAndUpdate(id, myRequestBody).exec();
+            let model = await this.claimedExport.Model.findOneAndUpdate({ _id: id }, myRequestBody, { runValidators: true }).exec();
             if (!model) return new httpErrors.NotFound();
 
             // Delete all sticky referenced but deleted models which have lost

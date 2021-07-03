@@ -84,16 +84,19 @@ export function LessonMixinClass(MixinClass) {
             },
             punishClicks: {
                 type: Number,
+                min: 0,
                 required: true,
                 default: 0
             },
             punishSeconds: {
                 type: Number,
+                min: 0,
                 required: true,
                 default: 0
             },
             punishPoints: {
                 type: Number,
+                min: 0,
                 required: true,
                 default: 0
             },
