@@ -40,7 +40,14 @@ export function itemFilterAndSort(list, search = "") {
         /** @type {string} */
         const name = item.getName().toLowerCase();
         const distance = levenshtein.get(name, search) / name.length;
-        const exactSearch = name.search(search);
+        const exactSearch = search.toLocaleLowerCase().split(" ").filter((part) => {
+            return Boolean(part);
+        }).map((part) => {
+            return name.search(part);
+        }).reduce((total, value, index, array) => {
+            if (index === array.length - 1) return (total + value) / name.length;
+            return total + value;
+        }, 0);
 
         let bonus = 0;
         if (exactSearch >= 0) bonus = 1 - exactSearch / name.length;
@@ -53,7 +60,8 @@ export function itemFilterAndSort(list, search = "") {
         const minDistance = Math.min(...Object.values(levenshteinValues).map((value) => value.distance));
         const distance = levenshteinValues[name].distance;
         const bonus = levenshteinValues[name].bonus;
-        return distance - bonus <= minDistance;
+        if (bonus) return true;
+        return distance <= minDistance;
     }).sort((a, b) => {
         if (search) {
             const aName = a.getName().toLowerCase();
