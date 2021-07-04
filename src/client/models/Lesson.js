@@ -7,6 +7,7 @@ import ActionObject from "~client/models/ActionObject";
 import SceneObject from "~client/models/SceneObject";
 import Label from "~client/models/Label";
 import Entity from "~client/models/Entity";
+import Scene from "~client/models/Scene";
 import { flatten, difference, union, uniq, clone, cloneDeep } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -101,6 +102,11 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             });
         };
 
+        const finalFilter = (allRecipes, allPossibleScenesResources) => {
+            allRecipes = allRecipes.filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
+            return allRecipes.filter((recipe) => allRecipes.every((aRecipe) => !aRecipe.getResources().includes(recipe)));
+        };
+
         for (const resource of resources) {
             if (!ApiClient.store.index("recipeItems").has(resource)) continue;
             const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
@@ -127,11 +133,11 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         const allOutputResources = [...outputResources];
         for (const outputResource of outputResources) allOutputResources.push(...(outputResource.getResources?.() ?? []));
 
-        const allPossibleScenes = union(this.scenes, resources.filter((resource) => resource.className === "Scene"));
+        const allPossibleScenes = union(this.scenes, resources.filter((resource) => resource instanceof Scene.RawClass));
         const allPossibleScenesResources = uniq(flatten(allPossibleScenes.map((scene) => scene.getResources())), this.inventory);
 
-        if (outputResources.length) return union(allRecipes, this.findRecipes(union(allOutputResources, resources))).filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
-        return allRecipes.filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
+        if (outputResources.length) allRecipes = union(allRecipes, this.findRecipes(union(allOutputResources, resources)));
+        return finalFilter(allRecipes, allPossibleScenesResources);
     }
 
 });
