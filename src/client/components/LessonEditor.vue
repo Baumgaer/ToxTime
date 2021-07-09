@@ -35,6 +35,7 @@
                     :ref="`scene${index}`"
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
+                    <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(scene)"></div>
                     <div class="closeIcon" :title="$t('remove')">
                         <component :is="'close-icon'" @click="onSceneRemoveClick(scene)"/>
                     </div>
@@ -60,6 +61,7 @@
                     :ref="`item${index}`"
                 >
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
+                    <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(item)"></div>
                     <div class="closeIcon" :title="$t('remove')">
                         <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
                     </div>
@@ -82,6 +84,7 @@
                     @click.stop="onModelSelection(recipe)"
                     :ref="`recipe${index}`"
                 >
+                    <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(recipe)"></div>
                     <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) ? $t('remove') : $t('restore')">
                         <component v-if="!model.excludedRecipes.includes(recipe)" :is="'close-icon'" class="closeIcon" @click.stop="onRecipeRemoveClick(recipe)"/>
                         <component v-else :is="'delete-restore-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
@@ -207,6 +210,31 @@ export default {
             set(value) {
                 this.model.description = value;
             }
+        },
+        hasOverwrites() {
+            return (model) => {
+                const recursiveSubObjects = (model, ...args) => {
+                    const result = [];
+                    const subObjects = model.getSubObjects(...args);
+                    result.push(...subObjects);
+                    for (const subObject of subObjects) {
+                        result.push(...recursiveSubObjects(subObject, ...args));
+                    }
+                    return result;
+                };
+
+                let resources = [];
+                if (model instanceof Recipe.RawClass) resources = model.getSubObjects(true);
+                if (model instanceof Scene.RawClass) resources = recursiveSubObjects(model);
+                const properties = ["amount", "points", "object", "activated"];
+
+                for (const property of properties) {
+                    if (this.model.getOverwrite(model, property)) return true;
+                    for (const resource of resources) {
+                        if (this.model.getOverwrite(resource, property)) return true;
+                    }
+                }
+            };
         }
     },
     mounted() {

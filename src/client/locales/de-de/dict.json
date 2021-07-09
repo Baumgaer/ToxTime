@@ -187,5 +187,6 @@
     "clicks": "Klicks",
     "seconds": "Sekunden",
     "punishPoints": "Strafpunkte",
-    "recipeAfterClickOnClose": "Rezept nach Klick auf \"schließen\" ausführen"
+    "recipeAfterClickOnClose": "Rezept nach Klick auf \"schließen\" ausführen",
+    "modified": "Bearbeitet"
 }
