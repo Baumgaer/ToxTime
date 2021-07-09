@@ -58,8 +58,19 @@
     }
 }
 
-.tippy-box[data-theme$="tablet"] {
-    .tippy-content {
-        padding: 0;
+.tippy-box {
+    &[data-theme$="tablet"] {
+        .tippy-content {
+            padding: 0;
+        }
+    }
+
+    &[data-theme$="lessonOverwrites"] {
+        .tippy-content {
+            padding: 0;
+            box-shadow: 0 0 5px @black;
+            border-radius: 4px;
+            overflow: hidden;
+        }
     }
 }

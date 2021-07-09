@@ -3,10 +3,15 @@
 .recipeEditor {
     height: 100%;
 
-    .description {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 5px;
+    .editorBody {
+        height: calc(100% - 50px);
+        overflow-y: auto;
+
+        .description {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px;
+        }
     }
 }

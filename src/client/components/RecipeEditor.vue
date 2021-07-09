@@ -1,16 +1,18 @@
 <template>
     <div class="recipeEditor" @dragover.prevent.stop="onInternalDragOver($event)" @dragleave.prevent.stop="onInternalDragLeave">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
-        <RecipeViewer
-            ref="viewer"
-            :model="model"
-            :itemFilter="itemFilter"
-            :forbiddenOutputTypes="forbiddenOutputTypes"
-            :forbiddenInputTypes="forbiddenInputTypes"
-            :changeable="true"
-            @settingsChange="onToggleSwitched"
-        />
-        <textarea-autosize class="description" :placeholder="$t('description')" v-model="model.description" :min-height="100" />
+        <div class="editorBody">
+            <RecipeViewer
+                ref="viewer"
+                :model="model"
+                :itemFilter="itemFilter"
+                :forbiddenOutputTypes="forbiddenOutputTypes"
+                :forbiddenInputTypes="forbiddenInputTypes"
+                :changeable="true"
+                @settingsChange="onToggleSwitched"
+            />
+            <textarea-autosize class="description" :placeholder="$t('description')" v-model="model.description" :min-height="100" />
+        </div>
     </div>
 </template>
 

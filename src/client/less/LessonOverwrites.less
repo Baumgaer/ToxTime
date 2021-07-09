@@ -1,15 +1,15 @@
 @import (less) "variables";
 
-.lessonsOverwrites {
+.lessonsOverwritesAnchor {
     position: absolute;
-    top: 60px;
-    right: 30px;
-    width: max-content;
-    min-width: 100px;
-    z-index: 10;
-    box-shadow: 0 0 5px @dark;
+    pointer-events: none;
+    //transition: all 0.5s;
+}
 
-    background-color: @white;
+.lessonsOverwritesContent {
+    width: max-content;
+    min-width: 200px;
+    max-width: 100%;
 
     div {
         padding: 5px;
@@ -20,8 +20,16 @@
     }
 
     .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         font-weight: bold;
-        border: 1px solid @black;
+        border-bottom: 2px solid @white;
+
+        .close-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
     }
 
     .field {
@@ -31,17 +39,12 @@
         padding: 0;
 
         > div {
-            border: 1px solid @black;
-
-            &:first-child,
-            &:nth-child(2) {
-                border-top: none;
-            }
+            border-bottom: 1px dotted @white;
         }
 
         .key {
             grid-area: key;
-            border-right: none;
+            text-align: right;
         }
 
         .value {

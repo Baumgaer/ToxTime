@@ -101,6 +101,10 @@
                 border: 1px solid @black;
                 box-sizing: border-box;
 
+                > * {
+                    pointer-events: none;
+                }
+
                 &.leftDropTarget {
                     border-left: 2px solid var(--primary-color, @primaryColor) !important;
                 }
@@ -116,6 +120,7 @@
                     font-size: 20px;
                     font-weight: bold;
                     cursor: pointer;
+                    pointer-events: all;
 
                     &:hover {
                         color: var(--primary-color, @primaryColor);
