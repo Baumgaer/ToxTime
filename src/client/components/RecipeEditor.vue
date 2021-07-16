@@ -2,6 +2,17 @@
     <div class="recipeEditor" @dragover.prevent.stop="onInternalDragOver($event)" @dragleave.prevent.stop="onInternalDragLeave">
         <EditorHead ref="editorHead" name="addRecipe" :model="model" :onSaveButtonClick="onSaveButtonClick" />
         <div class="editorBody">
+            <div class="legend">
+                <div class="input">{{ $t("neededInput") }}</div>
+                <div class="splitter"></div>
+                <div class="quantity">{{ $t("quantity") }}</div>
+                <div class="splitter"></div>
+                <div class="settings">{{ $t("settings") }}</div>
+                <div class="splitter"></div>
+                <div class="quantity">{{ $t("quantity") }}</div>
+                <div class="splitter"></div>
+                <div class="output">{{ $t("output") }}</div>
+            </div>
             <RecipeViewer
                 ref="viewer"
                 :model="model"

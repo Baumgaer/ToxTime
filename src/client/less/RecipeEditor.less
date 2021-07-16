@@ -7,6 +7,52 @@
         height: calc(100% - 50px);
         overflow-y: auto;
 
+        .legend {
+            padding: 10px 1em;
+            text-align: center;
+            white-space: nowrap;
+            height: 14px;
+            background-color: @dusk;
+            color: @white;
+            font-weight: bold;
+
+            > div {
+                display: inline-block;
+                vertical-align: top;
+                box-sizing: border-box;
+                padding: 0 8px;
+            }
+
+            .splitter {
+                border-left: 2px dotted @white;
+                height: 100%;
+                width: 0px;
+                padding: 0;
+            }
+
+            .input,
+            .output {
+                width: 3em;
+            }
+
+            .input {
+                direction: rtl;
+            }
+
+            .settings {
+                width: 40%;
+            }
+
+            .quantity {
+                width: calc(15% - 3em);
+                min-width: calc(3em + 5%);
+            }
+        }
+
+        .recipeViewer::v-deep {
+            padding: 1em 1em 5em 1em;
+        }
+
         .description {
             display: block;
             width: 100%;

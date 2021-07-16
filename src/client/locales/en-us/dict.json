@@ -188,5 +188,8 @@
     "seconds": "Seconds",
     "punishPoints": "Punish points",
     "recipeAfterClickOnClose": "Execute recipe after click on \"close\"",
-    "modified": "Modified"
+    "modified": "Modified",
+    "neededInput": "Needed input",
+    "quantity": "Quantity",
+    "output": "Output"
 }
