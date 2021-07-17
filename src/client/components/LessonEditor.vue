@@ -384,8 +384,11 @@ export default {
         },
 
         onDragEnd() {
-            ApiClient.store.collection("localStorage").isInternalDnD = false;
-            ApiClient.store.collection("localStorage").internalDnDData = null;
+            // Ugly FireFox hack because FF is unable to sort onDrop BEFORE dragEnd event
+            setTimeout(() => {
+                ApiClient.store.collection("localStorage").isInternalDnD = false;
+                ApiClient.store.collection("localStorage").internalDnDData = null;
+            });
         },
 
         /**
