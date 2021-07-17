@@ -126,6 +126,7 @@ export default class Select extends Tool {
      * @memberof Select
      */
     onToolKeyDown(event) {
+        if (document.activeElement?.tagName === "INPUT") return;
         super.onToolKeyDown(event);
         if (event.key !== "delete" || !this.selection) return;
 

@@ -34,7 +34,7 @@
                     autocomplete="off"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
                     @change="onNameChange($event)"
-                    @keyup="onNameKeyUp($event)"
+                    @keyup.stop.prevent="onNameKeyUp($event)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
                 />
