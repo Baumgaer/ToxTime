@@ -1,10 +1,21 @@
 <template>
     <div class="player">
-        <EditorHead :name="model.lesson.name"
-                    :model="model"
-                    :nameIsTranslated="true"
-                    :onSaveButtonClick="onSaveButtonClick.bind(this)"
-                    @preCloseButtonClickConfirm="onPreCloseButtonClickConfirm" />
+        <EditorHead
+            :name="model.lesson.name"
+            :model="model"
+            :nameIsTranslated="true"
+            :onSaveButtonClick="onSaveButtonClick.bind(this)"
+            @preCloseButtonClickConfirm="onPreCloseButtonClickConfirm"
+        >
+            <Button
+                :name="!inFullscreen ? 'fullscreen' : 'fullscreenExit'"
+                :showLabel="false"
+                @click="onFullscreenButtonClick"
+            >
+                <fullscreen-icon v-if="!inFullscreen" />
+                <fullscreen-exit-icon v-else />
+            </Button>
+        </EditorHead>
         <section v-for="scene in scenes" :key="scene._id">
             <GraphicViewer
                 :model="scene"
@@ -124,7 +135,8 @@ export default {
             markedItem: null,
             modelItemMap: new Map(),
             oldKnowledgeBase: null,
-            clicks: []
+            clicks: [],
+            inFullscreen: false
         };
     },
     mounted() {
@@ -176,10 +188,19 @@ export default {
             } else if (result) this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
         },
+        onFullscreenButtonClick() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else this.$el.requestFullscreen();
+        },
         onFullscreenChange() {
             if(!document.fullscreenElement) {
                 document.body.appendChild(this.$toasted.container);
-            } else this.$el.appendChild(this.$toasted.container);
+                this.inFullscreen = false;
+            } else {
+                this.$el.appendChild(this.$toasted.container);
+                this.inFullscreen = true;
+            }
         },
         onPreCloseButtonClickConfirm() {
             if (!document.fullscreenElement) return;

@@ -191,5 +191,7 @@
     "modified": "Bearbeitet",
     "neededInput": "Benötigte Eingabe",
     "quantity": "Menge",
-    "output": "Ausgabe"
+    "output": "Ausgabe",
+    "fullscreen": "Vollbild",
+    "fullscreenExit": "Vollbild verlassen"
 }

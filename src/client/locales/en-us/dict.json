@@ -191,5 +191,7 @@
     "modified": "Modified",
     "neededInput": "Needed input",
     "quantity": "Quantity",
-    "output": "Output"
+    "output": "Output",
+    "fullscreen": "Fullscreen",
+    "fullscreenExit": "Exit fullscreen"
 }
