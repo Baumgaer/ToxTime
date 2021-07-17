@@ -163,6 +163,9 @@ export default {
          */
         onWheel(event) {
             const paper = this.$refs.graphicViewer.paper;
+            const oldCenter = paper.view.center;
+            const mousePosition = paper.view.viewToProject(new paper.Point(event.offsetX, event.offsetY));
+            const delta = oldCenter.subtract(mousePosition);
             const zoom = 0.1;
 
             let sign = 1;
@@ -170,6 +173,7 @@ export default {
 
             const scaleFactor = 1 + zoom * sign;
             paper.view.scale(scaleFactor);
+            paper.view.translate(delta.multiply(zoom * sign));
         },
 
         async onSaveButtonClick() {
@@ -253,7 +257,6 @@ export default {
                     this.setTool("select");
                     item.selected = true;
                     actionObject.isSelected = true;
-                    item.scale(0.125);
                 }
             });
         },

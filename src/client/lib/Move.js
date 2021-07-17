@@ -11,7 +11,7 @@ export default class Move extends Tool {
      * @memberof Move
      */
     onToolMouseDrag(event) {
-        this.paper.view.translate(event.delta);
+        this.paper.view.center = event.downPoint.add(this.paper.view.center.subtract(event.point));
     }
 
 }
