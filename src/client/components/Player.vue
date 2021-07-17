@@ -1,6 +1,10 @@
 <template>
     <div class="player">
-        <EditorHead :name="model.lesson.name" :model="model" :nameIsTranslated="true" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
+        <EditorHead :name="model.lesson.name"
+                    :model="model"
+                    :nameIsTranslated="true"
+                    :onSaveButtonClick="onSaveButtonClick.bind(this)"
+                    @preCloseButtonClickConfirm="onPreCloseButtonClickConfirm" />
         <section v-for="scene in scenes" :key="scene._id">
             <GraphicViewer
                 :model="scene"
@@ -143,11 +147,11 @@ export default {
         }, { type: "info", position: "top-right", className: "recipeToaster" });
 
         this.tippy = tippy(this.$refs.tablet.$el, {
-            appendTo: this.$root.$el,
+            appendTo: this.$el,
             content: "",
             placement: "right",
             theme: "material",
-            zIndex: 20,
+            zIndex: 2000,
             showOnCreate: false,
             duration: 300,
             trigger: "",
@@ -155,6 +159,8 @@ export default {
                 setTimeout(instance.hide.bind(instance), 2500);
             }
         });
+        this.$el.onfullscreenchange = this.onFullscreenChange.bind(this);
+        this.$el.requestFullscreen();
     },
     async beforeDestroy() {
         if (!this.preventAutosave) await this.onSaveButtonClick();
@@ -169,6 +175,15 @@ export default {
                 this.$toasted.error(this.$t("errorWhileSaving", { name: this.model.getName() }), { className: "errorToaster" });
             } else if (result) this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
             if (!this.preventAutosave) this.saveTimeout = setTimeout(this.onSaveButtonClick.bind(this), 100 * 60 * 5);
+        },
+        onFullscreenChange() {
+            if(!document.fullscreenElement) {
+                document.body.appendChild(this.$toasted.container);
+            } else this.$el.appendChild(this.$toasted.container);
+        },
+        onPreCloseButtonClickConfirm() {
+            if (!document.fullscreenElement) return;
+            document.exitFullscreen();
         },
         onActionObjectGroupOrClickAreaPrepared(item, model) {
             if (!this.modelItemMap.has(model)) this.modelItemMap.set(model, item);

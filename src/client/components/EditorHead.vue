@@ -83,6 +83,7 @@ export default {
         },
 
         async onCloseButtonClick() {
+            this.$emit("preCloseButtonClickConfirm");
             this.hasChanges = this.model?.hasChangesDeep();
             if (this.hasChanges) {
                 const answer = await sweetAlert({

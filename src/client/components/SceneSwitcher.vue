@@ -36,7 +36,7 @@ export default {
     },
     mounted() {
         this.tippy = tippy(this.$refs.button, {
-            appendTo: this.$root.$el,
+            appendTo: this.$parent.$el,
             content: this.$refs.content,
             placement: "auto",
             theme: "material",
