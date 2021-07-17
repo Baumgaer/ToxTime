@@ -63,6 +63,8 @@ export default {
         return {
             model: window.activeUser.editingModel,
             currentTool: null,
+            watchedObjects: [],
+            watchDebounceId: null,
             toolMap: {
                 polyClickArea: PolyClickArea,
                 move: Move,
@@ -71,12 +73,47 @@ export default {
             }
         };
     },
+    computed: {
+        subObjects() {
+            return this.model.getSubObjects();
+        }
+    },
+    watch: {
+        subObjects: {
+            immediate: true,
+            handler: function() {
+                clearTimeout(this.watchDebounceId);
+                this.watchDebounceId = setTimeout(() => {
+                    const properties = ["clickAreas", "actionObjects"];
+                    for (const property of properties) {
+                        const subObjects = this.model[property];
+                        for (let index = 0; index < subObjects.length; index++) {
+                            const subObject = subObjects[index];
+                            this.addSelectWatcher(`model.${property}.${index}.isSelected`, subObject);
+                        }
+                    }
+                }, 100);
+            }
+        }
+    },
     beforeDestroy() {
         this.model.getSubObjects().forEach((subObject) => {
             subObject.isSelected = false;
         });
     },
     methods: {
+        addSelectWatcher(path, model) {
+            if (this.watchedObjects.includes(model)) return;
+            const activeLayer = this.$refs.graphicViewer.paper.project.activeLayer;
+            const item = activeLayer.getItem({ recursive: true, match: (child) => child.model === model });
+            this.watchedObjects.push(model);
+            this.$watch(path, (newValue) => {
+                if (!item) return;
+                if (!(this.currentTool instanceof Select)) this.setTool(newValue ? "select" : null);
+                item.selected = newValue;
+            });
+        },
+
         isAllowed(model) {
             return model && (model instanceof File.RawClass || model instanceof SceneObject.RawClass) && model !== this.model && !model.deleted && !model.getResources().includes(this.model);
         },
@@ -206,6 +243,19 @@ export default {
             actionObjectsMap = this.$refs.graphicViewer.actionObjectsMap;
             const lastActionObject = actionObjectsMap[actionObjectsMap.length - actionObjectAmountDifference - 1];
             if ((actionObjectsMap.length - 2) >= 0 && lastActionObject) lastActionObject.next();
+
+            setTimeout(() => {
+                const item = this.$refs.graphicViewer.paper.project.activeLayer.getItem({
+                    recursive: true,
+                    match: (child) => child.model === actionObject
+                });
+                if (item) {
+                    this.setTool("select");
+                    item.selected = true;
+                    actionObject.isSelected = true;
+                    item.scale(0.125);
+                }
+            });
         },
 
         async createAvatar() {

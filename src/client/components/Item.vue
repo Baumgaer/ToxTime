@@ -37,6 +37,7 @@
                     @keyup.stop.prevent="onNameKeyUp($event)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
+                    @blur="onNameBlur($event)"
                 />
                 <strong class="fixedName" v-else>{{ model.getName() ? model.getName() : $t("unnamed") }}</strong>
             </div>
@@ -159,6 +160,7 @@ export default {
 
         onMouseUp(event) {
             event.stopPropagation();
+            this.model.isSelected = true;
             this.$refs.itemRoot.setAttribute("draggable", "true");
             let parent = this.$parent;
             while (parent?.isItem) {
@@ -197,6 +199,7 @@ export default {
         },
 
         onNameKeyUp(event) {
+            this.model.isSelected = false;
             if (event.key === "Escape") {
                 this.$refs.nameInput.value = this.model.getName();
                 this.$refs.nameInput.blur();
@@ -233,6 +236,7 @@ export default {
          * @param {Event} event
          */
         async onNameChange(event) {
+            this.model.isSelected = false;
             if (!this.nameEditDBField) return;
             this.model[this.nameEditDBField] = event.target.value;
             this.$refs.nameInput.blur();
@@ -251,6 +255,10 @@ export default {
             const result = await modelToSave.save();
             if (result instanceof Error) return;
             this.$toasted.success(this.$t("saved", { name: this.model.getName() }), { className: "successToaster" });
+        },
+
+        onNameBlur() {
+            this.model.isSelected = false;
         }
     }
 };
