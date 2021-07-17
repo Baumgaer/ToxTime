@@ -176,16 +176,18 @@ export default {
             const hasAmount = this.model.getNormalizedOverwrite(model, "amount");
             item.visible = isActivated && Boolean(hasAmount);
         },
-        onCombineButtonClick() {
-            const resources = [...flatten(this.model.grabbing.map((item) => item.getResources()))];
-            const recipe = this.model.findRecipes(resources)[0];
-            if (recipe) {
-                this.execRecipe(recipe);
-            } else this.addPunishPoint();
+        onCombineButtonClick(event) {
+            if (!this.markedItem) {
+                const resources = [...flatten(this.model.grabbing.map((item) => item.getResources()))];
+                const recipe = this.model.findRecipes(resources)[0];
+                if (recipe) {
+                    this.execRecipe(recipe);
+                } else this.addPunishPoint();
+            } else this.onSceneClick(event, this.markedItem, this.markedItem.model, true);
         },
-        onSceneClick(event, item, model) {
+        onSceneClick(event, item, model, forced) {
             // Stop propagating when it was not a left click
-            if (event && event.event.button > 0) return false;
+            if (!forced && event && event.event.button > 0) return false;
 
             // Event bubbled to the whole scene, so the player clicked into the void
             // or tried to make combos which are maybe nonsense
