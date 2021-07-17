@@ -31,7 +31,9 @@
         </section>
         <section class="protocol"></section>
         <Inventory :model="model" icon="hand-left-icon" ref="grabbing" :field="'grabbing'" :minimumSlots="0" class="grabbing">
-            <Button name="combine" @click="onCombineButtonClick" />
+            <Button class="combineButton" name="combine" @click="onCombineButtonClick">
+                <call-merge-icon />
+            </Button>
         </Inventory>
         <Inventory :model="model" icon="bag-personal-icon" ref="inventory" />
         <div class="sidebar">

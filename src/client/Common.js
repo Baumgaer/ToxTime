@@ -82,6 +82,7 @@ import CommentTextIcon from "vue-material-design-icons/CommentText";
 import CommentTextMultipleIcon from "vue-material-design-icons/CommentTextMultiple";
 import FullscreenIcon from "vue-material-design-icons/Fullscreen";
 import FullscreenExitIcon from "vue-material-design-icons/FullscreenExit";
+import CallMergeIcon from "vue-material-design-icons/CallMerge";
 
 // Attach Icons
 Vue.component('account-icon', AccountIcon);
@@ -141,3 +142,4 @@ Vue.component('comment-text-icon', CommentTextIcon);
 Vue.component('comment-text-multiple-icon', CommentTextMultipleIcon);
 Vue.component('fullscreen-icon', FullscreenIcon);
 Vue.component('fullscreen-exit-icon', FullscreenExitIcon);
+Vue.component('call-merge-icon', CallMergeIcon);

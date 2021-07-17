@@ -1,5 +1,5 @@
 <template>
-    <section class="inventory" :style="`display: ${model[field].length ? 'flex' : 'none'}`" @wheel="onScroll($event)">
+    <section :class="`inventory${isRightAlignedCalculated ? ' rightAligned' : ''}`" :style="`display: ${model[field].length ? 'flex' : 'none'}`" @wheel="onScroll($event)">
         <div class="icon">
             <component :is="icon" />
         </div>
@@ -40,12 +40,25 @@ export default {
             default: 10
         }
     },
+    data() {
+        return {
+            isRightAlignedCalculated: this.isRightAligned()
+        };
+    },
+    created() {
+        this.onResize = this.onResize.bind(this);
+        window.addEventListener("resize", this.onResize);
+    },
     mounted() {
         if (this.model[this.field].length < 10) {
             for (let index = this.model[this.field].length; index < this.minimumSlots; index++) {
                 this.add(null);
             }
         }
+        this.onResize();
+    },
+    destroyed() {
+        window.removeEventListener("resize", this.onResize);
     },
     methods: {
         onScroll(event) {
@@ -55,6 +68,14 @@ export default {
         onSlotClick(item) {
             if (!item.amount) return;
             this.grab(item);
+        },
+        onResize() {
+            this.isRightAlignedCalculated = this.isRightAligned();
+        },
+        isRightAligned() {
+            if (!this.$parent.$el) return false;
+            const rect = this.$parent.$el.getBoundingClientRect();
+            return rect.height < rect.width;
         },
         nextEmptyInventorySlot(name = this.field) {
             for (let index = 0; index < this.model[name].length; index++) {

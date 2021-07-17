@@ -27,5 +27,14 @@
 
     .grabbing {
         bottom: 65px;
+
+        &.rightAligned {
+            right: 65px;
+            &::v-deep {
+                .label {
+                    display: none;
+                }
+            }
+        }
     }
 }
