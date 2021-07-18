@@ -251,7 +251,8 @@ export default {
             };
 
             for (const item of this.items) {
-                const component = this.$refs[item._id][0];
+                const component = this.$refs[item._id]?.[0];
+                if (!component) continue;
                 const allChildrenCollapsed = component.$children.every((child) => !child.opened);
                 if (component.hasSubObjects) collapseChildren(component.$children);
                 if (allChildrenCollapsed) component.opened = false;

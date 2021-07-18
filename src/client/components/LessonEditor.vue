@@ -37,7 +37,7 @@
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
                     <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(scene)"></div>
                     <div class="closeIcon" :title="$t('remove')">
-                        <component :is="'close-icon'" @click="onSceneRemoveClick(scene)"/>
+                        <component :is="'close-icon'" @click.stop="onSceneRemoveClick(scene)"/>
                     </div>
                     <div class="name">{{ scene.name }}</div>
                 </Avatar>
@@ -63,7 +63,7 @@
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
                     <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(item)"></div>
                     <div class="closeIcon" :title="$t('remove')">
-                        <component :is="'close-icon'" class="closeIcon" @click="onItemRemoveClick(item)"/>
+                        <component :is="'close-icon'" class="closeIcon" @click.stop="onItemRemoveClick(item)"/>
                     </div>
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
@@ -351,12 +351,14 @@ export default {
             const index = this.model.scenes.indexOf(scene);
             if (index < 0) return;
             this.model.scenes.splice(index, 1);
+            this.onCalculateButtonClick();
         },
 
         onItemRemoveClick(item) {
             const index = this.model.inventory.indexOf(item);
             if (index < 0) return;
             this.model.inventory.splice(index, 1);
+            this.onCalculateButtonClick();
         },
 
         onRecipeRemoveClick(recipe) {
@@ -364,12 +366,14 @@ export default {
             if (addedRecipes.includes(recipe)) {
                 addedRecipes.splice(addedRecipes.indexOf(recipe), 1);
             } else this.model.excludedRecipes.push(recipe);
+            this.onCalculateButtonClick();
         },
 
         onRecipeRestoreClick(recipe) {
             const excludedRecipes = this.model.excludedRecipes;
             if (!excludedRecipes.includes(recipe)) return;
             excludedRecipes.splice(excludedRecipes.indexOf(recipe), 1);
+            this.onCalculateButtonClick();
         },
 
         /**

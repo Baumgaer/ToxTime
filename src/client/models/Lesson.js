@@ -104,7 +104,9 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
 
         const finalFilter = (allRecipes, allPossibleScenesResources) => {
             allRecipes = allRecipes.filter((recipe) => invalidRecipeFilter(recipe, allPossibleScenesResources));
-            return allRecipes.filter((recipe) => allRecipes.every((aRecipe) => !aRecipe.getResources().includes(recipe)));
+            return allRecipes.filter((recipe) => {
+                return allRecipes.every((aRecipe) => !aRecipe.getResources().includes(recipe)) && !this.excludedRecipes.includes(recipe);
+            });
         };
 
         for (const resource of resources) {
@@ -125,7 +127,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
                 if (validToUse) allRecipes.push(recipe);
             }
         }
-        allRecipes = uniq(allRecipes);
+        allRecipes = uniq(allRecipes).filter((recipe) => !this.excludedRecipes.includes(recipe));
 
         const output = flatten(allRecipes.map((recipe) => recipe.output)).map((resource) => resource.object);
         const outputResources = difference(output, resources);

@@ -242,7 +242,7 @@ export function LessonMixinClass(MixinClass) {
          * @memberof Lesson
          */
         getGoalPoints(mode = "max") {
-            return Math[mode](...this.goals.map((goal) => goal.points));
+            return Math[mode](0, ...this.goals.map((goal) => goal.points));
         }
 
         getTotalPoints() {
