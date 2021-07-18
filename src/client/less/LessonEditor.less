@@ -51,6 +51,11 @@
             background-color: @warningColor;
             box-shadow: 0 0 3px @black;
             cursor: default;
+            pointer-events: all;
+        }
+
+        .closeIcon > * {
+            pointer-events: none;
         }
 
         .entityList {
@@ -197,7 +202,7 @@
                     padding: 5px;
                 }
 
-                &::v-deep * {
+                &::v-deep *:not(.modifiedIndicator, .closeIcon) {
                     pointer-events: none;
                 }
             }
