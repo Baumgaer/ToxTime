@@ -8,6 +8,8 @@ import SceneObject from "~client/models/SceneObject";
 import Label from "~client/models/Label";
 import Entity from "~client/models/Entity";
 import Scene from "~client/models/Scene";
+import Recipe from "~client/models/Recipe";
+import SpeechBubble from "~client/models/SpeechBubble";
 import { flatten, difference, union, uniq, clone, cloneDeep } from "~common/utils";
 
 const CommonClientLesson = LessonMixinClass(ClientModel);
@@ -92,6 +94,33 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         return this.getSpecificObjectsFor(model, resources).length > 0;
     }
 
+    hasValidInputFilter(recipeItem, resources) {
+        const isIncluded = resources.includes(recipeItem.object);
+        if (!isIncluded) return false;
+
+        let hasValidAnchor = true;
+        const isAoOrCa = recipeItem.object instanceof ActionObject.RawClass || recipeItem.object instanceof ClickArea.RawClass;
+        if (recipeItem.location === "scene" && !isAoOrCa) hasValidAnchor = this.hasValidAnchor(recipeItem.object, resources);
+        return isIncluded && hasValidAnchor;
+    }
+
+    hasValidOutputFilter(recipeItem, resources) {
+        const model = recipeItem.object;
+        if (!(model instanceof SpeechBubble.RawClass) && !(model instanceof Recipe.RawClass)) return true;
+        if (model instanceof Recipe.RawClass) return this.isValidToUse(model, resources);
+        const modelResources = [model.recipe, model.exitRecipe];
+        return modelResources.every((recipe) => {
+            if (!recipe) return true;
+            return this.isValidToUse(recipe, resources);
+        });
+    }
+
+    isValidToUse(recipe, resources) {
+        const inputOk = recipe.input.every((recipeItem) => this.hasValidInputFilter(recipeItem, resources));
+        const outputOk = recipe.output.every((recipeItem) => this.hasValidOutputFilter(recipeItem, resources));
+        return inputOk && outputOk;
+    }
+
     findRecipes(resources = this.getResources()) {
         let allRecipes = [];
 
@@ -115,21 +144,13 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
             for (const recipeItem of recipeItems) {
                 if (!ApiClient.store.index("recipes").has(recipeItem)) continue;
                 const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                const validToUse = recipe.input.every((item) => {
-                    const isIncluded = resources.includes(item.object);
-                    if (!isIncluded) return false;
-
-                    let hasValidAnchor = true;
-                    const isAoOrCa = item.object instanceof ActionObject.RawClass || item.object instanceof ClickArea.RawClass;
-                    if (item.location === "scene" && !isAoOrCa) hasValidAnchor = this.hasValidAnchor(item.object, resources);
-                    return isIncluded && hasValidAnchor;
-                });
+                const validToUse = this.isValidToUse(recipe, resources);
                 if (validToUse) allRecipes.push(recipe);
             }
         }
         allRecipes = uniq(allRecipes).filter((recipe) => !this.excludedRecipes.includes(recipe));
 
-        const output = flatten(allRecipes.map((recipe) => recipe.output)).map((resource) => resource.object);
+        const output = flatten(allRecipes.map((recipe) => recipe.output)).map((recipeItem) => recipeItem.object);
         const outputResources = difference(output, resources);
 
         const allOutputResources = [...outputResources];
