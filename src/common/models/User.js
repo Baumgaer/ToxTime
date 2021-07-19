@@ -83,7 +83,11 @@ export function UserMixinClass(MixinClass) {
         };
 
         getName(preferredField) {
-            return unescape(`${this[preferredField] || this.email}`);
+            if (preferredField) return unescape(`${this[preferredField] || this.email}`);
+            if (this.name) return unescape(this.name);
+            if (this.firstName && this.lastName) return unescape(`${this.firstName} ${this.lastName}`);
+            if (this.firstName) return unescape(this.firstName);
+            return unescape(this.email);
         }
     }
     return User;
