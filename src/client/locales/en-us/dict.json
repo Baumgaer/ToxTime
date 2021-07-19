@@ -193,5 +193,6 @@
     "quantity": "Quantity",
     "output": "Output",
     "fullscreen": "Fullscreen",
-    "fullscreenExit": "Exit fullscreen"
+    "fullscreenExit": "Exit fullscreen",
+    "invalidRecipe": "Invalid recipe"
 }

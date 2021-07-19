@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="speechBubble" ref="speechBubble" :style="`top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px`"></div>
-        <div class="speechBubblePopup" ref="speechBubblePopup" v-show="sceneItem">
+        <div class="speechBubblePopup" ref="speechBubblePopup">
             <div v-if="model">
                 <div class="closeButton" @click="close">
                     <close-icon />
@@ -55,7 +55,9 @@ export default {
             try {
                 const regex = /\{\{\s(.*?)(?:\((?:(.*),?)*\))?\s\}\}/ig;
                 /** @type {string} */
-                let result = unescape(this.model[`${this.property}_${window.activeUser.locale}`]);
+                const userLangString = `${this.property}_${window.activeUser.locale}`;
+                const fallbackString = `${this.property}_en-us`;
+                let result = unescape(this.model[userLangString] || this.model[fallbackString]);
                 const matches = result.match(regex);
                 if (matches) {
                     for (const match of matches) {
@@ -95,7 +97,7 @@ export default {
     },
     mounted() {
         window.addEventListener("resize", () => {
-            if (!this.tippy || !this.sceneItem || !this.tippy.state.isVisible) return;
+            if (!this.tippy || !this.tippy.state.isVisible) return;
             Object.assign(this, this.calcSizes());
         });
     },
@@ -127,13 +129,20 @@ export default {
             return recipes[random(recipes.length - 1)];
         },
         calcSizes() {
-            if (!this.sceneItem) return;
-            const viewCoords = this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.topLeft);
-            const width = Math.round(this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.topRight).subtract(viewCoords).length);
-            const height = Math.round(this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.bottomLeft).subtract(viewCoords).length);
-            const top = Math.round(viewCoords.y) + 55;
-            const left = Math.round(viewCoords.x);
-            return { width, height, top, left };
+            if (this.sceneItem) {
+                const viewCoords = this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.topLeft);
+                const width = Math.round(this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.topRight).subtract(viewCoords).length);
+                const height = Math.round(this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.bottomLeft).subtract(viewCoords).length);
+                const top = Math.round(viewCoords.y) + 55;
+                const left = Math.round(viewCoords.x);
+                return { width, height, top, left };
+            }
+            return {
+                width: 0,
+                height: 0,
+                top: Math.round(this.$parent.$el.offsetHeight / 2),
+                left: Math.round(this.$parent.$el.offsetWidth / 2)
+            };
         },
         createTippy() {
             if (this.tippy) return;
@@ -159,7 +168,7 @@ export default {
                 this.property = "error";
             } else {
                 try {
-                    await this.execRecipeFunc(recipe, this.sceneItem.model);
+                    await this.execRecipeFunc(recipe, this.sceneItem?.model);
                     this.property = "description";
                 } catch (error) {
                     this.error = error.toString();
@@ -168,7 +177,16 @@ export default {
         },
         async finish() {
             await this.next();
-            if (!this.error && this.property !== "error") this.hide();
+            /** @type {string} */
+            const userLangString = `${this.property}_${window.activeUser.locale}`;
+            const fallbackString = `${this.property}_en-us`;
+            const stringToDisplay = unescape(this.model[userLangString] || this.model[fallbackString]);
+            if (this.error || this.property === "error") {
+                if (!stringToDisplay && !this.error) {
+                    this.$toasted.error(this.$t('invalidRecipe'));
+                    this.hide();
+                }
+            } else this.hide();
         },
         async close() {
             if (this.model.exitRecipe) await this.next(this.model.exitRecipe);
@@ -179,8 +197,9 @@ export default {
             this.model = speechBubbleModel;
             this.createTippy();
             const project = scene.paper.project;
-            this.sceneItem = project.activeLayer.getItem((item) => item.model === clickedModel);
-            if (!this.sceneItem) return;
+            if (clickedModel) {
+                this.sceneItem = project.activeLayer.getItem((item) => item.model === clickedModel);
+            } else this.sceneItem = null;
             Object.assign(this, this.calcSizes());
             setTimeout(this.tippy.show.bind(this.tippy));
         },

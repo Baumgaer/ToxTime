@@ -193,5 +193,6 @@
     "quantity": "Menge",
     "output": "Ausgabe",
     "fullscreen": "Vollbild",
-    "fullscreenExit": "Vollbild verlassen"
+    "fullscreenExit": "Vollbild verlassen",
+    "invalidRecipe": "Ungültiges Rezept"
 }
