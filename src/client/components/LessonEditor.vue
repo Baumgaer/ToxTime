@@ -36,8 +36,8 @@
                 >
                     <div class="scenePicture" :style="`background-image: url(${scene.getAvatar().name})`"></div>
                     <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(scene)"></div>
-                    <div class="closeIcon" :title="$t('remove')">
-                        <component :is="'close-icon'" @click.stop="onSceneRemoveClick(scene)"/>
+                    <div class="closeIcon" :title="$t('remove')" @click.stop="onSceneRemoveClick(scene)">
+                        <component :is="'close-icon'"/>
                     </div>
                     <div class="name">{{ scene.name }}</div>
                 </Avatar>
@@ -62,8 +62,8 @@
                 >
                     <div class="itemPicture" :style="`background-image: url(${item.getAvatar().name})`"></div>
                     <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(item)"></div>
-                    <div class="closeIcon" :title="$t('remove')">
-                        <component :is="'close-icon'" class="closeIcon" @click.stop="onItemRemoveClick(item)"/>
+                    <div class="closeIcon" :title="$t('remove')" @click.stop="onItemRemoveClick(item)">
+                        <component :is="'close-icon'" class="closeIcon"/>
                     </div>
                     <div class="name">{{ item.name }}</div>
                 </Avatar>
