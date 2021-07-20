@@ -122,7 +122,7 @@
     "confirmTitle": "Confirm {type}",
     "confirmQuestion": "Do you really want to {type} {name}?",
     "delay": "Delay",
-    "ingredientsExact": "Exact ingredients",
+    "ingredientsExact": "Exact input",
     "quantityExact": "Exact quantities",
     "addRecipe": "Add recipe",
     "addCertainItem": "Add {type} \"{name}\"",

@@ -122,7 +122,7 @@
     "confirmTitle": "{type} bestätigen",
     "confirmQuestion": "{name} wirklich {type}?",
     "delay": "Verzögerung",
-    "ingredientsExact": "Exakte Zutaten",
+    "ingredientsExact": "Exakte Eingabe",
     "quantityExact": "Exakte Mengen",
     "addRecipe": "Rezept hinzufügen",
     "addCertainItem": "{type} \"{name}\" hinzufügen",
