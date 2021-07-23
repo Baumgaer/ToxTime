@@ -1,0 +1,45 @@
+@import (less) "variables";
+
+.lessonOverwritesItem {
+    div {
+        padding: 2px 0;
+        padding-left: 10px;
+    }
+    input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        border-bottom: 2px solid @white;
+
+        .close-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+    }
+
+    .field {
+        display: grid;
+        grid-template-columns: 1fr 200px;
+        grid-template-areas: "key value";
+        padding: 0;
+
+        > div {
+            border-bottom: 1px dotted @white;
+        }
+
+        .key {
+            grid-area: key;
+            text-align: right;
+        }
+
+        .value {
+            grid-area: value;
+        }
+    }
+}

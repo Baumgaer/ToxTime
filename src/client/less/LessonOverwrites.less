@@ -11,48 +11,26 @@
     min-width: 200px;
     max-width: 100%;
 
-    div {
-        padding: 5px;
-    }
-    input {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .title {
+    .head {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
-        font-weight: bold;
-        border-bottom: 2px solid @white;
+        height: 20px;
+        padding: 5px;
+        font-size: 20px;
 
         .close-icon {
-            font-size: 24px;
-            cursor: pointer;
+            &:hover {
+                cursor: pointer;
+                color: @primaryColor;
+            }
         }
     }
 
-    .field {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-areas: "key value";
-        padding: 0;
-
-        > div {
-            border-bottom: 1px dotted @white;
-        }
-
-        .key {
-            grid-area: key;
-            text-align: right;
-        }
-
-        .value {
-            grid-area: value;
-        }
-    }
-
-    .subObject {
-        padding: 0;
+    .body {
+        max-height: calc(98vh - 30px);
+        padding: 0 5px 5px 5px;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 }

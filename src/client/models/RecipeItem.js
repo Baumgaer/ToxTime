@@ -6,6 +6,10 @@ import ApiClient from "~client/lib/ApiClient";
 const CommonItemRecipeItem = RecipeItemMixinClass(Item.RawClass);
 export default Item.RawClass.buildClientExport(class RecipeItem extends CommonItemRecipeItem {
 
+    getIcon() {
+        return "circle-icon";
+    }
+
     getAvatar() {
         const object = this.object;
         if (!object) return null;
@@ -50,17 +54,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
             disabled: !objectValue.canOverwriteObject()
         };
 
-        const fields = [];
-        for (const field of [...overwritableFields, amountField, objectField]) {
-            if (fields.includes(field)) continue;
-            if (field.name === "amount") {
-                fields.push(amountField);
-            } else if (field.name === "object") {
-                fields.push(objectField);
-            } else fields.push(field);
-        }
-
-        return fields;
+        return [amountField, objectField];
     }
 
     get object() {

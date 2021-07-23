@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { escape } from "~common/utils";
+import { escape, compact } from "~common/utils";
 
 /**
  * Creates a new class with the returned class extended by the MixinClass
@@ -54,8 +54,7 @@ export function SpeechBubbleMixinClass(MixinClass) {
         };
 
         getSubObjects() {
-            if (!this.recipe) return [];
-            return [this.recipe];
+            return compact([this.recipe, this.exitRecipe]);
         }
 
         canOverwriteAmount() {
