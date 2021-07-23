@@ -67,24 +67,15 @@
 <script>
 import Lesson from "~client/models/Lesson";
 import ActionObject from "~client/models/ActionObject";
-import SceneObject from "~client/models/SceneObject";
-import ClickArea from "~client/models/ClickArea";
 import Recipe from "~client/models/Recipe";
 import RecipeItem from "~client/models/RecipeItem";
 import Scene from "~client/models/Scene";
-import Requisite from "~client/models/Requisite";
-import File from "~client/models/File";
-import Label from "~client/models/Label";
-import Knowledge from "~client/models/Knowledge";
 import ClientModel from "~client/lib/ClientModel";
-
-import ApiClient from "~client/lib/ApiClient";
 
 import ItemSelector from "~client/components/ItemSelector";
 import Item from "~client/components/Item";
 
 import tippyJS, { sticky, hideAll } from "tippy.js";
-
 
 export default {
     components: {
@@ -103,10 +94,6 @@ export default {
     },
     data() {
         return {
-            amount: Object.freeze({ name: "amount", type: 'number', value: null, min: 0, max: Infinity, disabled: false }),
-            points: Object.freeze({ name: "points", type: 'number', value: 0, min: -Infinity, max: Infinity, disabled: false }),
-            activated: Object.freeze({ name: "activated", type: 'checkbox', value: true, disabled: false }),
-            object: Object.freeze({ name: "object", type: 'model', value: null, disabled: false}),
             itemSelector: "",
             lastAttachPoint: null,
             lastTimeout: null
@@ -137,16 +124,7 @@ export default {
 
         allowedFields() {
             return (model) => {
-                const amountValue = this.lesson.getOverwrite(model, "amount") ?? model.amount ?? 1;
-                const activatedValue = this.lesson.getOverwrite(model, "activated") ?? this.activated.value;
-                if (model instanceof ActionObject.RawClass) return [{...this.activated, value: activatedValue}];
-                if (model instanceof SceneObject.RawClass) return [{ ...this.amount, value: amountValue, min: 1 }];
-                if (model instanceof ClickArea.RawClass) return [{ ...this.amount, value: amountValue }];
-                if (model instanceof Recipe.RawClass) {
-                    return [{...this.points, value: this.lesson.getOverwrite(model, "points") ?? 0}];
-                }
-                if (model instanceof RecipeItem.RawClass) return this.getRecipeItemFields(model);
-                return [];
+                return model.getOverwritableFields(this.lesson);
             };
         }
     },
@@ -198,34 +176,6 @@ export default {
             this.tippy.hide();
             this.model.isSelected = false;
             this.lastAttachPoint = null;
-        },
-
-        getRecipeItemFields(model) {
-
-            const overwriteObject = this.lesson.getOverwrite(model, "object");
-            const overwriteAmount = this.lesson.getOverwrite(model, "amount");
-
-            const amountValue = overwriteAmount ?? model.amount;
-            const objectValue = overwriteObject ? ApiClient.store.getModelById(overwriteObject.split("_")[0], overwriteObject.split("_")[1]) : model.object;
-
-            const isRequisite = objectValue instanceof Requisite.RawClass;
-            const isScene = objectValue instanceof Scene.RawClass;
-            const isFile = objectValue instanceof File.RawClass;
-            const isActionObject = objectValue instanceof ActionObject.RawClass;
-            const isLabel = objectValue instanceof Label.RawClass;
-            const isKnowledge = objectValue instanceof Knowledge.RawClass;
-
-            return [{
-                ...this.amount,
-                value: amountValue,
-                min: model.getMinimumAmount(),
-                max: model.getMaximumAmount(),
-                disabled: isActionObject || isScene || isFile || isKnowledge
-            }, {
-                ...this.object,
-                value: objectValue,
-                disabled: !isRequisite && !isLabel || isScene || isFile || isKnowledge
-            }];
         },
 
         openItemSelector(name) {

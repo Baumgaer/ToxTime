@@ -58,6 +58,14 @@ export function SpeechBubbleMixinClass(MixinClass) {
             return [this.recipe];
         }
 
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
+
     }
     return SpeechBubble;
 }

@@ -21,6 +21,47 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         return object.getIcon();
     }
 
+    getOverwritableFields(lesson) {
+        const overwriteObject = lesson && lesson.getOverwrite(this, "object");
+        const overwriteAmount = lesson && lesson.getOverwrite(this, "amount");
+
+        const amountValue = overwriteAmount ?? this.amount;
+        const objectValue = overwriteObject ? ApiClient.store.getModelById(overwriteObject.split("_")[0], overwriteObject.split("_")[1]) : this.object;
+
+        const overwritableFields = objectValue.getOverwritableFields();
+        const overwritableAmountField = overwritableFields.find((field) => field.name === "amount");
+        const overwritableObjectField = overwritableFields.find((field) => field.name === "object");
+
+        const amountField = {
+            ...(overwritableAmountField ?? {}),
+            name: "amount",
+            type: 'number',
+            value: amountValue,
+            min: this.getMinimumAmount(),
+            max: this.getMaximumAmount(),
+            disabled: !objectValue.canOverwriteAmount()
+        };
+
+        const objectField = {
+            ...(overwritableObjectField ?? {}),
+            name: "object",
+            type: 'model',
+            value: objectValue,
+            disabled: !objectValue.canOverwriteObject()
+        };
+
+        const fields = [];
+        for (const field of overwritableFields) {
+            if (field.name === "amount") {
+                fields.push(amountField);
+            } else if (field.name === "object") {
+                fields.push(objectField);
+            } else fields.push(field);
+        }
+
+        return fields;
+    }
+
     get object() {
         return this.file || this.scene || this.actionObject || this.clickArea || this.sceneObject || this.knowledge || this.speechBubble || this.recipe || this.label;
     }

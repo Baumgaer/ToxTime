@@ -46,6 +46,14 @@ export function ActionObjectMixinClass(MixinClass) {
         getLabels() {
             return uniq(this.labels.concat(this.sceneObject.getLabels()));
         }
+
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
     }
     return ActionObject;
 }

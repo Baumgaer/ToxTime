@@ -20,6 +20,14 @@ export function KnowledgeMixinClass(MixinClass) {
             }
         };
 
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
+
     }
     return Knowledge;
 }

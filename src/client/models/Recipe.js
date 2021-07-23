@@ -25,6 +25,13 @@ export default ClientModel.buildClientExport(class Recipe extends CommonClientRe
         };
     }
 
+    getOverwritableFields(lesson) {
+        const value = (lesson && lesson.getOverwrite(this, "points")) ?? 0;
+        return [
+            { name: "points", type: 'number', value, min: -Infinity, max: Infinity, disabled: false }
+        ];
+    }
+
     @CommonClientRecipe.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async edit() {
         const shouldProceed = await super.edit();

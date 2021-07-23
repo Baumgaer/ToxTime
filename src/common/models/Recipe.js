@@ -66,6 +66,14 @@ export function RecipeMixinClass(MixinClass) {
             return this.transitionSettings.ingredientsExact ?? false;
         }
 
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
+
     }
     return Recipe;
 }

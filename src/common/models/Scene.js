@@ -18,6 +18,14 @@ export function SceneMixinClass(MixinClass) {
                 default: `Scene`
             }
         };
+
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
     }
     return Scene;
 }

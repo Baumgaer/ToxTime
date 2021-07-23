@@ -326,6 +326,18 @@ export default class BaseModel {
         return result;
     }
 
+    getOverwritableFields() {
+        return [];
+    }
+
+    canOverwriteAmount() {
+        return true;
+    }
+
+    canOverwriteObject() {
+        return true;
+    }
+
     /**
      * Collects and caches all registered actions while assigning the context and returns them
      *

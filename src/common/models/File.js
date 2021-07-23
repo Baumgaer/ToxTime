@@ -51,6 +51,14 @@ export function FileMixinClass(MixinClass) {
         getLabels() {
             return this.labels;
         }
+
+        canOverwriteAmount() {
+            return false;
+        }
+
+        canOverwriteObject() {
+            return false;
+        }
     }
     return File;
 }

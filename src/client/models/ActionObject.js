@@ -32,6 +32,13 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
         return sceneObjectParent || sceneParent;
     }
 
+    getOverwritableFields(lesson) {
+        const value = (lesson && lesson.getOverwrite(this, "activated")) ?? true;
+        return [
+            { name: "activated", type: 'checkbox', value, disabled: false }
+        ];
+    }
+
     @CommonGameObjectActionObject.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => {
         const store = ApiClient.store;
         const mayContainingScene = store.indexValuesOf("scenes", instance)[0];

@@ -32,6 +32,13 @@ export default GameObject.RawClass.buildClientExport(class ClickArea extends Com
         return sceneObjectParent || sceneParent;
     }
 
+    getOverwritableFields(lesson) {
+        const value = (lesson && lesson.getOverwrite(this, "amount")) ?? 1;
+        return [
+            { name: "amount", type: 'number', value, min: 0, max: Infinity, disabled: false }
+        ];
+    }
+
     @CommonGameObjectClickArea.action("restore", { type: "component", name: "delete-restore-icon" }, (instance) => {
         const store = ApiClient.store;
         const mayContainingScene = store.indexValuesOf("scenes", instance)[0];

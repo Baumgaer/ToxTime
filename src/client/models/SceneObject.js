@@ -26,6 +26,13 @@ export default Requisite.RawClass.buildClientExport(class SceneObject extends Co
         }, value);
     }
 
+    getOverwritableFields(lesson) {
+        const value = (lesson && lesson.getOverwrite(this, "amount")) ?? 1;
+        return [
+            { name: "amount", type: 'number', value, min: 1, max: Infinity, disabled: false }
+        ];
+    }
+
     @CommonSceneObjectRequisite.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async edit() {
         const shouldProceed = await super.edit();

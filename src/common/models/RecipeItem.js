@@ -102,16 +102,10 @@ export function RecipeItemMixinClass(MixinClass) {
         }
 
         isUnique() {
-            const isScene = Boolean(this.scene);
-            const isFile = Boolean(this.file);
-            const isActionObject = Boolean(this.actionObject);
             const isSceneObject = Boolean(this.sceneObject);
-            const isKnowledge = Boolean(this.knowledge);
-            const isSpeechBubble = Boolean(this.speechBubble);
-            const isRecipe = Boolean(this.recipe);
-
             const inScene = this.location === "scene";
-            return isScene || isFile || isActionObject || isSceneObject && inScene || isKnowledge || isSpeechBubble || isRecipe;
+
+            return !this.object.canOverwriteObject() || isSceneObject && inScene;
         }
 
         canBeSpecifiedToActionObject() {
