@@ -13,10 +13,14 @@ export default ClientModel.buildClientExport(class Recipe extends CommonClientRe
         }
     };
 
+    getIcon() {
+        return "graph-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "graph-icon",
+            name: this.getIcon(),
             title: window.$t("recipe")
         };
     }

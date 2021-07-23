@@ -354,6 +354,10 @@ export default class BaseModel {
         return unescape(this[preferredField] || "");
     }
 
+    getIcon() {
+        return "";
+    }
+
     getAvatar() {
         return null;
     }

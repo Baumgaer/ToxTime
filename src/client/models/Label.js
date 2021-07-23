@@ -13,10 +13,14 @@ export default ClientModel.buildClientExport(class Label extends CommonClientLab
         }
     };
 
+    getIcon() {
+        return "label-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "label-icon",
+            name: this.getIcon(),
             title: window.$t("label")
         };
     }

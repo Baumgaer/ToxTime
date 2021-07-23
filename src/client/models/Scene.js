@@ -13,12 +13,16 @@ export default Requisite.RawClass.buildClientExport(class Scene extends CommonSc
         }
     };
 
+    getIcon() {
+        return "theater-icon";
+    }
+
     getAvatar(forceIcon) {
         const value = { title: window.$t('scene') };
         if (!forceIcon && this._id && !this.isCreatingAvatar) return Object.assign(super.getAvatar(), value);
         return Object.assign({
             type: "component",
-            name: "theater-icon"
+            name: this.getIcon()
         }, value);
     }
 

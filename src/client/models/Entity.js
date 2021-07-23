@@ -13,10 +13,14 @@ export default ClientModel.buildClientExport(class Entity extends CommonClientEn
         }
     };
 
+    getIcon() {
+        return "identifier-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "identifier-icon",
+            name: this.getIcon(),
             title: window.$t("entity")
         };
     }

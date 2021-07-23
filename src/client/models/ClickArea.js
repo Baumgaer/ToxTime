@@ -14,10 +14,14 @@ export default GameObject.RawClass.buildClientExport(class ClickArea extends Com
         }
     };
 
+    getIcon() {
+        return "cursor-default-click-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "cursor-default-click-icon",
+            name: this.getIcon(),
             title: window.$t('clickArea')
         };
     }

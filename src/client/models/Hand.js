@@ -13,10 +13,14 @@ export default ClientModel.buildClientExport(class Hand extends ClientModel {
         }
     };
 
+    getIcon() {
+        return "hand-left-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "hand-left-icon",
+            name: this.getIcon(),
             title: this.name
         };
     }

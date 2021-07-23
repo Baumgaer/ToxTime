@@ -12,10 +12,14 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
     /** @type {ClientModel | null} */
     editingModel = null;
 
+    getIcon() {
+        return "account-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "account-icon",
+            name: this.getIcon(),
             title: window.$t("user")
         };
     }

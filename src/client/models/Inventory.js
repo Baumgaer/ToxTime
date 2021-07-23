@@ -13,10 +13,14 @@ export default ClientModel.buildClientExport(class Inventory extends ClientModel
         }
     };
 
+    getIcon() {
+        return "bag-personal-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "bag-personal-icon",
+            name: this.getIcon(),
             title: this.name
         };
     }

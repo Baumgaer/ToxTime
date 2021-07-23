@@ -24,12 +24,16 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         }
     };
 
+    getIcon() {
+        return "school-icon";
+    }
+
     getAvatar() {
         const value = { title: window.$t("lesson") };
         if (this._id && this.scenes[0]) return Object.assign(this.scenes[0].getAvatar(), value);
         return Object.assign({
             type: "component",
-            name: "school-icon"
+            name: this.getIcon()
         }, value);
     }
 

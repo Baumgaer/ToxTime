@@ -14,10 +14,14 @@ export default GameObject.RawClass.buildClientExport(class ActionObject extends 
         }
     };
 
+    getIcon() {
+        return "movie-open-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "movie-open-icon",
+            name: this.getIcon(),
             title: window.$t('actionObject')
         };
     }

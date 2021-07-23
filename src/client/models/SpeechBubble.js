@@ -13,10 +13,14 @@ export default MultiLingualDescribed.RawClass.buildClientExport(class SpeechBubb
         }
     };
 
+    getIcon() {
+        return "comment-text-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "comment-text-icon",
+            name: this.getIcon(),
             title: window.$t("speechBubble")
         };
     }

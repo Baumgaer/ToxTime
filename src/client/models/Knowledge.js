@@ -13,10 +13,14 @@ export default MultiLingualDescribed.RawClass.buildClientExport(class Knowledge 
         }
     };
 
+    getIcon() {
+        return "head-lightbulb-icon";
+    }
+
     getAvatar() {
         return {
             type: "component",
-            name: "head-lightbulb-icon",
+            name: this.getIcon(),
             title: window.$t("knowledge")
         };
     }

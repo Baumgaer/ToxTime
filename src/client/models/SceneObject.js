@@ -13,12 +13,16 @@ export default Requisite.RawClass.buildClientExport(class SceneObject extends Co
         }
     };
 
+    getIcon() {
+        return "ufo-icon";
+    }
+
     getAvatar(forceIcon) {
         const value = { title: window.$t('sceneObject') };
         if (!forceIcon && this._id && !this.isCreatingAvatar) return Object.assign(super.getAvatar(), value);
         return Object.assign({
             type: "component",
-            name: "ufo-icon"
+            name: this.getIcon()
         }, value);
     }
 
