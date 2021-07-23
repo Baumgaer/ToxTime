@@ -28,7 +28,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         const amountValue = overwriteAmount ?? this.amount;
         const objectValue = overwriteObject ? ApiClient.store.getModelById(overwriteObject.split("_")[0], overwriteObject.split("_")[1]) : this.object;
 
-        const overwritableFields = objectValue.getOverwritableFields();
+        const overwritableFields = objectValue.getOverwritableFields(lesson);
         const overwritableAmountField = overwritableFields.find((field) => field.name === "amount");
         const overwritableObjectField = overwritableFields.find((field) => field.name === "object");
 
@@ -51,7 +51,8 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
         };
 
         const fields = [];
-        for (const field of overwritableFields) {
+        for (const field of [...overwritableFields, amountField, objectField]) {
+            if (fields.includes(field)) continue;
             if (field.name === "amount") {
                 fields.push(amountField);
             } else if (field.name === "object") {
