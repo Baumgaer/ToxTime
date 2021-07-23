@@ -1,6 +1,6 @@
 <template>
     <div class="lessonOverwritesItem">
-        <div class="title">{{ model.getName() }}</div>
+        <div class="title"><component :is="model.getIcon()" />{{ model.getName() }}</div>
         <div class="field" v-for="(field, index) of model.getOverwritableFields(lesson)" :key="`field_${field.name}_${index}`">
             <div class="key">{{ $t(field.name) }}</div>
             <div class="value">

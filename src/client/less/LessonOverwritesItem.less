@@ -12,14 +12,18 @@
 
     .title {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         font-weight: bold;
         border-bottom: 2px solid @white;
 
-        .close-icon {
-            font-size: 24px;
-            cursor: pointer;
+        .material-design-icon {
+            margin-right: 5px;
+        }
+
+        &::v-deep .material-design-icon {
+            svg {
+                bottom: 0;
+            }
         }
     }
 
