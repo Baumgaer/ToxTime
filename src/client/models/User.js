@@ -16,6 +16,10 @@ export default ClientModel.buildClientExport(class User extends CommonClientUser
         return "account-icon";
     }
 
+    getOverlayIcons() {
+        return this.isAdmin ? "crown-icon" : "";
+    }
+
     getAvatar() {
         return {
             type: "component",

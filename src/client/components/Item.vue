@@ -23,7 +23,7 @@
     >
         <menu-down-icon v-if="opened && hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
         <menu-right-icon v-else-if="hasSubObjects && showSubObjects" class="expandCollapseButton" @click="onExpandCollapseButtonClick" :title="null" />
-        <Avatar :model="model" ratio="1:1" :fitImage="true" :overlayIcons="overlayIcons" />
+        <Avatar :model="model" ratio="1:1" :fitImage="true" :overlayIcons="overlayIconString" />
         <input v-if="showCheckbox" type="checkbox" class="checkbox" v-model="checked" />
         <div class="info">
             <div class="name">
@@ -68,7 +68,7 @@
         <Tooltip v-if="tooltipCreated"
                  :model="model"
                  :nameEditDBField="nameEditDBField"
-                 :overlayIcons="overlayIcons"
+                 :overlayIcons="overlayIconString"
                  :autoCreate="true"
                  :preventTooltipHiding="preventTooltipHiding"
                  ref="tooltip"
@@ -112,7 +112,10 @@ export default {
             default: true
         },
         nameEditDBField: String,
-        overlayIcons: String,
+        overlayIcons: {
+            type: String,
+            default: ""
+        },
         compactMode: Boolean,
         preventTooltipHiding: Boolean,
         showCheckbox: Boolean,
@@ -133,6 +136,10 @@ export default {
 
         activeClass() {
             return window.activeUser.editingModel && this.model._id === window.activeUser.editingModel._id ? "active" : "";
+        },
+
+        overlayIconString() {
+            return this.overlayIcons || this.model.getOverlayIcons();
         }
     },
     beforeMount() {
