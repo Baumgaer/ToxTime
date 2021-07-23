@@ -100,7 +100,7 @@ export default {
     },
     computed: {
         lessonDescription() {
-            return unescape(this.model.lesson.description);
+            return unescape(this.model.lesson[`description_${window.activeUser.locale}`]);
         },
         knowledgeBase() {
             return uniq(this.model.knowledgeBase);

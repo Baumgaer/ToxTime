@@ -3,13 +3,7 @@
         <EditorHead ref="editorHead" name="addLesson" :model="model" :onSaveButtonClick="onSaveButtonClick.bind(this)" />
         <LessonOverwrites ref="lessonOverwrites" v-if="selectedModel" :lesson="model" :model="selectedModel" />
         <section class="editorBody" ref="editorBody" @click.stop="onModelSelection($event, null)" @wheel="updateOverwritePosition($event)" @scroll="updateOverwritePosition($event)">
-            <h3>{{ $t("description") }}</h3>
-            <section><textarea-autosize
-                class="description"
-                :placeholder="$t('description')"
-                v-model="description"
-                :min-height="100"
-            /></section>
+            <MultiLingualDescribedEditor :model="model" />
             <h3>{{ $t("entities") }}</h3>
             <section class="entityList">
                 <EntityItem v-for="entity of model.entities" :key="entity._dummyId || entity._id" :model="entity" :parentModel="model" />
@@ -174,6 +168,7 @@ import RecipeViewer from "~client/components/RecipeViewer";
 import Button from "~client/components/Button";
 import LessonOverwrites from "~client/components/LessonOverwrites";
 import EntityItem from "~client/components/EntityItem";
+import MultiLingualDescribedEditor from "~client/components/MultiLingualDescribedEditor";
 
 import ApiClient from "~client/lib/ApiClient";
 import Scene from "~client/models/Scene";
@@ -185,7 +180,6 @@ import File from "~client/models/File";
 import Entity from "~client/models/Entity";
 
 import { parseEventModelData } from "~client/utils";
-import { unescape } from "~common/utils";
 
 export default {
     components: {
@@ -194,7 +188,8 @@ export default {
         RecipeViewer,
         Button,
         LessonOverwrites,
-        EntityItem
+        EntityItem,
+        MultiLingualDescribedEditor
     },
     data() {
         return {
@@ -203,14 +198,6 @@ export default {
         };
     },
     computed: {
-        description: {
-            get() {
-                return unescape(this.model.description);
-            },
-            set(value) {
-                this.model.description = value;
-            }
-        },
         hasOverwrites() {
             return (model) => {
                 const recursiveSubObjects = (model, ...args) => {

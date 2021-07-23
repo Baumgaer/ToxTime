@@ -1,5 +1,5 @@
 import { LessonMixinClass } from "~common/models/Lesson";
-import ClientModel from "~client/lib/ClientModel";
+import MultiLingualDescribed from "~client/models/MultiLingualDescribed";
 import GameSession from "~client/models/GameSession";
 import ApiClient from "~client/lib/ApiClient";
 import ClickArea from "~client/models/ClickArea";
@@ -12,8 +12,8 @@ import Recipe from "~client/models/Recipe";
 import SpeechBubble from "~client/models/SpeechBubble";
 import { flatten, difference, union, uniq, clone, cloneDeep } from "~common/utils";
 
-const CommonClientLesson = LessonMixinClass(ClientModel);
-export default ClientModel.buildClientExport(class Lesson extends CommonClientLesson {
+const CommonMultiLingualDescribedLesson = LessonMixinClass(MultiLingualDescribed.RawClass);
+export default MultiLingualDescribed.RawClass.buildClientExport(class Lesson extends CommonMultiLingualDescribedLesson {
 
     /** @type {import("mongoose").SchemaDefinition} */
     static schemaDefinition = {
@@ -37,7 +37,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         }, value);
     }
 
-    @CommonClientLesson.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
+    @CommonMultiLingualDescribedLesson.action("edit", { type: "component", name: "lead-pencil-icon" }, () => window.activeUser.isAdmin)
     async edit() {
         const shouldProceed = await super.edit();
         if (!shouldProceed) return;
@@ -45,7 +45,7 @@ export default ClientModel.buildClientExport(class Lesson extends CommonClientLe
         window.activeUser.activeEditor = "addLessons";
     }
 
-    @CommonClientLesson.action("play", { type: "component", name: "play-icon" }, () => true)
+    @CommonMultiLingualDescribedLesson.action("play", { type: "component", name: "play-icon" }, () => true)
     async play() {
         let session = window.activeUser.getGameSessionByLesson(this);
 

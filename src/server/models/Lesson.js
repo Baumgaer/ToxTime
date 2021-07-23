@@ -1,5 +1,5 @@
 import { LessonMixinClass } from "~common/models/Lesson";
-import ServerModel from "~server/lib/ServerModel";
+import MultiLingualDescribed from "~server/models/MultiLingualDescribed";
 
-const CommonServerLesson = LessonMixinClass(ServerModel);
-export default ServerModel.buildServerExport(class Lesson extends CommonServerLesson { });
+const CommonMultiLingualDescribedLesson = LessonMixinClass(MultiLingualDescribed.RawClass);
+export default MultiLingualDescribed.RawClass.buildServerExport(class Lesson extends CommonMultiLingualDescribedLesson { });
