@@ -97,6 +97,7 @@ export default {
                     if (subObject instanceof RecipeItem.RawClass) {
                         if (subObject.speechBubble) result.push(subObject.speechBubble);
                         else if (subObject.recipe) result.push(subObject.recipe);
+                        else if (subObject.knowledge) result.push(subObject.knowledge);
                         else if (this.model instanceof Recipe.RawClass) result.push(subObject);
                         else result.push(...recursiveSubObjects(subObject));
                     } else result.push(subObject);
@@ -134,7 +135,7 @@ export default {
             if (input.type === "checkbox") valueField = "checked";
 
             let value = event.target.value;
-            if (input.type !== "model") value = JSON.parse(input[valueField]);
+            if (input.type !== "model" && input.type !== "text") value = JSON.parse(input[valueField]);
             this.lesson.setOverwrite(model, input.name, value);
             for (const entity of this.lesson.entities) {
                 entity.overwrites.__ob__?.dep.notify();

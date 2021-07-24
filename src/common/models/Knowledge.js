@@ -20,6 +20,10 @@ export function KnowledgeMixinClass(MixinClass) {
             }
         };
 
+        getOverwritableFields(lesson) {
+            return super.getOverwritableFields(lesson);
+        }
+
         canOverwriteAmount() {
             return false;
         }

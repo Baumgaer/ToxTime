@@ -25,6 +25,10 @@ export default MultiLingualDescribed.RawClass.buildClientExport(class SpeechBubb
         };
     }
 
+    getOverwritableFields(lesson) {
+        return super.getOverwritableFields(lesson, ["userName", "lessonName", "currentSceneName"]);
+    }
+
     @CommonMultiLingualDescribedSpeechBubble.action("edit", { type: "component", name: "lead-pencil-icon" }, (instance) => window.activeUser.isAdmin && !instance.deleted)
     async edit() {
         const shouldProceed = await super.edit();
