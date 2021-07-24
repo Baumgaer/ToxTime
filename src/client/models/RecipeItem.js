@@ -43,7 +43,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
             value: amountValue,
             min: this.getMinimumAmount(),
             max: this.getMaximumAmount(),
-            disabled: !objectValue.canOverwriteAmount()
+            disabled: !this.object.canOverwriteAmount()
         };
 
         const objectField = {
@@ -51,7 +51,7 @@ export default Item.RawClass.buildClientExport(class RecipeItem extends CommonIt
             name: "object",
             type: 'model',
             value: objectValue,
-            disabled: !objectValue.canOverwriteObject()
+            disabled: !this.object.canOverwriteObject()
         };
 
         return [amountField, objectField];
