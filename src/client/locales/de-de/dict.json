@@ -194,5 +194,6 @@
     "output": "Ausgabe",
     "fullscreen": "Vollbild",
     "fullscreenExit": "Vollbild verlassen",
-    "invalidRecipe": "Ungültiges Rezept"
+    "invalidRecipe": "Ungültiges Rezept",
+    "showMoreObjects": "Mehr Objekte anzeigen"
 }

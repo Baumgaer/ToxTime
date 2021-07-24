@@ -6,7 +6,7 @@
                 <close-icon @click="hide" />
             </div>
             <div class="body">
-                <lesson-overwrites-item :model="model" :lesson="lesson" />
+                <lesson-overwrites-item :model="model" :lesson="lesson" :showSubObjects="true" />
             </div>
         </div>
     </div>

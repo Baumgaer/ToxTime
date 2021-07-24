@@ -39,9 +39,16 @@
                 </div>
             </div>
         </div>
-        <div class="subObjects">
-            <lesson-overwrites-item v-for="(subObject, index) of subObjects" :key="`${model._id}_${subObject._id}_${index}`" :model="subObject" :lesson="lesson"/>
+        <div class="subObjects" v-if="showMoreSubObjects  && subObjects.length">
+            <lesson-overwrites-item
+                v-for="(subObject, index) of subObjects"
+                :key="`${model._id}_${subObject._id}_${index}`"
+                :model="subObject"
+                :lesson="lesson"
+                :showSubObjects="false"
+            />
         </div>
+        <div v-if="!showMoreSubObjects && subObjects.length" class="moreObjects" @click="onShowMoreButtonClick">{{ $t('showMoreObjects') }}</div>
     </div>
 </template>
 
@@ -69,11 +76,16 @@ export default {
         lesson: {
             type: Lesson.RawClass,
             required: true
+        },
+        showSubObjects: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
         return {
-            itemSelector: ""
+            itemSelector: "",
+            showMore: null
         };
     },
     computed: {
@@ -93,6 +105,10 @@ export default {
             };
             if (this.model instanceof RecipeItem.RawClass && !this.model.speechBubble && !this.model.recipe) return [];
             return recursiveSubObjects(this.model);
+        },
+
+        showMoreSubObjects() {
+            return this.showMore ?? this.showSubObjects;
         }
     },
 
@@ -132,6 +148,10 @@ export default {
             }
             this.lesson.setOverwrite(model, "object", `${selection.dataCollectionName}_${selection._id}`);
             this.lesson.overwrites.__ob__.dep.notify();
+        },
+
+        onShowMoreButtonClick() {
+            this.showMore = true;
         }
     }
 };

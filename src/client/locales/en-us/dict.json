@@ -194,5 +194,6 @@
     "output": "Output",
     "fullscreen": "Fullscreen",
     "fullscreenExit": "Exit fullscreen",
-    "invalidRecipe": "Invalid recipe"
+    "invalidRecipe": "Invalid recipe",
+    "showMoreObjects": "Show more objects"
 }
