@@ -239,12 +239,15 @@ export default ClientModel.buildClientExport(class GameSession extends CommonCli
             let sum = 0;
             const recipeItems = recipe.getSubObjects(true);
             for (const recipeItem of recipeItems) {
+                let multiplier = 1;
+                if (recipe.input.includes(recipeItem)) multiplier = 2;
+
                 const realRecipeItemObject = this.getRealRecipeItemObject(recipeItem);
-                if (realRecipeItemObject instanceof ActionObject.RawClass) sum += 4;
-                else if (realRecipeItemObject instanceof ClickArea.RawClass) sum += 3;
-                else if (realRecipeItemObject instanceof SceneObject.RawClass) sum += 2;
-                else if (realRecipeItemObject instanceof Label.RawClass) sum += 1;
-                else sum += 5;
+                if (realRecipeItemObject instanceof ActionObject.RawClass) sum += 8 * multiplier;
+                else if (realRecipeItemObject instanceof ClickArea.RawClass) sum += 4 * multiplier;
+                else if (realRecipeItemObject instanceof SceneObject.RawClass) sum += 2 * multiplier;
+                else if (realRecipeItemObject instanceof Label.RawClass) sum += 1 * multiplier;
+                else sum += 16 * multiplier;
             }
             recipeSumMap.set(recipe, sum);
         }
