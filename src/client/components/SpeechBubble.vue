@@ -16,10 +16,9 @@
 
 <script>
 import tippy, {sticky} from "tippy.js";
-import { uniq, random, unescape } from "~common/utils";
+import { unescape } from "~common/utils";
 import GameSession from "~client/models/GameSession";
-import Recipe from "~client/models/Recipe";
-import ApiClient from "~client/lib/ApiClient";
+import TemplateLiterals from "~client/lib/TemplateLiterals";
 
 export default {
     props: {
@@ -40,36 +39,12 @@ export default {
             if (this.error) return this.error;
             if (this.preparedContent) return this.preparedContent;
 
-            let randomRecipe = null;
-            const literals = {
-                userName: window.activeUser.getName(),
-                lessonName: this.session.getName(),
-                currentSceneName: this.session.currentScene.getName(),
-                randomRecipeName: (...args) => {
-                    if (randomRecipe === null) randomRecipe = this.randomRecipe(...args);
-                    return (randomRecipe || new Recipe.Model({
-                        name: this.$t('nothingFound')
-                    })).getName();
-                }
-            };
+            const userLangString = `${this.property}_${window.activeUser.locale}`;
+            const fallbackString = `${this.property}_en-us`;
+            const templateLiterals = new TemplateLiterals(this.session, this.model);
+
             try {
-                const regex = /\{\{\s(.*?)(?:\((?:(.*),?)*\))?\s\}\}/ig;
-                /** @type {string} */
-                const userLangString = `${this.property}_${window.activeUser.locale}`;
-                const fallbackString = `${this.property}_en-us`;
-                let result = unescape(this.model[userLangString] || this.model[fallbackString]);
-                const matches = result.match(regex);
-                if (matches) {
-                    for (const match of matches) {
-                        if (match.includes("(") && match.includes(")")) {
-                            const firstIndex = match.indexOf("(");
-                            const lastIndex = match.lastIndexOf(")");
-                            const funcName = match.slice(2, firstIndex).trim();
-                            const params = "[" + match.slice(firstIndex + 1, lastIndex).trim().replaceAll("'", "\"") + "]";
-                            result = result.replace(match, literals[funcName]?.(...JSON.parse(params)));
-                        } else result = result.replace(match, literals[match.slice(2, match.length - 2).trim()]);
-                    }
-                }
+                const result = templateLiterals.parseTemplate(this.model[userLangString] || this.model[fallbackString]);
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 this.preparedContent = result;
                 return result;
@@ -102,32 +77,6 @@ export default {
         });
     },
     methods: {
-        randomRecipe(location, usedOrUnused, valid) {
-            let recipes = [];
-            let inputResources = null;
-            if (location === "currentScene") {
-                inputResources = this.session.getResources();
-                for (const inputResource of inputResources) {
-                    const resources = [inputResource, ...inputResource.getResources()];
-                    for (const resource of resources) {
-                        const recipeItems = ApiClient.store.indexValuesOf("recipeItems", resource);
-                        for (const recipeItem of recipeItems) {
-                            const recipe = ApiClient.store.indexValuesOf("recipes", recipeItem)[0];
-                            recipes.push(recipe);
-                        }
-                    }
-                }
-                recipes = uniq(recipes);
-            } else recipes = this.session.lesson.getRecipes(true);
-            if (usedOrUnused) {
-                const usedRecipeIds = this.session.protocol.filter((entry) => entry.type === "exec").map((entry) => entry.object.split("_")[1]);
-                if (usedOrUnused === "used") {
-                    recipes = recipes.filter((recipe) => usedRecipeIds.includes(recipe._id));
-                } else recipes = recipes.filter((recipe) => !usedRecipeIds.includes(recipe._id));
-            }
-            if (valid) recipes = recipes.filter((recipe) => this.session.isValidRecipe(recipe, inputResources));
-            return recipes[random(recipes.length - 1)];
-        },
         calcSizes() {
             if (this.sceneItem) {
                 const viewCoords = this.sceneItem.parent.localToGlobal(this.sceneItem.bounds.topLeft);

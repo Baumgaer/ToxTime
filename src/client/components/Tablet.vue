@@ -52,10 +52,7 @@
                     </section>
                     <section v-show="category === 'knowledge'">
                         <ul>
-                            <li v-for="knowledge of knowledgeBase" :key="`knowledge_${knowledge._id}`">
-                                <strong>{{ knowledge.getName() }}</strong><br />
-                                {{ knowledge[`description_${window.activeUser.locale}`] }}
-                            </li>
+                            <li v-for="(knowledge, index) of knowledgeBase" :key="`knowledge_${index}`"> {{ knowledge }} </li>
                         </ul>
                     </section>
                     <iframe v-if="category === 'files'"
@@ -76,6 +73,7 @@ import GameSession from "~client/models/GameSession";
 import Button from "~client/components/Button";
 
 import ApiClient from "~client/lib/ApiClient";
+import TemplateLiterals from "~client/lib/TemplateLiterals";
 import { uniq, unescape } from "~common/utils";
 import sweetAlert from "sweetalert";
 import tippy from "tippy.js";
@@ -103,7 +101,11 @@ export default {
             return unescape(this.model.lesson[`description_${window.activeUser.locale}`]);
         },
         knowledgeBase() {
-            return uniq(this.model.knowledgeBase);
+            const knowledgeBase = uniq(this.model.knowledgeBase);
+            return knowledgeBase.map((knowledge) => {
+                const templateLiterals = new TemplateLiterals(this.model, knowledge);
+                return templateLiterals.parseTemplate(knowledge[`description_${window.activeUser.locale}`]);
+            });
         }
     },
     mounted() {
