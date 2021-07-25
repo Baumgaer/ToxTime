@@ -1,5 +1,5 @@
 <template>
-    <div class="speechBubbleProgramming">
+    <div class="variableProgramming">
         <div v-if="window.activeUser.locale === 'de-de'">
             Um Variablen zu nutzen, wird folgende Schreibweise verwendet: <br />
             <br />
@@ -34,6 +34,7 @@
             Beispiel: Ein zufälliges Rezept, dass auf die aktuelle Szene zutreffend ist und bereits genutzt wurde<br />
             <br />
             <code v-pre>{{ randomRecipeName("currentLocation", "used") }}</code><br />
+            <div>Darüber hinaus kann jeder weitere Variablenname verwendet werden. Alle hier nicht aufgelisteten Variablen können beim Erstellen einer Lektion belegt werden</div>
         </div>
         <div v-else>
             To use variables, the following notation is used: <br />
@@ -69,6 +70,7 @@
             Example: A random recipe that is applicable to the current scene and has already been used<br />
             <br />
             <code v-pre>{{ randomRecipeName("currentLocation", "used") }}</code><br />
+            <div>In addition, any other variable can be used. All variables not listed here can be assigned when creating a lesson</div>
         </div>
     </div>
 </template>
@@ -77,4 +79,4 @@
 export default {};
 </script>
 
-<style lang="less" scoped src="~client/less/SpeechBubbleProgramming.less"></style>
+<style lang="less" scoped src="~client/less/VariableProgramming.less"></style>

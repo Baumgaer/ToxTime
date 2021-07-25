@@ -7,7 +7,7 @@
                 <menu-right-icon v-else class="expandCollapseButton" :title="null" />
                 {{ $t('documentation') }}
             </h4>
-            <SpeechBubbleProgramming v-show="openDoc" />
+            <VariableProgramming v-show="openDoc" />
             <div class="explanation">{{ $t('normalSpeechCase') }}</div>
             <MultiLingualDescribedEditor :model="model" />
             <h3>{{ $t('recipeAfterClickOnNext') }}</h3>
@@ -69,7 +69,7 @@
 <script>
 import EditorHead from "~client/components/EditorHead";
 import MultiLingualDescribedEditor from "~client/components/MultiLingualDescribedEditor";
-import SpeechBubbleProgramming from "~client/components/SpeechBubbleProgramming";
+import VariableProgramming from "~client/components/VariableProgramming";
 import Item from "~client/components/Item";
 
 import Recipe from "~client/models/Recipe";
@@ -80,7 +80,7 @@ export default {
     components: {
         EditorHead,
         MultiLingualDescribedEditor,
-        SpeechBubbleProgramming,
+        VariableProgramming,
         Item
     },
     data() {
