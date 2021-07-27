@@ -16,9 +16,10 @@
 }
 
 .device {
-    height: 95vh;
+    height: 100vh;
     width: 70vh;
     max-width: calc(95vw - 70px);
+    box-sizing: border-box;
     border-radius: 5px;
     background-color: @black;
     box-shadow: 0 0 5px @dusk;
@@ -34,6 +35,12 @@
         nav {
             display: flex;
             border-bottom: 1px solid @dusk;
+
+            &.showingFile {
+                .button {
+                    width: calc(20% - 10px);
+                }
+            }
 
             .button {
                 justify-content: space-between;

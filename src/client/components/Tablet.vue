@@ -3,7 +3,7 @@
         <div class="button" ref="button"><tablet-android-icon /></div>
         <div class="device" ref="device">
             <div class="screen">
-                <nav>
+                <nav :class="`${showingFile ? 'showingFile' : ''}`">
                     <Button :name="'information'" :active="category === 'information'" @click="onNavButtonClick('information')">
                         <information-icon />
                     </Button>
