@@ -1,4 +1,5 @@
 @import (less) "variables.less";
+@import (less) "animations.less";
 
 .player {
     height: 100%;
@@ -34,6 +35,54 @@
                 .label {
                     display: none;
                 }
+            }
+        }
+    }
+
+    .loading {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: fade(@white, 15%);
+        backdrop-filter: blur(5px);
+
+        .spinner {
+            position: inherit;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            transform: translate(-50%, -50%);
+
+            .lds-ring {
+                display: inline-block;
+                position: relative;
+                width: 80px;
+                height: 80px;
+            }
+            .lds-ring div {
+                box-sizing: border-box;
+                display: block;
+                position: absolute;
+                width: 64px;
+                height: 64px;
+                margin: 8px;
+                border: 8px solid @primaryColor;
+                border-radius: 50%;
+                animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+                border-color: @primaryColor transparent transparent transparent;
+            }
+            .lds-ring div:nth-child(1) {
+                animation-delay: -0.45s;
+            }
+            .lds-ring div:nth-child(2) {
+                animation-delay: -0.3s;
+            }
+            .lds-ring div:nth-child(3) {
+                animation-delay: -0.15s;
             }
         }
     }

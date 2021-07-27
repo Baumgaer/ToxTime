@@ -40,6 +40,11 @@
             <SceneSwitcher class="sceneSwitcher" :model="model" />
             <Tablet class="tablet" :model="model" ref="tablet" />
         </div>
+        <div class="loading" v-if="loading">
+            <div class="spinner">
+                <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -138,10 +143,11 @@ export default {
             modelItemMap: new Map(),
             oldKnowledgeBase: null,
             clicks: [],
-            inFullscreen: false
+            inFullscreen: false,
+            loading: true
         };
     },
-    mounted() {
+    async mounted() {
         if (!this.model.currentScene) this.model.currentScene = this.model.lesson.scenes[0];
         const inventoryIsFilled = Boolean(this.model.inventory.filter((item) => Boolean(item.object)).length);
         if (!inventoryIsFilled) this.initializeInventory();
@@ -173,6 +179,11 @@ export default {
                 setTimeout(instance.hide.bind(instance), 2500);
             }
         });
+        const awaitingActionObjects = flatten(this.scenes.map((scene) => this.$refs[`scene_${scene._id}`]).map((graphicViewer) => {
+            return graphicViewer[0].actionObjectsMap.map((mapItem) => mapItem.promise);
+        }));
+        await Promise.all(awaitingActionObjects);
+        this.loading = false;
         this.$el.onfullscreenchange = this.onFullscreenChange.bind(this);
         this.$el.requestFullscreen();
     },
