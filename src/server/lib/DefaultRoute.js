@@ -256,6 +256,8 @@ export default class DefaultRoute {
                     console.info(`${request.connection.remoteAddress} ${request.method} ${request.originalUrl} ${result.message}`);
                     response.status(result.statusCode).send(result.stack);
                 }
+            } else if (result instanceof fs.ReadStream) {
+                result.pipe(response);
             } else if (typeof result === "string" || result instanceof Buffer) {
                 // Normally a string will be returned if we want to send a page
                 // (html or text). It is also possible to send a file here,
