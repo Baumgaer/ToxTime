@@ -18,13 +18,13 @@
         flex-wrap: wrap;
         width: calc(var(--slot-height, 50px) + 2px);
         height: fit-content;
-        max-height: calc(100vh - 50px);
+        max-height: calc(100vh - 100px);
         overflow-x: hidden;
         overflow-y: auto;
         top: 50%;
         right: 10px;
         left: auto;
-        transform: translateY(-50%);
+        transform: translateY(calc(-50% + 25px));
     }
 
     &::-webkit-scrollbar {
