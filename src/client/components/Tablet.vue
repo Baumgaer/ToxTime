@@ -23,7 +23,7 @@
                 <main>
                     <section v-show="category === 'information'">
                         <h2>{{ $t("description") }}</h2>
-                        {{ lessonDescription }}
+                        <pre>{{ lessonDescription }}</pre>
                         <h2>{{ $t("finishLesson") }}</h2>
                         {{ $t('finishLessonDescription') }}<br /><br />
                         <ol>

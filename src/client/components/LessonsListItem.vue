@@ -17,8 +17,7 @@
                 </div>
             </div>
             <h3>{{ $t('description') }}</h3>
-            <div class="description" v-html="description">{{ description }}</div>
-            <div class="difficulty"><span class="label">{{ $t('difficulty') }}:</span> {{ model.difficulty }}</div>
+            <div class="description">{{ description }}</div>
         </div>
     </div>
 </template>
@@ -27,6 +26,7 @@
 import Lesson from "~client/models/Lesson";
 import Button from "~client/components/Button";
 import Avatar from "~client/components/Avatar";
+import { unescape } from "~common/utils";
 
 export default {
     components: {
@@ -45,7 +45,7 @@ export default {
     },
     computed: {
         description() {
-            return this.model.description.replace(/\n/g, "<br />");
+            return unescape(this.model[`description_${window.activeUser.locale}`]);
         }
     }
 };
