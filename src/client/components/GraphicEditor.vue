@@ -105,9 +105,10 @@ export default {
         addSelectWatcher(path, model) {
             if (this.watchedObjects.includes(model)) return;
             const activeLayer = this.$refs.graphicViewer.paper.project.activeLayer;
-            const item = activeLayer.getItem({ recursive: true, match: (child) => child.model === model });
+            let item = activeLayer.getItem({ recursive: true, match: (child) => child.model === model });
             this.watchedObjects.push(model);
             this.$watch(path, (newValue) => {
+                if (!item) item = activeLayer.getItem({ recursive: true, match: (child) => child.model === model });
                 if (!item) return;
                 if (!(this.currentTool instanceof Select)) this.setTool(newValue ? "select" : null);
                 item.selected = newValue;
