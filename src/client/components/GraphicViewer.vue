@@ -1,13 +1,13 @@
 <template>
     <div ref="canvasWrapper" class="graphicViewer" @contextmenu="$emit('contextmenu', $event)">
         <img ref="background"
-             style="display: none;"
+             style="opacity: 0; pointer-events: none; z-index: -10; position: absolute"
              v-if="model.file"
              :src="`/files/${model.file._id}/avatar`"
              @load="onBackgroundLoaded($event)"
         />
         <img v-for="(actionObjectMap, index) of actionObjectsMap"
-             style="display: none;"
+             style="opacity: 0; pointer-events: none; z-index: -10; position: absolute"
              :ref="`actionObjectBackground${actionObjectMap.actionObject._id}${index}`"
              :key="`${actionObjectMap.actionObject._id}${index}`"
              :src="`/files/${actionObjectMap.actionObject.sceneObject.file._id}/avatar`"
@@ -310,8 +310,8 @@ export default {
             // click areas. If this is not done and the background is a svg,
             // the background scales on window resize while all other objects
             // are on a fixed position
-            const oldWidth = backgroundRef.naturalWidth;
-            const oldHeight = backgroundRef.naturalHeight;
+            const oldWidth = backgroundRef.naturalWidth || backgroundRef.width || backgroundRef.offsetWidth;
+            const oldHeight = backgroundRef.naturalHeight || backgroundRef.height || backgroundRef.offsetHeight;
             const newWidth = 1080;
             const newHeight = parseInt(oldHeight) * newWidth / parseInt(oldWidth);
             raster.size = new this.paper.Size(newWidth, newHeight);

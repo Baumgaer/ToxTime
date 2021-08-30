@@ -33,7 +33,7 @@
                     ref="nameInput"
                     autocomplete="off"
                     :value="model.getName() ? model.getName() : $t('unnamed')"
-                    @change="onNameChange($event)"
+                    @change.stop.prevent="onNameChange($event)"
                     @keyup.stop.prevent="onNameKeyUp($event)"
                     @mousedown="onMouseDown($event)"
                     @mouseup="onMouseUp($event)"
@@ -206,7 +206,6 @@ export default {
         },
 
         onNameKeyUp(event) {
-            this.model.isSelected = false;
             if (event.key === "Escape") {
                 this.$refs.nameInput.value = this.model.getName();
                 this.$refs.nameInput.blur();
