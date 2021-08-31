@@ -4,7 +4,7 @@
             <component v-if="icon" :is="icon" class="icon"></component>
             <div class="text">{{ $t(this.text) }}</div>
         </div>
-        <img style="opacity: 0; pointer-events: none;" ref="getSizeImage">
+        <img class="getSizeImage" ref="getSizeImage">
         <input type="file" name="file" style="display: none" ref="fileInput" multiple @change="onDrop($event)"/>
     </div>
 </template>
@@ -125,11 +125,11 @@ export default {
                         const img = this.$refs.getSizeImage;
                         img.onload = () => {
                             if (!SVG.hasAttribute("width") || SVG.getAttribute("width").includes("%")) {
-                                SVG.setAttribute("width", img.naturalWidth || img.width);
+                                SVG.setAttribute("width", img.naturalWidth || img.width || 100);
                             }
 
                             if (!SVG.hasAttribute("height") || SVG.getAttribute("height").includes("%")) {
-                                SVG.setAttribute("height", img.naturalHeight || img.height);
+                                SVG.setAttribute("height", img.naturalHeight || img.height || 100);
                             }
 
                             const xml = new XMLSerializer().serializeToString(XMLDOM.documentElement);

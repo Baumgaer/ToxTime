@@ -1,13 +1,13 @@
 <template>
     <div ref="canvasWrapper" class="graphicViewer" @contextmenu="$emit('contextmenu', $event)">
         <img ref="background"
-             style="opacity: 0; pointer-events: none; z-index: -10; position: absolute"
+             class="backgroundImage"
              v-if="model.file"
              :src="`/files/${model.file._id}/avatar`"
              @load="onBackgroundLoaded($event)"
         />
         <img v-for="(actionObjectMap, index) of actionObjectsMap"
-             style="opacity: 0; pointer-events: none; z-index: -10; position: absolute"
+             class="actionObjectBackground"
              :ref="`actionObjectBackground${actionObjectMap.actionObject._id}${index}`"
              :key="`${actionObjectMap.actionObject._id}${index}`"
              :src="`/files/${actionObjectMap.actionObject.sceneObject.file._id}/avatar`"

@@ -155,24 +155,30 @@ export default class WebServer {
             const contentSecurityNonce = uuidV4();
             response.locals.cspNonce = contentSecurityNonce;
 
-            const styleSrc = ["'self'"];
-            const scriptSrc = styleSrc;
-            const imgSrc = [].concat(styleSrc);
+            const all = ["'self'", "'unsafe-hashes'"];
             if (process.environment.NODE_ENV === 'development') {
-                styleSrc.push("'unsafe-eval'", "'unsafe-inline'");
+                all.push("'unsafe-eval'", "'unsafe-inline'");
             } else {
-                styleSrc.push(`'nonce-${contentSecurityNonce}'`);
-                styleSrc.push("'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='");
-                styleSrc.push("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
-                styleSrc.push("'sha256-Y5HGV3cmFL1QmdV9FMkQjm7MR7FR+stNxbf9+GKET60='");
+                all.push(`'nonce-${contentSecurityNonce}'`);
+                all.push("'sha256-pF+2LIv1zhSRXxRf8gaMyyZXQRwD9RS8NOXRN67phY0='");
+                all.push("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
+                all.push("'sha256-Y5HGV3cmFL1QmdV9FMkQjm7MR7FR+stNxbf9+GKET60='");
+                all.push("'sha256-APej8Tb1ZgQYTYDKE2e8AE9CMndApxPFQeDe9xwp/VU='");
             }
 
-            imgSrc.push("data:");
+            const styleSrc = all.slice();
+            const scriptSrc = all.slice();
             scriptSrc.push("blob:");
+
+            const imgSrc = all.slice();
+            imgSrc.push("data:");
+
+            const workerSrc = all.slice();
+            workerSrc.push("blob:");
 
             const helmetMiddleWare = helmet({
                 contentSecurityPolicy: {
-                    directives: { defaultSrc: ["'self'"], scriptSrc, styleSrc, imgSrc }
+                    directives: { defaultSrc: ["'self'"], scriptSrc, styleSrc, imgSrc, workerSrc }
                 }
             });
             helmetMiddleWare(request, response, next);
