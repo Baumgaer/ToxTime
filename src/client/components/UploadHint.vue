@@ -102,47 +102,50 @@ export default {
             // We only want to fix SVG
             if (!file.type.includes("svg")) return Promise.resolve(file);
 
-            const text = await file.text();
-            const parser = new DOMParser();
+            let text = await file.text();
 
-            try {
-                // Maybe the file was a fake and it cant be parsed correctly
-                const XMLDOM = parser.parseFromString(text, "text/xml");
-                if (!XMLDOM) return Promise.resolve(file);
+            /**
+             * @param {string} content
+             * @param {string} attributeName
+             */
+            const setAttribute = (content, attributeName) => {
+                const svgRegex = new RegExp("<svg .*?>");
+                const attributeRegex = new RegExp(`${attributeName}="([\\s\\S]+?)"`);
+                const viewBoxRegex = new RegExp(`viewBox="([\\s\\S]+?)"`);
 
-                // Maybe the file was a fake and there is no SVG element
-                const SVG = XMLDOM.getElementsByTagName("svg")[0];
-                if (!SVG) return Promise.resolve(file);
+                const svgTag = content.match(svgRegex);
+                if (!svgTag) return content;
 
-                // We only want to fix SVG when it hasn't any of the dimensions or any of them is in percent
-                const hasNonePercentWidth = SVG.hasAttribute("width") && !SVG.getAttribute("width").includes("%");
-                const hasNonePercentHeight = SVG.hasAttribute("height") && !SVG.getAttribute("height").includes("%");
-                if (hasNonePercentWidth && hasNonePercentHeight) return Promise.resolve(file);
+                const attribute = svgTag[0].match(attributeRegex);
+                const viewBox = svgTag[0].match(viewBoxRegex);
 
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = this.$refs.getSizeImage;
-                        img.onload = () => {
-                            if (!SVG.hasAttribute("width") || SVG.getAttribute("width").includes("%")) {
-                                SVG.setAttribute("width", img.naturalWidth || img.width || 100);
-                            }
+                const before = content.substring(0, svgTag.index);
+                const after = content.substring(svgTag.index + svgTag[0].length);
 
-                            if (!SVG.hasAttribute("height") || SVG.getAttribute("height").includes("%")) {
-                                SVG.setAttribute("height", img.naturalHeight || img.height || 100);
-                            }
+                let result = before;
+                if (!attribute || attribute[1].includes("%")) {
+                    let dimensions = {width: "1920", height: "1080"};
+                    if (viewBox) dimensions = {width: viewBox[1].split(" ")[2], height: viewBox[1].split(" ")[3]};
+                    if (attribute) {
+                        result += svgTag[0].substring(0, attribute.index);
+                    } else result += "<svg ";
+                    result += `${attributeName}="${dimensions[attributeName]}"`;
+                    if (attribute) {
+                        result += svgTag[0].substring(attribute.index + attribute[0].length);
+                    } else result += svgTag[0].substring(4);
+                    result += after;
+                }
 
-                            const xml = new XMLSerializer().serializeToString(XMLDOM.documentElement);
-                            const blob = new Blob([xml], { type: file.type });
-                            resolve(new File([blob], file.name, { type: file.type, lastModified: file.lastModified }));
-                        };
-                        img.setAttribute("src", event.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            } catch (error) {
-                return Promise.resolve(file);
-            }
+                return result;
+            };
+
+            text = setAttribute(text, "width");
+            text = setAttribute(text, "height");
+
+            return new Promise((resolve) => {
+                const blob = new Blob([text], { type: file.type });
+                resolve(new File([blob], file.name, { type: file.type, lastModified: file.lastModified }));
+            });
         },
 
         removeEventListeners() {
