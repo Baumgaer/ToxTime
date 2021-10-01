@@ -51,7 +51,7 @@ import CheckIcon from "vue-material-design-icons/Check";
 import CrownIcon from "vue-material-design-icons/Crown";
 import ContentSaveIcon from "vue-material-design-icons/ContentSave";
 import CloseIcon from "vue-material-design-icons/Close";
-import HandLeftIcon from "vue-material-design-icons/HandLeft";
+import HandLeftIcon from "vue-material-design-icons/HandBackLeft";
 import VectorPolygonIcon from "vue-material-design-icons/VectorPolygon";
 import CursorDefaultClickIcon from "vue-material-design-icons/CursorDefaultClick";
 import ArrangeBringForwardIcon from "vue-material-design-icons/ArrangeBringForward";
