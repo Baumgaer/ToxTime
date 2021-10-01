@@ -16,6 +16,14 @@ export default {
         window.$t = this.$t.bind(this);
         window.$toasted = this.$toasted;
 
+        window.onerror = (message, source, lineno, colno) => {
+            const errorMessage = `${message} in ${source} on line ${lineno}:${colno}`;
+            this.$toasted.error(errorMessage);
+            ApiClient.post("/error", {
+                error: errorMessage
+            });
+        };
+
         window.missingRequirementsMessageTrigger = (model) => {
             const errorList = Object.keys(model.lastOccurredErrors).map((errorKey, index) => {
                 const props = model.lastOccurredErrors[errorKey].properties;
