@@ -29,6 +29,7 @@ export default class BaseModel {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            default: null,
             sticky: true,
             ignoreOnIteration: true,
             ignoreOnValidation: true,
