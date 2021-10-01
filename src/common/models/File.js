@@ -28,12 +28,14 @@ export function FileMixinClass(MixinClass) {
             },
             size: {
                 type: Number,
-                required: true
+                required: true,
+                default: null
             },
             mime: {
                 type: String,
                 required: true,
-                set: escape
+                set: escape,
+                default: null
             },
             labels: {
                 type: [{ type: Schema.Types.ObjectId, ref: "Label", autopopulate: true }],

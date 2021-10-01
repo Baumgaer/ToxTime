@@ -24,6 +24,7 @@ export function UserMixinClass(MixinClass) {
                 unique: true,
                 lowercase: true,
                 trim: true,
+                default: null,
                 set: escape,
                 validate: {
                     validator: (value) => {

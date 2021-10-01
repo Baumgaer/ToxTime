@@ -96,18 +96,18 @@
                 <div v-for="(goal, index) of model.goals" :key="`goal_${index}`" class="goal">
                     <div class="action" @click="onGoalRemoveButtonClick(index)"><close-thick-icon /></div>
                     <div class="name">
-                        <input type="text" v-model="model.goals[index]['name_de-de']" :ref="`goal_${index}_name_de-de`" :placeholder="$t('goalDescriptionDe')">
-                        <input type="text" v-model="model.goals[index]['name_en-us']" :ref="`goal_${index}_name_en-us`" :placeholder="$t('goalDescriptionEn')">
+                        <input type="text" v-model="model.goals[index]['name_de-de']" :ref="`goal_${index}_name_de-de`" :placeholder="$t('goalsName_de-de')">
+                        <input type="text" v-model="model.goals[index]['name_en-us']" :ref="`goal_${index}_name_en-us`" :placeholder="$t('goalsName_en-us')">
                     </div>
                     <div class="points">
                         <input type="number" v-model="model.goals[index].points" :ref="`goal_${index}_points`" value="0">
                     </div>
                 </div>
-                <div class="goal" ref="goalPlaceholder">
-                    <div class="action"><close-thick-icon /></div>
+                <div class="goal placeholder" ref="goalPlaceholder">
+                    <div class="action"><!--<close-thick-icon />--></div>
                     <div class="name">
-                        <input type="text" :placeholder="$t('goalDescriptionDe')" @focus="onGoalPlaceholderClick('name_de-de')">
-                        <input type="text" :placeholder="$t('goalDescriptionEn')" @focus="onGoalPlaceholderClick('name_en-us')">
+                        <input type="text" :placeholder="$t('goalsName_de-de')" @focus="onGoalPlaceholderClick('name_de-de')">
+                        <input type="text" :placeholder="$t('goalsName_en-us')" @focus="onGoalPlaceholderClick('name_en-us')">
                     </div>
                     <div class="points">
                         <input type="number" value="0" @focus="onGoalPlaceholderClick('points')">

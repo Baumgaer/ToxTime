@@ -78,7 +78,8 @@ export function GameSessionMixinClass(MixinClass) {
             grade: {
                 type: Number,
                 min: 0,
-                max: 100
+                max: 100,
+                default: 0
             },
             protocol: {
                 type: [
@@ -86,22 +87,26 @@ export function GameSessionMixinClass(MixinClass) {
                         type: new Schema({
                             time: {
                                 type: Date,
-                                required: true
+                                required: true,
+                                default: null
                             },
                             type: {
                                 type: String,
                                 enum: ["add", "remove", "show", "hide", "exec"],
                                 required: true,
-                                set: escape
+                                set: escape,
+                                default: null
                             },
                             location: {
                                 type: String,
                                 enum: ["inventory", "hand", "scene", "knowledgeBase", "tablet", ""],
-                                set: escape
+                                set: escape,
+                                default: null
                             },
                             object: {
                                 type: String,
                                 required: true,
+                                default: null,
                                 validate: {
                                     validator: (value) => {
                                         if (typeof value !== "string") return false;

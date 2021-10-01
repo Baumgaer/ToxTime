@@ -23,6 +23,8 @@ export default class ClientModel extends BaseModel {
 
     isSelected = false;
 
+    lastOccurredErrors = {};
+
     /**
      * Builds the essential export for client side with a RawClass, a Schema and the Model
      *
@@ -96,8 +98,10 @@ export default class ClientModel extends BaseModel {
     }
 
     isValid() {
+        this.lastOccurredErrors = {};
         const validationObject = {};
         eachDeep(resolveProxy(this), (value, key, parentValue, context) => {
+            if (key === "schema") return false;
             if (!context.path) return;
             if (context.isCircular) return false;
 
@@ -130,7 +134,10 @@ export default class ClientModel extends BaseModel {
             }
         }
         if (!Object.keys(result.errors).length) return true;
-        if (result instanceof Error) return false;
+        if (result instanceof Error) {
+            this.lastOccurredErrors = result.errors;
+            return false;
+        }
         return true;
     }
 

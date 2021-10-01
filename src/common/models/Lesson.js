@@ -37,6 +37,13 @@ export function LessonMixinClass(MixinClass) {
                 type: [
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }
                 ],
+                validate: {
+                    validator: (value) => {
+                        return value && value.length > 0;
+                    },
+                    name: "notEnoughScenes",
+                    type: "required"
+                },
                 sticky: true,
                 required: true,
                 default: [],
@@ -119,6 +126,13 @@ export function LessonMixinClass(MixinClass) {
                         })
                     }
                 ],
+                validate: {
+                    validator: (value) => {
+                        return value && value.length > 0;
+                    },
+                    name: "notEnoughGoals",
+                    type: "required"
+                },
                 required: true,
                 default: []
             },

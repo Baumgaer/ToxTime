@@ -22,11 +22,18 @@ export function RequisiteMixinClass(MixinClass) {
             },
             file: {
                 type: Schema.Types.ObjectId,
-                required: true,
+                default: null,
                 sticky: true,
                 ref: "File",
                 ignoreOnIteration: true,
-                autopopulate: true
+                autopopulate: true,
+                validate: {
+                    validator: (value) => {
+                        return Boolean(value);
+                    },
+                    name: "background",
+                    type: "required"
+                }
             },
             clickAreas: {
                 type: [

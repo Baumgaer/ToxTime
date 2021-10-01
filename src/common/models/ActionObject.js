@@ -33,6 +33,7 @@ export function ActionObjectMixinClass(MixinClass) {
                 type: Schema.Types.ObjectId,
                 ref: "SceneObject",
                 required: true,
+                default: null,
                 autopopulate: true,
                 sticky: true
             }

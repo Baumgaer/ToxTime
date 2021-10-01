@@ -78,7 +78,7 @@ export default {
     },
     methods: {
         async onSaveClick() {
-            if (this.model.isValid()) return this.onSaveButtonClick();
+            if (!this.model || this.model.isValid()) return this.onSaveButtonClick();
             window.missingRequirementsMessageTrigger(this.model);
         },
 
