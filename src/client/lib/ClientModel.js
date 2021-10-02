@@ -35,7 +35,7 @@ export default class ClientModel extends BaseModel {
      * @returns { {RawClass: T, Schema: import("mongoose").Schema<T>, Model: T} }
      */
     static buildClientExport(RawClass) {
-        const schema = this.buildSchema(RawClass);
+        const schema = this.buildSchema(RawClass, false);
 
         this.schemaObject = schema.obj;
 
@@ -98,6 +98,7 @@ export default class ClientModel extends BaseModel {
     }
 
     isValid() {
+        this.schema.strict = false;
         this.lastOccurredErrors = {};
         const validationObject = {};
         eachDeep(resolveProxy(this), (value, key, parentValue, context) => {
@@ -109,7 +110,7 @@ export default class ClientModel extends BaseModel {
             if (key in thisSchemaObject && thisSchemaObject[key].ignoreOnValidation) return false;
 
             // We don't want to assign original data to break out from circular structures on validation
-            if (isValue(value) && isObjectLike(value)) return;
+            if (isValue(value) && isObjectLike(value)) return; // value = cloneDeep(resolveProxy(value));
 
             const parentIsModel = isValue(parentValue) && isObjectLike(parentValue) && parentValue instanceof ClientModel;
             const parentKey = context.path?.[context.path.length - 1];
@@ -122,6 +123,10 @@ export default class ClientModel extends BaseModel {
 
             set(validationObject, context.path, resolveProxy(value));
         }, { checkCircular: true, pathFormat: "array" });
+
+        // To be able to check values of object like properties, we assign the
+        // original model to the validation object to be able to access that properties
+        validationObject.originalModel = this;
         const tempDocument = new Document(validationObject, this.schema);
         const result = tempDocument.validateSync();
 

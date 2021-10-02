@@ -1,5 +1,5 @@
 <template>
-    <div class="graphicEditor" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
+    <div :class="`graphicEditor ${model.lastOccurredErrors.file ? 'errorField' : ''}`" @drop="onInternalDrop($event)" @dragover.prevent="onInternalDragOver($event)" @dragenter.prevent>
         <EditorHead
             ref="editorHead"
             :model="model"

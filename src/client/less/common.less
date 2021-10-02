@@ -58,6 +58,18 @@
     }
 }
 
+.errorField {
+    border: 1px solid @failColor !important;
+    background-color: lighten(@failColor, 30%);
+    color: @white;
+
+    &:focus {
+        border: inherit;
+        background-color: inherit;
+        color: inherit;
+    }
+}
+
 .tippy-box {
     &[data-theme$="tablet"] {
         .tippy-content {

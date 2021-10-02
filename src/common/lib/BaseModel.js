@@ -85,10 +85,11 @@ export default class BaseModel {
      * @static
      * @template T
      * @param {T} RawClass
+     * @param {boolean} [strict=false]
      * @returns {Schema<T>}
      * @memberof BaseModel
      */
-    static buildSchema(RawClass) {
+    static buildSchema(RawClass, strict = true) {
         let schemaDeclaration = {};
         const prototypeSchemas = [RawClass.schemaDefinition || {}];
         let proto = Object.getPrototypeOf(RawClass);
@@ -101,7 +102,8 @@ export default class BaseModel {
             collection: RawClass.dataCollectionName,
             discriminatorKey: "className",
             toObject: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) },
-            toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) }
+            toJSON: { transform: (doc, ret) => dataTransformer(doc, ret, RawClass) },
+            strict: strict
         });
         schema.loadClass(RawClass);
         return schema;

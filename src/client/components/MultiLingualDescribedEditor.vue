@@ -2,14 +2,14 @@
     <div class="multiLingualDescribedEditor">
         <h3>{{ $t("description_de-de") }}</h3>
         <section><textarea-autosize
-            class="description"
+            :class="`description ${model.lastOccurredErrors[`${prefix}_de-de`] ? 'errorField' : ''}`"
             :placeholder="$t('description_de-de')"
             v-model="deDescription"
             :min-height="100"
         /></section>
         <h3>{{ $t("description_en-us") }}</h3>
         <section><textarea-autosize
-            class="description"
+            :class="`description ${model.lastOccurredErrors[`${prefix}_de-de`] ? 'errorField' : ''}`"
             :placeholder="$t('description_en-us')"
             v-model="enDescription"
             :min-height="100"

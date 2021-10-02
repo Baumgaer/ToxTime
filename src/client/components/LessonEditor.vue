@@ -12,7 +12,7 @@
                 </Button>
             </section>
             <h3>{{ $t("scenes") }}</h3>
-            <section class="itemList">
+            <section :class="`itemList ${model.lastOccurredErrors.scenes ? 'errorField' : ''}`">
                 <Avatar
                     v-for="(scene, index) of model.scenes"
                     :key="scene._id"
@@ -87,7 +87,7 @@
                 </RecipeViewer>
             </section>
             <h3>{{ $t("goals") }} <span class="points">{{ $t("points") }}: {{ model.getGoalPoints() }}</span></h3>
-            <section class="goalList">
+            <section :class="`goalList ${model.lastOccurredErrors.goals ? 'errorField' : ''}`">
                 <div class="goalsHead">
                     <div class="action"></div>
                     <div class="names">{{ $t('description') }}</div>
@@ -96,8 +96,8 @@
                 <div v-for="(goal, index) of model.goals" :key="`goal_${index}`" class="goal">
                     <div class="action" @click="onGoalRemoveButtonClick(index)"><close-thick-icon /></div>
                     <div class="name">
-                        <input type="text" v-model="model.goals[index]['name_de-de']" :ref="`goal_${index}_name_de-de`" :placeholder="$t('goalsName_de-de')">
-                        <input type="text" v-model="model.goals[index]['name_en-us']" :ref="`goal_${index}_name_en-us`" :placeholder="$t('goalsName_en-us')">
+                        <input type="text" :class="`${model.lastOccurredErrors[`goals.${index}.name_de-de`] ? 'errorField' : ''}`" v-model="model.goals[index]['name_de-de']" :ref="`goal_${index}_name_de-de`" :placeholder="$t('goalsName_de-de')">
+                        <input type="text" :class="`${model.lastOccurredErrors[`goals.${index}.name_en-us`] ? 'errorField' : ''}`" v-model="model.goals[index]['name_en-us']" :ref="`goal_${index}_name_en-us`" :placeholder="$t('goalsName_en-us')">
                     </div>
                     <div class="points">
                         <input type="number" v-model="model.goals[index].points" :ref="`goal_${index}_points`" value="0">

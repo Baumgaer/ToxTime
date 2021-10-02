@@ -38,8 +38,9 @@ export function LessonMixinClass(MixinClass) {
                     { type: Schema.Types.ObjectId, ref: "Scene", autopopulate: true }
                 ],
                 validate: {
-                    validator: (value) => {
-                        return value && value.length > 0;
+                    validator: function (value) {
+                        const valueToCheck = this.originalModel?.scenes || value;
+                        return valueToCheck && valueToCheck.length > 0;
                     },
                     name: "notEnoughScenes",
                     type: "required"
