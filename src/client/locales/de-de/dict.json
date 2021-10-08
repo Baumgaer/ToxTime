@@ -200,5 +200,8 @@
     "invalid": "Ungültig",
     "background": "Hintergrund",
     "errorDescription_de-de": "Deutsche Fehlerbeschreibung",
-    "errorDescription_en-us": "Englische Fehlerbeschreibung"
+    "errorDescription_en-us": "Englische Fehlerbeschreibung",
+    "notEnoughScenes": "Nicht genügend Szenen",
+    "notEnoughGoals": "Nicht genügend Ziele",
+    "notAModelString": "Das ist keine gültige Objektidentifikation"
 }

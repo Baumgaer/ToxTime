@@ -200,5 +200,8 @@
     "invalid": "Invalid",
     "background": "Background",
     "errorDescription_de-de": "German error description",
-    "errorDescription_en-us": "English error description"
+    "errorDescription_en-us": "English error description",
+    "notEnoughScenes": "Not enough scenes",
+    "notEnoughGoals": "Not enough goals",
+    "notAModelString": "This is not an valid object identifier"
 }
