@@ -163,8 +163,7 @@ export function LessonMixinClass(MixinClass) {
          */
         getOverwrite(model, property) {
             const ownOverwrite = () => {
-                if (!(model._id in this.overwrites) || !isValue(this.overwrites[model._id])) return null;
-                return this.overwrites[model._id][property] ?? null;
+                return this.overwrites[model._id]?.[property] ?? null;
             };
 
             const entity = this.getEntity(model);

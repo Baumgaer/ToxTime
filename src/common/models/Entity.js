@@ -78,8 +78,7 @@ export function EntityMixinClass(MixinClass) {
         getOverwrite(model, property) {
             if (property === "activated") return this.currentPhenotype === model;
             const bucket = this.getBestBucket(model);
-            if (!this.overwrites[bucket] && !isValue(this.overwrites[bucket])) this.overwrites[bucket] = {};
-            return this.overwrites[bucket][property] ?? null;
+            return this.overwrites[bucket]?.[property] ?? null;
         }
 
         /**
