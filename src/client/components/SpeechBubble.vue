@@ -112,7 +112,8 @@ export default {
         },
         async next(recipe) {
             if (!recipe || recipe instanceof Event) recipe = this.model.recipe;
-            if (!window.activeUser.editingModel.isValidRecipe(recipe)) {
+            if (!recipe) return;
+            if (!window.activeUser.editingModel.isValidRecipe(recipe, null, true)) {
                 this.preparedContent = null;
                 this.property = "error";
             } else {
