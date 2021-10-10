@@ -346,7 +346,7 @@ export default {
                     if (clickedModel) {
                         resources = [clickedModel, ...clickedModel.getLabels(), ...flatten(this.model.grabbing.map((item) => item.getResources()))];
                     }
-                    if (this.model.isValidRecipe(recipeItemObject, resources)) this.execRecipe(recipeItemObject);
+                    if (this.model.isValidRecipe(recipeItemObject, resources, true)) this.execRecipe(recipeItemObject);
                 } else if (recipeItemObject instanceof SpeechBubble.RawClass) {
                     const id = this.model.currentScene._id;
                     const scene = this.$refs[`scene_${id}`][0];
