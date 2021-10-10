@@ -19,7 +19,7 @@
 
 <script>
 import MultiLingualDescribed from "~client/models/MultiLingualDescribed";
-import { unescape } from "~common/utils";
+import { unescape, escape } from "~common/utils";
 
 export default {
     props: {
@@ -73,7 +73,7 @@ export default {
             if (this[language].timeout) clearTimeout(this[language].timeout);
             this[language].timeout = setTimeout(() => {
                 const str = this.model[`${this.prefix}_${language}`];
-                if (str !== value) this.model[`${this.prefix}_${language}`] = value;
+                if (str !== escape(value)) this.model[`${this.prefix}_${language}`] = value;
                 this[language].timeout = null;
             }, 300);
         }
