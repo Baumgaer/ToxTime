@@ -79,9 +79,10 @@
                     :ref="`recipe${index}`"
                 >
                     <div class="modifiedIndicator" :title="$t('modified')" v-if="hasOverwrites(recipe)"></div>
-                    <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) ? $t('remove') : $t('restore')">
+                    <div class="closeIcon" :title="!model.excludedRecipes.includes(recipe) || recipe.deleted ? $t('remove') : $t('restore')">
                         <component v-if="!model.excludedRecipes.includes(recipe)" :is="'close-icon'" class="closeIcon" @click.stop="onRecipeRemoveClick(recipe)"/>
-                        <component v-else :is="'delete-restore-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
+                        <component v-else-if="!recipe.deleted" :is="'delete-restore-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
+                        <component v-else :is="'close-icon'" class="closeIcon" @click.stop="onRecipeRestoreClick(recipe)"/>
                     </div>
                     <div class="name">{{ recipe.name }}</div>
                 </RecipeViewer>
@@ -352,7 +353,13 @@ export default {
             const addedRecipes = this.model.addedRecipes;
             if (addedRecipes.includes(recipe)) {
                 addedRecipes.splice(addedRecipes.indexOf(recipe), 1);
-            } else this.model.excludedRecipes.push(recipe);
+            } else if (!recipe.deleted) {
+                this.model.excludedRecipes.push(recipe);
+            } else {
+                const autoDetected = this.model.autoDetectedRecipes;
+                const index = autoDetected.indexOf(recipe);
+                if (index >= 0) autoDetected.splice(index, 1);
+            }
             this.onCalculateButtonClick();
         },
 
@@ -416,7 +423,7 @@ export default {
 
         onCalculateButtonClick() {
             const result = this.model.findRecipes();
-            this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludedRecipes.includes(recipe));
+            this.model.autoDetectedRecipes = result.filter((recipe) => !this.model.excludedRecipes.includes(recipe) && !recipe.deleted);
         },
 
         onGoalPlaceholderClick(field) {

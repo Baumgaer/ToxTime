@@ -32,22 +32,50 @@ export default {
             default: "description"
         }
     },
+    data() {
+        return {
+            "en-us": {
+                cache: "",
+                timeout: null
+            },
+            "de-de": {
+                cache: "",
+                timeout: null
+            }
+        };
+    },
     computed: {
         enDescription: {
             get() {
-                return unescape(this.model[`${this.prefix}_en-us`]);
+                return this.getValue("en-us");
             },
             set(value) {
-                this.model[`${this.prefix}_en-us`] = value;
+                this.setValue(value, "en-us");
             }
         },
         deDescription: {
             get() {
-                return unescape(this.model[`${this.prefix}_de-de`]);
+                return this.getValue("de-de");
             },
             set(value) {
-                this.model[`${this.prefix}_de-de`] = value;
+                this.setValue(value, "de-de");
             }
+        }
+    },
+    methods: {
+        getValue(language) {
+            const str = this.model[`${this.prefix}_${language}`];
+            if (this[language].timeout || str === this[language].cache) return this[language].cache;
+            return unescape(str);
+        },
+        setValue(value, language) {
+            this[language].cache = value;
+            if (this[language].timeout) clearTimeout(this[language].timeout);
+            this[language].timeout = setTimeout(() => {
+                const str = this.model[`${this.prefix}_${language}`];
+                if (str !== value) this.model[`${this.prefix}_${language}`] = value;
+                this[language].timeout = null;
+            }, 300);
         }
     }
 };
