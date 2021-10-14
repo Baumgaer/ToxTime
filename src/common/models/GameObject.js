@@ -22,7 +22,7 @@ export function GameObjectMixinClass(MixinClass) {
             position: {
                 type: [Number],
                 required: true,
-                default: [],
+                default: null, // Has to be null to be able to determine if there was a position assigned
                 ignoreOnIteration: true
             },
             layer: {
