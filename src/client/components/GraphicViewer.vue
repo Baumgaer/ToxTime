@@ -93,9 +93,9 @@ export default {
                         if (prev) prev.resolve = resolve;
                     });
                     if (!map[map.length - 1]) promise = null;
-                    map.push({ actionObject, ownerGroupModel, promise, next: function() {
+                    map.push({ actionObject, ownerGroupModel, promise, next: async function() {
                         if (this === map[map.length - 1]) {
-                            that.setupClickAreas({ sceneObject: that.model }, that.paper.project.activeLayer);
+                            await that.setupClickAreas({ sceneObject: that.model }, that.paper.project.activeLayer);
                             that.adjustViewToBorder();
                         }
                         if (this.resolved) return;
@@ -150,6 +150,7 @@ export default {
         }
     },
     mounted() {
+        window.activeEditor = this;
         this.initialBackgroundLoadedPromise = new Promise((resolve) => this.initialBackgroundLoadedResolver = resolve);
         if (!this.model.file) this.initialBackgroundLoadedResolver();
         this.paper.setup(this.$refs.canvas);
@@ -163,7 +164,7 @@ export default {
         if (this.adjustToBorder) this.paper.view.onResize = this.adjustViewToBorder.bind(this);
     },
     methods: {
-        onBackgroundLoaded() {
+        async onBackgroundLoaded() {
             this.paper.activate();
             if (this.paper.view.background) this.paper.view.background.remove();
             const raster = this.buildRaster(this.$refs.background);
@@ -176,7 +177,7 @@ export default {
             this.paper.view.update();
             this.initialBackgroundLoadedResolver();
             if (!this.actionObjectsMap.length) {
-                this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
+                await this.setupClickAreas({ sceneObject: this.model }, this.paper.project.activeLayer);
                 this.adjustViewToBorder();
             }
         },
@@ -205,7 +206,7 @@ export default {
             }
 
             const group = this.buildActionObjectGroup(actionObjectMap, index);
-            this.setupClickAreas(actionObject, group, this.showClickAreas);
+            await this.setupClickAreas(actionObject, group, this.showClickAreas);
             group.onClick = (event) => this.clickFunction(event, group, actionObject);
 
             // Process sub action objects

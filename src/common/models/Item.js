@@ -43,6 +43,7 @@ export function ItemMixinClass(MixinClass) {
         };
 
         getSubObjects() {
+            if (!this.actionObject && !this.sceneObject) return [];
             return [this.actionObject || this.sceneObject];
         }
 
