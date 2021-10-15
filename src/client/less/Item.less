@@ -15,6 +15,9 @@
     transition: opacity @transitionConfig, background-color @transitionConfig;
     cursor: pointer;
 
+    content-visibility: auto;
+    contain-intrinsic-size: 345px 40px;
+
     &[draggable~="true"] {
         cursor: grab;
     }
@@ -22,6 +25,9 @@
     &.withChildren {
         grid-template-columns: @collapseSize @height 1fr;
         grid-template-areas: "collapse avatar info" "collapse avatar info";
+
+        content-visibility: visible;
+        contain-intrinsic-size: unset;
 
         .expandCollapseButton {
             display: flex;
@@ -155,6 +161,8 @@
 
     .avatar {
         grid-area: avatar;
+        content-visibility: auto;
+        contain-intrinsic-size: 40px 40px;
     }
 
     .checkbox {
@@ -238,6 +246,12 @@
             grid-template-rows: @halfHeight;
             grid-template-areas: "avatar info" "avatar info";
             border: none;
+
+            // contain-intrinsic-size: 345px 15px;
+
+            .avatar {
+                contain-intrinsic-size: 15px 15px;
+            }
 
             .info {
                 input {
