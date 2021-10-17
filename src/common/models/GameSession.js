@@ -59,10 +59,9 @@ export function GameSessionMixinClass(MixinClass) {
                 default: []
             },
             notes: {
-                type: [{ type: String }],
+                type: [{ type: String, set: escape }],
                 required: true,
-                default: [],
-                set: escape
+                default: []
             },
             answer: {
                 type: Number,
